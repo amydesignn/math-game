@@ -10,7 +10,7 @@ import BlobShadow from './BlobShadow'
  * tapping the ground), crossfading between idle and walk. Writes its own
  * position into `posRef` each frame so the pet can follow.
  */
-export default function Character({ id, targetRef, posRef }) {
+export default function Character({ id, start = [0, 0], targetRef, posRef }) {
   const group = useRef()
   const { scene, animations } = useGLTF(modelUrl('characters', id))
   // Clone so animations get their own mixer and swapping characters is clean.
@@ -65,7 +65,7 @@ export default function Character({ id, targetRef, posRef }) {
   })
 
   return (
-    <group ref={group}>
+    <group ref={group} position={[start[0], 0, start[1]]}>
       <BlobShadow radius={0.55} />
       <group scale={WORLD.characterScale}>
         <primitive object={model} />

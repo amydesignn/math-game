@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { WORLD } from '../config'
-import { DECOR } from '../world/Prop'
+import { MAPS } from '../maps'
 
 const SIZE = 104 // css px, drawn 2x for retina
 
@@ -9,7 +9,7 @@ const SIZE = 104 // css px, drawn 2x for retina
  * the world), with the scenery as fixed dots and Ivy + her pet as live dots.
  * Reads positions from refs each frame — no React re-renders.
  */
-export default function Minimap({ charPosRef, petPosRef }) {
+export default function Minimap({ map, charPosRef, petPosRef }) {
   const canvas = useRef()
 
   useEffect(() => {
@@ -25,18 +25,29 @@ export default function Minimap({ charPosRef, petPosRef }) {
     const draw = () => {
       ctx.clearRect(0, 0, SIZE * 2, SIZE * 2)
 
-      // the map itself — same green as the world's playable ground
-      ctx.fillStyle = '#c7e6b8'
+      // the map itself — same color as this world's playable ground
+      ctx.fillStyle = map.ground
       ctx.beginPath()
       ctx.roundRect(0, 0, SIZE * 2, SIZE * 2, 24)
       ctx.fill()
 
       // scenery (static)
       ctx.fillStyle = 'rgba(74,61,122,0.35)' // lilac-900 @ 35%
-      for (const d of DECOR) {
+      for (const d of map.decor) {
         ctx.beginPath()
         ctx.arc(toPx(d.position[0]), toPx(d.position[2]), 5, 0, Math.PI * 2)
         ctx.fill()
+      }
+
+      // gates — glowing dots in the color of the map they lead to
+      for (const g of map.gates) {
+        ctx.fillStyle = MAPS[g.to].gateColor
+        ctx.strokeStyle = '#ffffff'
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        ctx.arc(toPx(g.position[0]), toPx(g.position[2]), 7, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
       }
 
       // pet (gold, so it reads as "the companion")
@@ -60,7 +71,7 @@ export default function Minimap({ charPosRef, petPosRef }) {
     }
     raf = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(raf)
-  }, [charPosRef, petPosRef])
+  }, [map, charPosRef, petPosRef])
 
   return (
     <canvas

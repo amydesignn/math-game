@@ -27,6 +27,33 @@ to earn gems; gems buy assets she places to build a small world.
 - **B — math loop** (problems → gems; times tables first, then Y5/6 curriculum) — next
 - **C — shop + placement** (buy assets, drag onto the map) — the hard part (3D drag/raycast/snap/persist)
 
+## Maps (added 2026-07-16)
+The world is now **3 maps** Ivy discovers by walking into **gates** (two columns
++ a pulsing glow ring; the glow is the color of the map it leads to — color IS
+the signpost, no text). Chain: **Forest Clearing** (teal-green) ↔ **Sunny Town**
+(orange sand, building-kit houses/pavilion/market) ↔ **Rosy Garden** (pink,
+ruined colonnade + flower beds). Everything else is shared: same character, same
+pet, same camera/minimap/bounds.
+- `src/maps.js` = the whole registry: per-map ground/outside/sky colors,
+  `gateColor`, decor list (props from ANY pack via a `pack` field), gates, plus
+  `house()`/`pavilion()` composers for building-kit structures (BS=0.8 scale —
+  full-size kit walls tower 3× over the mini characters).
+- Travel: proximity check in `Scene` (radius 1.7 — forgiving because tap-walks
+  stop at the ring's edge; 1.15 was too tight, real fix from QA), white fade in
+  App, arrival just inside the reciprocal gate (`arrivalPoint`, pulled 2.4
+  inward so it doesn't re-trigger), map-name toast, camera SNAP on scene mount
+  (the fade hides it — without it the follow-cam swooshes across the new map).
+- `store.js` persists `map` — she resumes where she left. Old saves merge to
+  'clearing'.
+- Minimap redraws per map (its own ground color + decor dots + gate dots in
+  destination colors).
+- `public/models/building/` = kenney_building-kit subset (12 pieces), own
+  `Textures/` (texture-collision rule). Source pack in `~/Downloads/Math game/New map/`.
+- Preload: current map at once, all maps after 3.5s idle — gate travel never
+  pops in raw.
+- **Reusable skill exists:** `~/.claude/skills/wander-world/SKILL.md` — how to
+  add a map or spin up a whole new wander-world app from this template.
+
 ## Stack & layout
 - **Stack:** React 19 + Vite 8 + Tailwind 3 + **react-three-fiber 9 / drei 10 / three 0.185** (matches the Ivy Planner baseline; R3F chosen so the 2D UI stays inside the house design system and Oscar can design it — Babylon would wall off the UI layer).
 - **Run:** `npm run dev` (port 5180) · **Build:** `npm run build` · **Lint:** `npm run lint` (oxlint)

@@ -1,14 +1,58 @@
-import { Suspense, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import Scene from './world/Scene'
 import Minimap from './ui/Minimap'
-import { getState } from './store'
+import { getState, setMap } from './store'
 import { WORLD } from './config'
+import { MAPS, arrivalPoint, preloadMap } from './maps'
+
+const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
 
 export default function App() {
   const [state] = useState(getState)
   const [moved, setMoved] = useState(false)
+
+  // ── Maps: which one we're in, where this visit starts, travel fade + toast ──
+  const [mapId, setMapId] = useState(() => (MAPS[state.map] ? state.map : 'clearing'))
+  const [spawn, setSpawn] = useState([0, 0])
+  const [fading, setFading] = useState(false)
+  const [toast, setToast] = useState(null)
+  const travelling = useRef(false)
+  const toastTimer = useRef()
+
+  function travel(toId) {
+    if (travelling.current) return
+    travelling.current = true
+    setFading(true) // fade to white…
+    setTimeout(() => {
+      const from = mapId
+      const at = arrivalPoint(MAPS[toId], from)
+      // place her (and the trailing pet) just inside the gate she arrives by
+      charPosRef.current.set(at[0], 0, at[1])
+      petPosRef.current.set(at[0] + 1.4, 0, at[1] + 1.4)
+      targetRef.current = null
+      setSpawn(at)
+      setMapId(toId)
+      setMap(toId) // persist — she resumes in the map she left
+      setToast(MAPS[toId].name)
+      clearTimeout(toastTimer.current)
+      toastTimer.current = setTimeout(() => setToast(null), 2400)
+      setTimeout(() => {
+        setFading(false) // …and fade back in on the new map
+        travelling.current = false
+      }, FADE_MS)
+    }, FADE_MS)
+  }
+
+  // Preload: current map's models right away, the other maps once things settle
+  // (so walking into a gate never lands on a half-loaded world).
+  useEffect(() => {
+    preloadMap(MAPS[mapId])
+    const idle = setTimeout(() => Object.values(MAPS).forEach(preloadMap), 3500)
+    return () => clearTimeout(idle)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Shared refs — written by the scene each frame, read by the minimap +
   // gesture handlers. Refs (not state) so nothing re-renders at 60fps.
@@ -77,9 +121,13 @@ export default function App() {
         dpr={[1, 2]}
         camera={{ fov: 42, position: [0, 9, 11], near: 0.1, far: 200 }}
       >
-        <color attach="background" args={['#eae6f7']} />
+        <color attach="background" args={[MAPS[mapId].sky]} />
         <Suspense fallback={null}>
           <Scene
+            key={mapId} // travel = a fresh scene for the new map
+            map={MAPS[mapId]}
+            spawn={spawn}
+            onTravel={travel}
             characterId={state.character}
             petId={state.pet}
             targetRef={targetRef}
@@ -93,8 +141,44 @@ export default function App() {
 
       {/* ── HUD ── */}
       <GemCounter count={state.gems} />
-      <Minimap charPosRef={charPosRef} petPosRef={petPosRef} />
+      <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} />
       {!moved && <MoveHint />}
+      {toast && <MapToast name={toast} />}
+
+      {/* gate-travel fade (also swallows taps mid-travel) */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: '#ffffff',
+          opacity: fading ? 1 : 0,
+          transition: `opacity ${FADE_MS}ms ease`,
+          pointerEvents: fading ? 'auto' : 'none',
+        }}
+      />
+    </div>
+  )
+}
+
+function MapToast({ name }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 'max(72px, calc(env(safe-area-inset-top) + 56px))',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        padding: '10px 20px',
+        background: 'rgba(43,32,90,0.82)',
+        color: '#fff',
+        borderRadius: 999,
+        fontWeight: 700,
+        fontSize: 16,
+        letterSpacing: 0.2,
+        pointerEvents: 'none',
+      }}
+    >
+      ✨ {name}
     </div>
   )
 }

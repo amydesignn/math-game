@@ -17,6 +17,7 @@ function freshState() {
   return {
     character: 'character-female-a', // Ivy's avatar (chosen later in a picker)
     pet: 'animal-cat', // her companion
+    map: 'clearing', // which map she's in (walks through gates to change it)
     gems: 0, // earned by solving problems (Stage B)
     world: [], // placed props: [{ asset, x, z, rotation }] (Stage C)
     owned: [], // assets bought from the shop (Stage C)
@@ -66,6 +67,11 @@ export function setCharacter(id) {
 
 export function setPet(id) {
   state.pet = id
+  save()
+}
+
+export function setMap(id) {
+  state.map = id
   save()
 }
 

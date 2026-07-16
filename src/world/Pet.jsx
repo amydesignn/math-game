@@ -10,7 +10,7 @@ import BlobShadow from './BlobShadow'
  * petFollowDistance it walks/runs to catch up, otherwise it idles. Reads the
  * character's live position from `targetPosRef`.
  */
-export default function Pet({ id, targetPosRef, posRef }) {
+export default function Pet({ id, start = [0, 0], targetPosRef, posRef }) {
   const group = useRef()
   const { scene, animations } = useGLTF(modelUrl('pets', id))
   const model = useMemo(() => SkeletonUtils.clone(scene), [scene])
@@ -56,7 +56,7 @@ export default function Pet({ id, targetPosRef, posRef }) {
   })
 
   return (
-    <group ref={group} position={[1.4, 0, 1.4]}>
+    <group ref={group} position={[start[0] + 1.4, 0, start[1] + 1.4]}>
       <BlobShadow radius={0.45} />
       <group scale={WORLD.petScale}>
         <primitive object={model} />
