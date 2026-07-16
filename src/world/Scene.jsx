@@ -6,18 +6,26 @@ import Pet from './Pet'
 import Prop, { DECOR } from './Prop'
 import { WORLD } from '../config'
 
-export default function Scene({ characterId, petId }) {
-  const targetRef = useRef(null) // where the character is walking to (Vector3 | null)
-  const charPos = useRef(new THREE.Vector3(0, 0, 0)) // character's live position, for the pet + camera
+/**
+ * The 3D world. Shared refs live in App (so the minimap + pinch gestures can
+ * reach them): `targetRef` = walk destination, `charPosRef`/`petPosRef` = live
+ * positions, `zoomRef` = camera distance multiplier (pinch/wheel),
+ * `gestureRef.pinching` = true while two fingers are down (taps ignored).
+ */
+export default function Scene({ characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
   const marker = useRef() // the ring that pings on tap
   const markerLife = useRef(0) // 1 → 0 fade
 
   function handleTap(e) {
+    if (gestureRef.current.pinching) return // two fingers = zoom, not walk
     e.stopPropagation()
-    const p = e.point
-    targetRef.current = new THREE.Vector3(p.x, 0, p.z)
+    const B = WORLD.bounds
+    // clamp to the playable map so she can never wander off the edge
+    const x = Math.min(B, Math.max(-B, e.point.x))
+    const z = Math.min(B, Math.max(-B, e.point.z))
+    targetRef.current = new THREE.Vector3(x, 0, z)
     if (marker.current) {
-      marker.current.position.set(p.x, 0.02, p.z)
+      marker.current.position.set(x, 0.03, z)
       markerLife.current = 1
     }
   }
@@ -26,10 +34,11 @@ export default function Scene({ characterId, petId }) {
   const { camera } = useThree()
   const camTarget = useRef(new THREE.Vector3())
   useFrame((_, dt) => {
-    // camera trails the character at a fixed couch-friendly iso offset
-    const desired = charPos.current
+    // camera trails the character; pinch zoom scales the offset
+    const desired = charPosRef.current
+    const zoom = zoomRef.current
     const [ox, oy, oz] = WORLD.camOffset
-    camTarget.current.set(desired.x + ox, desired.y + oy, desired.z + oz)
+    camTarget.current.set(desired.x + ox * zoom, desired.y + oy * zoom, desired.z + oz * zoom)
     camera.position.lerp(camTarget.current, 1 - Math.exp(-4 * dt))
     camera.lookAt(desired.x, desired.y + 0.6, desired.z)
 
@@ -50,9 +59,15 @@ export default function Scene({ characterId, petId }) {
       <hemisphereLight args={['#fff6e8', '#b9b0d6', 0.9]} />
       <directionalLight position={[6, 12, 6]} intensity={1.1} />
 
-      {/* tappable ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} onPointerDown={handleTap} receiveShadow>
+      {/* the land beyond the map — muted, so "outside" reads as outside */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} onPointerDown={handleTap}>
         <planeGeometry args={[WORLD.groundSize, WORLD.groundSize]} />
+        <meshStandardMaterial color="#aec49e" />
+      </mesh>
+
+      {/* the playable map — brighter green, its edge IS the end of the world */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} onPointerDown={handleTap}>
+        <planeGeometry args={[WORLD.bounds * 2, WORLD.bounds * 2]} />
         <meshStandardMaterial color="#c7e6b8" />
       </mesh>
 
@@ -66,8 +81,8 @@ export default function Scene({ characterId, petId }) {
         <Prop key={i} {...d} />
       ))}
 
-      <Character id={characterId} targetRef={targetRef} posRef={charPos} />
-      <Pet id={petId} targetPosRef={charPos} />
+      <Character id={characterId} targetRef={targetRef} posRef={charPosRef} />
+      <Pet id={petId} targetPosRef={charPosRef} posRef={petPosRef} />
     </>
   )
 }

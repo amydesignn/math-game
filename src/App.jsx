@@ -1,16 +1,76 @@
-import { Suspense, useState } from 'react'
+import { Suspense, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
+import * as THREE from 'three'
 import Scene from './world/Scene'
+import Minimap from './ui/Minimap'
 import { getState } from './store'
+import { WORLD } from './config'
 
 export default function App() {
   const [state] = useState(getState)
   const [moved, setMoved] = useState(false)
 
+  // Shared refs — written by the scene each frame, read by the minimap +
+  // gesture handlers. Refs (not state) so nothing re-renders at 60fps.
+  const targetRef = useRef(null)
+  const charPosRef = useRef(new THREE.Vector3())
+  const petPosRef = useRef(new THREE.Vector3(1.4, 0, 1.4))
+  const zoomRef = useRef(1)
+  const gestureRef = useRef({ pinching: false })
+
+  // ── Pinch to zoom (iPad) + wheel/trackpad (desktop bonus) ──
+  const pointers = useRef(new Map())
+  const pinchStart = useRef(null) // { dist, zoom }
+
+  const clampZoom = (z) => Math.min(WORLD.zoomMax, Math.max(WORLD.zoomMin, z))
+
+  function onPointerDown(e) {
+    setMoved(true)
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (pointers.current.size === 2) {
+      gestureRef.current.pinching = true
+      targetRef.current = null // a pinch is not a walk — stop where she is
+      pinchStart.current = { dist: pointerDist(), zoom: zoomRef.current }
+    }
+  }
+
+  function onPointerMove(e) {
+    if (!pointers.current.has(e.pointerId)) return
+    pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
+    if (gestureRef.current.pinching && pointers.current.size === 2 && pinchStart.current) {
+      const ratio = pinchStart.current.dist / pointerDist() // fingers apart → closer
+      zoomRef.current = clampZoom(pinchStart.current.zoom * ratio)
+    }
+  }
+
+  function onPointerUp(e) {
+    pointers.current.delete(e.pointerId)
+    if (pointers.current.size < 2) {
+      pinchStart.current = null
+      // let the tap-suppression linger one tick so finger-lift doesn't walk
+      setTimeout(() => {
+        if (pointers.current.size < 2) gestureRef.current.pinching = false
+      }, 80)
+    }
+  }
+
+  function pointerDist() {
+    const [a, b] = [...pointers.current.values()]
+    return Math.hypot(a.x - b.x, a.y - b.y) || 1
+  }
+
+  function onWheel(e) {
+    zoomRef.current = clampZoom(zoomRef.current * Math.exp(e.deltaY * 0.0015))
+  }
+
   return (
     <div
       style={{ position: 'fixed', inset: 0 }}
-      onPointerDown={() => setMoved(true)}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      onWheel={onWheel}
     >
       <Canvas
         shadows={false}
@@ -19,12 +79,21 @@ export default function App() {
       >
         <color attach="background" args={['#eae6f7']} />
         <Suspense fallback={null}>
-          <Scene characterId={state.character} petId={state.pet} />
+          <Scene
+            characterId={state.character}
+            petId={state.pet}
+            targetRef={targetRef}
+            charPosRef={charPosRef}
+            petPosRef={petPosRef}
+            zoomRef={zoomRef}
+            gestureRef={gestureRef}
+          />
         </Suspense>
       </Canvas>
 
       {/* ── HUD ── */}
       <GemCounter count={state.gems} />
+      <Minimap charPosRef={charPosRef} petPosRef={petPosRef} />
       {!moved && <MoveHint />}
     </div>
   )

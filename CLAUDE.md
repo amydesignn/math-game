@@ -1,11 +1,16 @@
 # Ivy's Math World — build state & handoff
 
 ## Status (as of 2026-07-16)
-**Stage A shipped locally + verified.** A tappable 3D clearing: Ivy's character
-walks (tap-to-move, animated) with a cube pet trailing her, a follow camera, soft
-blob shadows, and scattered forest scenery. HUD shows a gem counter (0 for now)
-and a fading move hint. Zero console errors; `npm run build` + `oxlint` both clean.
-**Not deployed yet** (no repo/remote created) — awaiting Amy's taste pass.
+**Stage A shipped locally + verified, then extended same-day on Amy's feedback.**
+A tappable 3D clearing: Ivy's character walks (tap-to-move, animated) with a cube
+pet trailing her, a follow camera, soft blob shadows, and scattered forest
+scenery. HUD shows a gem counter (0 for now), a fading move hint, and a **live
+minimap** (top-right: scenery dots + Ivy/pet dots; the rounded square IS the
+playable map). The world has a real **boundary** (walks clamp to ±`WORLD.bounds`;
+outside land renders muted so "the end of the map" is visible in-world), plus
+**pinch-to-zoom** (iPad) / wheel (desktop). Zero console errors; `npm run build`
++ `oxlint` both clean. **Not deployed yet** (no repo/remote) — Amy + Ivy have
+played it locally and love it.
 
 This is V1 of a math game for Ivy (family project: Finn briefs → Oscar designs →
 Nathan builds). Concept: character + pet wander a space; Ivy solves math problems
@@ -40,6 +45,7 @@ to earn gems; gems buy assets she places to build a small world.
 ## Notes
 - **Supabase:** Amy chose to stage it (build the boundary now, wire before Stage B). The account architecture (parent-held magic-link auth) is decided *before* Stage B and becomes the family's account layer for the Planner + Cozy Closet too — so it's a deliberate decision, not a quick add. `store.js` is the only file that changes.
 - **Math content:** times tables / mental arithmetic first (infinite to generate, tight loop, best fit for gems-in-the-world pacing), then extend to her Year 5/6 curriculum topics — `store.js` already has a `topicProgress` field for it.
-- **Open design fork for Amy (raised, not yet decided):** gems as a *quiz reward* (answer N → get gems) vs gems *embedded in the world* (walk to a glinting gem → that opens the problem → solve → pet dances). Nathan leans embedded — makes the walking purposeful and the math exploratory. Changes Stage B architecture (world nodes vs quiz modal), so settle before scaffolding B.
+- **DECIDED (Amy, 2026-07-16): gems are EMBEDDED IN THE WORLD** — Ivy walks to a glinting gem, that opens the problem, solving it collects the gem + the pet dances. Stage B = world-node architecture (gem spawner + proximity trigger + problem sheet), not a quiz modal. Amy: "it is interactive!"
+- **Pinch/tap interplay:** the first finger of a pinch can trigger a walk before the second lands; the pinch handler clears `targetRef` on pinch-start so she stops. `gestureRef.pinching` also suppresses taps during + 80ms after a pinch. Keep this if touching gesture code.
 - **Deploy target (planned):** GitHub Pages like the other two apps (`vite.config.js` base already set to `/math-game/` for builds). Repo not created yet.
 - **Parked (Stage A scaffold, real art later):** ground is a flat uniform green — reads fine with props but Oscar's art pass will replace it; scenery positions are hand-placed placeholders.

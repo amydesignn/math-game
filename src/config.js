@@ -40,7 +40,10 @@ export const WORLD = {
   petFollowDistance: 1.6, // how far behind the character the pet trails
   arriveThreshold: 0.12, // stop when this close to the tap target
   groundSize: 120, // large enough that the edge never shows under the follow cam
+  bounds: 18, // half-extent of the playable map — walks clamp to ±bounds
   // camera offset from the character — steep 3/4 top-down so the trailing pet
   // never looms between camera and character
   camOffset: [0, 9, 6.5],
+  zoomMin: 0.55, // pinch-in limit (closer)
+  zoomMax: 2.2, // pinch-out limit (see more of the map)
 }
