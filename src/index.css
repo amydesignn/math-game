@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── House tokens (subset of oscar-styling-reference; iris/lilac branding) ── */
+:root {
+  --brand-iris-50: #eeeffe;
+  --brand-iris-100: #e0e2fd;
+  --brand-iris-500: #6169e8;
+  --brand-iris-600: #4b54dd;
+  --brand-iris-700: #3d43c4;
+  --brand-iris-900: #2b2f7a;
+  --brand-lilac-100: #ece6fa;
+  --brand-lilac-300: #cdbdf0;
+  --brand-lilac-500: #9b84e0;
+  --brand-lilac-900: #4a3d7a;
+  --lilac-50: #f6f4fd;
+  /* reward accent — same gold family as the Planner */
+  --star-gold: #f5b623;
+  --star-gold-text: #b07d09;
+  --gem-cyan: #2ec5c5;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--lilac-50);
+}
+
+/* touch-action none on the canvas so tap-to-move doesn't scroll the page */
+canvas { touch-action: none; display: block; }
