@@ -19,5 +19,5 @@ React 19 · Vite 8 · Tailwind · react-three-fiber / drei / three. iPad-first
 Mini Forest packs (CC0).
 
 ## Links
-- Live: _not deployed yet_
+- Live: https://amydesignn.github.io/math-game/
 - Handoff: `CLAUDE.md`

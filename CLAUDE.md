@@ -9,8 +9,14 @@ minimap** (top-right: scenery dots + Ivy/pet dots; the rounded square IS the
 playable map). The world has a real **boundary** (walks clamp to ±`WORLD.bounds`;
 outside land renders muted so "the end of the map" is visible in-world), plus
 **pinch-to-zoom** (iPad) / wheel (desktop). Zero console errors; `npm run build`
-+ `oxlint` both clean. **Not deployed yet** (no repo/remote) — Amy + Ivy have
-played it locally and love it.
++ `oxlint` both clean.
+
+**🎉 LIVE since 2026-07-16: https://amydesignn.github.io/math-game/** — public
+repo `amydesignn/math-game`, auto-deploys on push to `main` via
+`.github/workflows/deploy.yml` (same rails as ivy-planner). Verified live:
+page + models 200, world renders, minimap tracks. Note: localStorage saves are
+per-browser-per-device, so Amy playing on her own Mac gets her own world
+automatically; shared iPad = shared save until the Supabase account layer.
 
 This is V1 of a math game for Ivy (family project: Finn briefs → Oscar designs →
 Nathan builds). Concept: character + pet wander a space; Ivy solves math problems
@@ -49,3 +55,4 @@ to earn gems; gems buy assets she places to build a small world.
 - **Pinch/tap interplay:** the first finger of a pinch can trigger a walk before the second lands; the pinch handler clears `targetRef` on pinch-start so she stops. `gestureRef.pinching` also suppresses taps during + 80ms after a pinch. Keep this if touching gesture code.
 - **Deploy target (planned):** GitHub Pages like the other two apps (`vite.config.js` base already set to `/math-game/` for builds). Repo not created yet.
 - **Parked (Stage A scaffold, real art later):** ground is a flat uniform green — reads fine with props but Oscar's art pass will replace it; scenery positions are hand-placed placeholders.
+- **Parked for-fun ideas (Amy, 2026-07-16 — "later, not now"):** (1) light background music (Cozy Closet pattern: loop + volume ~.45 + start on first pointerdown since browsers block autoplay + speaker toggle); (2) the pet sometimes says "meow" 😂 — note the cube pets already have idle/gesture anims to pair a sound with, and pet ≠ always a cat, so sound should key off the pet id.
