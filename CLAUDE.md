@@ -28,12 +28,23 @@ to earn gems; gems buy assets she places to build a small world.
 - **C — shop + placement** (buy assets, drag onto the map) — the hard part (3D drag/raycast/snap/persist)
 
 ## Maps (added 2026-07-16)
-The world is now **3 maps** Ivy discovers by walking into **gates** (two columns
-+ a pulsing glow ring; the glow is the color of the map it leads to — color IS
-the signpost, no text). Chain: **Forest Clearing** (teal-green) ↔ **Sunny Town**
-(orange sand, building-kit houses/pavilion/market) ↔ **Rosy Garden** (pink,
-ruined colonnade + flower beds). Everything else is shared: same character, same
-pet, same camera/minimap/bounds.
+The world is now **5 maps in a RING** Ivy discovers by walking into **gates**
+(two columns + a pulsing glow ring; the glow is the color of the map it leads
+to — color IS the signpost, no text): **Forest Clearing** (teal-green) ↔
+**Sunny Town** (orange sand, building-kit houses/pavilion/market) ↔ **Rosy
+Garden** (pink, ruined colonnade + flower beds) ↔ **Merry Market** (yellow,
+mini-market stalls/shelves/freezers/carts) ↔ **Star Arcade** (violet,
+mini-arcade cabinets/claw/dance/pinball/prize corner) ↔ back to the Clearing.
+Each map has exactly 2 gates (west=back, east=onward), so "forward" always
+finds somewhere new and eventually leads home. Everything else is shared: same
+character, same pet, same camera/minimap/bounds. **Scale lesson:** mini-family
+packs (mini-market/mini-arcade/mini-forest) are designed 1:1 with the mini
+characters — place at scale 1, do NOT "correct" toward real-world proportions
+(1.3 made the bottle-return tower over her). The non-mini building-kit is the
+exception (0.8). Left out on purpose: the arcade pack's `gambling-machine`
+(slot machine ≠ kids app). More packs live in
+`~/Downloads/Math game - Other 3D assets maps/` (castle, coaster, space [no GLB
+— GLTF only], dungeon, skate, train, toy-car… — Amy: pick freely for future maps).
 - `src/maps.js` = the whole registry: per-map ground/outside/sky colors,
   `gateColor`, decor list (props from ANY pack via a `pack` field), gates, plus
   `house()`/`pavilion()` composers for building-kit structures (BS=0.8 scale —

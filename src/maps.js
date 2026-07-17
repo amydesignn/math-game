@@ -14,11 +14,22 @@ import { modelUrl } from './config'
 const BS = 0.8
 const CELL = BS // half of a (scaled) 2-unit cell — wall offset from house centre
 
+// Mini-market / mini-arcade are designed 1:1 with the mini characters (their
+// packs ship the same chibi people) — scale 1, don't "correct" toward
+// real-world proportions or machines tower over her.
+const MS = 1
+
 const b = (name, x, z, rotation = 0, scale = BS) => ({
   pack: 'building', name, position: [x, 0, z], rotation, scale,
 })
 const f = (name, x, z, rotation = 0, scale = 1) => ({
   pack: 'forest', name, position: [x, 0, z], rotation, scale,
+})
+const m = (name, x, z, rotation = 0, scale = MS) => ({
+  pack: 'market', name, position: [x, 0, z], rotation, scale,
+})
+const a = (name, x, z, rotation = 0, scale = MS) => ({
+  pack: 'arcade', name, position: [x, 0, z], rotation, scale,
 })
 
 /** A one-cell house: four walls + flat roof. `door` picks the doorway side. */
@@ -67,7 +78,10 @@ export const MAPS = {
       f('flag', 8.5, -8, 0),
       f('tent', -9, -8, 0.5),
     ],
-    gates: [{ to: 'town', position: [16, 0, 2] }],
+    gates: [
+      { to: 'town', position: [16, 0, 2] },
+      { to: 'arcade', position: [-16, 0, 2] },
+    ],
   },
 
   // ── Map 2 — a little town on warm orange ground ──
@@ -138,7 +152,85 @@ export const MAPS = {
       f('plant', -2.5, -4.5, 1.4),
       f('plant', 1.5, 5.5, 0.2),
     ],
-    gates: [{ to: 'town', position: [-16, 0, -3] }],
+    gates: [
+      { to: 'town', position: [-16, 0, -3] },
+      { to: 'market', position: [16, 0, 3] },
+    ],
+  },
+
+  // ── Map 4 — an open-air market on sunny yellow ground ──
+  market: {
+    id: 'market',
+    name: 'Merry Market',
+    ground: '#fdf0b8', // extra-bright — the lilac ground-light drags yellow toward dijon
+    outside: '#dcc98c',
+    sky: '#fdf6e3',
+    gateColor: '#f2c530',
+    decor: [
+      // front stalls — fruit + bread facing the spawn
+      m('display-fruit', -2.4, -5, Math.PI),
+      m('display-fruit', -1.2, -5, Math.PI),
+      m('display-bread', 1.2, -5, Math.PI),
+      m('display-bread', 2.4, -5, Math.PI),
+      // a continuous aisle of shelves behind the stalls (0.8 = touching)
+      m('shelf-boxes', -2.4, -8), m('shelf-bags', -1.6, -8),
+      m('shelf-boxes', -0.8, -8), m('shelf-end', 0, -8),
+      // frozen corner
+      m('freezer', 6.5, -3, -Math.PI / 2),
+      m('freezers-standing', 6.5, -5, -Math.PI / 2),
+      // checkout
+      m('cash-register', -5.5, -2, 0.5),
+      m('bottle-return', -7, -4.5, Math.PI / 2),
+      // strays — carts and a basket someone left around the square
+      m('shopping-cart', 4.5, 1.5, 2.4),
+      m('shopping-cart', -4, 4, -0.7),
+      m('shopping-basket', 1, 3, 0),
+      // entrance framing + a bit of green
+      m('fence', -1.2, 7), m('fence-door-rotate', 0, 7), m('fence', 1.2, 7),
+      m('column', -8, 6), m('column', 8, 6),
+      f('plant', 10, -8, 0.8),
+      f('patch-grass', -8, 8.5, 1.9),
+      f('plant', -10.5, 0, 2.4),
+    ],
+    gates: [
+      { to: 'garden', position: [-16, 0, 3] },
+      { to: 'arcade', position: [16, 0, -2] },
+    ],
+  },
+
+  // ── Map 5 — a games arcade on violet ground ──
+  arcade: {
+    id: 'arcade',
+    name: 'Star Arcade',
+    ground: '#ddcef6',
+    outside: '#b4a3d8',
+    sky: '#efe8fb',
+    gateColor: '#8f6fe8',
+    decor: [
+      // a row of arcade cabinets, screens facing the spawn
+      a('arcade-machine', -2.9, -5.5, Math.PI),
+      a('arcade-machine', -2.2, -5.5, Math.PI),
+      a('arcade-machine', -1.5, -5.5, Math.PI),
+      a('arcade-machine', -0.8, -5.5, Math.PI),
+      // the big machines get their own spots
+      a('dance-machine', 3.5, -4.5, Math.PI + 0.4),
+      a('claw-machine', -6, -3.5, 0.9),
+      a('air-hockey', 2.5, 0.5, 0.3),
+      a('pinball', -5, 1.5, Math.PI / 2),
+      a('pinball', -5, 2.6, Math.PI / 2),
+      a('basketball-game', 6, 2.5, -Math.PI / 2),
+      // prize corner
+      a('prize-wheel', 1.2, 6.5, Math.PI),
+      a('prizes', 2.8, 6.8, Math.PI),
+      a('ticket-machine', -0.6, 6.8, Math.PI),
+      // snacks + pillars
+      a('vending-machine', -7, 6, Math.PI / 2),
+      a('column', -9.5, -1), a('column', 9.5, -1),
+    ],
+    gates: [
+      { to: 'market', position: [-16, 0, -2] },
+      { to: 'clearing', position: [16, 0, 2] },
+    ],
   },
 }
 
