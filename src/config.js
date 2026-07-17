@@ -47,3 +47,12 @@ export const WORLD = {
   zoomMin: 0.55, // pinch-in limit (closer)
   zoomMax: 2.2, // pinch-out limit (see more of the map)
 }
+
+// ── Phase 2: gem sparkles (beta collection loop; Phase 4 swaps taps for math) ──
+export const GEMS = {
+  // Hard beta cap (Finn's brief, learned from Cozy Closet: a cap creates
+  // anticipation — an unlimited balance that later resets creates heartbreak).
+  cap: 15,
+  perMap: 3, // sparkles per map visit, so finding more means exploring the ring
+  collectRadius: 1.0, // walk this close to a sparkle → collected
+}

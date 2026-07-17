@@ -18,7 +18,8 @@ function freshState() {
     character: 'character-female-a', // Ivy's avatar (chosen later in a picker)
     pet: 'animal-cat', // her companion
     map: 'clearing', // which map she's in (walks through gates to change it)
-    gems: 0, // earned by solving problems (Stage B)
+    gems: 0, // Phase 2: collected from world sparkles (capped); Phase 4: earned by math
+    soundOn: true, // the speaker toggle (music + pet sounds)
     world: [], // placed props: [{ asset, x, z, rotation }] (Stage C)
     owned: [], // assets bought from the shop (Stage C)
     // Stage B — times tables first, curriculum topics later:
@@ -72,6 +73,11 @@ export function setPet(id) {
 
 export function setMap(id) {
   state.map = id
+  save()
+}
+
+export function setSoundOn(on) {
+  state.soundOn = !!on
   save()
 }
 

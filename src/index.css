@@ -38,3 +38,10 @@ html, body, #root {
 
 /* touch-action none on the canvas so tap-to-move doesn't scroll the page */
 canvas { touch-action: none; display: block; }
+
+/* gem counter pop — replays via key={count} remount on each collect */
+@keyframes gempop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}

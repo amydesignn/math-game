@@ -9,7 +9,7 @@ const SIZE = 104 // css px, drawn 2x for retina
  * the world), with the scenery as fixed dots and Ivy + her pet as live dots.
  * Reads positions from refs each frame — no React re-renders.
  */
-export default function Minimap({ map, charPosRef, petPosRef }) {
+export default function Minimap({ map, charPosRef, petPosRef, sparklesRef }) {
   const canvas = useRef()
 
   useEffect(() => {
@@ -17,6 +17,7 @@ export default function Minimap({ map, charPosRef, petPosRef }) {
     const css = getComputedStyle(document.documentElement)
     const iris = css.getPropertyValue('--brand-iris-600').trim() || '#4b54dd'
     const gold = css.getPropertyValue('--star-gold').trim() || '#f5b623'
+    const cyan = css.getPropertyValue('--gem-cyan').trim() || '#2ec5c5'
     const B = WORLD.bounds
     const s = (SIZE * 2) / (B * 2) // world units → device px
     const toPx = (v) => (v + B) * s
@@ -50,6 +51,17 @@ export default function Minimap({ map, charPosRef, petPosRef }) {
         ctx.stroke()
       }
 
+      // gem sparkles (cyan — "something to find here")
+      ctx.fillStyle = cyan
+      ctx.strokeStyle = '#ffffff'
+      ctx.lineWidth = 2
+      for (const sp of sparklesRef?.current || []) {
+        ctx.beginPath()
+        ctx.arc(toPx(sp.x), toPx(sp.z), 5, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+      }
+
       // pet (gold, so it reads as "the companion")
       const p = petPosRef.current
       ctx.fillStyle = gold
@@ -71,7 +83,7 @@ export default function Minimap({ map, charPosRef, petPosRef }) {
     }
     raf = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(raf)
-  }, [map, charPosRef, petPosRef])
+  }, [map, charPosRef, petPosRef, sparklesRef])
 
   return (
     <canvas

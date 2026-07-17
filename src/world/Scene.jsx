@@ -1,14 +1,38 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import Character from './Character'
 import Pet from './Pet'
 import Prop from './Prop'
 import Gate from './Gate'
-import { WORLD } from '../config'
+import Sparkle from './Sparkle'
+import { WORLD, GEMS } from '../config'
 import { MAPS } from '../maps'
+import { getState } from '../store'
 
 const GATE_RADIUS = 1.7 // walk this close to a gate's glow → travel (forgiving: tap-walks stop at the ring's edge)
+
+/**
+ * Scatter this visit's gem sparkles: random spots on the map, kept clear of
+ * the spawn point, the gates (a sparkle luring her into a gate would teleport
+ * her), the scenery, and each other. Count respects the remaining beta cap.
+ */
+function spawnSparkles(map, spawn) {
+  const count = Math.max(0, Math.min(GEMS.perMap, GEMS.cap - getState().gems))
+  const pts = []
+  const B = WORLD.bounds - 2.5
+  let guard = 0
+  while (pts.length < count && guard++ < 400) {
+    const x = (Math.random() * 2 - 1) * B
+    const z = (Math.random() * 2 - 1) * B
+    if (Math.hypot(x - spawn[0], z - spawn[1]) < 4) continue
+    if (map.gates.some((g) => Math.hypot(x - g.position[0], z - g.position[2]) < 4.5)) continue
+    if (map.decor.some((d) => Math.hypot(x - d.position[0], z - d.position[2]) < 1.8)) continue
+    if (pts.some((p) => Math.hypot(x - p.x, z - p.z) < 5)) continue
+    pts.push({ id: pts.length, x, z, collected: false })
+  }
+  return pts
+}
 
 /**
  * The 3D world for one map (App remounts it with key={mapId} on travel).
@@ -18,10 +42,50 @@ const GATE_RADIUS = 1.7 // walk this close to a gate's glow → travel (forgivin
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
+export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
   const marker = useRef() // the ring that pings on tap
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
+
+  // ── Phase 2: this visit's gem sparkles ──
+  const [sparkles, setSparkles] = useState(() => spawnSparkles(map, spawn))
+  const taken = useRef(new Set()) // same-frame double-collect guard
+
+  // the minimap draws live sparkles from this shared ref
+  useEffect(() => {
+    if (sparklesRef) sparklesRef.current = sparkles.filter((s) => !s.collected)
+    if (import.meta.env.DEV) {
+      // QA hooks (dev builds only): inspect sparkles, drive the walk
+      window.__sparkles = sparkles
+      window.__walk = (x, z) => (targetRef.current = new THREE.Vector3(x, 0, z))
+      window.__dbg = () => ({
+        char: charPosRef.current.toArray().map((v) => +v.toFixed(2)),
+        target: targetRef.current && targetRef.current.toArray().map((v) => +v.toFixed(2)),
+        traveled: traveled.current,
+        gates: map.gates.map((g) => ({ to: g.to, d: +Math.hypot(charPosRef.current.x - g.position[0], charPosRef.current.z - g.position[2]).toFixed(2) })),
+      })
+    }
+  }, [sparkles, sparklesRef, targetRef])
+
+  function collect(id) {
+    if (taken.current.has(id)) return
+    taken.current.add(id)
+    setSparkles((prev) => prev.map((s) => (s.id === id ? { ...s, collected: true } : s)))
+    onGem()
+  }
+
+  // tapping a sparkle walks her to it — proximity does the collecting
+  function walkToSparkle(sp) {
+    return (e) => {
+      if (gestureRef.current.pinching || sp.collected) return
+      e.stopPropagation()
+      targetRef.current = new THREE.Vector3(sp.x, 0, sp.z)
+      if (marker.current) {
+        marker.current.position.set(sp.x, 0.03, sp.z)
+        markerLife.current = 1
+      }
+    }
+  }
 
   function handleTap(e) {
     if (gestureRef.current.pinching) return // two fingers = zoom, not walk
@@ -60,14 +124,23 @@ export default function Scene({ map, spawn, onTravel, characterId, petId, target
     camera.position.lerp(camTarget.current, 1 - Math.exp(-4 * dt))
     camera.lookAt(desired.x, desired.y + 0.6, desired.z)
 
+    // sparkle check — walking up to a gem collects it
+    for (const sp of sparkles) {
+      if (sp.collected || taken.current.has(sp.id)) continue
+      const dx = desired.x - sp.x
+      const dz = desired.z - sp.z
+      if (dx * dx + dz * dz < GEMS.collectRadius * GEMS.collectRadius) collect(sp.id)
+    }
+
     // gate check — walking into a glow travels to its map
     if (!traveled.current) {
       for (const g of map.gates) {
         const dx = desired.x - g.position[0]
         const dz = desired.z - g.position[2]
         if (dx * dx + dz * dz < GATE_RADIUS * GATE_RADIUS) {
-          traveled.current = true
-          onTravel(g.to)
+          // only latch if App accepted the travel — a refusal (already mid-fade)
+          // must NOT lock this scene out of ever traveling again
+          if (onTravel(g.to)) traveled.current = true
           break
         }
       }
@@ -114,6 +187,10 @@ export default function Scene({ map, spawn, onTravel, characterId, petId, target
 
       {map.gates.map((g) => (
         <Gate key={g.to} position={g.position} color={MAPS[g.to].gateColor} />
+      ))}
+
+      {sparkles.map((sp) => (
+        <Sparkle key={sp.id} x={sp.x} z={sp.z} collected={sp.collected} onTap={walkToSparkle(sp)} />
       ))}
 
       <Character id={characterId} start={spawn} targetRef={targetRef} posRef={charPosRef} />

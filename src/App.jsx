@@ -3,15 +3,47 @@ import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import Scene from './world/Scene'
 import Minimap from './ui/Minimap'
-import { getState, setMap } from './store'
-import { WORLD } from './config'
+import { getState, setMap, addGems, setSoundOn } from './store'
+import { setupAudio, unlockAudio, setAudioEnabled } from './audio'
+import { WORLD, GEMS } from './config'
 import { MAPS, arrivalPoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
+const TEASER = 'More gems coming with math! ✨' // the beta-cap lock message (Finn's brief)
 
 export default function App() {
   const [state] = useState(getState)
   const [moved, setMoved] = useState(false)
+
+  // ── Phase 2: gems + beta cap ──
+  const [gems, setGems] = useState(state.gems)
+  const [teaser, setTeaser] = useState(false)
+  const teaserTimer = useRef()
+
+  function showTeaser() {
+    setTeaser(true)
+    clearTimeout(teaserTimer.current)
+    teaserTimer.current = setTimeout(() => setTeaser(false), 4000)
+  }
+
+  function onGem() {
+    const total = addGems(1)
+    setGems(total)
+    if (total >= GEMS.cap) showTeaser()
+  }
+
+  // already at the cap when the game opens → say why the sparkles are gone
+  useEffect(() => {
+    if (getState().gems >= GEMS.cap) {
+      const t = setTimeout(showTeaser, 1500)
+      return () => clearTimeout(t)
+    }
+  }, [])
+
+  // ── Phase 2: sound (Ivy's bgm + the cat's meow) ──
+  useEffect(() => {
+    setupAudio({ petId: state.pet, on: state.soundOn })
+  }, [state.pet, state.soundOn])
 
   // ── Maps: which one we're in, where this visit starts, travel fade + toast ──
   const [mapId, setMapId] = useState(() => (MAPS[state.map] ? state.map : 'clearing'))
@@ -22,7 +54,7 @@ export default function App() {
   const toastTimer = useRef()
 
   function travel(toId) {
-    if (travelling.current) return
+    if (travelling.current) return false // caller may retry next frame
     travelling.current = true
     setFading(true) // fade to white…
     setTimeout(() => {
@@ -43,6 +75,7 @@ export default function App() {
         travelling.current = false
       }, FADE_MS)
     }, FADE_MS)
+    return true
   }
 
   // Preload: current map's models right away, the other maps once things settle
@@ -61,6 +94,7 @@ export default function App() {
   const petPosRef = useRef(new THREE.Vector3(1.4, 0, 1.4))
   const zoomRef = useRef(1)
   const gestureRef = useRef({ pinching: false })
+  const sparklesRef = useRef([]) // live sparkles, written by Scene, drawn by Minimap
 
   // ── Pinch to zoom (iPad) + wheel/trackpad (desktop bonus) ──
   const pointers = useRef(new Map())
@@ -70,6 +104,8 @@ export default function App() {
 
   function onPointerDown(e) {
     setMoved(true)
+    unlockAudio() // browsers only allow sound after a user gesture
+
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
     if (pointers.current.size === 2) {
       gestureRef.current.pinching = true
@@ -128,6 +164,8 @@ export default function App() {
             map={MAPS[mapId]}
             spawn={spawn}
             onTravel={travel}
+            onGem={onGem}
+            sparklesRef={sparklesRef}
             characterId={state.character}
             petId={state.pet}
             targetRef={targetRef}
@@ -140,10 +178,12 @@ export default function App() {
       </Canvas>
 
       {/* ── HUD ── */}
-      <GemCounter count={state.gems} />
-      <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} />
+      <GemCounter count={gems} />
+      <SpeakerButton />
+      <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} />
       {!moved && <MoveHint />}
       {toast && <MapToast name={toast} />}
+      {teaser && <TeaserToast />}
 
       {/* gate-travel fade (also swallows taps mid-travel) */}
       <div
@@ -186,6 +226,7 @@ function MapToast({ name }) {
 function GemCounter({ count }) {
   return (
     <div
+      key={count} // remount on change → the pop animation replays
       style={{
         position: 'absolute',
         top: 'max(16px, env(safe-area-inset-top))',
@@ -200,10 +241,68 @@ function GemCounter({ count }) {
         fontWeight: 700,
         color: 'var(--brand-iris-900)',
         fontSize: 18,
+        animation: count > 0 ? 'gempop 0.35s ease' : undefined,
       }}
     >
       <Gem />
       {count.toLocaleString()}
+    </div>
+  )
+}
+
+function SpeakerButton() {
+  const [on, setOn] = useState(getState().soundOn)
+  return (
+    <button
+      aria-label={on ? 'Sound on' : 'Sound off'}
+      onPointerDown={(e) => e.stopPropagation()} // a speaker tap is not a walk/pinch
+      onClick={() => {
+        const next = !on
+        setOn(next)
+        setSoundOn(next) // persist
+        setAudioEnabled(next) // apply
+      }}
+      style={{
+        position: 'absolute',
+        top: 'max(64px, calc(env(safe-area-inset-top) + 48px))',
+        left: 16,
+        width: 42,
+        height: 42,
+        borderRadius: 999,
+        border: 'none',
+        background: '#ffffff',
+        boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
+        fontSize: 19,
+        cursor: 'pointer',
+        opacity: on ? 1 : 0.72,
+      }}
+    >
+      {on ? '🔊' : '🔇'}
+    </button>
+  )
+}
+
+function TeaserToast() {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 'max(120px, calc(env(safe-area-inset-top) + 104px))',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        padding: '10px 20px',
+        background: 'var(--star-gold)',
+        color: '#4a3305',
+        borderRadius: 999,
+        fontWeight: 700,
+        fontSize: 16,
+        letterSpacing: 0.2,
+        boxShadow: '0 4px 14px rgba(43,32,90,0.22)',
+        pointerEvents: 'none',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {TEASER}
     </div>
   )
 }
