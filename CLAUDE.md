@@ -22,10 +22,45 @@ This is V1 of a math game for Ivy (family project: Finn briefs → Oscar designs
 Nathan builds). Concept: character + pet wander a space; Ivy solves math problems
 to earn gems; gems buy assets she places to build a small world.
 
-**Staged plan** (Finn's ask split by real size):
-- **A — playground** (character + pet moving, assets loaded) ✅ DONE
-- **B — math loop** (problems → gems; times tables first, then Y5/6 curriculum) — next
-- **C — shop + placement** (buy assets, drag onto the map) — the hard part (3D drag/raycast/snap/persist)
+**Staged plan** — now aligned to Finn's phased brief in Notion ("Ivy's Math World — v1 Brief", under 🛠️ Our Workshop):
+- **Phase 1 — the world** (5 maps + teleport ring) ✅ DONE
+- **Phase 2 — music + gem collection** (bgm/meow + sparkle-tap gems, 15 cap) ✅ DONE 2026-07-16
+- **Phase 3 — shop + asset placement** (localStorage still; Supabase later per brief)
+- **Phase 4 — math popup overlay** (Oscar designs the React overlay; sparkles become math gems)
+- **Phase 5 — task wrappers** (water-a-tree skins) · **Phase 6 — progression** (quotas/badges)
+
+## Phase 2 (added 2026-07-16): music + gem collection
+- **Audio** (`src/audio.js`): bgm loop (Ivy's pick, `public/audio/bgm.mp3`, vol .38) +
+  occasional ambient meow (`meow-cat.mp3`, every 45–100s, keyed off pet id via
+  `PET_SOUNDS` — non-cat pets stay silent until they get a file). Browsers block
+  autoplay ⇒ `unlockAudio()` on first pointerdown (Cozy Closet pattern). Speaker
+  toggle in HUD (top-left, under gem counter); `soundOn` persists via store.
+  ⚠️ Licensing (Finn's flag): Pixabay/Uppbeat tracks are fine for private beta;
+  before PUBLIC launch verify game-use coverage or swap to Kenney audio (CC0).
+- **Gem sparkles** (`src/world/Sparkle.jsx` + spawn/collect in `Scene.jsx`):
+  up to `GEMS.perMap` (3) per map visit, positions random but kept ≥4.5 from
+  gates, ≥1.8 from decor, ≥4 from spawn, ≥5 apart. Tap a sparkle = walk to it;
+  walking within `GEMS.collectRadius` (1.0) collects — this proximity trigger is
+  exactly what Phase 4 swaps math problems into. Burst animation, gem-counter
+  pop (`gempop` keyframe), cyan dots on the minimap.
+- **15-gem beta cap** (`GEMS.cap`, Finn's Cozy-Closet lesson): spawn count =
+  `min(perMap, cap − gems)`, so the cap is unreachable to exceed; hitting it (or
+  loading a capped save) shows the gold teaser toast "More gems coming with
+  math! ✨". Do NOT raise the cap — anticipation, not a future reset.
+- **Travel hardening**: `Scene` only latches its one-travel-per-visit flag if
+  `App.travel()` returns true (accepted). Refusals (mid-fade) retry next frame —
+  a scene can no longer lock itself out of traveling (was reachable via dev-HMR
+  interrupting the fade timers).
+- **Dev-only QA hooks** (stripped from prod by `import.meta.env.DEV` DCE):
+  `window.__sparkles` / `__walk(x,z)` / `__dbg()` (Scene) and `__meow()` /
+  `__audio()` (audio.js). Drive walks + inspect state from the console when the
+  pane's phantom taps make manual QA flaky.
+- **Pane QA notes (cost time this session):** `window.location.reload()` from
+  javascript_tool silently no-ops sometimes — use `navigate` with `force:true`
+  and CHECK `performance.now()` to confirm a fresh document; the ~10s tool
+  round-trip cannot catch a 4s toast (verify via MutationObserver armed
+  pre-event, or dev console.log); after many three.js reloads in one tab the
+  GPU context dies (blank canvas, HUD fine) — new tab or move on to live.
 
 ## Maps (added 2026-07-16)
 The world is now **5 maps in a RING** Ivy discovers by walking into **gates**
