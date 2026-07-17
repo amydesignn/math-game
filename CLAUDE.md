@@ -25,7 +25,7 @@ to earn gems; gems buy assets she places to build a small world.
 **Staged plan** — now aligned to Finn's phased brief in Notion ("Ivy's Math World — v1 Brief", under 🛠️ Our Workshop):
 - **Phase 1 — the world** (5 maps + teleport ring) ✅ DONE
 - **Phase 2 — music + gem collection** (bgm/meow + sparkle-tap gems, 15 cap) ✅ DONE 2026-07-16
-- **Phase 3 — shop + asset placement** (localStorage still; Supabase later per brief)
+- **Phase 3 — shop + asset placement** ✅ DONE 2026-07-16 (localStorage still; Supabase later per brief)
 - **Phase 4 — math popup overlay** (Oscar designs the React overlay; sparkles become math gems)
 - **Phase 5 — task wrappers** (water-a-tree skins) · **Phase 6 — progression** (quotas/badges)
 
@@ -55,12 +55,45 @@ to earn gems; gems buy assets she places to build a small world.
   `window.__sparkles` / `__walk(x,z)` / `__dbg()` (Scene) and `__meow()` /
   `__audio()` (audio.js). Drive walks + inspect state from the console when the
   pane's phantom taps make manual QA flaky.
+## Phase 3 (added 2026-07-16): Gem Shop + asset placement
+- **Shop** (`src/ui/Shop.jsx` + `SHOP` catalog in config.js): bottom sheet on
+  the 🛍️ HUD button; 20 items from forest/market/arcade packs (emoji + name +
+  price, 2–6 gems); tap tile → Buy pill → buying closes the sheet and enters
+  placement. "Your things" shelf = bought-but-unplaced (a cancelled placement
+  lands there, nothing is ever lost). Functional Nathan UI on house tokens —
+  Oscar may reskin later (offer him the lift pattern in reverse).
+- **Economy note:** the 15-gem cap limits the BALANCE, not lifetime earnings —
+  spending frees room, so sparkles keep coming once she shops. This is the
+  intended loop (cap → anticipation → spend → more to find).
+- **Placement** (`src/world/Ghost.jsx` + Scene/App wiring): ghost = cloned GLB
+  with per-mesh cloned transparent materials (NEVER mutate the shared cache) +
+  pulsing iris ring; while `placing`, canvas taps position the ghost instead of
+  walking (sparkle taps disabled too); ↻ rotates 45°; ✓ Place writes
+  `{id, asset, pack, x, z, rot, map}` via the store; gate guard refuses spots
+  <2.4 from a gate (NoteToast explains). Tap a placed asset → gold ring +
+  Move/Rotate/Put-away/Done bar; ground tap deselects. Placed assets draw as
+  lilac dots on the minimap; sparkles won't spawn inside them.
+- **Error boundary** (`main.jsx` `<Oops>`): any render crash → friendly
+  tap-to-reload card (kids never see a blank page; localStorage is untouched).
+- **BUG CLASS to watch (cost this session a crash):** App.jsx computes derived
+  values eagerly between hook blocks — a top-level `const` referencing a hook
+  declared LOWER in the component is a temporal-dead-zone ReferenceError that
+  kills every fresh mount, while already-mounted HMR'd docs keep working (so
+  dev QA can look green while fresh loads are dead). `placedHere` did exactly
+  this. Keep derived consts BELOW all the state they touch, and gut-check any
+  "worked in HMR, blank on reload" symptom against this first.
 - **Pane QA notes (cost time this session):** `window.location.reload()` from
   javascript_tool silently no-ops sometimes — use `navigate` with `force:true`
   and CHECK `performance.now()` to confirm a fresh document; the ~10s tool
   round-trip cannot catch a 4s toast (verify via MutationObserver armed
   pre-event, or dev console.log); after many three.js reloads in one tab the
   GPU context dies (blank canvas, HUD fine) — new tab or move on to live.
+  Synthetic canvas taps MUST dispatch pointerdown AND pointerup with the same
+  pointerId — a down without its up leaves a phantom finger in App's pointer
+  map and the SECOND stray latches pinch mode, silently eating every tap.
+  And an empty #root + "error in <App>" with working WebGL = YOUR crash, not
+  the pane (see the TDZ bug class above) — check webgl2 availability before
+  blaming the GPU.
 
 ## Maps (added 2026-07-16)
 The world is now **5 maps in a RING** Ivy discovers by walking into **gates**
