@@ -4,8 +4,11 @@ import * as THREE from 'three'
 import Scene from './world/Scene'
 import Minimap from './ui/Minimap'
 import Shop from './ui/Shop'
-import { getState, setMap, addGems, setSoundOn, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset } from './store'
-import { setupAudio, unlockAudio, setAudioEnabled } from './audio'
+import Gem from './ui/Gem'
+import MathPopup, { SKINS } from './ui/MathPopup'
+import { nextProblem } from './math'
+import { getState, setMap, addGems, setSoundOn, recordAnswer, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset } from './store'
+import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { WORLD, GEMS } from './config'
 import { MAPS, arrivalPoint, preloadMap } from './maps'
 
@@ -27,12 +30,6 @@ export default function App() {
     teaserTimer.current = setTimeout(() => setTeaser(false), 4000)
   }
 
-  function onGem() {
-    const total = addGems(1)
-    setGems(total)
-    if (total >= GEMS.cap) showTeaser()
-  }
-
   // already at the cap when the game opens → say why the sparkles are gone
   useEffect(() => {
     if (getState().gems >= GEMS.cap) {
@@ -45,6 +42,37 @@ export default function App() {
   useEffect(() => {
     setupAudio({ petId: state.pet, on: state.soundOn })
   }, [state.pet, state.soundOn])
+
+  // ── Phase 4: the math loop — sparkles open problems ──
+  const [math, setMath] = useState(null) // { sparkleId, problem, skin }
+  const mathBusyRef = useRef(false) // Scene skips proximity checks while a problem is up
+  const collectFnRef = useRef(null) // Scene's collect(), registered on mount
+  const reactUntilRef = useRef(0) // char + pet celebrate until this timestamp
+  const hudGemRef = useRef(null) // the counter pill — target of the gem flight
+
+  function onSparkleReached(sparkleId) {
+    if (mathBusyRef.current) return
+    mathBusyRef.current = true
+    setFocusMode(true) // Ivy's research: the meow holds during a problem
+    setMath({ sparkleId, problem: nextProblem(), skin: SKINS.feedPet })
+  }
+
+  function onMathAward(n) {
+    const total = addGems(n)
+    setGems(total)
+    if (total >= GEMS.cap) showTeaser()
+  }
+
+  function onPetReact() {
+    reactUntilRef.current = performance.now() + 4000 // dance + emote-yes, visible after the card closes
+  }
+
+  function onMathClose(solved) {
+    if (solved && math) collectFnRef.current?.(math.sparkleId) // burst — the gem is hers
+    setMath(null)
+    mathBusyRef.current = false
+    setFocusMode(false)
+  }
 
   // ── Phase 3: shop + placement ──
   const [shopOpen, setShopOpen] = useState(false)
@@ -231,7 +259,10 @@ export default function App() {
             map={MAPS[mapId]}
             spawn={spawn}
             onTravel={travel}
-            onGem={onGem}
+            onSparkleReached={onSparkleReached}
+            mathBusyRef={mathBusyRef}
+            collectFnRef={collectFnRef}
+            reactUntilRef={reactUntilRef}
             sparklesRef={sparklesRef}
             placing={placing}
             ghostPosRef={ghostPosRef}
@@ -252,7 +283,7 @@ export default function App() {
       </Canvas>
 
       {/* ── HUD ── */}
-      <GemCounter count={gems} />
+      <GemCounter count={gems} innerRef={hudGemRef} />
       <SpeakerButton />
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} placed={placedHere} />
       {!moved && <MoveHint />}
@@ -295,6 +326,19 @@ export default function App() {
         />
       )}
 
+      {/* ── Phase 4: the math quest (Oscar's popup) ── */}
+      {math && (
+        <MathPopup
+          problem={math.problem}
+          skin={math.skin}
+          hudGemRef={hudGemRef}
+          onAward={onMathAward}
+          onPetReact={onPetReact}
+          onResult={(correct) => recordAnswer(math.problem.op, correct)}
+          onClose={onMathClose}
+        />
+      )}
+
       {/* gate-travel fade (also swallows taps mid-travel) */}
       <div
         style={{
@@ -333,10 +377,11 @@ function MapToast({ name }) {
   )
 }
 
-function GemCounter({ count }) {
+function GemCounter({ count, innerRef }) {
   return (
     <div
       key={count} // remount on change → the pop animation replays
+      ref={innerRef}
       style={{
         position: 'absolute',
         top: 'max(16px, env(safe-area-inset-top))',
@@ -414,16 +459,6 @@ function TeaserToast() {
     >
       {TEASER}
     </div>
-  )
-}
-
-function Gem() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6 3h12l4 6-10 12L2 9z" fill="var(--gem-cyan)" />
-      <path d="M6 3h12l4 6H2z" fill="#7fe0e0" />
-      <path d="M12 21 2 9h20z" fill="#25a8a8" />
-    </svg>
   )
 }
 

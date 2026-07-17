@@ -10,7 +10,7 @@ import BlobShadow from './BlobShadow'
  * tapping the ground), crossfading between idle and walk. Writes its own
  * position into `posRef` each frame so the pet can follow.
  */
-export default function Character({ id, start = [0, 0], targetRef, posRef }) {
+export default function Character({ id, start = [0, 0], targetRef, posRef, reactUntilRef }) {
   const group = useRef()
   const { scene, animations } = useGLTF(modelUrl('characters', id))
   // Clone so animations get their own mixer and swapping characters is clean.
@@ -18,6 +18,7 @@ export default function Character({ id, start = [0, 0], targetRef, posRef }) {
   // Target the clone directly so the mixer binds to this instance's bones.
   const { actions } = useAnimations(animations, model)
   const current = useRef(null)
+
 
   // start idle
   useEffect(() => {
@@ -38,6 +39,14 @@ export default function Character({ id, start = [0, 0], targetRef, posRef }) {
   useFrame((_, dt) => {
     const g = group.current
     if (!g) return
+
+    // solved a problem → a proud yes! (already rigged in the Kenney pack)
+    if (reactUntilRef && reactUntilRef.current > performance.now()) {
+      play('emote-yes')
+      posRef.current.copy(g.position)
+      return
+    }
+
     const target = targetRef.current
 
     if (target) {

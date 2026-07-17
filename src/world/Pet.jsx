@@ -10,12 +10,13 @@ import BlobShadow from './BlobShadow'
  * petFollowDistance it walks/runs to catch up, otherwise it idles. Reads the
  * character's live position from `targetPosRef`.
  */
-export default function Pet({ id, start = [0, 0], targetPosRef, posRef }) {
+export default function Pet({ id, start = [0, 0], targetPosRef, posRef, reactUntilRef }) {
   const group = useRef()
   const { scene, animations } = useGLTF(modelUrl('pets', id))
   const model = useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { actions } = useAnimations(animations, model)
   const current = useRef(null)
+
 
   useEffect(() => {
     play('idle')
@@ -36,6 +37,13 @@ export default function Pet({ id, start = [0, 0], targetPosRef, posRef }) {
     const g = group.current
     const char = targetPosRef.current
     if (!g || !char) return
+
+    // solved a problem → celebrate (cube pets ship a real dance animation)
+    if (reactUntilRef && reactUntilRef.current > performance.now()) {
+      play(actions['dance'] ? 'dance' : 'gesture-positive')
+      if (posRef) posRef.current.copy(g.position)
+      return
+    }
 
     const dx = char.x - g.position.x
     const dz = char.z - g.position.z

@@ -10,6 +10,7 @@ import { modelUrl } from '../config'
 export default function Prop({ pack = 'forest', name, position, rotation = 0, scale = 1 }) {
   const { scene } = useGLTF(modelUrl(pack, name))
   const model = useMemo(() => SkeletonUtils.clone(scene), [scene])
+
   return (
     <group position={position} rotation={[0, rotation, 0]} scale={scale}>
       <primitive object={model} />

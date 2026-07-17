@@ -44,14 +44,15 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
   const marker = useRef() // the ring that pings on tap
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
 
-  // ── Phase 2: this visit's gem sparkles ──
+  // ── Phase 2/4: this visit's gem sparkles (Phase 4: walking up opens MATH) ──
   const [sparkles, setSparkles] = useState(() => spawnSparkles(map, spawn, placed))
-  const taken = useRef(new Set()) // same-frame double-collect guard
+  const taken = useRef(new Set()) // same-frame double-fire guard
+  const cooling = useRef(new Set()) // unsolved popups re-arm only after she walks away
 
   // the minimap draws live sparkles from this shared ref
   useEffect(() => {
@@ -64,17 +65,26 @@ export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, placin
         char: charPosRef.current.toArray().map((v) => +v.toFixed(2)),
         target: targetRef.current && targetRef.current.toArray().map((v) => +v.toFixed(2)),
         traveled: traveled.current,
+        cooling: [...cooling.current],
+        busy: !!(mathBusyRef && mathBusyRef.current),
         gates: map.gates.map((g) => ({ to: g.to, d: +Math.hypot(charPosRef.current.x - g.position[0], charPosRef.current.z - g.position[2]).toFixed(2) })),
       })
     }
   }, [sparkles, sparklesRef, targetRef])
 
+  // App collects a sparkle after the problem is SOLVED (visual only — the
+  // award happens in App through the popup's onAward seam).
   function collect(id) {
     if (taken.current.has(id)) return
     taken.current.add(id)
     setSparkles((prev) => prev.map((s) => (s.id === id ? { ...s, collected: true } : s)))
-    onGem()
   }
+  useEffect(() => {
+    if (collectFnRef) collectFnRef.current = collect
+    return () => {
+      if (collectFnRef) collectFnRef.current = null
+    }
+  })
 
   // tapping a sparkle walks her to it — proximity does the collecting
   function walkToSparkle(sp) {
@@ -154,12 +164,26 @@ export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, placin
     camera.position.lerp(camTarget.current, 1 - Math.exp(-4 * dt))
     camera.lookAt(desired.x, desired.y + 0.6, desired.z)
 
-    // sparkle check — walking up to a gem collects it
-    for (const sp of sparkles) {
-      if (sp.collected || taken.current.has(sp.id)) continue
-      const dx = desired.x - sp.x
-      const dz = desired.z - sp.z
-      if (dx * dx + dz * dz < GEMS.collectRadius * GEMS.collectRadius) collect(sp.id)
+    // sparkle check — walking up to a gem opens its math problem (Phase 4).
+    // A closed-unsolved popup re-arms only after she walks away, so it never
+    // instantly reopens on the spot she's still standing in.
+    if (!(mathBusyRef && mathBusyRef.current)) {
+      for (const sp of sparkles) {
+        if (sp.collected || taken.current.has(sp.id)) continue
+        const dx = desired.x - sp.x
+        const dz = desired.z - sp.z
+        const d2 = dx * dx + dz * dz
+        if (cooling.current.has(sp.id)) {
+          if (d2 > 2.6 * 2.6) cooling.current.delete(sp.id)
+          continue
+        }
+        if (d2 < GEMS.collectRadius * GEMS.collectRadius) {
+          cooling.current.add(sp.id)
+          targetRef.current = null // she stops for the question
+          onSparkleReached(sp.id)
+          break
+        }
+      }
     }
 
     // gate check — walking into a glow travels to its map
@@ -253,8 +277,8 @@ export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, placin
       {/* the placement ghost */}
       {placing && ghostPos && <Ghost pack={placing.pack} asset={placing.asset} position={ghostPos} rotation={ghostRot} />}
 
-      <Character id={characterId} start={spawn} targetRef={targetRef} posRef={charPosRef} />
-      <Pet id={petId} start={spawn} targetPosRef={charPosRef} posRef={petPosRef} />
+      <Character id={characterId} start={spawn} targetRef={targetRef} posRef={charPosRef} reactUntilRef={reactUntilRef} />
+      <Pet id={petId} start={spawn} targetPosRef={charPosRef} posRef={petPosRef} reactUntilRef={reactUntilRef} />
     </>
   )
 }

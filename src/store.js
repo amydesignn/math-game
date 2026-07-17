@@ -10,6 +10,8 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
+import { GEMS } from './config'
+
 const KEY = 'math_world_v1'
 
 /** The complete game state. Add fields here as stages land; keep it flat + serialisable. */
@@ -83,9 +85,19 @@ export function setSoundOn(on) {
 }
 
 export function addGems(n) {
-  state.gems = Math.max(0, state.gems + n)
+  // clamped to the beta cap — the balance can never exceed it, however earned
+  state.gems = Math.min(GEMS.cap, Math.max(0, state.gems + n))
   save()
   return state.gems
+}
+
+/** Phase 4/6 bookkeeping: per-topic seen/correct counts (weekly quotas later). */
+export function recordAnswer(op, correct) {
+  const t = state.topicProgress[op] || { seen: 0, correct: 0 }
+  t.seen += 1
+  if (correct) t.correct += 1
+  state.topicProgress[op] = t
+  save()
 }
 
 // ── Phase 3: shop + placement ──

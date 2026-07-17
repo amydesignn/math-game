@@ -45,3 +45,14 @@ canvas { touch-action: none; display: block; }
   40% { transform: scale(1.18); }
   100% { transform: scale(1); }
 }
+
+/* ── Math popup animations (Oscar's Phase 4 comp, lifted) ── */
+@keyframes ringpulse { 0% { transform: scale(.9); opacity: .55; } 70% { transform: scale(1.35); opacity: 0; } 100% { opacity: 0; } }
+@keyframes popIn { 0% { transform: scale(.86) translateY(14px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes scrimIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes gemSpin { 0% { transform: rotate(-8deg) scale(.4); opacity: 0; } 40% { opacity: 1; } 100% { transform: rotate(6deg) scale(1); opacity: 1; } }
+@keyframes sparkTwinkle { 0% { transform: translate(-50%,-50%) scale(0) rotate(-20deg); opacity: 0; } 40% { opacity: 1; } 60% { transform: translate(-50%,-50%) scale(1.1) rotate(10deg); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(0) rotate(40deg); opacity: 0; } }
+@keyframes stepIn { 0% { transform: translateY(8px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes cellPop { 0% { transform: scale(.5); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
+.shakeit { animation: shakeX .42s cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes shakeX { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-9px); } 40%, 60% { transform: translateX(9px); } }

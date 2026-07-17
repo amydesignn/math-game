@@ -18,6 +18,7 @@ let petSound = null
 let enabled = true
 let unlocked = false
 let petTimer = null
+let focus = false // math focus time — pet sounds hold (music stays, it soothes)
 
 export function setupAudio({ petId, on }) {
   enabled = on
@@ -56,12 +57,17 @@ export function setAudioEnabled(on) {
   }
 }
 
+/** Ivy's research: nothing interrupts during a problem. Meow holds in focus mode. */
+export function setFocusMode(on) {
+  focus = on
+}
+
 function schedulePetSound() {
   clearTimeout(petTimer)
   if (!petSound) return
   const [min, max] = PET_SOUND_GAP_MS
   petTimer = setTimeout(() => {
-    if (enabled && document.visibilityState === 'visible') {
+    if (enabled && !focus && document.visibilityState === 'visible') {
       petSound.currentTime = 0
       petSound.play().catch(() => {})
     }
