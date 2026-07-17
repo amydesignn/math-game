@@ -20,8 +20,9 @@ function freshState() {
     map: 'clearing', // which map she's in (walks through gates to change it)
     gems: 0, // Phase 2: collected from world sparkles (capped); Phase 4: earned by math
     soundOn: true, // the speaker toggle (music + pet sounds)
-    world: [], // placed props: [{ asset, x, z, rotation }] (Stage C)
-    owned: [], // assets bought from the shop (Stage C)
+    world: [], // placed assets: [{ id, asset, pack, x, z, rot, map }] (Phase 3)
+    owned: [], // bought but not yet placed: [{ id, asset, pack }] (Phase 3)
+    nextId: 1, // asset id counter (persisted so ids never collide across sessions)
     // Stage B — times tables first, curriculum topics later:
     topicProgress: {}, // { [topicId]: { seen, correct } }
     startedISO: null,
@@ -85,6 +86,57 @@ export function addGems(n) {
   state.gems = Math.max(0, state.gems + n)
   save()
   return state.gems
+}
+
+// ── Phase 3: shop + placement ──
+// Spending gems frees room under the beta cap (the cap limits the BALANCE,
+// not lifetime earnings), so buying things lets more sparkles appear.
+
+/** Buy an item from the shop → inventory. Returns the new id, or null if she can't afford it. */
+export function buyAsset({ asset, pack }, price) {
+  if (state.gems < price) return null
+  state.gems -= price
+  const id = state.nextId++
+  state.owned.push({ id, asset, pack })
+  save()
+  return id
+}
+
+/** Place an owned item into the current map's world. */
+export function placeAsset(id, map, x, z, rot = 0) {
+  const i = state.owned.findIndex((o) => o.id === id)
+  if (i === -1) return
+  const [item] = state.owned.splice(i, 1)
+  state.world.push({ ...item, map, x, z, rot })
+  save()
+}
+
+export function moveAsset(id, x, z, rot) {
+  const w = state.world.find((p) => p.id === id)
+  if (w) {
+    w.x = x
+    w.z = z
+    if (rot != null) w.rot = rot
+    save()
+  }
+}
+
+/** Rotate a placed asset by 45°. */
+export function rotateAsset(id) {
+  const w = state.world.find((p) => p.id === id)
+  if (w) {
+    w.rot = (w.rot + Math.PI / 4) % (Math.PI * 2)
+    save()
+  }
+}
+
+/** Put a placed asset back into inventory (no refund — it's hers). */
+export function pickupAsset(id) {
+  const i = state.world.findIndex((p) => p.id === id)
+  if (i === -1) return
+  const [{ id: wid, asset, pack }] = state.world.splice(i, 1)
+  state.owned.push({ id: wid, asset, pack })
+  save()
 }
 
 export function resetAll() {

@@ -3,7 +3,8 @@ import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import Scene from './world/Scene'
 import Minimap from './ui/Minimap'
-import { getState, setMap, addGems, setSoundOn } from './store'
+import Shop from './ui/Shop'
+import { getState, setMap, addGems, setSoundOn, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled } from './audio'
 import { WORLD, GEMS } from './config'
 import { MAPS, arrivalPoint, preloadMap } from './maps'
@@ -45,6 +46,69 @@ export default function App() {
     setupAudio({ petId: state.pet, on: state.soundOn })
   }, [state.pet, state.soundOn])
 
+  // ── Phase 3: shop + placement ──
+  const [shopOpen, setShopOpen] = useState(false)
+  const [placing, setPlacing] = useState(null) // { id, asset, pack, isMove?, startAt? }
+  const [ghostRot, setGhostRot] = useState(0)
+  const [selectedId, setSelectedId] = useState(null) // a placed asset being edited
+  const [placed, setPlaced] = useState(() => getState().world)
+  const [owned, setOwned] = useState(() => getState().owned)
+  const [note, setNote] = useState(null) // small warning toast ("too close to the gate")
+  const ghostPosRef = useRef(null) // Scene writes the ghost's spot; confirm reads it
+  const noteTimer = useRef()
+
+  function refreshAssets() {
+    setPlaced([...getState().world])
+    setOwned([...getState().owned])
+  }
+
+  function showNote(text) {
+    setNote(text)
+    clearTimeout(noteTimer.current)
+    noteTimer.current = setTimeout(() => setNote(null), 2200)
+  }
+
+  function startPlacing(item) {
+    setSelectedId(null)
+    setShopOpen(false)
+    setGhostRot(item.rot ?? 0)
+    ghostPosRef.current = null
+    setPlacing(item)
+  }
+
+  function handleBuy(item) {
+    const id = buyAsset(item, item.price)
+    if (id == null) return
+    setGems(getState().gems)
+    refreshAssets()
+    startPlacing({ id, asset: item.asset, pack: item.pack })
+  }
+
+  function confirmPlace() {
+    const at = ghostPosRef.current
+    if (!placing || !at) return
+    const nearGate = MAPS[mapId].gates.some((g) => Math.hypot(at[0] - g.position[0], at[1] - g.position[2]) < 2.4)
+    if (nearGate) {
+      showNote('Too close to the gate — pick another spot ✨')
+      return
+    }
+    if (placing.isMove) moveAsset(placing.id, at[0], at[1], ghostRot)
+    else placeAsset(placing.id, mapId, at[0], at[1], ghostRot)
+    refreshAssets()
+    setPlacing(null)
+  }
+
+  function cancelPlace() {
+    // a cancelled new item stays in "Your things"; a cancelled move changes nothing
+    setPlacing(null)
+    refreshAssets()
+  }
+
+  function startMove(id) {
+    const w = getState().world.find((p) => p.id === id)
+    if (w) startPlacing({ id: w.id, asset: w.asset, pack: w.pack, isMove: true, startAt: [w.x, w.z], rot: w.rot })
+  }
+
   // ── Maps: which one we're in, where this visit starts, travel fade + toast ──
   const [mapId, setMapId] = useState(() => (MAPS[state.map] ? state.map : 'clearing'))
   const [spawn, setSpawn] = useState([0, 0])
@@ -52,6 +116,9 @@ export default function App() {
   const [toast, setToast] = useState(null)
   const travelling = useRef(false)
   const toastTimer = useRef()
+
+  // the assets she's placed in the map she's standing in (mapId lives just above)
+  const placedHere = placed.filter((w) => w.map === mapId)
 
   function travel(toId) {
     if (travelling.current) return false // caller may retry next frame
@@ -166,6 +233,13 @@ export default function App() {
             onTravel={travel}
             onGem={onGem}
             sparklesRef={sparklesRef}
+            placing={placing}
+            ghostPosRef={ghostPosRef}
+            ghostRot={ghostRot}
+            placed={placedHere}
+            hiddenId={placing?.isMove ? placing.id : null}
+            selectedId={selectedId}
+            onSelectPlaced={(id) => setSelectedId(id)}
             characterId={state.character}
             petId={state.pet}
             targetRef={targetRef}
@@ -180,10 +254,46 @@ export default function App() {
       {/* ── HUD ── */}
       <GemCounter count={gems} />
       <SpeakerButton />
-      <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} />
+      <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} placed={placedHere} />
       {!moved && <MoveHint />}
       {toast && <MapToast name={toast} />}
       {teaser && <TeaserToast />}
+      {note && <NoteToast text={note} />}
+
+      {/* ── Phase 3: shop + placement HUD ── */}
+      {!placing && !shopOpen && selectedId == null && (
+        <ShopButton onOpen={() => setShopOpen(true)} />
+      )}
+      {placing && (
+        <ActionBar
+          hint={placing.isMove ? 'Tap where it should go' : 'Tap a spot for it ✨'}
+          buttons={[
+            { label: '↻', aria: 'Rotate', onTap: () => setGhostRot((r) => (r + Math.PI / 4) % (Math.PI * 2)) },
+            { label: placing.isMove ? '✓ Move here' : '✓ Place', aria: 'Confirm', primary: true, onTap: confirmPlace },
+            { label: '✕', aria: 'Cancel', onTap: cancelPlace },
+          ]}
+        />
+      )}
+      {!placing && selectedId != null && (
+        <ActionBar
+          hint="Your decoration"
+          buttons={[
+            { label: '✥ Move', aria: 'Move', onTap: () => startMove(selectedId) },
+            { label: '↻', aria: 'Rotate', onTap: () => { rotateAsset(selectedId); refreshAssets() } },
+            { label: '📦', aria: 'Put away', onTap: () => { pickupAsset(selectedId); refreshAssets(); setSelectedId(null) } },
+            { label: '✓ Done', aria: 'Done', primary: true, onTap: () => setSelectedId(null) },
+          ]}
+        />
+      )}
+      {shopOpen && (
+        <Shop
+          gems={gems}
+          owned={owned}
+          onBuy={handleBuy}
+          onPlaceOwned={(o) => startPlacing({ id: o.id, asset: o.asset, pack: o.pack })}
+          onClose={() => setShopOpen(false)}
+        />
+      )}
 
       {/* gate-travel fade (also swallows taps mid-travel) */}
       <div
@@ -314,6 +424,98 @@ function Gem() {
       <path d="M6 3h12l4 6H2z" fill="#7fe0e0" />
       <path d="M12 21 2 9h20z" fill="#25a8a8" />
     </svg>
+  )
+}
+
+function ShopButton({ onOpen }) {
+  return (
+    <button
+      aria-label="Open the Gem Shop"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={onOpen}
+      style={{
+        position: 'absolute',
+        bottom: 'max(20px, env(safe-area-inset-bottom))',
+        right: 16,
+        width: 54,
+        height: 54,
+        borderRadius: 999,
+        border: 'none',
+        background: '#ffffff',
+        boxShadow: '0 4px 14px rgba(43,32,90,0.2)',
+        fontSize: 24,
+        cursor: 'pointer',
+      }}
+    >
+      🛍️
+    </button>
+  )
+}
+
+/** Bottom-center pill of big kid-sized buttons (placement + edit modes). */
+function ActionBar({ hint, buttons }) {
+  return (
+    <div
+      onPointerDown={(e) => e.stopPropagation()}
+      style={{
+        position: 'absolute',
+        bottom: 'max(20px, env(safe-area-inset-bottom))',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 8,
+      }}
+    >
+      <div style={{ padding: '6px 14px', background: 'rgba(43,32,90,0.82)', color: '#fff', borderRadius: 999, fontWeight: 600, fontSize: 13.5 }}>{hint}</div>
+      <div style={{ display: 'flex', gap: 10, background: '#ffffff', borderRadius: 999, padding: 8, boxShadow: '0 4px 14px rgba(43,32,90,0.2)' }}>
+        {buttons.map((b) => (
+          <button
+            key={b.aria}
+            aria-label={b.aria}
+            onClick={b.onTap}
+            style={{
+              minWidth: 46,
+              height: 46,
+              padding: '0 16px',
+              borderRadius: 999,
+              border: 'none',
+              background: b.primary ? 'var(--brand-iris-600)' : 'var(--brand-lilac-100)',
+              color: b.primary ? '#ffffff' : 'var(--brand-lilac-900)',
+              fontSize: 16,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            {b.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function NoteToast({ text }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: 'max(120px, calc(env(safe-area-inset-top) + 104px))',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        padding: '10px 20px',
+        background: 'rgba(43,32,90,0.88)',
+        color: '#fff',
+        borderRadius: 999,
+        fontWeight: 700,
+        fontSize: 15,
+        pointerEvents: 'none',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {text}
+    </div>
   )
 }
 

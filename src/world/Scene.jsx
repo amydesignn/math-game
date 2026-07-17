@@ -6,6 +6,7 @@ import Pet from './Pet'
 import Prop from './Prop'
 import Gate from './Gate'
 import Sparkle from './Sparkle'
+import Ghost from './Ghost'
 import { WORLD, GEMS } from '../config'
 import { MAPS } from '../maps'
 import { getState } from '../store'
@@ -17,7 +18,7 @@ const GATE_RADIUS = 1.7 // walk this close to a gate's glow → travel (forgivin
  * the spawn point, the gates (a sparkle luring her into a gate would teleport
  * her), the scenery, and each other. Count respects the remaining beta cap.
  */
-function spawnSparkles(map, spawn) {
+function spawnSparkles(map, spawn, placed = []) {
   const count = Math.max(0, Math.min(GEMS.perMap, GEMS.cap - getState().gems))
   const pts = []
   const B = WORLD.bounds - 2.5
@@ -28,6 +29,7 @@ function spawnSparkles(map, spawn) {
     if (Math.hypot(x - spawn[0], z - spawn[1]) < 4) continue
     if (map.gates.some((g) => Math.hypot(x - g.position[0], z - g.position[2]) < 4.5)) continue
     if (map.decor.some((d) => Math.hypot(x - d.position[0], z - d.position[2]) < 1.8)) continue
+    if (placed.some((w) => Math.hypot(x - w.x, z - w.z) < 1.8)) continue
     if (pts.some((p) => Math.hypot(x - p.x, z - p.z) < 5)) continue
     pts.push({ id: pts.length, x, z, collected: false })
   }
@@ -42,13 +44,13 @@ function spawnSparkles(map, spawn) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
+export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
   const marker = useRef() // the ring that pings on tap
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
 
   // ── Phase 2: this visit's gem sparkles ──
-  const [sparkles, setSparkles] = useState(() => spawnSparkles(map, spawn))
+  const [sparkles, setSparkles] = useState(() => spawnSparkles(map, spawn, placed))
   const taken = useRef(new Set()) // same-frame double-collect guard
 
   // the minimap draws live sparkles from this shared ref
@@ -77,7 +79,7 @@ export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, charac
   // tapping a sparkle walks her to it — proximity does the collecting
   function walkToSparkle(sp) {
     return (e) => {
-      if (gestureRef.current.pinching || sp.collected) return
+      if (gestureRef.current.pinching || sp.collected || placing) return
       e.stopPropagation()
       targetRef.current = new THREE.Vector3(sp.x, 0, sp.z)
       if (marker.current) {
@@ -87,6 +89,24 @@ export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, charac
     }
   }
 
+  // ── Phase 3: placement ghost (its position lives in state so it re-renders
+  // per tap; the shared ref lets App read the final spot on confirm) ──
+  const [ghostPos, setGhostPos] = useState(null)
+  useEffect(() => {
+    if (!placing) {
+      setGhostPos(null)
+      return
+    }
+    // moves start at the asset's own spot; new items just in front of her
+    const B = WORLD.bounds - 1
+    const c = charPosRef.current
+    const [sx, sz] = placing.startAt ?? [c.x + 1.8, c.z + 1.8]
+    const at = [Math.min(B, Math.max(-B, sx)), Math.min(B, Math.max(-B, sz))]
+    setGhostPos(at)
+    if (ghostPosRef) ghostPosRef.current = at
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placing])
+
   function handleTap(e) {
     if (gestureRef.current.pinching) return // two fingers = zoom, not walk
     e.stopPropagation()
@@ -94,6 +114,16 @@ export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, charac
     // clamp to the playable map so she can never wander off the edge
     const x = Math.min(B, Math.max(-B, e.point.x))
     const z = Math.min(B, Math.max(-B, e.point.z))
+
+    // placing? taps position the ghost instead of walking
+    if (placing) {
+      setGhostPos([x, z])
+      if (ghostPosRef) ghostPosRef.current = [x, z]
+      return
+    }
+
+    if (selectedId != null) onSelectPlaced(null) // ground tap = done editing
+
     targetRef.current = new THREE.Vector3(x, 0, z)
     if (marker.current) {
       marker.current.position.set(x, 0.03, z)
@@ -192,6 +222,36 @@ export default function Scene({ map, spawn, onTravel, onGem, sparklesRef, charac
       {sparkles.map((sp) => (
         <Sparkle key={sp.id} x={sp.x} z={sp.z} collected={sp.collected} onTap={walkToSparkle(sp)} />
       ))}
+
+      {/* ── Phase 3: assets Ivy has placed in THIS map ── */}
+      {placed.map((w) =>
+        w.id === hiddenId ? null : (
+          <group
+            key={w.id}
+            onPointerDown={(e) => {
+              if (gestureRef.current.pinching || placing) return
+              e.stopPropagation()
+              onSelectPlaced(w.id)
+            }}
+          >
+            <Prop pack={w.pack} name={w.asset} position={[w.x, 0, w.z]} rotation={w.rot} />
+          </group>
+        )
+      )}
+
+      {/* selection ring under the asset she's editing */}
+      {selectedId != null &&
+        placed
+          .filter((w) => w.id === selectedId && w.id !== hiddenId)
+          .map((w) => (
+            <mesh key="sel" rotation={[-Math.PI / 2, 0, 0]} position={[w.x, 0.02, w.z]}>
+              <ringGeometry args={[0.9, 1.12, 40]} />
+              <meshBasicMaterial color="#f5b623" transparent opacity={0.85} />
+            </mesh>
+          ))}
+
+      {/* the placement ghost */}
+      {placing && ghostPos && <Ghost pack={placing.pack} asset={placing.asset} position={ghostPos} rotation={ghostRot} />}
 
       <Character id={characterId} start={spawn} targetRef={targetRef} posRef={charPosRef} />
       <Pet id={petId} start={spawn} targetPosRef={charPosRef} posRef={petPosRef} />

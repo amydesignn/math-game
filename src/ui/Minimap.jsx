@@ -9,7 +9,7 @@ const SIZE = 104 // css px, drawn 2x for retina
  * the world), with the scenery as fixed dots and Ivy + her pet as live dots.
  * Reads positions from refs each frame — no React re-renders.
  */
-export default function Minimap({ map, charPosRef, petPosRef, sparklesRef }) {
+export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, placed = [] }) {
   const canvas = useRef()
 
   useEffect(() => {
@@ -51,6 +51,14 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef }) {
         ctx.stroke()
       }
 
+      // Ivy's placed decorations (lilac — hers, distinct from grey scenery)
+      ctx.fillStyle = '#9b84e0'
+      for (const w of placed) {
+        ctx.beginPath()
+        ctx.arc(toPx(w.x), toPx(w.z), 5, 0, Math.PI * 2)
+        ctx.fill()
+      }
+
       // gem sparkles (cyan — "something to find here")
       ctx.fillStyle = cyan
       ctx.strokeStyle = '#ffffff'
@@ -83,7 +91,7 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef }) {
     }
     raf = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(raf)
-  }, [map, charPosRef, petPosRef, sparklesRef])
+  }, [map, charPosRef, petPosRef, sparklesRef, placed])
 
   return (
     <canvas

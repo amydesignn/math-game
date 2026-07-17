@@ -48,6 +48,33 @@ export const WORLD = {
   zoomMax: 2.2, // pinch-out limit (see more of the map)
 }
 
+// ── Phase 3: the Gem Shop catalog ──
+// Curated from the packs already staged in public/models (all CC0, all scale 1
+// per the mini-pack rule). Prices tuned to the 15-gem cap: a full pocket buys
+// a handful of things, so earning → spending → earning keeps cycling.
+export const SHOP = [
+  { asset: 'tree', pack: 'forest', name: 'Tree', emoji: '🌳', price: 3 },
+  { asset: 'tree-high', pack: 'forest', name: 'Tall tree', emoji: '🌲', price: 4 },
+  { asset: 'plant', pack: 'forest', name: 'Plant', emoji: '🌿', price: 2 },
+  { asset: 'patch-grass', pack: 'forest', name: 'Grass patch', emoji: '🌱', price: 2 },
+  { asset: 'stones', pack: 'forest', name: 'Stones', emoji: '🪨', price: 2 },
+  { asset: 'fence', pack: 'forest', name: 'Fence', emoji: '🪵', price: 2 },
+  { asset: 'flag', pack: 'forest', name: 'Flag', emoji: '🚩', price: 2 },
+  { asset: 'tent', pack: 'forest', name: 'Tent', emoji: '⛺', price: 5 },
+  { asset: 'bridge', pack: 'forest', name: 'Bridge', emoji: '🌉', price: 6 },
+  { asset: 'target', pack: 'forest', name: 'Target', emoji: '🎯', price: 3 },
+  { asset: 'display-fruit', pack: 'market', name: 'Fruit stand', emoji: '🍎', price: 4 },
+  { asset: 'display-bread', pack: 'market', name: 'Bakery stand', emoji: '🥐', price: 4 },
+  { asset: 'shopping-cart', pack: 'market', name: 'Cart', emoji: '🛒', price: 3 },
+  { asset: 'freezer', pack: 'market', name: 'Ice-cream freezer', emoji: '🍦', price: 4 },
+  { asset: 'arcade-machine', pack: 'arcade', name: 'Arcade machine', emoji: '🕹️', price: 6 },
+  { asset: 'claw-machine', pack: 'arcade', name: 'Claw machine', emoji: '🧸', price: 6 },
+  { asset: 'pinball', pack: 'arcade', name: 'Pinball', emoji: '🎮', price: 5 },
+  { asset: 'dance-machine', pack: 'arcade', name: 'Dance machine', emoji: '💃', price: 6 },
+  { asset: 'prize-wheel', pack: 'arcade', name: 'Prize wheel', emoji: '🎡', price: 5 },
+  { asset: 'basketball-game', pack: 'arcade', name: 'Basketball hoop', emoji: '🏀', price: 5 },
+]
+
 // ── Phase 2: gem sparkles (beta collection loop; Phase 4 swaps taps for math) ──
 export const GEMS = {
   // Hard beta cap (Finn's brief, learned from Cozy Closet: a cap creates
