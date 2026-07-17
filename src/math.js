@@ -156,7 +156,7 @@ export function maybeLevelUp(topicId) {
 
 // QA hook (dev builds only): exercise the engine from the console
 if (import.meta.env.DEV && typeof window !== 'undefined') {
-  window.__math = { nextProblem, buildStages: (p) => buildStages(p), TOPICS, currentLevel }
+  window.__math = { nextProblem, buildStages: (p) => buildStages(p), buildStagesMulti, TOPICS, currentLevel }
 }
 
 /* ══════════════════ WORKED-EXAMPLE BUILDERS ═══════════════════════ */
@@ -178,6 +178,45 @@ export function buildStages(problem) {
   if (problem.type === 'long-mult') return buildLongMult(a, b)
   if (op === '+') return buildAdd(a, b)
   return buildMult2x1(a, b)
+}
+
+/* ---- C1 v2: multi-digit multiplier worked example (Oscar's comp, lifted
+   1:1 from ~/Downloads/math-worked-example-v2.html). Solves OPERAND-TRACKING,
+   Ivy's confirmed failure (Finn's diagnosis): the top number stays WHOLE in a
+   capsule, the active multiplier digit is spotlighted, and the tens-pass zero
+   placeholder is WRITTEN, never "remembered". Snap model is Oscar's (not the
+   rows model) — MultiColumnMath renders it. The shared WorkedExample routes
+   here when op==='×' && b>=10; buildLongMult above is the rows-model fallback,
+   superseded for the actual worked example by this. */
+const pad4 = (n) => padTo(n, 4)
+
+export function buildStagesMulti(a, b) {
+  const bO = b % 10, bT = Math.floor(b / 10)
+  const p1 = a * bO, p2 = a * bT, answer = a * b
+  const blank = () => ({ top: pad4(a), bO, bT, spot: null, row1: pad4(''), row2: pad4(''), sum: pad4(''), hiRow: null, zeroHot: false, shifted: false, carry: pad4(''), carryHot: false })
+  const stages = []
+  let s
+  s = blank()
+  stages.push({ caption: `${a} stays WHOLE — it's the whole team, we never split it apart. We'll take the bottom digits one at a time, right to left.`, snap: s })
+  // ones pass — if it carries, show the school's "remember it on top" move once
+  const aO = a % 10, aT = Math.floor(a / 10)
+  const oProd = aO * bO, oWrite = oProd % 10, oCarry = Math.floor(oProd / 10)
+  if (oCarry > 0) {
+    s = blank(); s.spot = 'O'; s.row1 = ['', '', '', String(oWrite)]; s.carry[2] = String(oCarry); s.carryHot = true; s.hiRow = 'row1'
+    stages.push({ caption: `Ones pass: spotlight the ${bO}. Start small: ${aO} × ${bO} = ${oProd} — write the ${oWrite}, and pop the ${oCarry} up top in yellow so we remember to add it.`, snap: s })
+    s = blank(); s.spot = 'O'; s.row1 = pad4(p1); s.carry[2] = String(oCarry); s.hiRow = 'row1'
+    stages.push({ caption: `Keep going: ${aT} × ${bO} = ${aT * bO}, plus the ${oCarry} waiting on top = ${aT * bO + oCarry}. Row 1 is ${p1}.`, snap: s })
+  } else {
+    s = blank(); s.spot = 'O'; s.row1 = pad4(p1); s.hiRow = 'row1'
+    stages.push({ caption: `Ones pass: spotlight the ${bO}. Whole ${a} × ${bO} = ${p1}. Write it as row 1, starting under the ones.`, snap: s })
+  }
+  s = blank(); s.spot = 'T'; s.row1 = pad4(p1); s.row2 = pad4('0'); s.zeroHot = true; s.shifted = true; s.hiRow = 'row2'
+  stages.push({ caption: `Tens pass: spotlight the ${bT}. It's not really ${bT} — it's ${bT}0! So this row slides one place left. Write a 0 in the ones spot first, so nothing sneaks in there.`, snap: s })
+  s = blank(); s.spot = 'T'; s.row1 = pad4(p1); s.row2 = pad4(p2 * 10); s.shifted = true; s.hiRow = 'row2'
+  stages.push({ caption: `Now the same move as before: whole ${a} × ${bT} = ${p2}. Write it next to the zero — that makes ${p2 * 10}.`, snap: s })
+  s = blank(); s.row1 = pad4(p1); s.row2 = pad4(p2 * 10); s.sum = pad4(answer); s.hiRow = 'sum'
+  stages.push({ caption: `Both passes done! Add the rows: ${p1} + ${p2 * 10} = ${answer}.`, snap: s })
+  return { stages, answer }
 }
 
 function baseRows(cols, a, op, b) {

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Gem from './Gem'
-import { OPSYM, solve, buildStages } from '../math'
+import { OPSYM, solve, buildStages, buildStagesMulti } from '../math'
 
 /*
  * MathPopup — Oscar's Phase 4 handoff, lifted 1:1 (his comp:
@@ -144,6 +144,124 @@ function ColumnMath({ snap, big = false }) {
   )
 }
 
+/* ---- v2 multi-pass grid (Oscar's comp, lifted): WHOLE-anchor capsule +
+   dashed active-digit spotlight + explicit written zero placeholder + school
+   yellow carry. Renders buildStagesMulti's snap model. This is the operand-
+   tracking visual Finn's diagnosis called for. ---- */
+function MultiColumnMath({ snap }) {
+  const cell = 50, fs = 28
+  const cols = [0, 1, 2, 3]
+  const numCell = (val, { hot, color = T.ink, key }) => (
+    <div key={key} style={{ width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1, color,
+      background: hot ? T.blueTint : 'transparent', borderRadius: 12,
+      boxShadow: hot ? `inset 0 0 0 2px ${T.blue}` : 'none',
+      animation: hot && val !== '' ? 'cellPop .32s ease-out both' : 'none',
+      transition: 'background .2s, box-shadow .2s' }}>{val}</div>
+  )
+  const lead = (sym) => <div style={{ width: cell * 0.7, textAlign: 'center', fontSize: fs, fontWeight: 700, color: T.ink3 }}>{sym || ''}</div>
+
+  // multiplier digits with Amy's dashed spotlight
+  const bDigit = (d, which) => {
+    const active = snap.spot === which, dim = snap.spot && !active
+    return (
+      <div key={which} style={{ width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: cell - 8, height: cell - 8, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1,
+          color: active ? T.blueDark : T.ink, opacity: dim ? 0.28 : 1,
+          border: active ? `2.5px dashed ${T.blue}` : '2.5px dashed transparent',
+          background: active ? T.blueTint : 'transparent',
+          animation: active ? 'spotIn .35s ease-out both' : 'none',
+          transition: 'opacity .25s' }}>{d}</div>
+      </div>
+    )
+  }
+
+  const rowEl = (arr, hot, anim) => (
+    <div style={{ display: 'flex', alignItems: 'center', animation: anim || 'none' }}>
+      {lead('')}
+      {cols.map((i) => numCell(arr[i], { hot: hot && arr[i] !== '', color: T.blue, key: i }))}
+    </div>
+  )
+
+  const hasCarry = snap.carry.some((x) => x !== '')
+  return (
+    <div style={{ display: 'inline-flex', flexDirection: 'column', background: '#fff',
+      border: `1.5px solid ${T.line}`, borderRadius: 18, padding: '14px 18px 16px' }}>
+      {/* school carry — the yellow number on top, remembered for the addition */}
+      {hasCarry && (
+        <div style={{ display: 'flex', alignItems: 'flex-end', height: 34, marginBottom: 16 }}>
+          {lead('')}
+          {cols.map((i) => (
+            <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
+              {snap.carry[i] !== '' && (
+                <div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 17, fontWeight: 700, color: '#B45309', background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  animation: snap.carryHot ? 'spotIn .35s ease-out both' : 'none', opacity: snap.carryHot ? 1 : 0.75 }}>{snap.carry[i]}</div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+      {/* top number — WHOLE, anchored in a capsule */}
+      <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+        {lead('')}
+        {(() => {
+          const firstIdx = snap.top.findIndex((x) => x !== '')
+          return (
+            <>
+              {cols.slice(0, firstIdx).map((i) => numCell('', { hot: false, key: 'pad' + i }))}
+              <div style={{ position: 'relative', display: 'flex' }}>
+                <div style={{ position: 'absolute', inset: -3, borderRadius: 16, border: `2.5px solid ${T.teal}`,
+                  background: 'rgba(0,187,167,.06)', pointerEvents: 'none' }} />
+                <span style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', fontSize: 10.5, fontWeight: 700,
+                  letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff', background: T.teal, borderRadius: 8,
+                  padding: '2px 8px', whiteSpace: 'nowrap' }}>whole</span>
+                {cols.slice(firstIdx).map((i) => numCell(snap.top[i], { hot: false, key: i }))}
+              </div>
+            </>
+          )
+        })()}
+      </div>
+      {/* multiplier row w/ spotlight digits */}
+      <div style={{ display: 'flex', alignItems: 'center', marginTop: 8 }}>
+        {lead('×')}
+        {numCell('', { key: 'sp0' })}{numCell('', { key: 'sp1' })}
+        {bDigit(snap.bT, 'T')}
+        {bDigit(snap.bO, 'O')}
+      </div>
+      <div style={{ height: 0, borderTop: `3px solid ${T.ink}`, margin: '8px 0' }} />
+      {/* pass rows */}
+      <div style={{ display: 'flex', alignItems: 'center', minHeight: cell }}>
+        {lead('')}
+        {cols.map((i) => numCell(snap.row1[i], { hot: snap.hiRow === 'row1' && snap.row1[i] !== '', color: T.blue, key: i }))}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', minHeight: cell, animation: snap.shifted && snap.hiRow === 'row2' ? 'shiftNudge .4s ease-out both' : 'none' }}>
+        {lead(snap.sum.some((x) => x !== '') ? '+' : '')}
+        {cols.map((i) => {
+          const isZero = i === 3 && snap.row2[3] === '0'
+          return (
+            <div key={i} style={{ position: 'relative' }}>
+              {numCell(snap.row2[i], { hot: (snap.hiRow === 'row2' && snap.row2[i] !== '') || (isZero && snap.zeroHot),
+                color: isZero ? T.amber : T.blue, key: i })}
+              {isZero && snap.zeroHot && (
+                <span style={{ position: 'absolute', left: '50%', bottom: -16, transform: 'translateX(-50%)',
+                  fontSize: 10.5, fontWeight: 700, color: T.amber, whiteSpace: 'nowrap' }}>write it!</span>
+              )}
+            </div>
+          )
+        })}
+      </div>
+      {snap.sum.some((x) => x !== '') && (
+        <>
+          <div style={{ height: 0, borderTop: `3px solid ${T.ink}`, margin: '8px 0' }} />
+          {rowEl(snap.sum, snap.hiRow === 'sum')}
+        </>
+      )}
+    </div>
+  )
+}
+
 /* ---- numeric keypad (touch-friendly, no OS keyboard needed) ---- */
 function Keypad({ onKey }) {
   const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok']
@@ -175,7 +293,13 @@ function KeypadKey({ k, isOk, isDel, onKey }) {
 /* ============================ WORKED EXAMPLE ========================= */
 function WorkedExample({ problem, onBack }) {
   const sim = problem.similar
-  const { stages } = useRef(buildStages({ ...problem, a: sim.a, b: sim.b })).current
+  // v2 (Oscar): a multi-digit multiplier gets the whole-anchor + active-digit
+  // spotlight + written-zero-placeholder treatment — the operand-tracking
+  // visual. Routing per Oscar's handoff: multiplication with b ≥ 10.
+  const useV2 = problem.op === '×' && sim.b >= 10
+  const { stages } = useRef(
+    useV2 ? buildStagesMulti(sim.a, sim.b) : buildStages({ ...problem, a: sim.a, b: sim.b })
+  ).current
   const [i, setI] = useState(0)
   const last = i >= stages.length - 1
   const st = stages[i]
@@ -190,7 +314,7 @@ function WorkedExample({ problem, onBack }) {
         <span style={{ opacity: 0.6 }}>· here's one just like it</span>
       </div>
       <div key={i} style={{ animation: 'stepIn .3s ease-out both' }}>
-        <ColumnMath snap={st.snap} big />
+        {useV2 ? <MultiColumnMath snap={st.snap} /> : <ColumnMath snap={st.snap} big />}
       </div>
       <div style={{ minHeight: 58, maxWidth: 400, textAlign: 'center', fontSize: 17, fontWeight: 500, color: T.ink,
         lineHeight: 1.5, background: T.blueTint, borderRadius: 14, padding: '12px 18px' }}>{st.caption}</div>
@@ -200,7 +324,8 @@ function WorkedExample({ problem, onBack }) {
             background: k === i ? T.blue : k < i ? T.blueSubtle : '#E6E6E6', transition: 'all .2s' }} />
         ))}
       </div>
-      <div style={{ display: 'flex', gap: 12, marginTop: 2 }}>
+      <div style={{ display: 'flex', gap: 10, marginTop: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
+        {i > 0 && <BigButton tone="ghost" onClick={() => setI(i - 1)}>◂ Back</BigButton>}
         {!last && <BigButton tone="blue" onClick={() => setI(i + 1)}>Show next step ▸</BigButton>}
         {last && <BigButton tone="blue" onClick={onBack}>Now try yours again</BigButton>}
         {!last && <BigButton tone="ghost" onClick={onBack}>I've got it</BigButton>}
