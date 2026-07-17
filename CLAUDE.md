@@ -26,8 +26,39 @@ to earn gems; gems buy assets she places to build a small world.
 - **Phase 1 — the world** (5 maps + teleport ring) ✅ DONE
 - **Phase 2 — music + gem collection** (bgm/meow + sparkle-tap gems, 15 cap) ✅ DONE 2026-07-16
 - **Phase 3 — shop + asset placement** ✅ DONE 2026-07-16 (localStorage still; Supabase later per brief)
-- **Phase 4 — math popup overlay** (Oscar designs the React overlay; sparkles become math gems)
+- **Phase 4 — math popup overlay** ✅ DONE 2026-07-16 (Oscar designed, Nathan lifted + wired; sparkles ARE math gems now)
 - **Phase 5 — task wrappers** (water-a-tree skins) · **Phase 6 — progression** (quotas/badges)
+
+## Phase 4 (added 2026-07-16): THE MATH LOOP
+- **Oscar's handoff** = `~/Downloads/math-popup-flow.html` (self-contained comp).
+  Lifted 1:1 into `src/ui/MathPopup.jsx` (tokens, skin banner, keypad, ask /
+  correct / recover states, flying gems) + `src/math.js` (his `buildStages`
+  worked-example builder + Nathan's infinite problem generator). Adaptations
+  (logged in Notion): gem PNG → house SVG (`src/ui/Gem.jsx`, shared with HUD),
+  `onClose(solved)`, `onResult(correct)` seam, physical-keyboard input.
+- **The loop:** walking into a sparkle (radius 1.0) opens the quest — she
+  STOPS (target cleared), meow holds (audio focus mode), bgm keeps playing.
+  Solve → 3 gems fly to the HUD counter, +1 awarded (cap-clamped in store),
+  sparkle bursts, pet `dance` + character `emote-yes` for 4s (via
+  `reactUntilRef`, checked in each one's useFrame). Wrong → step-by-step
+  column-math worked example on a SIMILAR problem (matching carry profile —
+  `nextProblem()` guarantees it), then "try yours again". Close unsolved →
+  gem stays; it re-arms only after she walks >2.6 away (`cooling` set in
+  Scene) so it can't instantly reopen underfoot. Re-approach = fresh problem
+  (deliberate: kinder than trapping her on one she's dodging).
+- **Topics:** `nextProblem()` = 60% 2-digit×1-digit, 40% 2-digit+2-digit
+  (times-tables-first per Amy). `topicProgress[op] = {seen, correct}` records
+  every check for Phase 6 quotas. Long multiplication (Ivy's pain point) is
+  an open v1-topic question with Finn+Amy — the ×-builder extends to it.
+- **Task wrappers ready:** SKINS has `feedPet` live; Phase 5 skins = one new
+  entry each (Oscar's architecture note, preserved verbatim in the file).
+- **QA notes:** the popup is plain DOM — testable with dispatched
+  KeyboardEvents (`window` listener) and button clicks; dispatch each key in
+  its OWN javascript_tool call (same-tick bursts hit a stale `entry` closure —
+  humans can't type that fast, QA can). In the hidden Browser-pane window,
+  rAF (and thus ALL R3F movement/anims) only ticks while a screenshot is
+  being taken — interleave screenshots as the frame pump, and never diagnose
+  "the character is frozen" from JS polls alone.
 
 ## Phase 2 (added 2026-07-16): music + gem collection
 - **Audio** (`src/audio.js`): bgm loop (Ivy's pick, `public/audio/bgm.mp3`, vol .38) +
