@@ -25,8 +25,10 @@ function freshState() {
     world: [], // placed assets: [{ id, asset, pack, x, z, rot, map }] (Phase 3)
     owned: [], // bought but not yet placed: [{ id, asset, pack }] (Phase 3)
     nextId: 1, // asset id counter (persisted so ids never collide across sessions)
-    // Stage B — times tables first, curriculum topics later:
-    topicProgress: {}, // { [topicId]: { seen, correct } }
+    // Curriculum progress (C1+). Per topic: her current ladder rung, per-level
+    // counts, the last-10 results at the TOP level (with dates — mastery needs
+    // 2 distinct days), and the mastered flag Phase 6's map nodes will light.
+    topicProgress: {}, // { [topicId]: { level, byLevel: {n:{seen,correct}}, topResults: [{d, ok}], mastered } }
     startedISO: null,
     lastActive: null,
   }
@@ -91,12 +93,38 @@ export function addGems(n) {
   return state.gems
 }
 
-/** Phase 4/6 bookkeeping: per-topic seen/correct counts (weekly quotas later). */
-export function recordAnswer(op, correct) {
-  const t = state.topicProgress[op] || { seen: 0, correct: 0 }
-  t.seen += 1
-  if (correct) t.correct += 1
-  state.topicProgress[op] = t
+/**
+ * C1 bookkeeping: record a checked answer for a topic at a ladder level.
+ * At the topic's TOP level we also keep the last-10 results with dates, and
+ * flip `mastered` on Finn's rule: 8 of the last 10 correct, across ≥2 days.
+ * (Old v1 records were keyed by bare op ('+'/'×') with {seen,correct} only —
+ * they're simply left in place; new topic ids never collide with them.)
+ */
+export function recordAnswer(topicId, level, correct, topLevel) {
+  const t = state.topicProgress[topicId] || { level: 1, byLevel: {}, topResults: [], mastered: false }
+  t.level = t.level || 1
+  t.byLevel[level] = t.byLevel[level] || { seen: 0, correct: 0 }
+  t.byLevel[level].seen += 1
+  if (correct) t.byLevel[level].correct += 1
+
+  if (level === topLevel) {
+    t.topResults = (t.topResults || []).slice(-9)
+    t.topResults.push({ d: new Date().toISOString().slice(0, 10), ok: !!correct })
+    const last10 = t.topResults
+    const wins = last10.filter((r) => r.ok).length
+    const days = new Set(last10.map((r) => r.d)).size
+    if (last10.length === 10 && wins >= 8 && days >= 2) t.mastered = true
+  }
+
+  state.topicProgress[topicId] = t
+  save()
+}
+
+/** Advance (or set) a topic's ladder rung — the diagnostic or level-up rule calls this. */
+export function setTopicLevel(topicId, level) {
+  const t = state.topicProgress[topicId] || { level: 1, byLevel: {}, topResults: [], mastered: false }
+  t.level = level
+  state.topicProgress[topicId] = t
   save()
 }
 

@@ -6,7 +6,7 @@ import Minimap from './ui/Minimap'
 import Shop from './ui/Shop'
 import Gem from './ui/Gem'
 import MathPopup, { SKINS } from './ui/MathPopup'
-import { nextProblem } from './math'
+import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { getState, setMap, addGems, setSoundOn, recordAnswer, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { WORLD, GEMS } from './config'
@@ -334,7 +334,11 @@ export default function App() {
           hudGemRef={hudGemRef}
           onAward={onMathAward}
           onPetReact={onPetReact}
-          onResult={(correct) => recordAnswer(math.problem.op, correct)}
+          onResult={(correct) => {
+            const p = math.problem
+            recordAnswer(p.type, p.level, correct, TOPICS[p.type].topLevel)
+            if (correct) maybeLevelUp(p.type)
+          }}
           onClose={onMathClose}
         />
       )}

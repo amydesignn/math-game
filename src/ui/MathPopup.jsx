@@ -98,43 +98,48 @@ function BigButton({ children, onClick, tone = 'blue', style }) {
   )
 }
 
-/* ---- column-math grid (the concrete visual for the worked example) ---- */
+/* ---- column-math grid (the concrete visual for the worked example) ----
+   Generalized to a rows model for C1: builders emit
+   { cols, rows: [{id, cells, lead?, note?, style?} | {rule:true}], hi }
+   so partial-product rows (long multiplication) fit. Cell styling, highlight
+   ring, and amber carries are Oscar's visual language, untouched. */
 function ColumnMath({ snap, big = false }) {
   const cell = big ? 54 : 44, fs = big ? 30 : 26
-  const col = ['H', 'T', 'O']
-  const cellStyle = (key, val) => {
+  const cellStyle = (key, val, isRes) => {
     const hot = snap.hi.includes(key)
     return { width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-      color: key.startsWith('res') ? T.blue : T.ink,
+      color: isRes ? T.blue : T.ink,
       background: hot ? T.blueTint : 'transparent', borderRadius: 12,
       boxShadow: hot ? `inset 0 0 0 2px ${T.blue}` : 'none',
       animation: hot && val !== '' ? 'cellPop .32s ease-out both' : 'none',
       transition: 'background .2s, box-shadow .2s' }
   }
-  const Row = ({ prefix, arr, lead }) => (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ width: cell * 0.7, textAlign: 'center', fontSize: fs, fontWeight: 700, color: T.ink3 }}>{lead || ''}</div>
-      {col.map((c, i) => (
-        <div key={c} style={cellStyle(`${prefix}-${c}`, arr[i])}>{arr[i]}</div>
-      ))}
-    </div>
-  )
   return (
     <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch',
       background: '#fff', border: `1.5px solid ${T.line}`, borderRadius: 18, padding: '12px 16px 14px' }}>
-      {/* carry row */}
-      <div style={{ display: 'flex', alignItems: 'center', height: big ? 26 : 22 }}>
-        <div style={{ width: cell * 0.7 }}></div>
-        {col.map((c, i) => (
-          <div key={c} style={{ width: cell, textAlign: 'center', fontSize: big ? 18 : 15, fontWeight: 700,
-            color: T.amber, animation: snap.carry[i] ? 'cellPop .3s ease-out both' : 'none' }}>{snap.carry[i]}</div>
-        ))}
-      </div>
-      <Row prefix="top" arr={snap.top} />
-      <Row prefix="bot" arr={snap.bottom} lead={OPSYM[snap.op]} />
-      <div style={{ height: 0, borderTop: `3px solid ${T.ink}`, margin: '6px 0' }}></div>
-      <Row prefix="res" arr={snap.result} />
+      {snap.rows.map((r, ri) => {
+        if (r.rule) return <div key={ri} style={{ height: 0, borderTop: `3px solid ${T.ink}`, margin: '6px 0' }} />
+        if (r.style === 'carry')
+          return (
+            <div key={ri} style={{ display: 'flex', alignItems: 'center', height: big ? 26 : 22 }}>
+              <div style={{ width: cell * 0.7 }}></div>
+              {r.cells.map((c, i) => (
+                <div key={i} style={{ width: cell, textAlign: 'center', fontSize: big ? 18 : 15, fontWeight: 700,
+                  color: T.amber, animation: c ? 'cellPop .3s ease-out both' : 'none' }}>{c}</div>
+              ))}
+            </div>
+          )
+        return (
+          <div key={ri} style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: cell * 0.7, textAlign: 'center', fontSize: fs, fontWeight: 700, color: T.ink3 }}>{r.lead || ''}</div>
+            {r.cells.map((c, i) => (
+              <div key={i} style={cellStyle(`${r.id}-${i}`, c, r.id === 'res')}>{c}</div>
+            ))}
+            {r.note && <div style={{ marginLeft: 10, fontSize: 13, fontWeight: 600, color: T.ink3, whiteSpace: 'nowrap' }}>{r.note}</div>}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -170,7 +175,7 @@ function KeypadKey({ k, isOk, isDel, onKey }) {
 /* ============================ WORKED EXAMPLE ========================= */
 function WorkedExample({ problem, onBack }) {
   const sim = problem.similar
-  const { stages } = useRef(buildStages(problem.op, sim.a, sim.b)).current
+  const { stages } = useRef(buildStages({ ...problem, a: sim.a, b: sim.b })).current
   const [i, setI] = useState(0)
   const last = i >= stages.length - 1
   const st = stages[i]
@@ -234,15 +239,18 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
   const win = () => {
     setPhase('correct')
     onPetReact?.()
-    // fly a gem from the card to the HUD counter
+    // The AWARD rides a plain timer so it can never be lost — rAF starves in
+    // hidden/throttled windows (iOS low-power, background tabs), and the gem
+    // must land even if the flight animation doesn't get a frame.
+    setTimeout(() => onAward?.(1), 620)
+    // the visual: fly gems from the card to the HUD counter
     requestAnimationFrame(() => {
       const card = cardRef.current, hud = hudGemRef && hudGemRef.current
-      if (!card || !hud) { onAward?.(1); return }
+      if (!card || !hud) return
       const c = card.getBoundingClientRect(), h = hud.getBoundingClientRect()
       const from = { x: c.left + c.width / 2, y: c.top + c.height * 0.42 }
       const to = { x: h.left + h.width / 2, y: h.top + h.height / 2 }
       setFlyGems([0, 1, 2].map((i) => ({ id: Date.now() + i, from, to, delay: i * 90 })))
-      setTimeout(() => { onAward?.(1) }, 620)
       setTimeout(() => setFlyGems([]), 1200)
     })
   }
