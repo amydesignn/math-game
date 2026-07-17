@@ -46,10 +46,24 @@ to earn gems; gems buy assets she places to build a small world.
   gem stays; it re-arms only after she walks >2.6 away (`cooling` set in
   Scene) so it can't instantly reopen underfoot. Re-approach = fresh problem
   (deliberate: kinder than trapping her on one she's dodging).
-- **Topics:** `nextProblem()` = 60% 2-digit×1-digit, 40% 2-digit+2-digit
-  (times-tables-first per Amy). `topicProgress[op] = {seen, correct}` records
-  every check for Phase 6 quotas. Long multiplication (Ivy's pain point) is
-  an open v1-topic question with Finn+Amy — the ×-builder extends to it.
+- **Topics (C1 landed 2026-07-17):** `math.js` has a typed-topic registry —
+  `long-mult` (2×2-digit, the C1 frontier) + `mult-2x1`/`add-2x2` (confidence
+  pool). Long-mult ladder L1→L3 graded by CARRY ANATOMY (L1 none / L2 one
+  partial / L3 both+addition); similar problems LEVEL-matched. Mix = 70%
+  frontier / 30% confidence. `topicProgress` is per-level:
+  `{topicId: {level, byLevel:{n:{seen,correct}}, topResults(last-10 @ top
+  level w/ dates), mastered}}` — mastery = Finn's 8/10-at-top-across-2-days;
+  level-up after 5 correct at rung, never down. ⚠️ Everything marked
+  `FINN-SPEC` in math.js is PROVISIONAL DATA awaiting Finn's C1 topic spec +
+  Amy's workbook calibration problems (those become CI test fixtures —
+  vitest gets added with them). The curriculum roadmap (C1–C5 + gem economy,
+  all blessed) lives in the Break Room thread + the Notion brief's 📚 section.
+- **ColumnMath is a ROWS model now** (`{cols, rows:[{id,cells,lead?,note?,
+  style?}|{rule}], hi:['id-colIdx']}`) so partial-product rows fit; all
+  builders emit it. Long division (C2) slots in as more rows.
+- **Award hardening:** the gem award rides a plain setTimeout, NOT the
+  requestAnimationFrame that animates the flight — rAF starves in hidden/
+  throttled windows (pane QA, iOS low-power) and the award must always land.
 - **Task wrappers ready:** SKINS has `feedPet` live; Phase 5 skins = one new
   entry each (Oscar's architecture note, preserved verbatim in the file).
 - **QA notes:** the popup is plain DOM — testable with dispatched
