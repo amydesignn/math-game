@@ -24,6 +24,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # The calibration set gates the deploy: if the generator drifts away from
+      # the levels in Ivy's real workbook, the build fails and nothing ships.
+      # (Finn's C1 spec: "CI fails if the generator drifts.")
+      - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:

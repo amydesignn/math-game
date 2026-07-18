@@ -9,10 +9,12 @@
  *  - `similar` = a DIFFERENT problem of the same shape AND same carry class,
  *    used for the worked example — Ivy follows the method, never copies.
  *
- * ⚠️ LADDER + MIX NUMBERS ARE PROVISIONAL DATA (marked FINN-SPEC below):
- * Finn's C1 topic spec + Amy's workbook calibration problems replace them the
- * moment they land — the machinery stays. The calibration set becomes a test
- * fixture file asserting generator output per level (curate to calibrate).
+ * ✅ THE C1 LADDER IS NOW CALIBRATED (2026-07-18). Finn's C1 topic spec + the
+ * 10 real problems from Ivy's workbook landed and are locked in as CI fixtures
+ * (src/__tests__/calibration.test.js) — the deploy fails if the generator
+ * drifts from the curriculum. Gems per correct = ladder level (L1=1/L2=2/L3=3).
+ * Still FINN-SPEC (provisional): the generator's numeric RANGES and the 70/30
+ * session mix — those are Layer-2 scheduler work, not levelling.
  */
 
 import { getState, setTopicLevel } from './store'
@@ -26,37 +28,49 @@ const rand = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1))
 const addCarries = (a, b) => (a % 10) + (b % 10) > 9
 const mulCarries = (a, b) => b * (a % 10) > 9 // 2×1: carry within the product
 
-// Long multiplication carry anatomy: carries inside each partial product,
-// plus a carry in the final addition of the partials.
+/**
+ * Does the partial product `a × d` carry at ANY column?
+ * NOTE (calibration finding, 2026-07-18): this must walk every column, not just
+ * the ones digit. 53 × 32 carries at the TENS step of each partial (2×5=10) and
+ * nowhere else — the old ones-digit-only check graded it L1 (easiest) when it is
+ * really L3. Finn's calibration set caught it; see src/__tests__/calibration.
+ */
+function partialCarries(a, d) {
+  let x = a
+  while (x > 0) {
+    if ((x % 10) * d > 9) return true
+    x = Math.floor(x / 10)
+  }
+  return false
+}
+
+// Long multiplication carry anatomy: the two partial products (for the worked
+// example) plus whether each one carries.
 function longMultAnatomy(a, b) {
   const bo = b % 10
   const bt = Math.floor(b / 10)
-  const p1 = a * bo
-  const p2 = a * bt * 10
-  const p1Carries = bo * (a % 10) > 9
-  const p2Carries = bt * (a % 10) > 9
-  const addCarry = (() => {
-    // column-wise addition of p1 + p2 with carry detection
-    let x = p1, y = p2, c = 0
-    while (x > 0 || y > 0) {
-      const s = (x % 10) + (y % 10) + c
-      if (s > 9) return true
-      c = 0
-      x = Math.floor(x / 10)
-      y = Math.floor(y / 10)
-    }
-    return false
-  })()
-  return { p1, p2, p1Carries, p2Carries, addCarry }
+  return {
+    p1: a * bo,
+    p2: a * bt * 10,
+    p1Carries: partialCarries(a, bo),
+    p2Carries: partialCarries(a, bt),
+  }
 }
 
-/** C1 ladder — carry-class per level. FINN-SPEC: provisional definitions. */
-function longMultLevelOf(a, b) {
-  const { p1Carries, p2Carries, addCarry } = longMultAnatomy(a, b)
-  const carries = (p1Carries ? 1 : 0) + (p2Carries ? 1 : 0)
-  if (carries === 0 && !addCarry) return 1 // L1: no carrying anywhere
-  if (carries <= 1) return 2 // L2: one partial product carries
-  return 3 // L3: both partials carry (final-addition carry welcome)
+/**
+ * C1 ladder — Finn's C1 Topic Spec, calibrated against the 10 real problems
+ * from Ivy's Grade 5 workbook (Unit 4, pp.18–19). The level is the count of
+ * PARTIAL PRODUCTS that carry:
+ *   L1 — neither partial carries. A carry in the FINAL ADDITION is fine here
+ *        (calibration #2, 34 × 22: "partials clean; one carry in final add" =
+ *        L1). The lesson at L1 is the algorithm's shape, not carry pressure.
+ *   L2 — exactly one partial carries. One pressure point at a time.
+ *   L3 — both partials carry. Real Grade 5/6 territory.
+ * Locked by src/__tests__/calibration.test.js — CI fails if this drifts.
+ */
+export function levelOfLongMult(a, b) {
+  const { p1Carries, p2Carries } = longMultAnatomy(a, b)
+  return (p1Carries ? 1 : 0) + (p2Carries ? 1 : 0) + 1
 }
 
 /* ── topic registry ────────────────────────────────────────────────── */
@@ -74,9 +88,12 @@ export const TOPICS = {
       do {
         a = rand(range[0], range[1])
         b = rand(12, level === 1 ? 43 : level === 2 ? 49 : 89)
-      } while (longMultLevelOf(a, b) !== level && guard++ < 500)
+      } while (levelOfLongMult(a, b) !== level && guard++ < 500)
       const similar = similarLongMult(a, b, level)
-      return { type: 'long-mult', level, op: '×', a, b, similar }
+      // gems per correct = ladder level (Finn's C1 spec: L1=1 · L2=2 · L3=3).
+      // Carried on the problem so BOTH encounters pay the same — a sparkle and
+      // a station problem of equal difficulty are worth the same to her.
+      return { type: 'long-mult', level, op: '×', a, b, similar, gems: level }
     },
   },
   'mult-2x1': {
@@ -90,7 +107,7 @@ export const TOPICS = {
       do {
         s = { a: rand(12, 49), b: rand(2, 6) }
       } while (s.a === a || mulCarries(s.a, s.b) !== mulCarries(a, b))
-      return { type: 'mult-2x1', level: 1, op: '×', a, b, similar: s }
+      return { type: 'mult-2x1', level: 1, op: '×', a, b, similar: s, gems: 1 }
     },
   },
   'add-2x2': {
@@ -104,7 +121,7 @@ export const TOPICS = {
       do {
         s = { a: rand(14, 68), b: rand(13, 59) }
       } while (s.a === a || addCarries(s.a, s.b) !== addCarries(a, b))
-      return { type: 'add-2x2', level: 1, op: '+', a, b, similar: s }
+      return { type: 'add-2x2', level: 1, op: '+', a, b, similar: s, gems: 1 }
     },
   },
 }
@@ -114,7 +131,7 @@ function similarLongMult(a, b, level) {
   let guard = 0
   do {
     s = { a: rand(12, 89), b: rand(12, 89) }
-  } while ((s.a === a || longMultLevelOf(s.a, s.b) !== level) && guard++ < 500)
+  } while ((s.a === a || levelOfLongMult(s.a, s.b) !== level) && guard++ < 500)
   return s
 }
 

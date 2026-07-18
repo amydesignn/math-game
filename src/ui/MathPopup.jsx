@@ -32,6 +32,8 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
   const [flyGems, setFlyGems] = useState([])
   const cardRef = useRef(null)
   const answer = solve(problem.op, problem.a, problem.b)
+  // what this problem is worth: her ladder level (Finn's C1 spec L1=1/L2=2/L3=3)
+  const pay = problem.gems || 1
 
   const onKey = (k) => {
     if (phase !== 'ask') return
@@ -57,7 +59,7 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
     // The AWARD rides a plain timer so it can never be lost — rAF starves in
     // hidden/throttled windows (iOS low-power, background tabs), and the gem
     // must land even if the flight animation doesn't get a frame.
-    setTimeout(() => onAward?.(1), 620)
+    setTimeout(() => onAward?.(pay), 620)
     requestAnimationFrame(() => {
       const card = cardRef.current, hud = hudGemRef && hudGemRef.current
       if (!card || !hud) return
@@ -101,7 +103,7 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
 
         <div style={{ padding: '22px 26px 4px' }}>
           {phase === 'ask' && <AskState skin={skin} problem={problem} entry={entry} onKey={onKey} />}
-          {phase === 'correct' && <CorrectState skin={skin} onNext={() => onClose(true)} />}
+          {phase === 'correct' && <CorrectState skin={skin} pay={pay} onNext={() => onClose(true)} />}
           {phase === 'recover' && (
             <div style={{ paddingBottom: 6 }}>
               <div style={{ textAlign: 'center', marginBottom: 14 }}>
@@ -130,7 +132,7 @@ function AskState({ skin, problem, entry, onKey }) {
   )
 }
 
-function CorrectState({ skin, onNext }) {
+function CorrectState({ skin, pay, onNext }) {
   return (
     <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
       padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
@@ -143,7 +145,7 @@ function CorrectState({ skin, onNext }) {
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 26, fontWeight: 700, color: T.ink }}>Nice work!</div>
         <div style={{ fontSize: 16, color: T.ink3, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
-          {skin.win} <span>+1</span> <Gem size={18} />
+          {skin.win} <span>+{pay}</span> <Gem size={18} />
         </div>
       </div>
       <BigButton tone="blue" onClick={onNext} style={{ marginTop: 6, minWidth: 180 }}>Keep going ✨</BigButton>
