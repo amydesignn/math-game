@@ -49,30 +49,96 @@ export const WORLD = {
 }
 
 // ── Phase 3: the Gem Shop catalog ──
-// Curated from the packs already staged in public/models (all CC0, all scale 1
-// per the mini-pack rule). Prices tuned to the 15-gem cap: a full pocket buys
-// a handful of things, so earning → spending → earning keeps cycling.
+// All CC0 Kenney packs staged in public/models (each keeps its OWN Textures/ —
+// see the texture-collision rule in CLAUDE.md).
+//
+// Shelves are labelled the way IVY reads them ("Skate park"), never by pack name
+// ("kenney_mini-skate" means nothing to an 11-year-old). A category is also the
+// natural home for a future aspirational / mastery-locked set — a whole shelf
+// can sit visible as "???" for her to save toward.
+export const SHOP_CATEGORIES = [
+  { id: 'forest', label: 'Forest', emoji: '🌲' },
+  { id: 'market', label: 'Market', emoji: '🛒' },
+  { id: 'arcade', label: 'Arcade', emoji: '🕹️' },
+  { id: 'skate', label: 'Skate park', emoji: '🛹' },
+  { id: 'dungeon', label: 'Dungeon', emoji: '🗝️' },
+  { id: 'castle', label: 'Castle', emoji: '🏰' },
+]
+
+// `scale` = the pack's base size against the mini characters. The mini-* packs
+// are authored 1:1 with them (scale 1 — do NOT "correct" toward real-world
+// proportions); the full-size kits need bringing down (castle, like the
+// building kit, is authored on a big modular grid).
 export const SHOP = [
-  { asset: 'tree', pack: 'forest', name: 'Tree', emoji: '🌳', price: 3 },
-  { asset: 'tree-high', pack: 'forest', name: 'Tall tree', emoji: '🌲', price: 4 },
-  { asset: 'plant', pack: 'forest', name: 'Plant', emoji: '🌿', price: 2 },
-  { asset: 'patch-grass', pack: 'forest', name: 'Grass patch', emoji: '🌱', price: 2 },
-  { asset: 'stones', pack: 'forest', name: 'Stones', emoji: '🪨', price: 2 },
-  { asset: 'fence', pack: 'forest', name: 'Fence', emoji: '🪵', price: 2 },
-  { asset: 'flag', pack: 'forest', name: 'Flag', emoji: '🚩', price: 2 },
-  { asset: 'tent', pack: 'forest', name: 'Tent', emoji: '⛺', price: 5 },
-  { asset: 'bridge', pack: 'forest', name: 'Bridge', emoji: '🌉', price: 6 },
-  { asset: 'target', pack: 'forest', name: 'Target', emoji: '🎯', price: 3 },
-  { asset: 'display-fruit', pack: 'market', name: 'Fruit stand', emoji: '🍎', price: 4 },
-  { asset: 'display-bread', pack: 'market', name: 'Bakery stand', emoji: '🥐', price: 4 },
-  { asset: 'shopping-cart', pack: 'market', name: 'Cart', emoji: '🛒', price: 3 },
-  { asset: 'freezer', pack: 'market', name: 'Ice-cream freezer', emoji: '🍦', price: 4 },
-  { asset: 'arcade-machine', pack: 'arcade', name: 'Arcade machine', emoji: '🕹️', price: 6 },
-  { asset: 'claw-machine', pack: 'arcade', name: 'Claw machine', emoji: '🧸', price: 6 },
-  { asset: 'pinball', pack: 'arcade', name: 'Pinball', emoji: '🎮', price: 5 },
-  { asset: 'dance-machine', pack: 'arcade', name: 'Dance machine', emoji: '💃', price: 6 },
-  { asset: 'prize-wheel', pack: 'arcade', name: 'Prize wheel', emoji: '🎡', price: 5 },
-  { asset: 'basketball-game', pack: 'arcade', name: 'Basketball hoop', emoji: '🏀', price: 5 },
+  // ── Forest ──
+  { asset: 'tree', pack: 'forest', cat: 'forest', name: 'Tree', emoji: '🌳', price: 3 },
+  { asset: 'tree-high', pack: 'forest', cat: 'forest', name: 'Tall tree', emoji: '🌲', price: 4 },
+  { asset: 'plant', pack: 'forest', cat: 'forest', name: 'Plant', emoji: '🌿', price: 2 },
+  { asset: 'patch-grass', pack: 'forest', cat: 'forest', name: 'Grass patch', emoji: '🌱', price: 2 },
+  { asset: 'stones', pack: 'forest', cat: 'forest', name: 'Stones', emoji: '🪨', price: 2 },
+  { asset: 'fence', pack: 'forest', cat: 'forest', name: 'Fence', emoji: '🪵', price: 2 },
+  { asset: 'flag', pack: 'forest', cat: 'forest', name: 'Flag', emoji: '🚩', price: 2 },
+  { asset: 'tent', pack: 'forest', cat: 'forest', name: 'Tent', emoji: '⛺', price: 5 },
+  { asset: 'bridge', pack: 'forest', cat: 'forest', name: 'Bridge', emoji: '🌉', price: 6 },
+  { asset: 'target', pack: 'forest', cat: 'forest', name: 'Target', emoji: '🎯', price: 3 },
+  // ── Market ──
+  { asset: 'display-fruit', pack: 'market', cat: 'market', name: 'Fruit stand', emoji: '🍎', price: 4 },
+  { asset: 'display-bread', pack: 'market', cat: 'market', name: 'Bakery stand', emoji: '🥐', price: 4 },
+  { asset: 'shopping-cart', pack: 'market', cat: 'market', name: 'Cart', emoji: '🛒', price: 3 },
+  { asset: 'freezer', pack: 'market', cat: 'market', name: 'Ice-cream freezer', emoji: '🍦', price: 4 },
+  // ── Arcade ──
+  { asset: 'arcade-machine', pack: 'arcade', cat: 'arcade', name: 'Arcade machine', emoji: '🕹️', price: 6 },
+  { asset: 'claw-machine', pack: 'arcade', cat: 'arcade', name: 'Claw machine', emoji: '🧸', price: 6 },
+  { asset: 'pinball', pack: 'arcade', cat: 'arcade', name: 'Pinball', emoji: '🎮', price: 5 },
+  { asset: 'dance-machine', pack: 'arcade', cat: 'arcade', name: 'Dance machine', emoji: '💃', price: 6 },
+  { asset: 'prize-wheel', pack: 'arcade', cat: 'arcade', name: 'Prize wheel', emoji: '🎡', price: 5 },
+  { asset: 'basketball-game', pack: 'arcade', cat: 'arcade', name: 'Basketball hoop', emoji: '🏀', price: 5 },
+  // ── Skate park (mini pack — scale 1) ──
+  { asset: 'half-pipe', pack: 'skate', cat: 'skate', name: 'Half pipe', emoji: '🛝', price: 6 },
+  { asset: 'bowl-side', pack: 'skate', cat: 'skate', name: 'Bowl', emoji: '🥣', price: 5 },
+  { asset: 'structure-platform', pack: 'skate', cat: 'skate', name: 'Platform', emoji: '🏗️', price: 4 },
+  { asset: 'rail-curve', pack: 'skate', cat: 'skate', name: 'Curved rail', emoji: '➰', price: 3 },
+  { asset: 'rail-high', pack: 'skate', cat: 'skate', name: 'High rail', emoji: '🚧', price: 3 },
+  { asset: 'steps', pack: 'skate', cat: 'skate', name: 'Steps', emoji: '🪜', price: 3 },
+  { asset: 'obstacle-box', pack: 'skate', cat: 'skate', name: 'Grind box', emoji: '📦', price: 2 },
+  { asset: 'skateboard', pack: 'skate', cat: 'skate', name: 'Skateboard', emoji: '🛹', price: 2 },
+  // ── Dungeon (mini pack — scale 1) ──
+  { asset: 'chest', pack: 'dungeon', cat: 'dungeon', name: 'Treasure chest', emoji: '💰', price: 5 },
+  { asset: 'gate', pack: 'dungeon', cat: 'dungeon', name: 'Dungeon gate', emoji: '⛩️', price: 5 },
+  { asset: 'column', pack: 'dungeon', cat: 'dungeon', name: 'Column', emoji: '🏛️', price: 3 },
+  { asset: 'stairs', pack: 'dungeon', cat: 'dungeon', name: 'Stone stairs', emoji: '🗿', price: 3 },
+  { asset: 'banner', pack: 'dungeon', cat: 'dungeon', name: 'Banner', emoji: '🎌', price: 2 },
+  { asset: 'shield-round', pack: 'dungeon', cat: 'dungeon', name: 'Shield', emoji: '🛡️', price: 2 },
+  { asset: 'barrel', pack: 'dungeon', cat: 'dungeon', name: 'Barrel', emoji: '🛢️', price: 2 },
+  { asset: 'wall', pack: 'dungeon', cat: 'dungeon', name: 'Stone wall', emoji: '🧱', price: 2 },
+  // ── Castle (full-size kit — scaled down like the building kit) ──
+  // NOTE: castle-kit is MODULAR — towers are meant to stack (base+mid+roof) and
+  // we only place on the ground plane, so a single piece is a block, not a
+  // tower. Named honestly. A real castle centrepiece wants to be a COMPOSED
+  // prefab (same trick as house()/pavilion() in maps.js) — good candidate for
+  // the aspirational tier.
+  { asset: 'tower-square', pack: 'castle', cat: 'castle', name: 'Tower block', emoji: '🗿', price: 8, scale: 0.6 },
+  { asset: 'gate', pack: 'castle', cat: 'castle', name: 'Castle gate', emoji: '🏰', price: 6, scale: 0.6 },
+  { asset: 'bridge-straight', pack: 'castle', cat: 'castle', name: 'Stone bridge', emoji: '🌁', price: 6, scale: 0.6 },
+  { asset: 'rocks-large', pack: 'castle', cat: 'castle', name: 'Boulder', emoji: '⛰️', price: 3, scale: 0.6 },
+  { asset: 'flag', pack: 'castle', cat: 'castle', name: 'Castle flag', emoji: '🏳️', price: 2, scale: 0.6 },
+]
+
+/** The catalog entry for a placed/owned asset (pack + asset is the key). */
+export const shopEntry = (pack, asset) => SHOP.find((s) => s.pack === pack && s.asset === asset)
+
+/**
+ * Final render scale = the pack's base scale × the SIZE she bought.
+ * Amy's call (Ivy: "it is fun"): a ×2 costs 2× and a ×3 costs 3×.
+ */
+export const assetScale = (pack, asset, size = 1) => (shopEntry(pack, asset)?.scale ?? 1) * size
+
+/** Size tiers — the multiplier IS the price multiplier. Legible for a kid, and
+ *  on-theme for a maths game: pick ×3 and every price visibly triples. */
+export const SIZES = [
+  { size: 1, label: 'Normal' },
+  { size: 2, label: 'Big ×2' },
+  { size: 3, label: 'Huge ×3' },
 ]
 
 // ── Content refresh cadence ──

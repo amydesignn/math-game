@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SHOP, SPARKLE } from '../config'
+import { SHOP, SHOP_CATEGORIES, SIZES, SPARKLE } from '../config'
 
 // display fill for each sparkle swatch (metallics + rainbow read as gradients)
 const SWATCH_BG = {
@@ -19,8 +19,9 @@ const SWATCH_BG = {
  * lists bought-but-unplaced items (e.g. a cancelled placement) to place later.
  */
 export default function Shop({ gems, owned, activeSparkle, onBuy, onBuySparkle, onPlaceOwned, onClose }) {
-  const [selected, setSelected] = useState(null) // catalog index
+  const [selected, setSelected] = useState(null) // "pack:asset" of the selected tile
   const [magicSel, setMagicSel] = useState(null) // selected sparkle colorId
+  const [size, setSize] = useState(1) // ×1/×2/×3 — resets each time the shop opens
 
   const sheet = {
     position: 'absolute',
@@ -62,7 +63,10 @@ export default function Shop({ gems, owned, activeSparkle, onBuy, onBuySparkle, 
                   return (
                     <button key={o.id} onClick={() => onPlaceOwned(o)} style={tile(true)}>
                       <span style={{ fontSize: 30 }}>{item?.emoji ?? '📦'}</span>
-                      <span style={tileName}>{item?.name ?? o.asset}</span>
+                      <span style={tileName}>
+                        {item?.name ?? o.asset}
+                        {o.size > 1 && <span style={{ color: 'var(--brand-iris-600)', fontWeight: 800 }}> ×{o.size}</span>}
+                      </span>
                       <span style={{ ...tilePrice, color: 'var(--brand-iris-600)' }}>place ✥</span>
                     </button>
                   )
@@ -108,33 +112,72 @@ export default function Shop({ gems, owned, activeSparkle, onBuy, onBuySparkle, 
             })}
           </div>
 
-          <SectionLabel>Buy with gems</SectionLabel>
-          <div style={grid}>
-            {SHOP.map((item, i) => {
-              const affordable = gems >= item.price
-              const isSel = selected === i
+          {/* Size — the multiplier IS the price multiplier (Ivy: "it is fun") */}
+          <SectionLabel>How big?</SectionLabel>
+          <div style={{ display: 'flex', gap: 8, margin: '0 4px 4px' }}>
+            {SIZES.map((s) => {
+              const on = size === s.size
               return (
                 <button
-                  key={item.asset}
-                  onClick={() => affordable && setSelected(isSel ? null : i)}
-                  style={{ ...tile(affordable), outline: isSel ? '3px solid var(--brand-iris-600)' : 'none' }}
+                  key={s.size}
+                  onClick={() => { setSize(s.size); setSelected(null) }}
+                  style={{
+                    flex: 1, padding: '9px 6px', borderRadius: 14, cursor: 'pointer', fontFamily: 'inherit',
+                    border: `2px solid ${on ? 'var(--brand-iris-600)' : 'var(--brand-lilac-100)'}`,
+                    background: on ? 'var(--brand-iris-600)' : 'var(--lilac-50)',
+                    color: on ? '#fff' : 'var(--brand-iris-900)',
+                    fontWeight: on ? 800 : 600, fontSize: 13.5,
+                  }}
                 >
-                  <span style={{ fontSize: 30, filter: affordable ? 'none' : 'grayscale(1)' }}>{item.emoji}</span>
-                  <span style={tileName}>{item.name}</span>
-                  {isSel ? (
-                    <span
-                      onClick={(e) => { e.stopPropagation(); onBuy(item) }}
-                      style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '3px 12px', fontWeight: 800 }}
-                    >
-                      Buy 💎{item.price}
-                    </span>
-                  ) : (
-                    <span style={{ ...tilePrice, color: affordable ? 'var(--brand-iris-900)' : '#b6aed6' }}>💎 {item.price}</span>
-                  )}
+                  {s.label}
                 </button>
               )
             })}
           </div>
+          {size > 1 && (
+            <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--brand-lilac-900)', opacity: 0.8, margin: '0 4px 10px' }}>
+              {size}× bigger — so everything costs {size}× more ✨
+            </div>
+          )}
+
+          {/* One shelf per theme */}
+          {SHOP_CATEGORIES.map((cat) => {
+            const items = SHOP.filter((s) => s.cat === cat.id)
+            if (!items.length) return null
+            return (
+              <div key={cat.id}>
+                <SectionLabel>{cat.emoji} {cat.label}</SectionLabel>
+                <div style={grid}>
+                  {items.map((item) => {
+                    const cost = item.price * size
+                    const affordable = gems >= cost
+                    const key = item.pack + ':' + item.asset
+                    const isSel = selected === key
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => affordable && setSelected(isSel ? null : key)}
+                        style={{ ...tile(affordable), outline: isSel ? '3px solid var(--brand-iris-600)' : 'none' }}
+                      >
+                        <span style={{ fontSize: 30, filter: affordable ? 'none' : 'grayscale(1)' }}>{item.emoji}</span>
+                        <span style={tileName}>{item.name}</span>
+                        {isSel ? (
+                          <span
+                            onClick={(e) => { e.stopPropagation(); onBuy(item, size); setSelected(null) }}
+                            style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '3px 12px', fontWeight: 800 }}
+                          >
+                            Buy 💎{cost}
+                          </span>
+                        ) : (
+                          <span style={{ ...tilePrice, color: affordable ? 'var(--brand-iris-900)' : '#b6aed6' }}>💎 {cost}</span>
+                        )}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
     </>

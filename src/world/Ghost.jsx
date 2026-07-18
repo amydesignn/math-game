@@ -10,7 +10,7 @@ import { modelUrl } from '../config'
  * Materials are cloned per-mesh so the transparency never leaks back into the
  * shared GLB cache (the same model may be solid elsewhere in the scene).
  */
-export default function Ghost({ pack, asset, position, rotation = 0 }) {
+export default function Ghost({ pack, asset, position, rotation = 0, scale = 1 }) {
   const { scene } = useGLTF(modelUrl(pack, asset))
   const ring = useRef()
 
@@ -36,7 +36,7 @@ export default function Ghost({ pack, asset, position, rotation = 0 }) {
 
   return (
     <>
-      <group position={[position[0], 0, position[1]]} rotation={[0, rotation, 0]}>
+      <group position={[position[0], 0, position[1]]} rotation={[0, rotation, 0]} scale={scale}>
         <primitive object={model} />
       </group>
       <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[position[0], 0.025, position[1]]}>

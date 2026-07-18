@@ -166,12 +166,13 @@ export default function App() {
     setPlacing(item)
   }
 
-  function handleBuy(item) {
-    const id = buyAsset(item, item.price)
+  // `size` is the ×1/×2/×3 tier she picked; the price scales with it
+  function handleBuy(item, size = 1) {
+    const id = buyAsset({ ...item, size }, item.price * size)
     if (id == null) return
     setGems(getState().gems)
     refreshAssets()
-    startPlacing({ id, asset: item.asset, pack: item.pack })
+    startPlacing({ id, asset: item.asset, pack: item.pack, size })
   }
 
   function confirmPlace() {
@@ -196,7 +197,7 @@ export default function App() {
 
   function startMove(id) {
     const w = getState().world.find((p) => p.id === id)
-    if (w) startPlacing({ id: w.id, asset: w.asset, pack: w.pack, isMove: true, startAt: [w.x, w.z], rot: w.rot })
+    if (w) startPlacing({ id: w.id, asset: w.asset, pack: w.pack, size: w.size, isMove: true, startAt: [w.x, w.z], rot: w.rot })
   }
 
   // ── Maps: which one we're in, where this visit starts, travel fade + toast ──
@@ -390,7 +391,7 @@ export default function App() {
           activeSparkle={sparkle}
           onBuy={handleBuy}
           onBuySparkle={handleBuySparkle}
-          onPlaceOwned={(o) => startPlacing({ id: o.id, asset: o.asset, pack: o.pack })}
+          onPlaceOwned={(o) => startPlacing({ id: o.id, asset: o.asset, pack: o.pack, size: o.size })}
           onClose={() => setShopOpen(false)}
         />
       )}

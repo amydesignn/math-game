@@ -253,12 +253,14 @@ export function completeStation(mapId) {
 // Spending gems frees room under the beta cap (the cap limits the BALANCE,
 // not lifetime earnings), so buying things lets more sparkles appear.
 
-/** Buy an item from the shop → inventory. Returns the new id, or null if she can't afford it. */
-export function buyAsset({ asset, pack }, price) {
+/** Buy an item from the shop → inventory. `size` is the ×1/×2/×3 she chose (it
+ *  rides with the item forever, so a Huge tree stays huge when moved or stored).
+ *  Returns the new id, or null if she can't afford it. */
+export function buyAsset({ asset, pack, size = 1 }, price) {
   if (state.gems < price) return null
   state.gems -= price
   const id = state.nextId++
-  state.owned.push({ id, asset, pack })
+  state.owned.push({ id, asset, pack, size })
   save()
   return id
 }
@@ -295,8 +297,8 @@ export function rotateAsset(id) {
 export function pickupAsset(id) {
   const i = state.world.findIndex((p) => p.id === id)
   if (i === -1) return
-  const [{ id: wid, asset, pack }] = state.world.splice(i, 1)
-  state.owned.push({ id: wid, asset, pack })
+  const [{ id: wid, asset, pack, size = 1 }] = state.world.splice(i, 1)
+  state.owned.push({ id: wid, asset, pack, size }) // size survives put-away
   save()
 }
 

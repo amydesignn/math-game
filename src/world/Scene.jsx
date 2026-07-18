@@ -9,7 +9,7 @@ import Sparkle from './Sparkle'
 import Station from './Station'
 import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
-import { WORLD, GEMS, STATION } from '../config'
+import { WORLD, GEMS, STATION, assetScale } from '../config'
 import { MAPS } from '../maps'
 import { stationFor } from '../stations'
 import { SKINS } from '../ui/skins'
@@ -325,7 +325,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
               onSelectPlaced(w.id)
             }}
           >
-            <Prop pack={w.pack} name={w.asset} position={[w.x, 0, w.z]} rotation={w.rot} />
+            <Prop pack={w.pack} name={w.asset} position={[w.x, 0, w.z]} rotation={w.rot} scale={assetScale(w.pack, w.asset, w.size)} />
           </group>
         )
       )}
@@ -342,7 +342,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
           ))}
 
       {/* the placement ghost */}
-      {placing && ghostPos && <Ghost pack={placing.pack} asset={placing.asset} position={ghostPos} rotation={ghostRot} />}
+      {placing && ghostPos && <Ghost pack={placing.pack} asset={placing.asset} position={ghostPos} rotation={ghostRot} scale={assetScale(placing.pack, placing.asset, placing.size)} />}
 
       <Character id={characterId} start={spawn} targetRef={targetRef} posRef={charPosRef} reactUntilRef={reactUntilRef} />
       <Pet id={petId} start={spawn} targetPosRef={charPosRef} posRef={petPosRef} reactUntilRef={reactUntilRef} />
