@@ -11,34 +11,17 @@ import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { stationFor, currentWindow } from './stations'
 import { getState, setMap, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
-import { WORLD, GEMS } from './config'
+import { WORLD } from './config'
 import { MAPS, arrivalPoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
-const TEASER = 'More gems coming with math! ✨' // the beta-cap lock message (Finn's brief)
 
 export default function App() {
   const [state] = useState(getState)
   const [moved, setMoved] = useState(false)
 
-  // ── Phase 2: gems + beta cap ──
+  // ── Gems (uncapped since the beta cap retired 2026-07-18) ──
   const [gems, setGems] = useState(state.gems)
-  const [teaser, setTeaser] = useState(false)
-  const teaserTimer = useRef()
-
-  function showTeaser() {
-    setTeaser(true)
-    clearTimeout(teaserTimer.current)
-    teaserTimer.current = setTimeout(() => setTeaser(false), 4000)
-  }
-
-  // already at the cap when the game opens → say why the sparkles are gone
-  useEffect(() => {
-    if (getState().gems >= GEMS.cap) {
-      const t = setTimeout(showTeaser, 1500)
-      return () => clearTimeout(t)
-    }
-  }, [])
 
   // ── Phase 2: sound (Ivy's bgm + the cat's meow) ──
   useEffect(() => {
@@ -60,9 +43,7 @@ export default function App() {
   }
 
   function onMathAward(n) {
-    const total = addGems(n)
-    setGems(total)
-    if (total >= GEMS.cap) showTeaser()
+    setGems(addGems(n)) // every correct answer pays, always
   }
 
   function onPetReact() {
@@ -375,7 +356,6 @@ export default function App() {
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} placed={placedHere} />
       {!moved && <MoveHint />}
       {toast && <MapToast name={toast} />}
-      {teaser && <TeaserToast />}
       {note && <NoteToast text={note} />}
 
       {/* ── Phase 3: shop + placement HUD ── */}
@@ -545,30 +525,6 @@ function SpeakerButton() {
   )
 }
 
-function TeaserToast() {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: 'max(120px, calc(env(safe-area-inset-top) + 104px))',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        padding: '10px 20px',
-        background: 'var(--star-gold)',
-        color: '#4a3305',
-        borderRadius: 999,
-        fontWeight: 700,
-        fontSize: 16,
-        letterSpacing: 0.2,
-        boxShadow: '0 4px 14px rgba(43,32,90,0.22)',
-        pointerEvents: 'none',
-        whiteSpace: 'nowrap',
-      }}
-    >
-      {TEASER}
-    </div>
-  )
-}
 
 function ShopButton({ onOpen }) {
   return (

@@ -128,9 +128,17 @@ export const STATION = {
 
 // ── Phase 2: gem sparkles (beta collection loop; Phase 4 swaps taps for math) ──
 export const GEMS = {
-  // Hard beta cap (Finn's brief, learned from Cozy Closet: a cap creates
-  // anticipation — an unlimited balance that later resets creates heartbreak).
-  cap: 15,
+  // ⚰️ THE 15-GEM BETA CAP RETIRED 2026-07-18 — deliberately, as the economy
+  // design always said it would ("the cap retires with the real economy").
+  // It was right for the pre-math beta, where gems were free to collect and a
+  // cap created anticipation instead of an unlimited balance that later resets
+  // (Finn's Cozy Closet lesson). The moment MATH became how gems are earned it
+  // inverted: Ivy solved 6 problems, was told she was correct, and was paid
+  // NOTHING. Effort with no reward is the one thing this app must never do.
+  // Gems earned under the cap were refunded from the lifetime ledger (store.js).
+  // The economy self-limits by what a problem pays (ladder level) + the refresh
+  // cadence — not by a ceiling on her savings. An uncapped balance is also what
+  // makes the aspirational shop tier (50–150 gems) mean anything to save toward.
   perMap: 3, // sparkles per map visit, so finding more means exploring the ring
   collectRadius: 1.0, // walk this close to a sparkle → collected
 }

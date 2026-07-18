@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { GEMS, SHOP, SPARKLE } from './config'
+import { SHOP, SPARKLE } from './config'
 
 const KEY = 'math_world_v1'
 
@@ -20,12 +20,13 @@ function freshState() {
     character: 'character-female-a', // Ivy's avatar (chosen later in a picker)
     pet: 'animal-cat', // her companion
     map: 'clearing', // which map she's in (walks through gates to change it)
-    gems: 0, // Phase 2: collected from world sparkles (capped); Phase 4: earned by math
+    gems: 0, // spendable balance — uncapped since the beta cap retired (2026-07-18)
     // lifetimeGems = every gem ever EARNED (never decremented by spending). It
     // is the ledger the gem economy's badges read, and — the Cozy Closet lesson
-    // honored — it means the beta cap can retire later with ZERO loss: her real
+    // honored — it is what let the beta cap retire with ZERO loss: her real
     // total was never bounded, only her spendable balance was.
     lifetimeGems: 0,
+    capRetiredAt: null, // stamped once, when the one-time cap-retirement refund runs
     soundOn: true, // the speaker toggle (music + pet sounds)
     world: [], // placed assets: [{ id, asset, pack, x, z, rot, map }] (Phase 3)
     owned: [], // bought but not yet placed: [{ id, asset, pack }] (Phase 3)
@@ -48,6 +49,12 @@ function freshState() {
 }
 
 let state = load()
+// Persist immediately on boot so one-time migrations (the cap-retirement
+// refund, new fields) are written even if she never touches anything. Without
+// this the refund would re-run every load — harmless for assets, but it would
+// hand back gems she'd spent on CONSUMABLES (sparkles can't be reconstructed
+// as "spent"), which is a free-gem exploit.
+save()
 
 function load() {
   try {
@@ -59,16 +66,29 @@ function load() {
     }
     // merge onto freshState so new fields appear for existing players
     const merged = { ...freshState(), ...JSON.parse(raw) }
+    // Reconstruct what she has already spent, from the things she owns/placed.
+    // (Consumed items like sparkles can't be reconstructed — so this is a FLOOR,
+    // which always errs in her favour below. That's deliberate.)
+    const spent = [...(merged.owned || []), ...(merged.world || [])].reduce((sum, it) => {
+      const s = SHOP.find((x) => x.asset === it.asset && x.pack === it.pack)
+      return sum + (s ? s.price : 0)
+    }, 0)
+
     // Retroactive lifetimeGems seed (zero-loss): a returning player from before
     // the ledger existed has earned AT LEAST her current balance plus whatever
-    // she already spent on things she owns/placed. Reconstruct that floor so no
-    // past earnings are lost when badges start reading lifetimeGems.
-    if (!merged.lifetimeGems) {
-      const spent = [...(merged.owned || []), ...(merged.world || [])].reduce((sum, it) => {
-        const s = SHOP.find((x) => x.asset === it.asset && x.pack === it.pack)
-        return sum + (s ? s.price : 0)
-      }, 0)
-      merged.lifetimeGems = (merged.gems || 0) + spent
+    // she already spent. Reconstruct that floor so no past earnings are lost.
+    if (!merged.lifetimeGems) merged.lifetimeGems = (merged.gems || 0) + spent
+
+    // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
+    // While the 15-gem beta cap was live, a correct answer over the cap paid
+    // NOTHING — Ivy solved 6 problems, was told she was right, and got zero.
+    // The lifetime ledger recorded those earnings even when the balance was
+    // clamped, so we can pay them back exactly: what she earned, minus what she
+    // spent, IS her rightful balance. Never take gems away — only ever top up.
+    if (!merged.capRetiredAt) {
+      const rightful = (merged.lifetimeGems || 0) - spent
+      if (rightful > (merged.gems || 0)) merged.gems = rightful
+      merged.capRetiredAt = new Date().toISOString()
     }
     return merged
   } catch {
@@ -112,11 +132,13 @@ export function setSoundOn(on) {
 }
 
 export function addGems(n) {
-  // lifetime ledger counts everything EARNED (positive), before the cap clamps
-  // the spendable balance — so the cap never costs her a real gem.
+  // lifetime ledger counts everything EARNED (positive) — the badges read this
   if (n > 0) state.lifetimeGems = (state.lifetimeGems || 0) + n
-  // clamped to the beta cap — the balance can never exceed it, however earned
-  state.gems = Math.min(GEMS.cap, Math.max(0, state.gems + n))
+  // NO CAP. The beta cap retired on 2026-07-18 (see retireBetaCap below): once
+  // math became the way gems are earned, clamping the balance meant a correct
+  // answer could pay NOTHING — effort with no reward, the one thing this app
+  // must never do. The economy self-limits by what a problem pays instead.
+  state.gems = Math.max(0, state.gems + n)
   save()
   return state.gems
 }

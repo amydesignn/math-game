@@ -74,6 +74,31 @@ to earn gems; gems buy assets she places to build a small world.
   being taken — interleave screenshots as the frame pump, and never diagnose
   "the character is frozen" from JS polls alone.
 
+## ⚰️ The 15-gem beta cap RETIRED (2026-07-18)
+**The bug that retired it:** Ivy farmed to the 15-gem cap, then solved 6 more
+problems. The app told her she was correct each time and paid her **nothing**.
+Effort with no reward is the one thing this app must never do — and it's the
+exact inversion of why the cap existed. The cap was right for the pre-math beta
+(gems were free to collect; a cap made anticipation instead of an unlimited
+balance that later resets — Finn's Cozy Closet lesson). The moment MATH became
+the way gems are earned, the same cap started punishing correct answers.
+- `addGems` no longer clamps; `GEMS.cap` is gone (config carries the reasoning).
+- **Sparkle spawn** was `min(perMap, cap − gems)` → now just `perMap`. At 21 gems
+  the old formula spawned ZERO sparkles, so a capped player also lost the world.
+- The **"More gems coming with math! ✨" teaser is deleted** — with math live it
+  had become a lie, and it was the message she saw while being paid nothing.
+- **One-time refund** (`capRetiredAt` in store.js): gems the cap swallowed are
+  paid back from the lifetime ledger — `rightful = lifetimeGems − spent`, and it
+  only ever tops UP, never takes away. This is exactly what `lifetimeGems` was
+  added for ("the cap retires with ZERO loss").
+- ⚠️ `save()` now runs **once on boot** so that migration persists. Without it the
+  refund re-ran every load — harmless for assets (spend is reconstructed from
+  owned/placed) but a **free-gem exploit for CONSUMABLES**, since a spent sparkle
+  can't be reconstructed as "spent". Verified: buy a sparkle → reload → no refund.
+- The economy now self-limits by what a problem pays (ladder level) + the refresh
+  cadence. An uncapped balance is also what makes the aspirational shop tier
+  (50–150 gems) worth saving toward.
+
 ## Phase 5 (added 2026-07-17): STATION mini-quests (Oscar's Station Pack)
 - **Oscar's handoff** = `~/Downloads/delivery — station + sparkle packs/`
   (`math-station-flow.html` + README + PNGs). Lifted per Oscar's ship order.

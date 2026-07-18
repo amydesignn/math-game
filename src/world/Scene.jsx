@@ -11,7 +11,6 @@ import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
 import { WORLD, GEMS, STATION } from '../config'
 import { MAPS } from '../maps'
-import { getState } from '../store'
 import { stationFor } from '../stations'
 import { SKINS } from '../ui/skins'
 
@@ -23,7 +22,9 @@ const GATE_RADIUS = 1.7 // walk this close to a gate's glow → travel (forgivin
  * her), the scenery, and each other. Count respects the remaining beta cap.
  */
 function spawnSparkles(map, spawn, placed = []) {
-  const count = Math.max(0, Math.min(GEMS.perMap, GEMS.cap - getState().gems))
+  // Full scatter every visit — the balance is uncapped since the beta cap
+  // retired, so gems-to-find are never rationed by how many she already holds.
+  const count = GEMS.perMap
   const pts = []
   const B = WORLD.bounds - 2.5
   let guard = 0
