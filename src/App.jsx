@@ -6,8 +6,10 @@ import Minimap from './ui/Minimap'
 import Shop from './ui/Shop'
 import Gem from './ui/Gem'
 import MathPopup, { SKINS } from './ui/MathPopup'
+import StationPopup from './ui/StationPopup'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
-import { getState, setMap, addGems, setSoundOn, recordAnswer, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset } from './store'
+import { stationFor } from './stations'
+import { getState, setMap, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { WORLD, GEMS } from './config'
 import { MAPS, arrivalPoint, preloadMap } from './maps'
@@ -72,6 +74,42 @@ export default function App() {
     setMath(null)
     mathBusyRef.current = false
     setFocusMode(false)
+  }
+
+  // ── Phase 5: the station mini-quest (Oscar's tier-3 encounter) ──
+  const [station, setStation] = useState(null) // { skinId, bonus, problems, resumeAt, mapId }
+  const [farewellMap, setFarewellMap] = useState(null) // the map whose station is saying goodbye
+  const stationRef = useRef(null) // Scene writes {x,z,color} here; the minimap draws the dot
+  const farewellTimer = useRef()
+
+  function onStationReached() {
+    if (mathBusyRef.current) return
+    const st = stationFor(mapId)
+    if (!st) return
+    mathBusyRef.current = true // shares the sparkle lock — one problem UI at a time
+    setFocusMode(true)
+    setStation({ skinId: st.skinId, bonus: st.bonus, problems: st.problems, resumeAt: st.solvedCount, mapId })
+  }
+
+  function onStationResult(problem, correct) {
+    recordAnswer(problem.type, problem.level, correct, TOPICS[problem.type].topLevel)
+    if (correct) maybeLevelUp(problem.type)
+  }
+
+  function onStationClose({ completed, solvedCount }) {
+    const mid = station?.mapId
+    setStation(null)
+    mathBusyRef.current = false
+    setFocusMode(false)
+    if (!mid) return
+    if (completed) {
+      completeStation(mid) // done for the day — won't reappear
+      setFarewellMap(mid) // the world plays the sparkle-white dissolve at its spot
+      clearTimeout(farewellTimer.current)
+      farewellTimer.current = setTimeout(() => setFarewellMap(null), 1750)
+    } else {
+      setStationSolved(mid, solvedCount) // remember progress — it RESUMES on return
+    }
   }
 
   // ── Phase 3: shop + placement ──
@@ -260,6 +298,9 @@ export default function App() {
             spawn={spawn}
             onTravel={travel}
             onSparkleReached={onSparkleReached}
+            onStationReached={onStationReached}
+            farewellActive={farewellMap === mapId}
+            stationRef={stationRef}
             mathBusyRef={mathBusyRef}
             collectFnRef={collectFnRef}
             reactUntilRef={reactUntilRef}
@@ -285,7 +326,7 @@ export default function App() {
       {/* ── HUD ── */}
       <GemCounter count={gems} innerRef={hudGemRef} />
       <SpeakerButton />
-      <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} placed={placedHere} />
+      <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} placed={placedHere} />
       {!moved && <MoveHint />}
       {toast && <MapToast name={toast} />}
       {teaser && <TeaserToast />}
@@ -340,6 +381,21 @@ export default function App() {
             if (correct) maybeLevelUp(p.type)
           }}
           onClose={onMathClose}
+        />
+      )}
+
+      {/* ── Phase 5: the station mini-quest (Oscar's tier-3 encounter) ── */}
+      {station && (
+        <StationPopup
+          quest={station}
+          resumeAt={station.resumeAt}
+          hudGemRef={hudGemRef}
+          onAward={onMathAward}
+          onBonusAward={onMathAward}
+          onPetReact={onPetReact}
+          onWorldReact={onPetReact}
+          onResult={onStationResult}
+          onClose={onStationClose}
         />
       )}
 

@@ -6,10 +6,13 @@ import Pet from './Pet'
 import Prop from './Prop'
 import Gate from './Gate'
 import Sparkle from './Sparkle'
+import Station from './Station'
 import Ghost from './Ghost'
-import { WORLD, GEMS } from '../config'
+import { WORLD, GEMS, STATION } from '../config'
 import { MAPS } from '../maps'
 import { getState } from '../store'
+import { stationFor } from '../stations'
+import { SKINS } from '../ui/skins'
 
 const GATE_RADIUS = 1.7 // walk this close to a gate's glow → travel (forgiving: tap-walks stop at the ring's edge)
 
@@ -44,7 +47,7 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onSparkleReached, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
   const marker = useRef() // the ring that pings on tap
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
@@ -53,6 +56,31 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, mathBusy
   const [sparkles, setSparkles] = useState(() => spawnSparkles(map, spawn, placed))
   const taken = useRef(new Set()) // same-frame double-fire guard
   const cooling = useRef(new Set()) // unsolved popups re-arm only after she walks away
+
+  // ── Phase 5: today's station for this map (or null) ──
+  const [station] = useState(() => stationFor(map.id))
+  const stationSkin = station ? SKINS[station.skinId] : null
+  const stationCooling = useRef(false) // unfinished close re-arms only after she walks off
+
+  // let the minimap draw a dot where the station stands (world presence)
+  useEffect(() => {
+    if (stationRef) stationRef.current = station && !station.completed ? { x: station.x, z: station.z, color: stationSkin.accent } : null
+    return () => {
+      if (stationRef) stationRef.current = null
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [station, farewellActive])
+
+  // tapping the station walks her to its ring — proximity opens the quest
+  function walkToStation(e) {
+    if (gestureRef.current.pinching || placing || !station) return
+    e.stopPropagation()
+    targetRef.current = new THREE.Vector3(station.x, 0, station.z)
+    if (marker.current) {
+      marker.current.position.set(station.x, 0.03, station.z)
+      markerLife.current = 1
+    }
+  }
 
   // the minimap draws live sparkles from this shared ref
   useEffect(() => {
@@ -186,6 +214,22 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, mathBusy
       }
     }
 
+    // station check — walking into the ring opens the mini-quest. Re-arms only
+    // after she walks off (same kindness as the sparkle popup), and never while
+    // it's saying goodbye (farewellActive) or already done for the day.
+    if (station && !station.completed && !farewellActive && !(mathBusyRef && mathBusyRef.current) && !placing) {
+      const sdx = desired.x - station.x
+      const sdz = desired.z - station.z
+      const sd2 = sdx * sdx + sdz * sdz
+      if (stationCooling.current) {
+        if (sd2 > STATION.rearm * STATION.rearm) stationCooling.current = false
+      } else if (sd2 < STATION.reach * STATION.reach) {
+        stationCooling.current = true
+        targetRef.current = null // she stops for the quest
+        onStationReached()
+      }
+    }
+
     // gate check — walking into a glow travels to its map
     if (!traveled.current) {
       for (const g of map.gates) {
@@ -246,6 +290,11 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, mathBusy
       {sparkles.map((sp) => (
         <Sparkle key={sp.id} x={sp.x} z={sp.z} collected={sp.collected} onTap={walkToSparkle(sp)} />
       ))}
+
+      {/* ── Phase 5: today's station (stays visible through its farewell) ── */}
+      {station && (!station.completed || farewellActive) && (
+        <Station x={station.x} z={station.z} skin={stationSkin} resume={station.solvedCount} farewell={farewellActive} onTap={walkToStation} />
+      )}
 
       {/* ── Phase 3: assets Ivy has placed in THIS map ── */}
       {placed.map((w) =>

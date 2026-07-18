@@ -142,6 +142,27 @@ export function currentLevel(topicId) {
 }
 
 /**
+ * A station's problem list. Oscar's locked rule: ONE skill per station (variety
+ * lives BETWEEN stations, never inside one) — so all `count` problems come from
+ * a SINGLE topic, chosen frontier-weighted like the sparkle mix, at her current
+ * ladder level. Each problem's `gems` payout = the level she solved it at
+ * (L1=1 … L3=3), per the economy spec. Length is data — 2 today, 3 later.
+ */
+export function generateStation(count = 2) {
+  const topicId = Math.random() < 0.7 ? 'long-mult' : Math.random() < 0.6 ? 'mult-2x1' : 'add-2x2'
+  const level = currentLevel(topicId)
+  const problems = []
+  let guard = 0
+  while (problems.length < count && guard++ < 200) {
+    const p = TOPICS[topicId].generate(level)
+    if (problems.some((q) => q.a === p.a && q.b === p.b)) continue // no repeat in one quest
+    p.gems = p.level // per-problem payout = ladder level
+    problems.push(p)
+  }
+  return problems
+}
+
+/**
  * Level-up check, called after each recorded answer: `levelUpAfter` correct at
  * the current rung advances her one rung (never past the top; never down —
  * the worked example is the struggle-support, not demotion).

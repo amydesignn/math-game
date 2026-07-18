@@ -75,6 +75,19 @@ export const SHOP = [
   { asset: 'basketball-game', pack: 'arcade', name: 'Basketball hoop', emoji: '🏀', price: 5 },
 ]
 
+// ── Phase 5: station mini-quests (encounter tier 3) ──
+// Stations are the "task wrappers with world presence" — rare-ish, 2–3 a day
+// across the ring of maps, so most days feel different. One skin + one skill per
+// station; a completion bonus on top of the per-problem payout.
+export const STATION = {
+  length: 2, // problems per quest (data — Oscar's wrapper is agnostic; 3 later)
+  bonus: 1, // completion-bonus gems (economy spec: +1–2)
+  perDayMin: 2, // how many of the 5 maps host a station today…
+  perDayMax: 3, // …picked fresh each day
+  reach: 1.7, // walk this close to the ring → the quest opens (matches gate feel)
+  rearm: 2.6, // after an unfinished close, re-open only once she walks this far off
+}
+
 // ── Phase 2: gem sparkles (beta collection loop; Phase 4 swaps taps for math) ──
 export const GEMS = {
   // Hard beta cap (Finn's brief, learned from Cozy Closet: a cap creates

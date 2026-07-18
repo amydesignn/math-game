@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { GEMS } from './config'
+import { GEMS, SHOP } from './config'
 
 const KEY = 'math_world_v1'
 
@@ -21,6 +21,11 @@ function freshState() {
     pet: 'animal-cat', // her companion
     map: 'clearing', // which map she's in (walks through gates to change it)
     gems: 0, // Phase 2: collected from world sparkles (capped); Phase 4: earned by math
+    // lifetimeGems = every gem ever EARNED (never decremented by spending). It
+    // is the ledger the gem economy's badges read, and — the Cozy Closet lesson
+    // honored — it means the beta cap can retire later with ZERO loss: her real
+    // total was never bounded, only her spendable balance was.
+    lifetimeGems: 0,
     soundOn: true, // the speaker toggle (music + pet sounds)
     world: [], // placed assets: [{ id, asset, pack, x, z, rot, map }] (Phase 3)
     owned: [], // bought but not yet placed: [{ id, asset, pack }] (Phase 3)
@@ -29,6 +34,10 @@ function freshState() {
     // counts, the last-10 results at the TOP level (with dates — mastery needs
     // 2 distinct days), and the mastered flag Phase 6's map nodes will light.
     topicProgress: {}, // { [topicId]: { level, byLevel: {n:{seen,correct}}, topResults: [{d, ok}], mastered } }
+    // Phase 5: today's station plan. day = YYYY-MM-DD; byMap[mapId] =
+    // { skinId, problems, bonus, x, z, solvedCount, completed }. Rebuilt daily
+    // (stations.js) so 2–3 worlds get a themed quest and most days feel new.
+    stations: { day: null, byMap: {} },
     startedISO: null,
     lastActive: null,
   }
@@ -45,7 +54,19 @@ function load() {
       return s
     }
     // merge onto freshState so new fields appear for existing players
-    return { ...freshState(), ...JSON.parse(raw) }
+    const merged = { ...freshState(), ...JSON.parse(raw) }
+    // Retroactive lifetimeGems seed (zero-loss): a returning player from before
+    // the ledger existed has earned AT LEAST her current balance plus whatever
+    // she already spent on things she owns/placed. Reconstruct that floor so no
+    // past earnings are lost when badges start reading lifetimeGems.
+    if (!merged.lifetimeGems) {
+      const spent = [...(merged.owned || []), ...(merged.world || [])].reduce((sum, it) => {
+        const s = SHOP.find((x) => x.asset === it.asset && x.pack === it.pack)
+        return sum + (s ? s.price : 0)
+      }, 0)
+      merged.lifetimeGems = (merged.gems || 0) + spent
+    }
+    return merged
   } catch {
     return freshState()
   }
@@ -87,6 +108,9 @@ export function setSoundOn(on) {
 }
 
 export function addGems(n) {
+  // lifetime ledger counts everything EARNED (positive), before the cap clamps
+  // the spendable balance — so the cap never costs her a real gem.
+  if (n > 0) state.lifetimeGems = (state.lifetimeGems || 0) + n
   // clamped to the beta cap — the balance can never exceed it, however earned
   state.gems = Math.min(GEMS.cap, Math.max(0, state.gems + n))
   save()
@@ -126,6 +150,39 @@ export function setTopicLevel(topicId, level) {
   t.level = level
   state.topicProgress[topicId] = t
   save()
+}
+
+// ── Phase 5: station daily plan ──
+// The plan is built by stations.js (which owns the generation + spot logic);
+// the store only persists it and records progress, so it stays circular-import
+// free (math.js imports the store, not the other way around).
+
+export function getStations() {
+  return state.stations
+}
+
+/** Replace today's whole station plan (stations.js calls this once per day). */
+export function setStations(plan) {
+  state.stations = plan
+  save()
+}
+
+/** She left a station unfinished — remember how far she got so it RESUMES. */
+export function setStationSolved(mapId, solvedCount) {
+  const st = state.stations.byMap[mapId]
+  if (st) {
+    st.solvedCount = solvedCount
+    save()
+  }
+}
+
+/** A completed quest — mark it done so it won't reappear until tomorrow. */
+export function completeStation(mapId) {
+  const st = state.stations.byMap[mapId]
+  if (st) {
+    st.completed = true
+    save()
+  }
 }
 
 // ── Phase 3: shop + placement ──

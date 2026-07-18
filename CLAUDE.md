@@ -27,7 +27,7 @@ to earn gems; gems buy assets she places to build a small world.
 - **Phase 2 — music + gem collection** (bgm/meow + sparkle-tap gems, 15 cap) ✅ DONE 2026-07-16
 - **Phase 3 — shop + asset placement** ✅ DONE 2026-07-16 (localStorage still; Supabase later per brief)
 - **Phase 4 — math popup overlay** ✅ DONE 2026-07-16 (Oscar designed, Nathan lifted + wired; sparkles ARE math gems now)
-- **Phase 5 — task wrappers** (water-a-tree skins) · **Phase 6 — progression** (quotas/badges)
+- **Phase 5 — task wrappers** (station mini-quests) ✅ DONE 2026-07-17 (Oscar's Station Pack lifted; 6 skins, farewell, sparkle consumable next) · **Phase 6 — progression** (quotas/badges)
 
 ## Phase 4 (added 2026-07-16): THE MATH LOOP
 - **Oscar's handoff** = `~/Downloads/math-popup-flow.html` (self-contained comp).
@@ -73,6 +73,50 @@ to earn gems; gems buy assets she places to build a small world.
   rAF (and thus ALL R3F movement/anims) only ticks while a screenshot is
   being taken — interleave screenshots as the frame pump, and never diagnose
   "the character is frozen" from JS polls alone.
+
+## Phase 5 (added 2026-07-17): STATION mini-quests (Oscar's Station Pack)
+- **Oscar's handoff** = `~/Downloads/delivery — station + sparkle packs/`
+  (`math-station-flow.html` + README + PNGs). Lifted per Oscar's ship order.
+  Scope FENCE honored: farewell variants H/I/J + alternate ring motions live in
+  `math-station-playground.html` and are RESERVED for a later "special stations"
+  drop — NOT built. V1 farewell = the one universal white dissolve.
+- **Shared kit (`src/ui/mathkit.jsx`)** — the reusable math atoms (T tokens,
+  Sparkles, BigButton, EquationRow, ColumnMath, MultiColumnMath, Keypad,
+  WorkedExample, FlyGem, useKeyInput) were EXTRACTED here so MathPopup and
+  StationPopup share them, not copy them (Oscar's rule: "shared modules, not
+  copies"). MathPopup slimmed to its own state machine + re-exports SKINS.
+- **`src/ui/skins.js`** — the 6-skin RELEASE SET (feedPet/waterTree/bakery/
+  flowers/arcade/starParty): each drives BOTH a single sparkle (tag/paw/accent/
+  ask/win) AND a station quest (marker/asset/glow/questLabel/stepNoun/questAsk/
+  stepWin/questWin). Adding a skin = one entry.
+- **`src/ui/StationPopup.jsx`** — the quest spine around the popup: intro →
+  per-problem ask → stepdone → recover (worked example) → complete (distinct
+  amber bonus burst). Per-problem `gems` = ladder level; a completion `bonus`.
+  Awards ride plain timers (rAF-starve hardening), only flights use rAF.
+- **`src/world/Station.jsx`** — the 3D world node: skin-colored pulsing ring +
+  glowing orb + drei `<Html>` marker/quest-label + oversize hitbox. FAREWELL =
+  a ~1.6s universal SILVER-WHITE dissolve (orb rises/shrinks/whitens + white
+  bloom + shockwave) driven in-component; App flips `farewell` for 1750ms.
+- **Daily plan (`src/stations.js` + store `stations` field)** — `ensureDailyStations()`
+  picks STATION.perDayMin..Max (2–3) of the 5 maps once per day, gives each a
+  distinct skin + `generateStation(2)` (ONE topic/skill per station, frontier-
+  weighted, current level) + a clear spot. `stationFor(mapId)` returns today's
+  live (uncompleted) station. Kept OUT of the store to avoid the math.js↔store
+  import loop.
+- **Spawn/proximity** in Scene mirror the sparkle loop (STATION.reach opens,
+  STATION.rearm re-arms after an unfinished close — resumes at the unsolved
+  problem, never resets). Minimap draws a skin-colored station dot.
+- **lifetimeGems** — every EARNED gem now also accrues to `state.lifetimeGems`
+  in `addGems` (before the balance cap), and a retroactive seed on load
+  (`gems + Σ price of owned/placed`) means the 15-gem cap can retire later with
+  ZERO loss. The economy's badges will read this ledger.
+- **QA hooks (dev only):** `window.__stations()` (today's plan) and
+  `window.__forceStation(mapId, skinId)` (inject a station for deterministic
+  testing — spawns are random across 2–3 maps/day; force + reload to mount).
+- **NEXT in this delivery = the Sparkle Pack** (`handoff — sparkle pack.md`):
+  a "Magic" shop category selling a 15-min consumable sparkle trail
+  (buySparkle/activateSparkle/giftSparkle, sparkle bar, quiet expiry). Separate
+  seams, ships as its own deploy.
 
 ## Phase 2 (added 2026-07-16): music + gem collection
 - **Audio** (`src/audio.js`): bgm loop (Ivy's pick, `public/audio/bgm.mp3`, vol .38) +

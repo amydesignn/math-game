@@ -9,7 +9,7 @@ const SIZE = 104 // css px, drawn 2x for retina
  * the world), with the scenery as fixed dots and Ivy + her pet as live dots.
  * Reads positions from refs each frame — no React re-renders.
  */
-export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, placed = [] }) {
+export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stationRef, placed = [] }) {
   const canvas = useRef()
 
   useEffect(() => {
@@ -70,6 +70,19 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, place
         ctx.stroke()
       }
 
+      // today's station (a bigger ringed dot in the skin's colour — the special
+      // thing to find; drawn under the companions so they always read on top)
+      const st = stationRef?.current
+      if (st) {
+        ctx.beginPath()
+        ctx.arc(toPx(st.x), toPx(st.z), 8, 0, Math.PI * 2)
+        ctx.fillStyle = st.color
+        ctx.fill()
+        ctx.strokeStyle = '#ffffff'
+        ctx.lineWidth = 3
+        ctx.stroke()
+      }
+
       // pet (gold, so it reads as "the companion")
       const p = petPosRef.current
       ctx.fillStyle = gold
@@ -91,7 +104,7 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, place
     }
     raf = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(raf)
-  }, [map, charPosRef, petPosRef, sparklesRef, placed])
+  }, [map, charPosRef, petPosRef, sparklesRef, stationRef, placed])
 
   return (
     <canvas
