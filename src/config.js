@@ -75,6 +75,18 @@ export const SHOP = [
   { asset: 'basketball-game', pack: 'arcade', name: 'Basketball hoop', emoji: '🏀', price: 5 },
 ]
 
+// ── Content refresh cadence ──
+// So there's always something new to earn: stations regenerate and the map's
+// gem sparkles re-scatter every this-many hours. This is the "restart after a
+// period" rule (Ivy maxed out day one). BETA-PROVISIONAL — the blessed gem
+// economy spec finalizes the cadence and when the 15-gem cap retires; until
+// then, tune this ONE number. Guide: 24 = once a day · 6 = a few times a day ·
+// 3 = frequent (current) · 1 = very abundant. Windows align to the clock (UTC),
+// so a fresh batch lands on each boundary regardless of when she last played.
+export const REFRESH = {
+  periodHours: 3,
+}
+
 // ── Phase 5: station mini-quests (encounter tier 3) ──
 // Stations are the "task wrappers with world presence" — rare-ish, 2–3 a day
 // across the ring of maps, so most days feel different. One skin + one skill per

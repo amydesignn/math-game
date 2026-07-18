@@ -8,7 +8,7 @@ import Gem from './ui/Gem'
 import MathPopup, { SKINS } from './ui/MathPopup'
 import StationPopup from './ui/StationPopup'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
-import { stationFor } from './stations'
+import { stationFor, currentWindow } from './stations'
 import { getState, setMap, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { WORLD, GEMS } from './config'
@@ -81,6 +81,19 @@ export default function App() {
   const [farewellMap, setFarewellMap] = useState(null) // the map whose station is saying goodbye
   const stationRef = useRef(null) // Scene writes {x,z,color} here; the minimap draws the dot
   const farewellTimer = useRef()
+
+  // Content refresh: when the window rolls over (every REFRESH.periodHours),
+  // bump this so the Scene re-scatters gems + reloads its station. A minute-
+  // granular check is plenty — the boundary just needs to be noticed while
+  // she's playing; a reload picks it up regardless.
+  const [refreshWindow, setRefreshWindow] = useState(currentWindow)
+  useEffect(() => {
+    const t = setInterval(() => {
+      const w = currentWindow()
+      setRefreshWindow((prev) => (w !== prev ? w : prev))
+    }, 60000)
+    return () => clearInterval(t)
+  }, [])
 
   function onStationReached() {
     if (mathBusyRef.current) return
@@ -301,6 +314,7 @@ export default function App() {
             onStationReached={onStationReached}
             farewellActive={farewellMap === mapId}
             stationRef={stationRef}
+            refreshKey={refreshWindow}
             mathBusyRef={mathBusyRef}
             collectFnRef={collectFnRef}
             reactUntilRef={reactUntilRef}

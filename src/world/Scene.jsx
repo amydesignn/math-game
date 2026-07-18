@@ -47,7 +47,7 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
   const marker = useRef() // the ring that pings on tap
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
@@ -57,10 +57,26 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
   const taken = useRef(new Set()) // same-frame double-fire guard
   const cooling = useRef(new Set()) // unsolved popups re-arm only after she walks away
 
-  // ── Phase 5: today's station for this map (or null) ──
-  const [station] = useState(() => stationFor(map.id))
+  // ── Phase 5: the current window's station for this map (or null) ──
+  const [station, setStation] = useState(() => stationFor(map.id))
   const stationSkin = station ? SKINS[station.skinId] : null
   const stationCooling = useRef(false) // unfinished close re-arms only after she walks off
+
+  // ── Content refresh: when the window rolls over, re-scatter this map's gems
+  // and reload its station in place (no remount, no camera snap). Deferred while
+  // a problem/placement is up — the next check or map visit picks it up. This is
+  // the "gems + stations restart after a period" rule, felt without traveling. ──
+  const firstRefresh = useRef(true)
+  useEffect(() => {
+    if (firstRefresh.current) { firstRefresh.current = false; return }
+    if ((mathBusyRef && mathBusyRef.current) || placing) return
+    taken.current.clear()
+    cooling.current.clear()
+    setSparkles(spawnSparkles(map, spawn, placed))
+    stationCooling.current = false
+    setStation(stationFor(map.id))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshKey])
 
   // let the minimap draw a dot where the station stands (world presence)
   useEffect(() => {

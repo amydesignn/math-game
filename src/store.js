@@ -34,10 +34,11 @@ function freshState() {
     // counts, the last-10 results at the TOP level (with dates — mastery needs
     // 2 distinct days), and the mastered flag Phase 6's map nodes will light.
     topicProgress: {}, // { [topicId]: { level, byLevel: {n:{seen,correct}}, topResults: [{d, ok}], mastered } }
-    // Phase 5: today's station plan. day = YYYY-MM-DD; byMap[mapId] =
-    // { skinId, problems, bonus, x, z, solvedCount, completed }. Rebuilt daily
-    // (stations.js) so 2–3 worlds get a themed quest and most days feel new.
-    stations: { day: null, byMap: {} },
+    // Phase 5: the current station plan. window = the refresh window it was
+    // built for (see REFRESH); byMap[mapId] = { skinId, problems, bonus, x, z,
+    // solvedCount, completed }. Rebuilt every refresh window (stations.js) so
+    // 2–3 worlds get a fresh themed quest and there's always something to earn.
+    stations: { window: null, byMap: {} },
     startedISO: null,
     lastActive: null,
   }

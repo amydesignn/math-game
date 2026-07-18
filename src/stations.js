@@ -9,12 +9,16 @@
  */
 
 import { MAPS } from './maps'
-import { WORLD, STATION } from './config'
+import { WORLD, STATION, REFRESH } from './config'
 import { generateStation } from './math'
 import { STATION_SKIN_IDS } from './ui/skins'
 import { getStations, setStations } from './store'
 
-const todayKey = () => new Date().toISOString().slice(0, 10)
+// The current refresh window: an integer that ticks up every REFRESH.periodHours.
+// Stations (and the map's gem sparkles) regenerate whenever it advances, so
+// there's always something new to earn. Clock-aligned, so a fresh batch lands on
+// each boundary no matter when she last played.
+export const currentWindow = () => Math.floor(Date.now() / (REFRESH.periodHours * 3600_000))
 
 const shuffle = (arr) => {
   const a = [...arr]
@@ -42,13 +46,14 @@ function pickSpot(map) {
 const round = (n) => Math.round(n * 100) / 100
 
 /**
- * Ensure today's plan exists (idempotent within a day). Picks perDayMin..Max of
- * the maps, gives each a distinct skin, generates its quest, and persists.
- * Returns the plan's byMap object.
+ * Ensure the current window's plan exists (idempotent within a window). Picks
+ * perDayMin..Max of the maps, gives each a distinct skin, generates its quest,
+ * and persists. Returns the plan's byMap object. Rebuilds whenever the refresh
+ * window advances — that's the "stations restart after a period" rule.
  */
-export function ensureDailyStations() {
+export function ensureStations() {
   const plan = getStations()
-  if (plan.day === todayKey()) return plan.byMap
+  if (plan.window === currentWindow()) return plan.byMap
 
   const mapIds = shuffle(Object.keys(MAPS))
   const span = STATION.perDayMax - STATION.perDayMin + 1
@@ -69,26 +74,26 @@ export function ensureDailyStations() {
       completed: false,
     }
   }
-  setStations({ day: todayKey(), byMap })
+  setStations({ window: currentWindow(), byMap })
   return byMap
 }
 
-/** Today's live (uncompleted) station for a map, or null. */
+/** The current window's live (uncompleted) station for a map, or null. */
 export function stationFor(mapId) {
-  const byMap = ensureDailyStations()
+  const byMap = ensureStations()
   const st = byMap[mapId]
   return st && !st.completed ? st : null
 }
 
-// QA hooks (dev builds only): inspect today's plan and force a station into a
-// given map so the encounter can be tested deterministically (spawns are random
-// across 2–3 maps/day). A forced station shows after the scene remounts —
-// reload or re-enter the map.
+// QA hooks (dev builds only): inspect the plan, force a station into a map for
+// deterministic testing (spawns are random across 2–3 maps/window; force +
+// reload/re-enter to mount), and roll the refresh window forward to test the
+// periodic restart without waiting for the clock.
 if (import.meta.env.DEV && typeof window !== 'undefined') {
-  window.__stations = () => ensureDailyStations()
+  window.__stations = () => ensureStations()
   window.__forceStation = (mapId = 'clearing', skinId = 'feedPet') => {
+    ensureStations()
     const plan = getStations()
-    ensureDailyStations()
     plan.byMap[mapId] = {
       skinId,
       problems: generateStation(STATION.length),
@@ -98,7 +103,13 @@ if (import.meta.env.DEV && typeof window !== 'undefined') {
       solvedCount: 0,
       completed: false,
     }
-    setStations({ day: plan.day, byMap: plan.byMap })
+    setStations({ window: plan.window, byMap: plan.byMap })
     return plan.byMap[mapId]
+  }
+  // pretend the window already elapsed → next ensureStations regenerates
+  window.__rollRefresh = () => {
+    const plan = getStations()
+    setStations({ window: (plan.window ?? currentWindow()) - 1, byMap: plan.byMap })
+    return 'refresh window rolled back — reload or re-enter a map to see fresh content'
   }
 }
