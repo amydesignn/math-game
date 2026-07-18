@@ -7,6 +7,7 @@ import Prop from './Prop'
 import Gate from './Gate'
 import Sparkle from './Sparkle'
 import Station from './Station'
+import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
 import { WORLD, GEMS, STATION } from '../config'
 import { MAPS } from '../maps'
@@ -47,7 +48,7 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
   const marker = useRef() // the ring that pings on tap
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
@@ -344,6 +345,11 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
 
       <Character id={characterId} start={spawn} targetRef={targetRef} posRef={charPosRef} reactUntilRef={reactUntilRef} />
       <Pet id={petId} start={spawn} targetPosRef={charPosRef} posRef={petPosRef} reactUntilRef={reactUntilRef} />
+
+      {/* ── Sparkle Pack: the consumable aura + fairy-dust trail on her ── */}
+      {sparkle && (
+        <SparkleTrail key={sparkle.colorId + ':' + sparkle.expiresAt} sparkle={sparkle} charPosRef={charPosRef} onExpire={onSparkleExpire} />
+      )}
     </>
   )
 }

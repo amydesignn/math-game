@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { GEMS, SHOP } from './config'
+import { GEMS, SHOP, SPARKLE } from './config'
 
 const KEY = 'math_world_v1'
 
@@ -34,6 +34,9 @@ function freshState() {
     // counts, the last-10 results at the TOP level (with dates — mastery needs
     // 2 distinct days), and the mastered flag Phase 6's map nodes will light.
     topicProgress: {}, // { [topicId]: { level, byLevel: {n:{seen,correct}}, topResults: [{d, ok}], mastered } }
+    // Sparkle Pack: the active consumable trail, or null. { colorId, expiresAt }.
+    // Survives reload; expires silently when the clock passes expiresAt.
+    sparkle: null,
     // Phase 5: the current station plan. window = the refresh window it was
     // built for (see REFRESH); byMap[mapId] = { skinId, problems, bonus, x, z,
     // solvedCount, completed }. Rebuilt every refresh window (stations.js) so
@@ -151,6 +154,44 @@ export function setTopicLevel(topicId, level) {
   t.level = level
   state.topicProgress[topicId] = t
   save()
+}
+
+// ── Sparkle Pack: the 15-minute consumable trail ──
+
+/** The active sparkle if it hasn't expired, else null (clears a lapsed one). */
+export function getActiveSparkle() {
+  const s = state.sparkle
+  if (!s) return null
+  if (Date.now() >= s.expiresAt) {
+    state.sparkle = null
+    save()
+    return null
+  }
+  return s
+}
+
+/** Start (or restart) a sparkle — buying while one is active just resets the
+ *  timer, no stacking, no waste-guilt. */
+export function activateSparkle(colorId) {
+  state.sparkle = { colorId, expiresAt: Date.now() + SPARKLE.durationMs }
+  save()
+  return state.sparkle
+}
+
+/** Buy a sparkle colour → activate it. Returns the colorId, or null if she
+ *  can't afford it. Price is per-colour (SPARKLE.colors). */
+export function buySparkle(colorId) {
+  const c = SPARKLE.colors[colorId]
+  if (!c || state.gems < c.price) return null
+  state.gems -= c.price
+  activateSparkle(colorId)
+  return colorId
+}
+
+/** A rare free gift (the tutorial: she learns what a sparkle IS before spending). */
+export function giftSparkle(colorId) {
+  activateSparkle(colorId)
+  return colorId
 }
 
 // ── Phase 5: station daily plan ──

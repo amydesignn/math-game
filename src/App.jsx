@@ -9,7 +9,7 @@ import MathPopup, { SKINS } from './ui/MathPopup'
 import StationPopup from './ui/StationPopup'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { stationFor, currentWindow } from './stations'
-import { getState, setMap, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset } from './store'
+import { getState, setMap, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { WORLD, GEMS } from './config'
 import { MAPS, arrivalPoint, preloadMap } from './maps'
@@ -120,6 +120,15 @@ export default function App() {
       setFarewellMap(mid) // the world plays the sparkle-white dissolve at its spot
       clearTimeout(farewellTimer.current)
       farewellTimer.current = setTimeout(() => setFarewellMap(null), 1750)
+      // rare free sparkle AFTER a good quest — the tutorial (she learns what it
+      // is before spending). Never mid-math, never for a wrong answer; and only
+      // when none is already running (buying/gifting just resets, never stacks).
+      if (!getActiveSparkle() && Math.random() < 0.25) {
+        const gift = Math.random() < 0.5 ? 'pink' : 'blue'
+        giftSparkle(gift)
+        setSparkle(getActiveSparkle())
+        showNote('A free sparkle for you! ✨')
+      }
     } else {
       setStationSolved(mid, solvedCount) // remember progress — it RESUMES on return
     }
@@ -140,6 +149,27 @@ export default function App() {
     setPlaced([...getState().world])
     setOwned([...getState().owned])
   }
+
+  // ── Sparkle Pack: the 15-minute consumable trail ──
+  const [sparkle, setSparkle] = useState(getActiveSparkle) // { colorId, expiresAt } | null
+
+  function handleBuySparkle(colorId) {
+    if (!buySparkle(colorId)) return // can't afford — shop shows it greyed anyway
+    setGems(getState().gems)
+    setSparkle(getActiveSparkle())
+  }
+  function onSparkleExpire() {
+    getActiveSparkle() // clears the lapsed one in the store
+    setSparkle(null) // …dust settles, bar fades — quietly (no toast)
+  }
+  // catch expiry even if she's standing still (no frames driving the trail)
+  useEffect(() => {
+    if (!sparkle) return
+    const t = setInterval(() => {
+      if (!getActiveSparkle()) { setSparkle(null); clearInterval(t) }
+    }, 1000)
+    return () => clearInterval(t)
+  }, [sparkle])
 
   function showNote(text) {
     setNote(text)
@@ -315,6 +345,8 @@ export default function App() {
             farewellActive={farewellMap === mapId}
             stationRef={stationRef}
             refreshKey={refreshWindow}
+            sparkle={sparkle}
+            onSparkleExpire={onSparkleExpire}
             mathBusyRef={mathBusyRef}
             collectFnRef={collectFnRef}
             reactUntilRef={reactUntilRef}
@@ -375,7 +407,9 @@ export default function App() {
         <Shop
           gems={gems}
           owned={owned}
+          activeSparkle={sparkle}
           onBuy={handleBuy}
+          onBuySparkle={handleBuySparkle}
           onPlaceOwned={(o) => startPlacing({ id: o.id, asset: o.asset, pack: o.pack })}
           onClose={() => setShopOpen(false)}
         />

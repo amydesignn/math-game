@@ -1,5 +1,14 @@
 import { useState } from 'react'
-import { SHOP } from '../config'
+import { SHOP, SPARKLE } from '../config'
+
+// display fill for each sparkle swatch (metallics + rainbow read as gradients)
+const SWATCH_BG = {
+  pink: '#FB64B6',
+  blue: '#51A2FF',
+  gold: 'linear-gradient(135deg,#FFD230,#E17100)',
+  silver: 'linear-gradient(135deg,#F8FAFC,#90A1B9)',
+  rainbow: 'linear-gradient(135deg,#FF6467,#FFB900,#00C950,#51A2FF,#C27AFF)',
+}
 
 /*
  * The Gem Shop — Phase 3's bottom sheet. Functional Nathan-built UI (house
@@ -9,8 +18,9 @@ import { SHOP } from '../config'
  * shop and hands the item to App, which enters placement mode. "Your things"
  * lists bought-but-unplaced items (e.g. a cancelled placement) to place later.
  */
-export default function Shop({ gems, owned, onBuy, onPlaceOwned, onClose }) {
+export default function Shop({ gems, owned, activeSparkle, onBuy, onBuySparkle, onPlaceOwned, onClose }) {
   const [selected, setSelected] = useState(null) // catalog index
+  const [magicSel, setMagicSel] = useState(null) // selected sparkle colorId
 
   const sheet = {
     position: 'absolute',
@@ -60,6 +70,43 @@ export default function Shop({ gems, owned, onBuy, onPlaceOwned, onClose }) {
               </div>
             </>
           )}
+
+          {/* Magic — the sparkle consumable (15-min trail on her character) */}
+          <SectionLabel>✨ Magic — a sparkle trail for 15 min</SectionLabel>
+          {activeSparkle && (
+            <div style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--brand-iris-600)', margin: '0 4px 8px' }}>
+              {SPARKLE.colors[activeSparkle.colorId]?.label} sparkle is on ✨ — buy again to refresh it
+            </div>
+          )}
+          <div style={{ ...grid, marginBottom: 6 }}>
+            {SPARKLE.order.map((id) => {
+              const c = SPARKLE.colors[id]
+              const affordable = gems >= c.price
+              const isSel = magicSel === id
+              return (
+                <button
+                  key={id}
+                  onClick={() => affordable && setMagicSel(isSel ? null : id)}
+                  style={{ ...tile(affordable), outline: isSel ? '3px solid var(--brand-iris-600)' : 'none' }}
+                >
+                  <span style={{ width: 34, height: 34, borderRadius: '50%', background: SWATCH_BG[id],
+                    boxShadow: '0 1px 4px rgba(40,30,70,0.25), inset 0 0 0 1.5px rgba(255,255,255,0.6)',
+                    filter: affordable ? 'none' : 'grayscale(0.7)' }} />
+                  <span style={tileName}>{c.label}</span>
+                  {isSel ? (
+                    <span
+                      onClick={(e) => { e.stopPropagation(); onBuySparkle(id); setMagicSel(null) }}
+                      style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '3px 12px', fontWeight: 800 }}
+                    >
+                      Buy 💎{c.price}
+                    </span>
+                  ) : (
+                    <span style={{ ...tilePrice, color: affordable ? 'var(--brand-iris-900)' : '#b6aed6' }}>💎 {c.price} · 15m</span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
 
           <SectionLabel>Buy with gems</SectionLabel>
           <div style={grid}>

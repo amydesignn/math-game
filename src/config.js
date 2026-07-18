@@ -87,6 +87,32 @@ export const REFRESH = {
   periodHours: 3,
 }
 
+// ── Sparkle Pack: a 15-minute cosmetic consumable (Oscar's Sparkle Pack) ──
+// The first non-permanent shop item — the gem SINK that keeps gems worth
+// earning after the world fills up. Bought from the shop's "Magic" tier; a
+// sparkle aura + fairy-dust trail rides on Ivy's character for the duration,
+// with a quiet-draining bar above her head. Prices are per-colour (Oscar's,
+// blessed by Amy): 2 a colour, 3 for a metallic, 4 for rainbow.
+export const SPARKLE = {
+  durationMs: 15 * 60 * 1000,
+  // emitter recipe (Oscar's, tuned with Amy — translated from his 2D comp to
+  // the 3D world): beat cadence, motes per beat, glint cadence, particle cap.
+  beatMs: 55,
+  dustPerBeat: 3,
+  glintEvery: 4, // lux skus glint every 3rd beat instead
+  auraStars: 7,
+  maxParticles: 80,
+  colors: {
+    pink: { label: 'Pink', price: 2, hex: '#FB64B6', cs: ['#FB64B6', '#FDA5D5', '#ffffff'] },
+    blue: { label: 'Blue', price: 2, hex: '#51A2FF', cs: ['#51A2FF', '#8EC5FF', '#ffffff'] },
+    gold: { label: 'Gold', price: 3, hex: '#FFB900', cs: ['#FFB900', '#FEE685', '#ffffff'], lux: true },
+    silver: { label: 'Silver', price: 3, hex: '#E2E8F0', cs: ['#E2E8F0', '#CAD5E2', '#ffffff'], lux: true },
+    rainbow: { label: 'Rainbow', price: 4, hex: null, cs: null }, // per-particle hue cycle
+  },
+  // the shop's Magic tier, in display order
+  order: ['pink', 'blue', 'gold', 'silver', 'rainbow'],
+}
+
 // ── Phase 5: station mini-quests (encounter tier 3) ──
 // Stations are the "task wrappers with world presence" — rare-ish, 2–3 a day
 // across the ring of maps, so most days feel different. One skin + one skill per
