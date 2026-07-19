@@ -108,7 +108,24 @@ still exists underneath (dev + tests run on it), so if the game is ever
 shared later, guest mode is a one-line flip on the SignIn screen — recorded
 here so it isn't re-derived, and deliberately not built now.
 
-## Supabase setup (Amy's ~5 minutes, at A2)
+## ✅ Supabase setup DONE 2026-07-19 (Amy + Nathan via the supabase MCP)
+
+Project **Math-app** `lqcgagruudakeddkbeuj` (us-west-2, free tier).
+- **URL:** `https://lqcgagruudakeddkbeuj.supabase.co`
+- **Publishable key** (client-side, public-by-design; prefer over legacy anon):
+  `sb_publishable_QMEUCZ1wx1Hqff3ZC8aP_g_30HErHSa`
+- **Users** (both confirmed): Amy `amyngo2k2@gmail.com`, Ivy `ivydesign2026@gmail.com`
+- **`saves` table + RLS** created via migration `create_saves_table_with_rls`
+  (select/insert/update own-row only, **no delete policy**).
+- Migration `lock_down_rls_auto_enable_helper` sealed the dashboard's
+  auto-RLS helper function (was API-callable — security advisor catch).
+- Auth URL config: site = the Pages URL, `http://localhost:5180` in redirects.
+- The **supabase MCP** is connected in Nathan's sessions — schema, SQL,
+  logs and advisors are directly reachable; re-run `get_advisors` after
+  any DDL. ⚠️ Remaining to verify in dashboard: **signups OFF**
+  (Auth → Sign In / Providers) — MCP can't read that setting.
+
+## The original setup checklist (kept for reference)
 
 1. Create a free-tier project (closest region).
 2. Auth → email provider ON, **"Allow new users to sign up" OFF** — the
