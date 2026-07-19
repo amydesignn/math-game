@@ -74,9 +74,52 @@ to earn gems; gems buy assets she places to build a small world.
   being taken — interleave screenshots as the frame pump, and never diagnose
   "the character is frozen" from JS polls alone.
 
-## 🔜 NEXT UP — Phase 5-A: the level bar + level-up popup
-**Oscar's design package lands with Amy. Decisions are LOCKED — do not re-derive them.**
-Full spec: Notion → "🎮 Phase 5: Level Ladder — Decisions & Specs" (child of the v1 Brief).
+## Phase 5-A ✅ SHIPPED 2026-07-18 — the level bar + signed congratulations
+Oscar's `~/Downloads/math-level-bar-flow.html` lifted into `src/ui/LevelBar.jsx`
+(bar + popup) + `src/levels.js` (ladder maths + message packs). Decisions were
+LOCKED before the build — spec: Notion → "🎮 Phase 5: Level Ladder — Decisions
+& Specs" (child of the v1 Brief). What landed:
+- **`src/levels.js`** — `requiredFor`/`levelState`/`levelOf`/`fmtPoints`,
+  `STAGE_LABELS` (Warm-up/Challenge/Expert, ready for 5-B), `MESSAGE_PACKS`,
+  `pickLevelMessage`. **The bar reads `lifetimeGems`** — no second field.
+- **The signature (Amy's ask):** Ivy sees WHO wrote each line. Five each —
+  Finn / Oscar / Nathan. **Author rotates Finn → Oscar → Nathan, message steps
+  through each pack**, so no voice repeats back-to-back and all fifteen show
+  before any repeat. `store.levelUps` is the rotation cursor. Finn's other 7
+  (he wrote 12 on the team's behalf before Oscar and Nathan wrote their own)
+  are parked in the Notion spec — swapping one in is a one-line change.
+- **Public-release seam:** the signature line is conditional on `from`. Swap
+  `MESSAGE_PACKS` for unsigned copy and the card renders no signature —
+  our names are NOT baked into the component.
+- **Retroactive popups fire** (Amy overruled the caution): `celebratedLevel`
+  starts at 1, so an existing save is simply owed its popups on next boot;
+  `pendingLevelUps()` returns them and the queue drains one at a time.
+- **The popup gate:** `worldBusy` blocks the card over a math popup, a station
+  quest, the farewell dissolve, the shop, a placement, or a gate fade. The BAR
+  still celebrates instantly — only the card waits for quiet.
+- **Two bugs fixed in the comp** (found by reading before lifting): the surge
+  set `shown` to the level boundary, which reads as the NEXT level at 0% — so
+  the label flipped 450ms early, spoiling the roll; and the fill snapped back
+  down mid-roll because only `surge` forced 100%, not `flip`. Both noted inline
+  at the fix sites. **Tell Oscar** — his standalone comp has them too.
+- **Finn's threshold table is a test fixture** (`src/__tests__/levels.test.js`,
+  12 tests) exactly like the C1 calibration set — round-trips both directions
+  to Level 40, asserts the rate change at 10, and checks the bar's remainder
+  always adds back up to her real total.
+- **Dev QA hooks:** `window.__award(n)` (award without solving — a level-up is
+  50 points of long multiplication otherwise) and `window.__level()`.
+- ⚠️ **Pane physics, again:** background-tab timer throttling stretches the
+  1350ms bar theatre well past 2s — a card that hasn't appeared yet is usually
+  throttling, not a bug. Poll at 4–6s before diagnosing.
+- **Difficulty labels: nothing to do yet.** Ivy currently sees no difficulty
+  wording at all (verified — L1/L2/L3 appear only in code comments), so
+  `stageLabel()` sits ready for 5-B's history popup rather than inventing a
+  label nobody asked to see.
+
+## Phase 5-B / 5-C (next)
+5-B = tap the bar → history popup (total points + per-topic stage counts, NO
+accuracy — Design Principle 4; the data already exists in `topicProgress`).
+5-C = topic badges ⭐⭐⭐, roadmap only. Both await Oscar + Amy's design.
 
 - **ONE accumulator — and it already exists.** The spec calls it `totalPoints`; that is
   exactly `lifetimeGems` (increments on every award, never decremented by
