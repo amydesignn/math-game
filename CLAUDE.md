@@ -162,6 +162,44 @@ exactly while the full scheduler machinery soaks in prod.
   doc. **A3** = real-iPad QA (pagehide flush, offline boot, accidental-logout
   UX) + the family's accounts.
 
+## Phase A2 ✅ SHIPPED 2026-07-19 — the supabase backend + the sign-in wall
+- **`src/auth.js`** = the session layer: one supabase-js client (URL +
+  publishable key are public-by-design; RLS is the boundary), magic link via
+  `signInWithOtp({ shouldCreateUser: false })`, `emailRedirectTo` = origin +
+  BASE_URL (must match the dashboard redirect allowlist: the Pages URL, and
+  `http://localhost:5180` for dev). **The token + uid are cached synchronously**
+  (kept fresh by onAuthStateChange) so the pagehide flush can build its request
+  without an async lookup inside a dying page.
+- **`supabaseBackend()` in backend.js:** `loadRemote` via supabase-js
+  (boot-time, no urgency); `saveRemote` is a RAW `fetch(..., {keepalive:true})`
+  upsert to PostgREST (`Prefer: resolution=merge-duplicates`) — supabase-js
+  can't do keepalive, and keepalive is what survives the iPad home button.
+- **Backend choice in main.jsx:** `PROD → supabase` (the hard sign-in wall —
+  no guest mode, per Amy), `dev → local` (pane QA needs no session),
+  **`?cloud` in a dev URL exercises the real flow**. The store and its 70-test
+  suite never import auth-specific code paths — the race fixtures all run on
+  the scriptable mock, unchanged.
+- **SignIn screen** (in main.jsx): "Ask Mum to open your world 💜" — NOT an
+  error tone (it doubles as the accidental-logout screen). idle → sending →
+  sent ("Check your email 📬") / error (generic amber note — **the allowlist
+  never leaks** which emails exist). Functional build on house tokens; Oscar
+  reskin welcome, same deal as the shop's first pass. The guest-mode flip, if
+  ever needed, is one extra button on this screen.
+- **Verified:** dev-default boot byte-identical (local backend, zero console
+  errors); `?cloud` → wall renders; unknown email → **server-confirmed 422
+  "Signups not allowed for otp" in the auth logs** (via the supabase MCP —
+  `get_logs` is the ground truth the pane's network recorder can't see).
+  **NOT verifiable without Amy's inbox:** the magic-link redeem + first real
+  cloud push — that's the live test / A3.
+- **Pane gotcha (new):** `computer type` into a React-controlled input can
+  silently not stick — use `read_page` refs + `form_input` for form QA.
+- **⚠️ One device = one account (A3 briefing):** the local save is one
+  localStorage blob shared by whoever signs in on that browser. Signing in
+  with the WRONG family email on a device can push that device's save onto
+  the other account's cloud row (the ledger merge doesn't know about owners —
+  accepted scope: one kid, one iPad). Recoverable via MCP (no delete policy),
+  but the rule is simply: iPad = Ivy's email, Amy's machines = Amy's.
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).

@@ -21,6 +21,7 @@
  * The scriptable mock lives with the tests (src/__tests__/store-boot.test.js),
  * not here — it never belongs in the app bundle.
  */
+import { supabase, sessionCache, SUPABASE_URL, SUPABASE_KEY } from './auth'
 
 export function localBackend() {
   return {
@@ -31,6 +32,44 @@ export function localBackend() {
       return null
     },
     async saveRemote() {
+      return true
+    },
+  }
+}
+
+/*
+ * The real one (A2). Requires a signed-in session — the Boot gate guarantees
+ * that before initStore(supabaseBackend()) ever runs.
+ *
+ * loadRemote goes through supabase-js (boot-time, no urgency). saveRemote
+ * deliberately does NOT: it's a raw fetch with `keepalive: true` so the
+ * pagehide flush survives the iPad home-button moment, built synchronously
+ * from the cached token (an async token lookup inside a dying page is a race).
+ * RLS scopes every request to the session's own row.
+ */
+export function supabaseBackend() {
+  return {
+    kind: 'supabase',
+    async loadRemote() {
+      const { data, error } = await supabase.from('saves').select('state').maybeSingle()
+      if (error) throw error // failed read ≠ empty read — the store must know
+      return data ? { state: data.state } : null
+    },
+    async saveRemote(blob) {
+      const { token, uid } = sessionCache()
+      if (!token || !uid) throw new Error('no-session')
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/saves?on_conflict=user_id`, {
+        method: 'POST',
+        keepalive: true, // the state blob is a few KB — well under keepalive's 64KB cap
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          Prefer: 'resolution=merge-duplicates,return=minimal', // upsert
+        },
+        body: JSON.stringify([{ user_id: uid, state: blob, updated_at: new Date().toISOString() }]),
+      })
+      if (!res.ok) throw new Error(`cloud push failed: ${res.status}`)
       return true
     },
   }
