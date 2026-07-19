@@ -11,6 +11,7 @@
  */
 
 import { SHOP, SPARKLE } from './config'
+import { localBackend } from './backend'
 
 const KEY = 'math_world_v1'
 
@@ -58,6 +59,30 @@ function freshState() {
   }
 }
 
+// ── Phase A: cloud-sync machinery (design: docs/accounts-boot-gate.md) ──
+// The public API below stays SYNCHRONOUS — async lives only here at the
+// edges (boot + background persistence). localStorage remains this device's
+// source of truth; the cloud is sync + backup, never a gate to play.
+const TUNING = {
+  pushDebounceMs: 2000, // trailing debounce on cloud pushes
+  bootReadTimeoutMs: 4000, // boot never waits longer than this on the network
+  retryReadMs: 15000, // how often a failed boot read retries in the background
+}
+let backend = localBackend()
+// THE invariant that kills the empty-state-clobber race by construction:
+// a session may never WRITE to the cloud until it has successfully READ it.
+// (A failed read leaves this false; a read of an EMPTY cloud sets it true.)
+let cloudSynced = false
+// Best known value of the cloud copy's lifetimeGems ledger (-1 = cloud empty).
+// The push guard refuses any write that would regress it — the ledger is
+// monotonic in legal play, so a regression is a bug or a stale boot, never her.
+let cloudLedger = -1
+let dirty = false // local changes not yet confirmed in the cloud
+let forceNextPush = false // resetAll's one legal ledger regression
+let pushTimer = null
+let retryTimer = null
+let initPromise = null // memoized — StrictMode double-mounts initStore safely
+
 let state = load()
 // Persist immediately on boot so one-time migrations (the cap-retirement
 // refund, new fields) are written even if she never touches anything. Without
@@ -65,6 +90,139 @@ let state = load()
 // hand back gems she'd spent on CONSUMABLES (sparkles can't be reconstructed
 // as "spent"), which is a free-gem exploit.
 save()
+
+/**
+ * The boot gate (main.jsx <Boot> awaits this before mounting <App>).
+ * Local hydration already happened synchronously above — this reconciles
+ * with the cloud: read (bounded by bootReadTimeoutMs), pick the winner by
+ * the merge rule, adopt or push. A failed read leaves the game fully
+ * playable on local state, with pushes disabled until a read succeeds.
+ */
+export function initStore(be, tuning) {
+  if (initPromise) return initPromise
+  if (be) backend = be
+  if (tuning) Object.assign(TUNING, tuning)
+  initPromise = (async () => {
+    try {
+      const remote = await withTimeout(backend.loadRemote(), TUNING.bootReadTimeoutMs)
+      adoptReadResult(remote, { allowAdopt: true })
+    } catch {
+      scheduleRetryRead() // offline / flaky — play local, keep trying quietly
+    }
+    return state
+  })()
+  return initPromise
+}
+
+/** A successful cloud read landed — reconcile. Only the BOOT read may adopt
+ *  a winning remote state (`allowAdopt`); a late background read never yanks
+ *  the world out from under her mid-play. If a late read finds the cloud
+ *  ahead (two-device play — out of scope by design), we keep playing local,
+ *  the push guard blocks uploads, and the next boot resolves it cleanly. */
+function adoptReadResult(remote, { allowAdopt }) {
+  cloudSynced = true
+  cloudLedger = remote ? remote.state.lifetimeGems || 0 : -1
+  const remoteWins = remote && pickWinner(state, remote.state) === 'remote'
+  if (remoteWins && allowAdopt) {
+    state = migrate(remote.state)
+    writeLocal()
+    dirty = false // the pre-boot local copy lost the merge; nothing of hers is in it
+  } else if (!remoteWins) {
+    scheduleCloudPush() // local is authoritative (cloud empty or behind) — sync up
+  }
+}
+
+/** The merge rule: the monotonic ledger picks the winner, not the clock —
+ *  an iPad that lost its battery can carry a stale save with a future
+ *  timestamp, but lifetimeGems only ever counts UP in legal play.
+ *  Tie on the ledger → later lastActive wins (skew is irrelevant at a tie). */
+function pickWinner(local, remote) {
+  const l = local.lifetimeGems || 0
+  const r = remote.lifetimeGems || 0
+  if (r !== l) return r > l ? 'remote' : 'local'
+  return (remote.lastActive || '') > (local.lastActive || '') ? 'remote' : 'local'
+}
+
+function withTimeout(promise, ms) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error('boot-read-timeout')), ms)
+    promise.then(
+      (v) => (clearTimeout(t), resolve(v)),
+      (e) => (clearTimeout(t), reject(e)),
+    )
+  })
+}
+
+function scheduleRetryRead() {
+  clearTimeout(retryTimer)
+  retryTimer = setTimeout(async () => {
+    try {
+      const remote = await backend.loadRemote()
+      adoptReadResult(remote, { allowAdopt: false })
+    } catch {
+      scheduleRetryRead()
+    }
+  }, TUNING.retryReadMs)
+}
+
+/** Trailing-debounced cloud push. Every save() calls this; it quietly does
+ *  nothing until the read-before-write invariant is satisfied. */
+function scheduleCloudPush() {
+  dirty = true
+  if (!cloudSynced) return
+  clearTimeout(pushTimer)
+  pushTimer = setTimeout(() => {
+    flushCloudNow()
+  }, TUNING.pushDebounceMs)
+}
+
+/**
+ * Push the current state to the cloud immediately (pagehide / visibility
+ * flush, and the tail of the debounce). Refuses — loudly, in dev — any push
+ * that would regress the cloud's ledger, unless resetAll armed forceNextPush.
+ */
+export async function flushCloudNow() {
+  if (!cloudSynced) return false
+  clearTimeout(pushTimer)
+  const ledger = state.lifetimeGems || 0
+  if (!forceNextPush && cloudLedger > ledger) {
+    if (import.meta.env.DEV)
+      console.warn(`[store] refused cloud push: ledger ${ledger} < cloud ${cloudLedger}`)
+    return false
+  }
+  try {
+    const snapshot = JSON.parse(JSON.stringify(state))
+    await backend.saveRemote(snapshot)
+    cloudLedger = ledger
+    dirty = false
+    forceNextPush = false
+    return true
+  } catch {
+    dirty = true // localStorage holds truth; a lost push costs nothing until the next one lands
+    return false
+  }
+}
+
+// Flush at the moments an iPad actually disappears: home button (pagehide),
+// tab hidden, and coming back online with unsent changes. (The supabase
+// backend uses keepalive fetch so the pagehide flush survives dismissal.)
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', () => {
+    flushCloudNow()
+  })
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushCloudNow()
+    else if (dirty) scheduleCloudPush()
+  })
+  window.addEventListener('online', () => {
+    if (dirty) flushCloudNow()
+  })
+}
+
+// Dev QA hook, same family as __award/__stations.
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  window.__cloud = () => ({ kind: backend.kind, cloudSynced, cloudLedger, dirty })
+}
 
 function load() {
   try {
@@ -74,45 +232,60 @@ function load() {
       s.startedISO = new Date().toISOString()
       return s
     }
-    // merge onto freshState so new fields appear for existing players
-    const merged = { ...freshState(), ...JSON.parse(raw) }
-    // Reconstruct what she has already spent, from the things she owns/placed.
-    // (Consumed items like sparkles can't be reconstructed — so this is a FLOOR,
-    // which always errs in her favour below. That's deliberate.)
-    const spent = [...(merged.owned || []), ...(merged.world || [])].reduce((sum, it) => {
-      const s = SHOP.find((x) => x.asset === it.asset && x.pack === it.pack)
-      return sum + (s ? s.price : 0)
-    }, 0)
-
-    // Retroactive lifetimeGems seed (zero-loss): a returning player from before
-    // the ledger existed has earned AT LEAST her current balance plus whatever
-    // she already spent. Reconstruct that floor so no past earnings are lost.
-    if (!merged.lifetimeGems) merged.lifetimeGems = (merged.gems || 0) + spent
-
-    // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
-    // While the 15-gem beta cap was live, a correct answer over the cap paid
-    // NOTHING — Ivy solved 6 problems, was told she was right, and got zero.
-    // The lifetime ledger recorded those earnings even when the balance was
-    // clamped, so we can pay them back exactly: what she earned, minus what she
-    // spent, IS her rightful balance. Never take gems away — only ever top up.
-    if (!merged.capRetiredAt) {
-      const rightful = (merged.lifetimeGems || 0) - spent
-      if (rightful > (merged.gems || 0)) merged.gems = rightful
-      merged.capRetiredAt = new Date().toISOString()
-    }
-    return merged
+    return migrate(JSON.parse(raw))
   } catch {
+    // Corrupt/unreadable local storage. Fresh is SAFE even with a cloud copy:
+    // fresh carries ledger 0, so the boot merge rule hands the win straight
+    // to the cloud save — corrupt-local recovers from the cloud for free.
     return freshState()
   }
 }
 
-function save() {
-  state.lastActive = new Date().toISOString()
+/** Everything a parsed save needs before it may become `state` — shared by
+ *  the localStorage path (load) and cloud adoption (adoptReadResult), so a
+ *  save is migrated identically wherever it came from. Idempotent. */
+function migrate(parsed) {
+  // merge onto freshState so new fields appear for existing players
+  const merged = { ...freshState(), ...parsed }
+  // Reconstruct what she has already spent, from the things she owns/placed.
+  // (Consumed items like sparkles can't be reconstructed — so this is a FLOOR,
+  // which always errs in her favour below. That's deliberate.)
+  const spent = [...(merged.owned || []), ...(merged.world || [])].reduce((sum, it) => {
+    const s = SHOP.find((x) => x.asset === it.asset && x.pack === it.pack)
+    return sum + (s ? s.price : 0)
+  }, 0)
+
+  // Retroactive lifetimeGems seed (zero-loss): a returning player from before
+  // the ledger existed has earned AT LEAST her current balance plus whatever
+  // she already spent. Reconstruct that floor so no past earnings are lost.
+  if (!merged.lifetimeGems) merged.lifetimeGems = (merged.gems || 0) + spent
+
+  // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
+  // While the 15-gem beta cap was live, a correct answer over the cap paid
+  // NOTHING — Ivy solved 6 problems, was told she was right, and got zero.
+  // The lifetime ledger recorded those earnings even when the balance was
+  // clamped, so we can pay them back exactly: what she earned, minus what she
+  // spent, IS her rightful balance. Never take gems away — only ever top up.
+  if (!merged.capRetiredAt) {
+    const rightful = (merged.lifetimeGems || 0) - spent
+    if (rightful > (merged.gems || 0)) merged.gems = rightful
+    merged.capRetiredAt = new Date().toISOString()
+  }
+  return merged
+}
+
+function writeLocal() {
   try {
     localStorage.setItem(KEY, JSON.stringify(state))
   } catch {
     /* storage full / disabled — game still runs in-memory this session */
   }
+}
+
+function save() {
+  state.lastActive = new Date().toISOString()
+  writeLocal()
+  scheduleCloudPush()
 }
 
 // ── Public API (the whole surface the rest of the app is allowed to use) ──
@@ -343,6 +516,11 @@ export function pickupAsset(id) {
 export function resetAll() {
   state = freshState()
   state.startedISO = new Date().toISOString()
+  // The ONE legal ledger regression (see the push guard): arm a forced push,
+  // and if it can't land right now (offline), the flag holds until one does —
+  // otherwise the guard would block the fresh save's uploads forever.
+  forceNextPush = true
   save()
+  flushCloudNow()
   return state
 }

@@ -39,6 +39,12 @@ html, body, #root {
 /* touch-action none on the canvas so tap-to-move doesn't scroll the page */
 canvas { touch-action: none; display: block; }
 
+/* boot-gate shimmer (main.jsx) — delayed 350ms so a fast local boot shows nothing */
+@keyframes bootshimmer {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.92); }
+  100% { opacity: .85; transform: translate(-50%, -50%) scale(1.06); }
+}
+
 /* gem counter pop — replays via key={count} remount on each collect */
 @keyframes gempop {
   0% { transform: scale(1); }

@@ -1,7 +1,47 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import { initStore } from './store.js'
 import './index.css'
+
+/*
+ * The boot gate (Phase A, docs/accounts-boot-gate.md): <App> mounts only
+ * after initStore() settles, so every consumer's synchronous store call is
+ * guaranteed a hydrated state — the async-ness never leaks past this file.
+ * With the local backend it settles in a microtask; the cover below matches
+ * the page background and only shows its shimmer after 350ms, so a fast boot
+ * renders nothing visible at all. The cloud boot is bounded by the store's
+ * 4s read timeout, after which she plays on the local save regardless.
+ */
+function Boot() {
+  const [ready, setReady] = React.useState(false)
+  React.useEffect(() => {
+    let on = true
+    initStore().then(() => on && setReady(true)) // memoized — StrictMode-safe
+    return () => {
+      on = false
+    }
+  }, [])
+  if (!ready)
+    return (
+      <div style={{ position: 'fixed', inset: 0, background: 'var(--lilac-50)' }}>
+        <span
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            fontSize: 40,
+            opacity: 0,
+            animation: 'bootshimmer 1.1s ease 0.35s infinite alternate',
+          }}
+        >
+          ✨
+        </span>
+      </div>
+    )
+  return <App />
+}
 
 /*
  * Friendly crash screen — if anything ever throws, Ivy gets a tap-to-reload
@@ -45,7 +85,7 @@ class Oops extends React.Component {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      <App />
+      <Boot />
     </Oops>
   </React.StrictMode>,
 )
