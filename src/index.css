@@ -65,3 +65,20 @@ canvas { touch-action: none; display: block; }
 @keyframes markerOrbit { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-11px) rotate(6deg); } }
 @keyframes slotFill { 0% { transform: scale(.4) rotate(-14deg); } 60% { transform: scale(1.25) rotate(6deg); } 100% { transform: scale(1) rotate(0); } }
 @keyframes bonusRing { 0% { transform: scale(.5); opacity: .8; } 100% { transform: scale(2.1); opacity: 0; } }
+
+/* ── Level bar + level-up popup (Oscar's Phase 5-A comp, lifted) ── */
+/* the bar */
+@keyframes shineSweep { 0% { transform: translateX(-140%) skewX(-18deg); } 100% { transform: translateX(340%) skewX(-18deg); } }
+@keyframes nearShimmer { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.28); } }
+@keyframes surgeGlow { 0% { box-shadow: 0 0 0 0 rgba(127,34,254,0); } 45% { box-shadow: 0 0 0 7px rgba(127,34,254,.22); } 100% { box-shadow: 0 0 0 0 rgba(127,34,254,0); } }
+@keyframes rollOut { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-115%); opacity: 0; } }
+@keyframes rollIn { 0% { transform: translateY(115%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes tickPop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
+@keyframes floatUp { 0% { transform: translateY(4px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-26px); opacity: 0; } }
+@keyframes barStar { 0% { transform: translate(0,0) scale(.4) rotate(0deg); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(var(--dx),var(--dy)) scale(1) rotate(var(--rot)); opacity: 0; } }
+/* the popup — its own popIn (the overshoot is Oscar's); `popIn` above belongs
+   to the math card and is deliberately gentler, so they don't share a name */
+@keyframes lvlPopIn { 0% { transform: scale(.82) translateY(18px); opacity: 0; } 60% { transform: scale(1.03) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes confettiFall { 0% { transform: translate(0,-10px) rotate(0deg); opacity: 0; } 12% { opacity: 1; } 100% { transform: translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity: 0; } }
+@keyframes badgeBounce { 0% { transform: scale(.3) rotate(-10deg); opacity: 0; } 55% { transform: scale(1.12) rotate(3deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+@keyframes haloPulse { 0% { transform: scale(.8); opacity: .5; } 100% { transform: scale(1.55); opacity: 0; } }

@@ -27,6 +27,16 @@ function freshState() {
     // total was never bounded, only her spendable balance was.
     lifetimeGems: 0,
     capRetiredAt: null, // stamped once, when the one-time cap-retirement refund runs
+    // Phase 5-A: the Player Level bar reads lifetimeGems directly (ONE
+    // accumulator — see levels.js). These two only track the CELEBRATION:
+    //   celebratedLevel — the highest level she has already been congratulated
+    //     for. Starts at 1 (level 1 is where everyone begins, no popup), so an
+    //     existing save naturally gets its retroactive popups on first boot —
+    //     Amy's call: "It doesn't mean it's not there that she did not receive it."
+    //   levelUps — how many congratulations she has seen, which is what rotates
+    //     the message through Finn → Oscar → Nathan.
+    celebratedLevel: 1,
+    levelUps: 0,
     soundOn: true, // the speaker toggle (music + pet sounds)
     world: [], // placed assets: [{ id, asset, pack, x, z, rot, map }] (Phase 3)
     owned: [], // bought but not yet placed: [{ id, asset, pack }] (Phase 3)
@@ -141,6 +151,34 @@ export function addGems(n) {
   state.gems = Math.max(0, state.gems + n)
   save()
   return state.gems
+}
+
+// ── Phase 5-A: the level-up celebration ledger ──
+// The LEVEL itself is derived from lifetimeGems (levels.js) and never stored —
+// one accumulator, no second field to drift. What's stored here is only which
+// congratulations she has already received.
+
+/** Levels she has earned but not yet been congratulated for, low → high.
+ *  Normally empty; non-empty on the migration boot, or if she closed the app
+ *  mid-celebration. */
+export function pendingLevelUps(currentLevel) {
+  const from = state.celebratedLevel || 1
+  const out = []
+  for (let l = from + 1; l <= currentLevel; l++) out.push(l)
+  return out
+}
+
+/** She saw the popup for `level`. Never walks backwards. */
+export function recordLevelUp(level) {
+  state.celebratedLevel = Math.max(state.celebratedLevel || 1, level)
+  state.levelUps = (state.levelUps || 0) + 1
+  save()
+  return state.levelUps
+}
+
+/** How many congratulations she has seen — the message rotation cursor. */
+export function getLevelUps() {
+  return state.levelUps || 0
 }
 
 /**

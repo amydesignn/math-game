@@ -7,9 +7,11 @@ import Shop from './ui/Shop'
 import Gem from './ui/Gem'
 import MathPopup, { SKINS } from './ui/MathPopup'
 import StationPopup from './ui/StationPopup'
+import LevelBar, { LevelUpPopup } from './ui/LevelBar'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
+import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow } from './stations'
-import { getState, setMap, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle } from './store'
+import { getState, setMap, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { WORLD } from './config'
 import { MAPS, arrivalPoint, preloadMap } from './maps'
@@ -22,6 +24,14 @@ export default function App() {
 
   // ── Gems (uncapped since the beta cap retired 2026-07-18) ──
   const [gems, setGems] = useState(state.gems)
+
+  // ── Phase 5-A: Player Level ──
+  // `points` IS lifetimeGems — the same accumulator, read for a different job:
+  // gems are the wallet (spends down), points are the story so far (never do).
+  // One trigger updates both, which is why they're set together in onAward.
+  const [points, setPoints] = useState(state.lifetimeGems)
+  const [levelQueue, setLevelQueue] = useState([]) // levels awaiting their popup
+  const [levelPopup, setLevelPopup] = useState(null) // { level, message, from }
 
   // ── Phase 2: sound (Ivy's bgm + the cat's meow) ──
   useEffect(() => {
@@ -44,6 +54,17 @@ export default function App() {
 
   function onMathAward(n) {
     setGems(addGems(n)) // every correct answer pays, always
+    setPoints(getState().lifetimeGems) // …and the same answer moves her level bar
+  }
+
+  /** The bar finished its theatre and handed us a new level — queue the applause. */
+  function onLevelUp(newLevel) {
+    setLevelQueue((q) => [...q, newLevel])
+  }
+
+  function closeLevelPopup() {
+    if (levelPopup) recordLevelUp(levelPopup.level) // she's seen it; rotate the voice
+    setLevelPopup(null)
   }
 
   function onPetReact() {
@@ -211,6 +232,38 @@ export default function App() {
   // the assets she's placed in the map she's standing in (mapId lives just above)
   const placedHere = placed.filter((w) => w.map === mapId)
 
+  // ── Phase 5-A: retroactive congratulations, once, on boot ──
+  // Her lifetime record predates the bar, so she may already be several levels
+  // in. Amy overruled my caution here and she was right: those levels are real
+  // and she never got to see them. `celebratedLevel` starts at 1, so this fires
+  // exactly once per level, ever — the queue drains and the store remembers.
+  useEffect(() => {
+    const owed = pendingLevelUps(levelOf(getState().lifetimeGems))
+    if (owed.length) setLevelQueue(owed)
+  }, [])
+
+  // Dev QA: drive an award without solving a problem. Level-ups need 50 points,
+  // which is a lot of long multiplication to do by hand in a test pane.
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    window.__award = (n = 1) => { onMathAward(n); return getState().lifetimeGems }
+    window.__level = () => ({ points: getState().lifetimeGems, level: levelOf(getState().lifetimeGems), celebrated: getState().celebratedLevel, levelUps: getState().levelUps })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ── The popup gate: applause only lands on a quiet world ──
+  // Never over a math card, a station quest, the farewell dissolve, the shop,
+  // a placement, or a gate fade. If she levels up mid-quest the bar celebrates
+  // immediately (she sees it) and the card waits for the calm afterwards.
+  const worldBusy = !!(math || station || farewellMap || placing || shopOpen || fading)
+  useEffect(() => {
+    if (levelPopup || worldBusy || !levelQueue.length) return
+    const [next, ...rest] = levelQueue
+    const { text, from } = pickLevelMessage(next, getLevelUps())
+    setLevelPopup({ level: next, message: text, from })
+    setLevelQueue(rest)
+  }, [levelPopup, worldBusy, levelQueue])
+
   function travel(toId) {
     if (travelling.current) return false // caller may retry next frame
     travelling.current = true
@@ -354,6 +407,15 @@ export default function App() {
       {/* ── HUD ── */}
       <GemCounter count={gems} innerRef={hudGemRef} />
       <SpeakerButton />
+      <div
+        style={{
+          position: 'absolute',
+          top: 'max(16px, env(safe-area-inset-top))',
+          right: 16 + 104 + 12, // left of the minimap (SIZE 104 + gutter)
+        }}
+      >
+        <LevelBar points={points} onLevelUp={onLevelUp} />
+      </div>
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} placed={placedHere} />
       {!moved && <MoveHint />}
       {toast && <MapToast name={toast} />}
@@ -425,6 +487,16 @@ export default function App() {
           onWorldReact={onPetReact}
           onResult={onStationResult}
           onClose={onStationClose}
+        />
+      )}
+
+      {/* ── Phase 5-A: the congratulations, from the team to Ivy ── */}
+      {levelPopup && (
+        <LevelUpPopup
+          level={levelPopup.level}
+          message={levelPopup.message}
+          from={levelPopup.from}
+          onClose={closeLevelPopup}
         />
       )}
 
