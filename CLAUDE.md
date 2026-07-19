@@ -74,6 +74,42 @@ to earn gems; gems buy assets she places to build a small world.
   being taken — interleave screenshots as the frame pump, and never diagnose
   "the character is frozen" from JS polls alone.
 
+## 🔜 NEXT UP — Phase 5-A: the level bar + level-up popup
+**Oscar's design package lands with Amy. Decisions are LOCKED — do not re-derive them.**
+Full spec: Notion → "🎮 Phase 5: Level Ladder — Decisions & Specs" (child of the v1 Brief).
+
+- **ONE accumulator — and it already exists.** The spec calls it `totalPoints`; that is
+  exactly `lifetimeGems` (increments on every award, never decremented by
+  spending, difficulty-weighted). **Do NOT add a second field** — two counters
+  with identical semantics silently drift, and a fresh `totalPoints: 0` would
+  erase her history, which is the whole thing this feature exists to prevent.
+  Her record already survived the cap-retirement refund, so the bar is truthful
+  from the first frame. Station completion bonuses DO count ("point equals any
+  gem she collected").
+- **Level rule (Amy's, canonical):** every **50 points** below Level 10, every
+  **100** at 10+. The earlier quadratic `25L(L−1)` is RETIRED.
+  ```
+  required(L) = L <= 10 ? 50 * (L - 1) : 450 + 100 * (L - 10)
+  level(P)    = P <  450 ? Math.floor(P / 50) + 1 : 10 + Math.floor((P - 450) / 100)
+  ```
+  Verified round-tripping to Level 40. Ivy is Level 2 today; next at 100.
+- **Never resets.** On level-up the bar becomes a partially-filled "in progress"
+  bar toward the next level. Totals render abbreviated above 1,000 → `1K`.
+- **Retroactive popups DO fire** (Amy overruled the caution): if migration puts
+  her at Level 2, she gets the Level 2 popup; if she'd earned two, she gets two.
+  The popup is not a notification — it's how Oscar/Nathan/Finn send her a
+  compliment. Pool of 12 + a Level-10 special, rotate randomly.
+- **Difficulty labels are UI-only:** L1/L2/L3 stay in the data model; Ivy sees
+  **Warm-up / Challenge / Expert**. She must never see "L1" anywhere.
+- **No accuracy, ever.** Counts only — show what she's done, never grade what she
+  missed (Design Principle 4).
+- Phase names are **5-A** (bar + popup) / **5-B** (tap → history) / **5-C**
+  (badge book, roadmap only) — "Phase 1" already means "The World".
+
+⚖️ **Load convention (Amy, 2026-07-18):** flag load proactively, park ideas by
+default, shift art/composition/pedagogy to Oscar/Finn, and **wait for design
+rather than guessing** — a placeholder that gets rebuilt costs more than waiting.
+
 ## ⚰️ The 15-gem beta cap RETIRED (2026-07-18)
 **The bug that retired it:** Ivy farmed to the 15-gem cap, then solved 6 more
 problems. The app told her she was correct each time and paid her **nothing**.
