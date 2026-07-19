@@ -21,7 +21,7 @@
  * The scriptable mock lives with the tests (src/__tests__/store-boot.test.js),
  * not here — it never belongs in the app bundle.
  */
-import { supabase, sessionCache, SUPABASE_URL, SUPABASE_KEY } from './auth'
+import { client, sessionCache, SUPABASE_URL, SUPABASE_KEY } from './auth'
 
 export function localBackend() {
   return {
@@ -51,7 +51,7 @@ export function supabaseBackend() {
   return {
     kind: 'supabase',
     async loadRemote() {
-      const { data, error } = await supabase.from('saves').select('state').maybeSingle()
+      const { data, error } = await client().from('saves').select('state').maybeSingle()
       if (error) throw error // failed read ≠ empty read — the store must know
       return data ? { state: data.state } : null
     },

@@ -21,7 +21,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 22+: supabase-js's realtime client needs native WebSocket if it is
+          # ever constructed under Node (the auth client is lazy, so tests
+          # don't — this is belt-and-braces, run 29703622528 was the lesson).
+          node-version: 22
           cache: npm
       - run: npm ci
       # The calibration set gates the deploy: if the generator drifts away from
