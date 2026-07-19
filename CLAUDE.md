@@ -193,6 +193,12 @@ exactly while the full scheduler machinery soaks in prod.
   cloud push — that's the live test / A3.
 - **Pane gotcha (new):** `computer type` into a React-controlled input can
   silently not stick — use `read_page` refs + `form_input` for form QA.
+- **CI lesson (run 29703622528): NEVER construct the supabase client at
+  module scope.** `createClient` instantiates a realtime client that demands
+  a native WebSocket — fine in local Node 22, fatal in CI's Node 20, and the
+  store's tests import auth.js transitively (store → backend → auth). The
+  client is lazy (`client()` in auth.js) so tests never construct it;
+  deploy.yml is pinned to Node 22 as belt-and-braces. Keep both.
 - **⚠️ One device = one account (A3 briefing):** the local save is one
   localStorage blob shared by whoever signs in on that browser. Signing in
   with the WRONG family email on a device can push that device's save onto
