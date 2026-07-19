@@ -116,6 +116,52 @@ LOCKED before the build — spec: Notion → "🎮 Phase 5: Level Ladder — Dec
   `stageLabel()` sits ready for 5-B's history popup rather than inventing a
   label nobody asked to see.
 
+## Phase A1 ✅ SHIPPED 2026-07-19 — the async boot gate (accounts, part 1 of 3)
+The cloud-accounts groundwork (design: **`docs/accounts-boot-gate.md`** — read
+it before touching any of this; commit `b99d53e`). The store is cloud-ready
+with ZERO visible change — the `local` backend reproduces the old behaviour
+exactly while the full scheduler machinery soaks in prod.
+- **`src/backend.js`** = the transport interface (`loadRemote`/`saveRemote`).
+  `local` now; `supabase` lands in A2; the scriptable mock lives with the tests.
+- **store.js public API unchanged** (deliberate — 5-B can land in parallel with
+  zero merge friction). New: `initStore(backend?, tuning?)` (memoized,
+  StrictMode-safe) + `flushCloudNow()`. Module-load still hydrates localStorage
+  synchronously; initStore reconciles with the cloud after.
+- **THE invariant (two gates, deliberate defense in depth):** a session can
+  never WRITE to the cloud before successfully READING it — enforced in BOTH
+  `scheduleCloudPush` and `flushCloudNow`. Do not "simplify" one away: the
+  sabotage test proved either alone still holds the line, and both together is
+  the point. The empty-state-clobber race is unrepresentable.
+- **Merge rule = the monotonic ledger, not the clock:** higher `lifetimeGems`
+  wins, `lastActive` only breaks ties. Push guard refuses ledger regressions;
+  `resetAll()` is the ONE legal regression (arms `forceNextPush`, which holds
+  until a push lands — otherwise an offline reset would block uploads forever).
+- **`migrate()` extracted from `load()`** — adopted cloud saves take the exact
+  same migration path (cap refund, ledger seed) as local ones. Keep it that way.
+- **`<Boot>` in main.jsx** gates `<App>` on initStore; the cover's shimmer
+  delays 350ms so a local boot (settles in a microtask) shows nothing.
+- **Flush points:** 2s trailing debounce + `pagehide` / `visibilitychange:
+  hidden` / `online`. A2's supabase backend must use `fetch(keepalive)` for the
+  pagehide flush (sendBeacon can't carry the auth header).
+- **Tests: `src/__tests__/store-boot.test.js`** — 11 race fixtures (fresh
+  module per test via `vi.resetModules()` + dynamic import; in-memory
+  localStorage; scriptable mock). Failure-proven by sabotage: removing both
+  invariant gates fails exactly fixtures 5/5b/6.
+- **Dev hook `window.__cloud()`** → `{kind, cloudSynced, cloudLedger, dirty}`.
+- **DECIDED (Amy 2026-07-19): NO guest mode** — math-game was never shared
+  (unlike Planner/Cozy Closet), so A2 = hard sign-in, exactly two accounts
+  (both Amy's inboxes, parent-held magic link). Guest mode stays a one-line
+  flip on the SignIn screen if that ever changes.
+- **Supabase PROVISIONED 2026-07-19** (same day — Amy in dashboard + Nathan
+  via the supabase MCP): project **Math-app** `lqcgagruudakeddkbeuj`, both
+  users created + confirmed, `saves` table + own-row RLS (no delete policy)
+  applied by migration, signups/manual-linking/anonymous OFF, confirm-email ON.
+  URL + publishable key recorded in `docs/accounts-boot-gate.md`.
+- **NEXT = A2, zero prerequisites left** — supabase backend (`fetch(keepalive)`
+  for the pagehide flush) + auth screens, everything needed is in the design
+  doc. **A3** = real-iPad QA (pagehide flush, offline boot, accidental-logout
+  UX) + the family's accounts.
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).
