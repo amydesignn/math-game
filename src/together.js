@@ -53,8 +53,12 @@ export function labelFor(email) {
   return LABELS[(email || '').toLowerCase().trim()] || 'Friend'
 }
 
-/** Random per-TAB key. Deliberately not the uid: the same account in two
- *  tabs/devices must not collide (each session is its own presence). */
+/** Random per-TAB session key — the wire address of ONE browser tab. Distinct
+ *  from a player's IDENTITY (their account uid): a player carries one identity
+ *  across every tab/device, and presence collapses by identity so two Ivy tabs
+ *  render as one Ivy (see createRoster). With no identity (dev two-tab QA), the
+ *  identity falls back to this key, so each tab is its own player — QA still
+ *  sees two buddies. */
 export function makeSessionKey() {
   return Math.random().toString(36).slice(2, 10)
 }
@@ -98,26 +102,70 @@ export function createBuddySim() {
  * transport synthesizes those from presence join/leave, the dev transport
  * sends them itself, so there is ONE roster code path. Returns diffs so the
  * UI can toast arrivals and goodbyes.
+ *
+ * Keyed by IDENTITY (a player's account), not by session key: two tabs of the
+ * same identity collapse to ONE buddy, reference-counted by their session keys.
+ * A buddy joins on the FIRST session of its identity and only leaves when its
+ * LAST session goes — so closing one of Ivy's two tabs never yanks her out of
+ * Mum's meadow. One session per identity is the `primary`; the session routes
+ * movement through it so a second, idle tab can't jitter the buddy.
  */
-export function createRoster(selfKey) {
-  const members = new Map() // k → profile
+export function createRoster(selfId) {
+  const members = new Map() // id → { profile, keys:Set<k>, primary:k }
+
+  const findByKey = (k) => {
+    for (const m of members.values()) if (m.keys.has(k)) return m
+    return null
+  }
+
   return {
     hello(profile) {
-      if (!profile || !profile.k || profile.k === selfKey) return { joined: null }
-      const known = members.has(profile.k)
-      members.set(profile.k, profile) // update always — profile can change (sparkle)
-      return { joined: known ? null : profile }
+      if (!profile || !profile.k) return { joined: null, isNew: false, id: null }
+      const id = profile.id ?? profile.k // no identity (dev) → the tab IS the player
+      if (id === selfId) return { joined: null, isNew: false, id } // our own, any tab
+      const m = members.get(id)
+      if (m) {
+        m.keys.add(profile.k)
+        // refresh visuals (sparkle/character can change) — keep the render key stable
+        m.profile = { ...profile, id, k: m.primary }
+        return { joined: null, isNew: false, id }
+      }
+      const entry = { ...profile, id, k: profile.k }
+      members.set(id, { profile: entry, keys: new Set([profile.k]), primary: profile.k })
+      return { joined: entry, isNew: true, id }
     },
     bye(k) {
-      const left = members.get(k) || null
-      members.delete(k)
-      return { left }
+      const m = findByKey(k)
+      if (!m) return { left: null, gone: false, id: null, promoted: null }
+      const id = m.profile.id
+      m.keys.delete(k)
+      if (m.keys.size === 0) {
+        members.delete(id)
+        return { left: m.profile, gone: true, id, promoted: null }
+      }
+      // another tab of this identity is still here — the buddy stays. If the tab
+      // that left was driving movement, promote a survivor to take the wheel.
+      let promoted = null
+      if (m.primary === k) {
+        promoted = m.keys.values().next().value
+        m.primary = promoted
+        m.profile = { ...m.profile, k: promoted }
+      }
+      return { left: null, gone: false, id, promoted }
+    },
+    idOf(k) {
+      const m = findByKey(k)
+      return m ? m.profile.id : null
+    },
+    primaryOf(id) {
+      const m = members.get(id)
+      return m ? m.primary : null
     },
     list() {
-      return [...members.values()]
+      return [...members.values()].map((m) => m.profile)
     },
-    has(k) {
-      return members.has(k)
+    has(id) {
+      return members.has(id)
     },
   }
 }
@@ -142,44 +190,66 @@ export function createRoster(selfKey) {
  *   session.updateProfile(patch)         // e.g. sparkle change
  *   session.leave()
  */
-export async function joinMeadow({ mode, profile, getSelf, onBuddies, onJoin, onLeave, onEmote, onDown }) {
+export async function joinMeadow({ mode, profile, identity, getSelf, onBuddies, onJoin, onLeave, onEmote, onDown }) {
   const key = makeSessionKey()
-  const self = { ...profile, k: key }
-  const roster = createRoster(key)
-  const sims = new Map() // k → buddy sim
-  const pendingMoves = new Map() // move arrived before its hello (broadcast can beat presence)
+  // IDENTITY (the account) is stable across a player's tabs/devices; the session
+  // key is per-tab. Presence collapses by identity, so two tabs of one account
+  // are one buddy. No identity (dev two-tab QA) → the identity is the tab's own
+  // key, so each tab is its own player and QA still sees two buddies.
+  const selfId = identity ?? key
+  const self = { ...profile, k: key, id: selfId }
+  const roster = createRoster(selfId)
+  const sims = new Map() // identity id → buddy sim (one per player, not per tab)
+  const pendingMoves = new Map() // k → move that beat its hello (broadcast races presence)
+  const selfKeys = new Set([key]) // every tab of OUR OWN identity — never rendered as a buddy
   let live = true
 
   const buddies = () =>
-    roster.list().map((p) => ({ k: p.k, profile: p, sim: sims.get(p.k) }))
+    roster.list().map((p) => ({ k: p.id, profile: p, sim: sims.get(p.id) }))
 
   function handle(event, payload) {
-    if (!live || !payload || payload.k === key) return
+    if (!live || !payload || selfKeys.has(payload.k)) return
     if (event === 'hello') {
-      const { joined } = roster.hello(payload)
-      if (!sims.has(payload.k) && roster.has(payload.k)) {
-        const sim = createBuddySim()
-        sims.set(payload.k, sim)
-        const pend = pendingMoves.get(payload.k)
-        if (pend) {
-          sim.applyMove(pend)
-          pendingMoves.delete(payload.k)
-        }
+      const { joined, isNew, id } = roster.hello(payload)
+      if (id === selfId) {
+        // our own identity in another tab — track its key so its moves/emotes
+        // are dropped, never rendered (and never leak into pendingMoves)
+        selfKeys.add(payload.k)
+        pendingMoves.delete(payload.k)
+        return
+      }
+      if (isNew && !sims.has(id)) sims.set(id, createBuddySim())
+      const pend = pendingMoves.get(payload.k)
+      if (pend) {
+        if (roster.primaryOf(id) === payload.k) sims.get(id)?.applyMove(pend)
+        pendingMoves.delete(payload.k) // a non-primary tab's early move is discarded
       }
       if (joined) onJoin?.(joined)
       onBuddies?.(buddies())
     } else if (event === 'bye') {
-      const { left } = roster.bye(payload.k)
-      sims.delete(payload.k)
+      const { left, gone, id, promoted } = roster.bye(payload.k)
       pendingMoves.delete(payload.k)
+      if (gone && id != null) sims.delete(id)
+      else if (promoted != null && id != null) {
+        // a different tab now drives this buddy — let its next keyframe snap in
+        // cleanly rather than gliding from the departed tab's stale position
+        const sim = sims.get(id)
+        if (sim) sim.started = false
+      }
       if (left) onLeave?.(left)
       onBuddies?.(buddies())
     } else if (event === 'move') {
-      const sim = sims.get(payload.k)
-      if (sim) sim.applyMove(payload)
-      else pendingMoves.set(payload.k, payload) // held until the hello lands
+      const id = roster.idOf(payload.k)
+      if (id == null) {
+        pendingMoves.set(payload.k, payload) // held until the hello lands
+        return
+      }
+      // only the primary tab of a buddy drives its sim — an idle second tab's
+      // stale keyframes would otherwise snap the buddy back and forth (jitter)
+      if (roster.primaryOf(id) === payload.k) sims.get(id)?.applyMove(payload)
     } else if (event === 'emote') {
-      if (roster.has(payload.k)) onEmote?.(payload.k, payload.kind)
+      const id = roster.idOf(payload.k)
+      if (id != null) onEmote?.(id, payload.kind)
     }
   }
 

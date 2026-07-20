@@ -153,6 +153,44 @@ describe('roster (one code path for presence and dev hellos)', () => {
     expect(roster.bye('amy1').left?.label).toBe('Mum')
     expect(roster.list()).toEqual([])
   })
+
+  it('fixture 6b — two tabs of ONE identity collapse to one buddy', () => {
+    // The two-Ivys bug, at the roster: Ivy in two tabs = two session keys, one
+    // account (`id`). She must join once and appear once.
+    const roster = createRoster('me')
+    const first = roster.hello({ k: 'ivyTabA', id: 'uid-ivy', label: 'Ivy' })
+    expect(first.joined?.label).toBe('Ivy')
+    expect(first.isNew).toBe(true)
+    const second = roster.hello({ k: 'ivyTabB', id: 'uid-ivy', label: 'Ivy' })
+    expect(second.joined).toBeNull() // no second toast, no second Ivy
+    expect(second.isNew).toBe(false)
+    expect(roster.list()).toHaveLength(1)
+  })
+
+  it('fixture 6c — a buddy leaves only when its LAST tab goes', () => {
+    const roster = createRoster('me')
+    roster.hello({ k: 'ivyTabA', id: 'uid-ivy', label: 'Ivy' })
+    roster.hello({ k: 'ivyTabB', id: 'uid-ivy', label: 'Ivy' })
+    const closeOne = roster.bye('ivyTabB')
+    expect(closeOne.left).toBeNull() // tab A still holds Ivy — she stays
+    expect(closeOne.gone).toBe(false)
+    expect(roster.list()).toHaveLength(1)
+    const closeLast = roster.bye('ivyTabA')
+    expect(closeLast.left?.label).toBe('Ivy') // now she really goes
+    expect(closeLast.gone).toBe(true)
+    expect(roster.list()).toEqual([])
+  })
+
+  it('fixture 6d — closing the primary tab promotes a survivor (drives movement)', () => {
+    const roster = createRoster('me')
+    roster.hello({ k: 'ivyTabA', id: 'uid-ivy', label: 'Ivy' }) // primary
+    roster.hello({ k: 'ivyTabB', id: 'uid-ivy', label: 'Ivy' })
+    expect(roster.primaryOf('uid-ivy')).toBe('ivyTabA')
+    const r = roster.bye('ivyTabA')
+    expect(r.gone).toBe(false)
+    expect(r.promoted).toBe('ivyTabB') // tab B takes the wheel
+    expect(roster.primaryOf('uid-ivy')).toBe('ivyTabB')
+  })
 })
 
 // ── the session ─────────────────────────────────────────────────────────────
@@ -278,6 +316,64 @@ describe('joinMeadow (transport + roster + sims composed)', () => {
     transport.emit('hello', { k: 'amy1', label: 'Mum' })
     expect(events.joins).toEqual([])
     await flush()
+  })
+
+  it('fixture 16 — THE two-tabs bug: one buddy for a two-tab player', async () => {
+    // Mum's client hears BOTH of Ivy's tabs. She must see one Ivy, one toast.
+    const { transport, events, session } = await joined()
+    transport.emit('hello', { k: 'ivyA', id: 'uid-ivy', label: 'Ivy', character: 'c', pet: 'p' })
+    transport.emit('hello', { k: 'ivyB', id: 'uid-ivy', label: 'Ivy', character: 'c', pet: 'p' })
+    expect(events.joins.map((p) => p.label)).toEqual(['Ivy']) // exactly one
+    const list = events.buddies.at(-1)
+    expect(list).toHaveLength(1)
+    expect(list[0].k).toBe('uid-ivy') // rendered by identity, not by tab
+    // closing one tab keeps her present; the second removes her
+    transport.emit('bye', { k: 'ivyB' })
+    expect(events.leaves).toEqual([])
+    expect(events.buddies.at(-1)).toHaveLength(1)
+    transport.emit('bye', { k: 'ivyA' })
+    expect(events.leaves.map((p) => p.label)).toEqual(['Ivy'])
+    expect(events.buddies.at(-1)).toEqual([])
+    session.leave()
+  })
+
+  it('fixture 17 — an idle second tab cannot jitter the buddy (primary routing)', async () => {
+    const { transport, events, session } = await joined()
+    transport.emit('hello', { k: 'ivyA', id: 'uid-ivy', label: 'Ivy' }) // primary
+    transport.emit('hello', { k: 'ivyB', id: 'uid-ivy', label: 'Ivy' })
+    const sim = events.buddies.at(-1)[0].sim
+    transport.emit('move', { k: 'ivyA', x: 5, z: 5, tx: null, tz: null }) // primary drives
+    expect(sim.pos).toEqual({ x: 5, z: 5 })
+    transport.emit('move', { k: 'ivyB', x: -9, z: -9, tx: null, tz: null }) // idle tab ignored
+    expect(sim.pos).toEqual({ x: 5, z: 5 })
+    // when the primary leaves, the survivor takes over and its keyframe snaps in
+    transport.emit('bye', { k: 'ivyA' })
+    transport.emit('move', { k: 'ivyB', x: -9, z: -9, tx: null, tz: null })
+    expect(sim.pos).toEqual({ x: -9, z: -9 })
+    session.leave()
+  })
+
+  it('fixture 18 — our OWN second tab never renders as a buddy (no self-clone)', async () => {
+    // The other half of the bug: Ivy in two tabs must not see herself walking
+    // around. Any presence sharing our identity is invisible to us.
+    const transport = testTransport()
+    const events = { joins: [], buddies: [], emotes: [] }
+    const session = await joinMeadow({
+      mode: transport,
+      identity: 'uid-me',
+      profile: { label: 'Ivy' },
+      getSelf: () => null,
+      onBuddies: (l) => events.buddies.push(l),
+      onJoin: (p) => events.joins.push(p),
+      onEmote: (k, kind) => events.emotes.push({ k, kind }),
+    })
+    transport.emit('hello', { k: 'myOtherTab', id: 'uid-me', label: 'Ivy' })
+    transport.emit('move', { k: 'myOtherTab', x: 3, z: 3, tx: null, tz: null })
+    transport.emit('emote', { k: 'myOtherTab', kind: 'wave' })
+    expect(events.joins).toEqual([])
+    expect(events.emotes).toEqual([])
+    expect(events.buddies).toEqual([]) // never rendered
+    session.leave()
   })
 })
 

@@ -329,6 +329,9 @@ export default function App({ cloud = false }) {
     try {
       joinP = joinMeadow({
           mode: cloud ? 'supabase' : 'dev',
+          // the account uid ties a player's tabs together into one buddy; dev
+          // (no session) leaves it undefined so two-tab QA still shows two
+          identity: cloud ? sessionCache().uid : undefined,
           profile: {
             label: cloud ? labelFor(sessionCache().email) : 'Friend',
             character: state.character,

@@ -259,10 +259,39 @@ before touching any of this; Amy's framing IS the architecture).
   `__leaveMeadow()` / `__meadow()` (buddy sims readable without frames);
   BroadcastChannel links same-origin tabs, no accounts needed. Remember the
   pane physics: hidden tabs freeze rAF — screenshots pump the sim.
-- **Known scope edges (accepted, family-only):** same account in two tabs
-  renders as two buddies (harmless); a backgrounded buddy freezes at its last
-  target until presence times out (quiet goodbye toast); buddy sims don't
-  clamp to WORLD.bounds (only family code sends targets).
+- **Known scope edges (accepted, family-only):** a backgrounded buddy freezes
+  at its last target until presence times out (quiet goodbye toast); buddy sims
+  don't clamp to WORLD.bounds (only family code sends targets).
+
+### Phase B follow-up ✅ 2026-07-20 — two tabs, one buddy (identity presence)
+Amy's family QA found the last scope edge live: **two tabs of one account showed
+two buddies** (Mum saw two Ivys; each Ivy tab even saw the other as a stranger).
+Closed by moving presence from PER-TAB keys to PER-IDENTITY (the account uid):
+- **Wire:** `joinMeadow({ identity })` — the account uid (App passes
+  `sessionCache().uid` on cloud; **undefined in dev, so two-tab pane QA still
+  shows two buddies** — each dev tab falls back to being its own identity). Each
+  presence still carries a per-tab `k` AND a stable `id`.
+- **`createRoster` is now keyed by identity + reference-counted:** each member
+  holds a `Set` of its session keys and a `primary`. A buddy JOINS on the first
+  tab of its identity (one toast) and only LEAVES when its LAST tab goes — so
+  closing one of Ivy's two tabs never yanks her out of Mum's meadow.
+- **One sim per identity, driven by the `primary` tab only.** A second, idle tab
+  keyframes its stale position every ~3s; routing all tabs into one sim would
+  snap the buddy back and forth. Non-primary moves are dropped; when the primary
+  leaves, a survivor is promoted and `sim.started=false` lets its next keyframe
+  snap in cleanly (no glide from the departed tab's ghost position).
+- **Our own other tabs are invisible to us** (`selfKeys` set): any presence
+  sharing our identity is filtered, so Ivy never sees a clone of herself.
+- **Buddies now render/emote-key by identity id** (`buddies()` returns
+  `k: p.id`), which also keeps the React key stable across a primary promotion —
+  the Buddy doesn't remount when the active tab changes.
+- **Tests:** together.test.js grew to 27 (fixtures 6b–6d roster refcount +
+  promotion; 16 the two-tabs collapse end-to-end; 17 idle-tab-can't-jitter; 18
+  our-own-tab-is-invisible). Full suite 98/98, oxlint clean, build clean.
+  ⚠️ **Live confirmation is still Amy's** — same-account collapse only truly
+  exercises under cloud auth (two real tabs signed into one inbox); the dev
+  transport is per-tab identity by design. Pane-verified: meadow join path boots
+  + renders with zero console errors.
 
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
