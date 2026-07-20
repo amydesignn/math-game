@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import Character from './Character'
@@ -9,6 +9,7 @@ import Sparkle from './Sparkle'
 import Station from './Station'
 import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
+import Buddy from './Buddy'
 import { WORLD, GEMS, STATION, assetScale } from '../config'
 import { MAPS } from '../maps'
 import { stationFor } from '../stations'
@@ -49,18 +50,20 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes }) {
   const marker = useRef() // the ring that pings on tap
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
 
   // ── Phase 2/4: this visit's gem sparkles (Phase 4: walking up opens MATH) ──
-  const [sparkles, setSparkles] = useState(() => spawnSparkles(map, spawn, placed))
+  // The Together meadow deliberately has none — no earning in the shared
+  // space (Phase B design rule), so nothing spawns and nothing can open.
+  const [sparkles, setSparkles] = useState(() => (map.together ? [] : spawnSparkles(map, spawn, placed)))
   const taken = useRef(new Set()) // same-frame double-fire guard
   const cooling = useRef(new Set()) // unsolved popups re-arm only after she walks away
 
   // ── Phase 5: the current window's station for this map (or null) ──
-  const [station, setStation] = useState(() => stationFor(map.id))
+  const [station, setStation] = useState(() => (map.together ? null : stationFor(map.id)))
   const stationSkin = station ? SKINS[station.skinId] : null
   const stationCooling = useRef(false) // unfinished close re-arms only after she walks off
 
@@ -71,6 +74,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
   const firstRefresh = useRef(true)
   useEffect(() => {
     if (firstRefresh.current) { firstRefresh.current = false; return }
+    if (map.together) return // the meadow has nothing to refresh
     if ((mathBusyRef && mathBusyRef.current) || placing) return
     taken.current.clear()
     cooling.current.clear()
@@ -346,6 +350,19 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
 
       <Character id={characterId} start={spawn} targetRef={targetRef} posRef={charPosRef} reactUntilRef={reactUntilRef} />
       <Pet id={petId} start={spawn} targetPosRef={charPosRef} posRef={petPosRef} reactUntilRef={reactUntilRef} />
+
+      {/* ── Phase B: the other player (and their pet) in the Together meadow ──
+          Each buddy gets its OWN Suspense: their GLB may not be preloaded
+          here, and suspending the app-level boundary would blank the whole
+          world while it fetches. This way they simply pop in when ready. */}
+      {buddies.map(
+        (b) =>
+          b.sim && (
+            <Suspense key={b.k} fallback={null}>
+              <Buddy profile={b.profile} sim={b.sim} emote={buddyEmotes?.[b.k]} />
+            </Suspense>
+          ),
+      )}
 
       {/* ── Sparkle Pack: the consumable aura + fairy-dust trail on her ── */}
       {sparkle && (

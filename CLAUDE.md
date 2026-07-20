@@ -206,6 +206,64 @@ exactly while the full scheduler machinery soaks in prod.
   accepted scope: one kid, one iPad). Recoverable via MCP (no delete policy),
   but the rule is simply: iPad = Ivy's email, Amy's machines = Amy's.
 
+## Phase B ✅ SHIPPED 2026-07-19 — the Together Space (the meadow)
+The two-player presence feature (design: **`docs/together-space.md`** — read it
+before touching any of this; Amy's framing IS the architecture).
+- **The core design: replicate TAPS, not positions.** Tap-to-move is
+  deterministic, so the channel carries `{x, z, tx, tz}` intentions and each
+  side runs the same walk sim (`src/walk.js` — the ONE walk implementation,
+  shared by Character and the Buddy sim; retune movement THERE or the sims
+  drift). A handful of messages a minute replaces a 10–20Hz position stream;
+  latency self-heals because both sims converge on the same target. Pets are
+  never synced — they follow their owner locally.
+- **`src/together.js`** = sims + roster + session + transports (supabase
+  private channel / BroadcastChannel dev / scriptable test — the backend.js
+  pattern). **Invariant 1: no import path from together.js to the store**,
+  structurally enforced by a fixture — no netcode bug can touch Ivy's save.
+- **The meadow** (`maps.js`, `together: true`) sits OUTSIDE the gate ring: in
+  via the 💞 button, out via 🏡. No sparkles/stations/shop/placement, emotes
+  only (👋💜🎉😄, closed vocabulary, no free text). `store.map` is NEVER set
+  to 'meadow' — the session is the room, nothing persists.
+- **Supabase Realtime, PRIVATE channel** `family-meadow`: RLS on
+  realtime.messages (migration `family_meadow_realtime_authorization`) grants
+  receive+send to `authenticated` only. **Server-verified 2026-07-19:** anon
+  private join → "Unauthorized: You do not have permissions to read from this
+  Channel topic" in the realtime logs. `setAuth()` before subscribe;
+  `track()` only after SUBSCRIBED. ⚠️ **Amy's one dashboard step: Realtime
+  Settings → "Allow public access" OFF** (a hostile client could otherwise
+  use public-plane channels; planes are separate so family traffic never
+  leaks there, but off = sealed).
+- **Tests: `src/__tests__/together.test.js`** — 21 fixtures (sim convergence
+  under latency, snap rule, roster races, the move-beats-hello hold, keyframe
+  timer hygiene, Invariant 1) + `stations.test.js` (the plan can never assign
+  a quest to a together map). Failure-proven by sabotage: both self-filters
+  removed → 2 fixtures fail (one alone still holds — deliberate defense in
+  depth, same shape as the boot gate's two gates); stations filter removed →
+  the meadow fixture fails.
+- **The adversarial verify pass ran (31 agents, 18 claims refuted, 8
+  confirmed and ALL fixed same session).** The load-bearing fixes, don't
+  regress them: **(1) the join window is NON-interactive** — enterMeadow
+  stops the walk, latches travel, and raises the fade BEFORE the await
+  (an open world during the join let the shop / a math popup / the selection
+  bar ride into the meadow = store writes from the shared space); **(2) a
+  timed-out join that succeeds late is left() immediately** (else: a zombie
+  session nobody holds — ghost presence on Mum's side, doppelgängers on
+  retry); **(3) a refused join removes its channel** (realtime auto-retries
+  CHANNEL_ERROR joins); **(4) ensureStations filters `together` maps**;
+  **(5) Buddy sanitizes wire profiles** (unknown character/pet/sparkle ids
+  degrade to defaults — a bad id would otherwise crash the whole canvas to
+  <Oops>) and mounts inside its OWN Suspense (a loading buddy must not blank
+  the world); **(6) onDown leaves the dead session + clears buddies** (toast
+  alone left frozen ghosts and live keyframes).
+- **Pane QA recipe (two tabs, dev transport):** `__enterMeadow()` /
+  `__leaveMeadow()` / `__meadow()` (buddy sims readable without frames);
+  BroadcastChannel links same-origin tabs, no accounts needed. Remember the
+  pane physics: hidden tabs freeze rAF — screenshots pump the sim.
+- **Known scope edges (accepted, family-only):** same account in two tabs
+  renders as two buddies (harmless); a backgrounded buddy freezes at its last
+  target until presence times out (quiet goodbye toast); buddy sims don't
+  clamp to WORLD.bounds (only family code sends targets).
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).

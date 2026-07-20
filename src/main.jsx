@@ -50,7 +50,7 @@ function Boot() {
       unsub?.()
     }
   }, [])
-  if (phase === 'ready') return <App />
+  if (phase === 'ready') return <App cloud={CLOUD} />
   if (phase === 'signin') return <SignIn />
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'var(--lilac-50)' }}>

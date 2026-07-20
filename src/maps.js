@@ -232,6 +232,42 @@ export const MAPS = {
       { to: 'clearing', position: [16, 0, 2] },
     ],
   },
+
+  // ── The Meadow — the Together Space (Phase B, docs/together-space.md) ──
+  // OUTSIDE the ring on purpose: no gates lead here and none lead away — you
+  // arrive by the 💞 button (mutual agreement made in the living room, not in
+  // the app) and go home the same way. `together: true` switches the rules:
+  // no sparkles, no stations, no shop, no placement — presence + emotes only,
+  // and NOTHING here is ever persisted (the session is the room).
+  meadow: {
+    id: 'meadow',
+    name: 'The Meadow',
+    together: true,
+    ground: '#e7dcf7', // soft lavender — its own colour, not one of the ring's
+    outside: '#c3b3e0',
+    sky: '#f5effc',
+    gateColor: '#b48fe0', // unused (no gates lead here) — registry-consistent
+    decor: [
+      // a loose tree ring, open in the middle where the two of them meet
+      f('tree-high', -9, -7, 0.5),
+      f('tree', 8, -8, -0.6),
+      f('tree', -11, 3, 1.8),
+      f('tree-high', 10, 5, 0.9),
+      f('tree', -4, 10, 2.4),
+      f('tree', 5, 10.5, 0.1),
+      // flowers and soft ground
+      f('plant', -3, -4, 0.4, 1.1),
+      f('plant', 3.5, -3.5, 1.7),
+      f('plant', -5.5, 3, 2.2, 0.9),
+      f('plant', 6, 2.5, 0.8),
+      f('patch-grass', 0, -6, 1.2),
+      f('patch-grass', -7, -1, 0.3),
+      f('patch-grass', 7.5, -1.5, 2.0),
+      f('stones', 0, 6.5, 0.7),
+      f('flag', 11, -3, 0), // a little landmark to wander to
+    ],
+    gates: [],
+  },
 }
 
 /** Where to stand after arriving in `map` from `fromId`: just inside the

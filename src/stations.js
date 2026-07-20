@@ -55,7 +55,11 @@ export function ensureStations() {
   const plan = getStations()
   if (plan.window === currentWindow()) return plan.byMap
 
-  const mapIds = shuffle(Object.keys(MAPS))
+  // The Together meadow is not a quest world: `together` maps never earn
+  // (Phase B rule), and a station assigned there would persist 'meadow' into
+  // the save/cloud AND silently eat one of the day's 2–3 quests (the meadow's
+  // Scene guard would never mount it). Caught by the adversarial verify pass.
+  const mapIds = shuffle(Object.keys(MAPS).filter((id) => !MAPS[id].together))
   const span = STATION.perDayMax - STATION.perDayMin + 1
   const count = Math.min(mapIds.length, STATION.perDayMin + Math.floor(Math.random() * span))
   const skins = shuffle(STATION_SKIN_IDS)

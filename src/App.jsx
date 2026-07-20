@@ -13,12 +13,14 @@ import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow } from './stations'
 import { getState, setMap, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
+import { joinMeadow, EMOTES, labelFor } from './together'
+import { sessionCache } from './auth'
 import { WORLD } from './config'
 import { MAPS, arrivalPoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
 
-export default function App() {
+export default function App({ cloud = false }) {
   const [state] = useState(getState)
   const [moved, setMoved] = useState(false)
 
@@ -221,6 +223,21 @@ export default function App() {
     if (w) startPlacing({ id: w.id, asset: w.asset, pack: w.pack, size: w.size, isMove: true, startAt: [w.x, w.z], rot: w.rot })
   }
 
+  // ── Phase B: the Together Space (docs/together-space.md) ──
+  // `meadow` = the live channel session, or null (home = the normal state).
+  // Nothing here EVER touches the store — the meadow has no shared mutable
+  // state by design, so no netcode path can reach Ivy's save (Invariant 1).
+  const [meadow, setMeadow] = useState(null)
+  const meadowRef = useRef(null) // for cleanup + handlers that outlive renders
+  const joiningRef = useRef(false)
+  const inMeadowRef = useRef(false) // gates keyframes/moves until we've actually arrived
+  const [buddies, setBuddies] = useState([])
+  const buddiesRef = useRef([]) // the minimap reads this each frame
+  const [buddyEmotes, setBuddyEmotes] = useState({}) // k → { kind, emoji, at }
+  const emoteTimers = useRef({})
+  // (no "home map" bookkeeping: the store's persisted `map` IS home — the
+  // meadow never writes it, so going home = reading it back)
+
   // ── Maps: which one we're in, where this visit starts, travel fade + toast ──
   const [mapId, setMapId] = useState(() => (MAPS[state.map] ? state.map : 'clearing'))
   const [spawn, setSpawn] = useState([0, 0])
@@ -251,11 +268,34 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Phase B pane QA hooks — reassigned EVERY render on purpose: a one-shot
+  // effect would freeze enterMeadow's first-render closure (the stale-closure
+  // class from the QA lessons in CLAUDE.md). Lets QA enter/leave without
+  // fighting phantom taps, and inspect buddy sims without needing frames
+  // (rAF is frozen in hidden panes).
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    window.__enterMeadow = enterMeadow
+    window.__leaveMeadow = leaveMeadow
+    window.__meadow = () => ({
+      in: inMeadowRef.current,
+      key: meadowRef.current?.key ?? null,
+      buddies: buddiesRef.current.map((b) => ({
+        k: b.k,
+        label: b.profile?.label,
+        pos: b.sim ? { x: +b.sim.pos.x.toFixed(2), z: +b.sim.pos.z.toFixed(2) } : null,
+        target: b.sim?.target ? { x: +b.sim.target.x.toFixed(2), z: +b.sim.target.z.toFixed(2) } : null,
+      })),
+    })
+  })
+
   // ── The popup gate: applause only lands on a quiet world ──
   // Never over a math card, a station quest, the farewell dissolve, the shop,
   // a placement, or a gate fade. If she levels up mid-quest the bar celebrates
   // immediately (she sees it) and the card waits for the calm afterwards.
-  const worldBusy = !!(math || station || farewellMap || placing || shopOpen || fading)
+  // (the meadow counts as busy too — a signed congratulations card should be
+  // read at home in the quiet, not mid-visit; the queue simply waits)
+  const worldBusy = !!(math || station || farewellMap || placing || shopOpen || fading || meadow)
   useEffect(() => {
     if (levelPopup || worldBusy || !levelQueue.length) return
     const [next, ...rest] = levelQueue
@@ -263,6 +303,197 @@ export default function App() {
     setLevelPopup({ level: next, message: text, from })
     setLevelQueue(rest)
   }, [levelPopup, worldBusy, levelQueue])
+
+  // ── Phase B: entering and leaving the meadow ──
+  // Join FIRST (the world stays playable while the channel connects; a
+  // failure is just a friendly note, never a white screen), then the same
+  // fade theatre as gate travel. The store's `map` is never set to 'meadow' —
+  // close the app there and you reopen at home: the session IS the room.
+  async function enterMeadow() {
+    if (travelling.current || joiningRef.current || meadowRef.current) return
+    // Quiet world only. The 💞 button is already hidden in most busy states,
+    // but re-check here — a popup can open between render and tap.
+    if (math || station || placing || shopOpen || selectedId != null) return
+    joiningRef.current = true
+    // The join window is NON-interactive (adversarial-verify catch: an open
+    // world during the await let the shop / a sparkle problem / a selection
+    // bar ride into the meadow — store writes from the shared space). So:
+    // stop her walk (no proximity events), latch travel (no gate can fire),
+    // and raise the fade NOW — its overlay swallows every tap while we join.
+    targetRef.current = null
+    travelling.current = true
+    setFading(true)
+    const fadeStart = performance.now()
+    let joinP = null
+    let session = null
+    try {
+      joinP = joinMeadow({
+          mode: cloud ? 'supabase' : 'dev',
+          profile: {
+            label: cloud ? labelFor(sessionCache().email) : 'Friend',
+            character: state.character,
+            pet: state.pet,
+            sparkle: getActiveSparkle()?.colorId ?? null,
+          },
+          getSelf: () =>
+            inMeadowRef.current
+              ? {
+                  x: +charPosRef.current.x.toFixed(2),
+                  z: +charPosRef.current.z.toFixed(2),
+                  tx: targetRef.current ? +targetRef.current.x.toFixed(2) : null,
+                  tz: targetRef.current ? +targetRef.current.z.toFixed(2) : null,
+                }
+              : null, // not arrived yet — say nothing rather than a home position
+          onBuddies: (list) => {
+            buddiesRef.current = list
+            setBuddies(list)
+          },
+          onJoin: (p) => showNote(`💜 ${p.label} is here!`),
+          onLeave: (p) => showNote(`👋 ${p.label} went home`),
+          onEmote: (k, kind) => {
+            const e = EMOTES.find((x) => x.kind === kind)
+            if (!e) return
+            setBuddyEmotes((prev) => ({ ...prev, [k]: { kind, emoji: e.emoji, at: performance.now() } }))
+            clearTimeout(emoteTimers.current[k])
+            // a re-render after the bubble's hold, so it actually disappears
+            emoteTimers.current[k] = setTimeout(() => {
+              setBuddyEmotes((prev) => {
+                const next = { ...prev }
+                delete next[k]
+                return next
+              })
+            }, 2800)
+          },
+          onDown: () => {
+            // The channel died (network drop, failed token refresh). The buddy
+            // is unreachable — clear them and stop our own sending by leaving
+            // the dead session. She STAYS in the meadow (going home is hers to
+            // choose); meadowRef is kept so 🏡 still runs the normal exit.
+            meadowRef.current?.leave()
+            buddiesRef.current = []
+            setBuddies([])
+            setBuddyEmotes({})
+            showNote('The meadow hiccupped — you can head home anytime 💜')
+          },
+        })
+      session = await withTimeout(joinP, 6000)
+    } catch {
+      // A timed-out join may still SUCCEED later — and a session nobody holds
+      // can never be left (the zombie: ghost presence on Mum's side,
+      // doppelgängers on retry — adversarial-verify catch). Kill it the
+      // moment it materialises.
+      joinP?.then((s) => s.leave()).catch(() => {})
+      setFading(false)
+      travelling.current = false
+      joiningRef.current = false
+      showNote("The meadow isn't reachable right now 💜")
+      return
+    }
+    if (!mountedRef.current) {
+      session.leave() // the App unmounted mid-join — nobody will render this
+      return
+    }
+    meadowRef.current = session
+    setMeadow(session)
+    // the fade has been rising since before the join — wait out only the rest
+    const fadeLeft = Math.max(0, FADE_MS - (performance.now() - fadeStart))
+    setTimeout(() => {
+      // spawn off-centre with a little scatter so the two of them never
+      // appear inside each other (sides can coincide; the z jitter can't)
+      const at = [Math.random() < 0.5 ? -1.6 : 1.6, 0.6 + Math.random() * 1.4]
+      charPosRef.current.set(at[0], 0, at[1])
+      petPosRef.current.set(at[0] + 1.4, 0, at[1] + 1.4)
+      targetRef.current = null
+      inMeadowRef.current = true
+      setSpawn(at)
+      setMapId('meadow') // deliberately NOT setMap() — nothing persists from here
+      setToast(MAPS.meadow.name)
+      clearTimeout(toastTimer.current)
+      toastTimer.current = setTimeout(() => setToast(null), 2400)
+      setTimeout(() => {
+        setFading(false)
+        travelling.current = false
+        joiningRef.current = false
+      }, FADE_MS)
+    }, fadeLeft)
+  }
+
+  function leaveMeadow() {
+    if (travelling.current || !meadowRef.current) return
+    travelling.current = true
+    setFading(true)
+    setTimeout(() => {
+      meadowRef.current?.leave()
+      meadowRef.current = null
+      inMeadowRef.current = false
+      setMeadow(null)
+      setBuddies([])
+      buddiesRef.current = []
+      setBuddyEmotes({})
+      Object.values(emoteTimers.current).forEach(clearTimeout)
+      emoteTimers.current = {}
+      const persisted = getState().map // untouched by the meadow — still home
+      const home = MAPS[persisted] && !MAPS[persisted].together ? persisted : 'clearing'
+      charPosRef.current.set(0, 0, 0)
+      petPosRef.current.set(1.4, 0, 1.4)
+      targetRef.current = null
+      setSpawn([0, 0])
+      setMapId(home)
+      setToast(MAPS[home].name)
+      clearTimeout(toastTimer.current)
+      toastTimer.current = setTimeout(() => setToast(null), 2400)
+      setTimeout(() => {
+        setFading(false)
+        travelling.current = false
+      }, FADE_MS)
+    }, FADE_MS)
+  }
+
+  // Replicate TAPS, not positions (the whole netcode design): watch the walk
+  // target for changes and broadcast position+target on each one. 200ms of
+  // send latency is invisible — both sides converge on the same target, and
+  // the keyframe beat corrects any drift.
+  useEffect(() => {
+    if (!meadow) return
+    let last = 'init'
+    const t = setInterval(() => {
+      if (!inMeadowRef.current) return
+      const tgt = targetRef.current
+      const sig = tgt ? `${tgt.x.toFixed(1)},${tgt.z.toFixed(1)}` : 'stop'
+      if (sig === last) return
+      last = sig
+      meadow.sendMove({
+        x: +charPosRef.current.x.toFixed(2),
+        z: +charPosRef.current.z.toFixed(2),
+        tx: tgt ? +tgt.x.toFixed(2) : null,
+        tz: tgt ? +tgt.z.toFixed(2) : null,
+      })
+    }, 200)
+    return () => clearInterval(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meadow])
+
+  // sparkle bought/expired while in the meadow → the buddy sees it change
+  useEffect(() => {
+    meadowRef.current?.updateProfile({ sparkle: sparkle?.colorId ?? null })
+  }, [sparkle])
+
+  // leaving the page = leaving the meadow (presence would time out anyway,
+  // but a clean bye makes the goodbye toast instant on the other side);
+  // mountedRef also lets a join that resolves after unmount clean itself up
+  const mountedRef = useRef(true)
+  useEffect(() => {
+    mountedRef.current = true // StrictMode's simulated unmount must not stick
+    return () => {
+      mountedRef.current = false
+      meadowRef.current?.leave()
+    }
+  }, [])
+
+  function sendEmote(e) {
+    meadowRef.current?.sendEmote(e.kind)
+    onPetReact() // own character emote-yes + pet dance — the local feedback
+  }
 
   function travel(toId) {
     if (travelling.current) return false // caller may retry next frame
@@ -400,6 +631,8 @@ export default function App() {
             petPosRef={petPosRef}
             zoomRef={zoomRef}
             gestureRef={gestureRef}
+            buddies={meadow && mapId === 'meadow' ? buddies : []}
+            buddyEmotes={buddyEmotes}
           />
         </Suspense>
       </Canvas>
@@ -416,14 +649,27 @@ export default function App() {
       >
         <LevelBar points={points} onLevelUp={onLevelUp} />
       </div>
-      <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} placed={placedHere} />
-      {!moved && <MoveHint />}
+      <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
+      {!moved && !meadow && <MoveHint />}
       {toast && <MapToast name={toast} />}
       {note && <NoteToast text={note} />}
 
       {/* ── Phase 3: shop + placement HUD ── */}
-      {!placing && !shopOpen && selectedId == null && (
+      {!placing && !shopOpen && selectedId == null && !meadow && (
         <ShopButton onOpen={() => setShopOpen(true)} />
+      )}
+
+      {/* ── Phase B: the Together Space HUD ── */}
+      {/* home: one quiet button, no status, no badge — the agreement to play
+          together happens in the living room, not in the app */}
+      {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
+        <TogetherButton onTap={enterMeadow} />
+      )}
+      {meadow && (
+        <>
+          <HomeButton onTap={leaveMeadow} />
+          <EmoteBar onEmote={sendEmote} />
+        </>
       )}
       {placing && (
         <ActionBar
@@ -435,7 +681,7 @@ export default function App() {
           ]}
         />
       )}
-      {!placing && selectedId != null && (
+      {!placing && selectedId != null && !meadow && (
         <ActionBar
           hint="Your decoration"
           buttons={[
@@ -511,6 +757,110 @@ export default function App() {
           pointerEvents: fading ? 'auto' : 'none',
         }}
       />
+    </div>
+  )
+}
+
+// joinMeadow already fails fast on a refused channel; this bounds the
+// slow-network case so the button can never hang silently.
+function withTimeout(promise, ms) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error('meadow-timeout')), ms)
+    promise.then(
+      (v) => (clearTimeout(t), resolve(v)),
+      (e) => (clearTimeout(t), reject(e)),
+    )
+  })
+}
+
+/** 💞 — the only Together surface in the solo game (bottom-left, quiet). */
+function TogetherButton({ onTap }) {
+  return (
+    <button
+      aria-label="Play together in the meadow"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={onTap}
+      style={{
+        position: 'absolute',
+        bottom: 'max(20px, env(safe-area-inset-bottom))',
+        left: 16,
+        width: 54,
+        height: 54,
+        borderRadius: 999,
+        border: 'none',
+        background: '#ffffff',
+        boxShadow: '0 4px 14px rgba(43,32,90,0.2)',
+        fontSize: 24,
+        cursor: 'pointer',
+      }}
+    >
+      💞
+    </button>
+  )
+}
+
+/** 🏡 — leave the meadow (takes the shop button's spot while visiting). */
+function HomeButton({ onTap }) {
+  return (
+    <button
+      aria-label="Go back home"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={onTap}
+      style={{
+        position: 'absolute',
+        bottom: 'max(20px, env(safe-area-inset-bottom))',
+        right: 16,
+        width: 54,
+        height: 54,
+        borderRadius: 999,
+        border: 'none',
+        background: '#ffffff',
+        boxShadow: '0 4px 14px rgba(43,32,90,0.2)',
+        fontSize: 24,
+        cursor: 'pointer',
+      }}
+    >
+      🏡
+    </button>
+  )
+}
+
+/** The meadow's whole vocabulary — four emotes, no text (Phase B rule). */
+function EmoteBar({ onEmote }) {
+  return (
+    <div
+      onPointerDown={(e) => e.stopPropagation()}
+      style={{
+        position: 'absolute',
+        bottom: 'max(20px, env(safe-area-inset-bottom))',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        gap: 10,
+        background: '#ffffff',
+        borderRadius: 999,
+        padding: 8,
+        boxShadow: '0 4px 14px rgba(43,32,90,0.2)',
+      }}
+    >
+      {EMOTES.map((e) => (
+        <button
+          key={e.kind}
+          aria-label={e.kind}
+          onClick={() => onEmote(e)}
+          style={{
+            width: 46,
+            height: 46,
+            borderRadius: 999,
+            border: 'none',
+            background: 'var(--brand-lilac-100)',
+            fontSize: 22,
+            cursor: 'pointer',
+          }}
+        >
+          {e.emoji}
+        </button>
+      ))}
     </div>
   )
 }

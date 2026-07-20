@@ -29,7 +29,7 @@ let _client = null
  * user id are cached here, kept fresh by onAuthStateChange, and read by the
  * supabase backend at fetch time.
  */
-let cached = { token: null, uid: null }
+let cached = { token: null, uid: null, email: null }
 
 export function client() {
   if (!_client) {
@@ -41,7 +41,11 @@ export function client() {
       },
     })
     _client.auth.onAuthStateChange((_event, session) => {
-      cached = { token: session?.access_token ?? null, uid: session?.user?.id ?? null }
+      cached = {
+        token: session?.access_token ?? null,
+        uid: session?.user?.id ?? null,
+        email: session?.user?.email ?? null,
+      }
     })
   }
   return _client
@@ -56,7 +60,7 @@ export function sessionCache() {
 export async function getSessionOnce() {
   const { data } = await client().auth.getSession()
   const s = data.session ?? null
-  cached = { token: s?.access_token ?? null, uid: s?.user?.id ?? null }
+  cached = { token: s?.access_token ?? null, uid: s?.user?.id ?? null, email: s?.user?.email ?? null }
   return s
 }
 

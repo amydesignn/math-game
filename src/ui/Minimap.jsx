@@ -9,7 +9,7 @@ const SIZE = 104 // css px, drawn 2x for retina
  * the world), with the scenery as fixed dots and Ivy + her pet as live dots.
  * Reads positions from refs each frame — no React re-renders.
  */
-export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stationRef, placed = [] }) {
+export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stationRef, buddiesRef, placed = [] }) {
   const canvas = useRef()
 
   useEffect(() => {
@@ -83,6 +83,19 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
         ctx.stroke()
       }
 
+      // buddies (warm pink — another real person in the meadow, Phase B)
+      for (const b of buddiesRef?.current || []) {
+        const bp = b.sim?.pos
+        if (!bp) continue
+        ctx.fillStyle = '#ef7fb5'
+        ctx.strokeStyle = '#ffffff'
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        ctx.arc(toPx(bp.x), toPx(bp.z), 8, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.stroke()
+      }
+
       // pet (gold, so it reads as "the companion")
       const p = petPosRef.current
       ctx.fillStyle = gold
@@ -104,7 +117,7 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
     }
     raf = requestAnimationFrame(draw)
     return () => cancelAnimationFrame(raf)
-  }, [map, charPosRef, petPosRef, sparklesRef, stationRef, placed])
+  }, [map, charPosRef, petPosRef, sparklesRef, stationRef, buddiesRef, placed])
 
   return (
     <canvas
