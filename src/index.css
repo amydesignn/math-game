@@ -85,6 +85,10 @@ canvas { touch-action: none; display: block; }
 /* the popup — its own popIn (the overshoot is Oscar's); `popIn` above belongs
    to the math card and is deliberately gentler, so they don't share a name */
 @keyframes lvlPopIn { 0% { transform: scale(.82) translateY(18px); opacity: 0; } 60% { transform: scale(1.03) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+/* Phase 5-B — the progress popup: a calmer rise than popIn (a record book is
+   opened, not sprung), and the climb ladder's rungs landing in sequence. */
+@keyframes sheetIn { 0% { transform: scale(.9) translateY(14px); opacity: 0; } 60% { transform: scale(1.01) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes rungPop { 0% { transform: scale(.5); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
 @keyframes confettiFall { 0% { transform: translate(0,-10px) rotate(0deg); opacity: 0; } 12% { opacity: 1; } 100% { transform: translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity: 0; } }
 @keyframes badgeBounce { 0% { transform: scale(.3) rotate(-10deg); opacity: 0; } 55% { transform: scale(1.12) rotate(3deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
 @keyframes haloPulse { 0% { transform: scale(.8); opacity: .5; } 100% { transform: scale(1.55); opacity: 0; } }

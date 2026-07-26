@@ -41,13 +41,14 @@ const barStyles = {
  * level-up theatre and only then calls onLevelUp — so the popup is pure
  * applause, arriving after the bar has already told the story.
  */
-export default function LevelBar({ points, onLevelUp }) {
+export default function LevelBar({ points, onLevelUp, onOpen }) {
   const [shown, setShown] = useState(points) // the points the bar renders (lags during theatre)
   const [phase, setPhase] = useState('idle') // idle | surge | flip | regrow
   const [burst, setBurst] = useState(null)
   const [floater, setFloater] = useState(null) // the "+N" tick
   const [shine, setShine] = useState(0)
   const [rolling, setRolling] = useState(null) // { from, to } — the label roll
+  const [pressed, setPressed] = useState(false) // 5-B: the tap affordance
   const prevRef = useRef(points) // seeded from the boot value ⇒ no theatre on mount
   const timers = useRef([])
   const later = (fn, ms) => { timers.current.push(setTimeout(fn, ms)) }
@@ -100,10 +101,28 @@ export default function LevelBar({ points, onLevelUp }) {
       })
     : null
 
+  // Tappable only while idle: mid-theatre the bar is telling her something, and
+  // opening the record book over its own animation would talk across it.
+  const tappable = !!onOpen && phase === 'idle'
+
   return (
     <div
-      style={{ ...barStyles.pill, animation: phase !== 'idle' ? 'surgeGlow 1.3s ease-out 1' : 'none' }}
-      aria-label={`Level ${st.level}, ${st.into} of ${st.need} points`}
+      onClick={tappable ? onOpen : undefined}
+      onPointerDown={tappable ? () => setPressed(true) : undefined}
+      onPointerUp={() => setPressed(false)}
+      onPointerLeave={() => setPressed(false)}
+      onKeyDown={onOpen ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen() } } : undefined}
+      role={onOpen ? 'button' : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      style={{ ...barStyles.pill,
+        cursor: tappable ? 'pointer' : 'default',
+        // No icon by design (Amy) — it's words plus press feedback, discovered
+        // by tapping. The press state is therefore the ONLY affordance; keep it.
+        transform: pressed ? 'translateY(1px) scale(.99)' : 'none',
+        boxShadow: pressed ? '0 1px 5px rgba(43,32,90,0.2)' : barStyles.pill.boxShadow,
+        transition: 'transform .09s ease, box-shadow .09s ease',
+        animation: phase !== 'idle' ? 'surgeGlow 1.3s ease-out 1' : 'none' }}
+      aria-label={`Level ${st.level}, ${st.into} of ${st.need} points${onOpen ? '. Tap to see your progress.' : ''}`}
     >
       <span style={barStyles.label}>
         Level

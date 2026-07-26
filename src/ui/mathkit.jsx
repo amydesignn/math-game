@@ -25,6 +25,63 @@ export const T = {
 
 export { Gem }
 
+/* ---- THE MODAL SHELL — one frame for every popup ----------------------
+ * Governed by `docs/modal-system.md` (Oscar's locked format, 2026-07-25).
+ * Math, Station and Progress all wear THIS shell; the only thing that differs
+ * between them is the header TINT (mint = math workflow · soft-violet =
+ * progress/level). Change a value here and all three move together — that is
+ * the entire point, so never re-declare these numbers in a popup.
+ */
+export const MODAL = {
+  gutter: 20,
+  radius: 28, // 4px base unit (Amy) — was 26 before the sync
+  scrim: 'rgba(56,42,82,.44)', scrimBlur: 'blur(6px)',
+  border: '1.5px solid rgba(74,54,110,.10)',
+  shadow: '0 24px 60px rgba(50,38,80,.30), 0 4px 16px rgba(50,38,80,.13)',
+  width: 'min(520px, calc(100vw - 40px))',
+  // 40, not Oscar's token 36: Amy's call — a friendlier tap target on Ivy's iPad
+  // (his comp rendered 40 while MODAL said 36; 40 is what the screenshots show).
+  close: 40, closeBg: '#ECEAF1', closeFg: '#6E6685',
+}
+
+/** The close ✕. One implementation so the tap target can never drift again. */
+export function ModalClose({ onClick, style }) {
+  return (
+    <button onClick={onClick} aria-label="Close"
+      style={{ border: 'none', background: MODAL.closeBg, color: MODAL.closeFg,
+        width: MODAL.close, height: MODAL.close, borderRadius: '50%', cursor: 'pointer',
+        fontSize: 15, fontWeight: 600, lineHeight: 1, flex: 'none',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', ...style }}>✕</button>
+  )
+}
+
+/**
+ * The shell: fixed wrapper + scrim + card.
+ *   onScrim  — omit to make the popup undismissable by tapping outside
+ *   overlay  — rendered ABOVE the scrim but OUTSIDE the card, because the gem
+ *              flights have to cross the whole screen, not the card
+ *   cardStyle — per-popup layout only (padding, scroll model). Never colour,
+ *              radius, border or shadow: those belong to every popup equally.
+ */
+export function Modal({ children, onScrim, cardRef, cardClass, cardStyle, overlay, label,
+  animation = 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both', zIndex = 40 }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex, display: 'flex', alignItems: 'center',
+      justifyContent: 'center', padding: MODAL.gutter }}>
+      <div onClick={onScrim}
+        style={{ position: 'absolute', inset: 0, background: MODAL.scrim, backdropFilter: MODAL.scrimBlur,
+          WebkitBackdropFilter: MODAL.scrimBlur, animation: 'scrimIn .25s ease-out both' }} />
+      {overlay}
+      <div ref={cardRef} className={cardClass} role="dialog" aria-label={label}
+        style={{ position: 'relative', width: MODAL.width, maxHeight: 'calc(100vh - 32px)',
+          overflowY: 'auto', background: T.surface, borderRadius: MODAL.radius,
+          border: MODAL.border, boxShadow: MODAL.shadow, animation, ...cardStyle }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 /* ---- a scatter of twinkling stars (reward moments) ---- */
 export function Sparkles({ colors = ['#fff', T.tealLt, T.blueSubtle], n = 14 }) {
   const items = useRef(

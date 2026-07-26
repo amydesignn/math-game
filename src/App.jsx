@@ -8,6 +8,7 @@ import Gem from './ui/Gem'
 import MathPopup, { SKINS } from './ui/MathPopup'
 import StationPopup from './ui/StationPopup'
 import LevelBar, { LevelUpPopup } from './ui/LevelBar'
+import ProgressPopup from './ui/ProgressPopup'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow } from './stations'
@@ -34,6 +35,11 @@ export default function App({ cloud = false }) {
   const [points, setPoints] = useState(state.lifetimeGems)
   const [levelQueue, setLevelQueue] = useState([]) // levels awaiting their popup
   const [levelPopup, setLevelPopup] = useState(null) // { level, message, from }
+  // 5-B: her record book, opened by tapping the level bar. Declared up here
+  // with the other level state because `worldBusy` (a derived const further
+  // down) reads it — a const above its own state is the TDZ crash that kills
+  // every fresh mount while HMR'd tabs keep working. See CLAUDE.md.
+  const [progressOpen, setProgressOpen] = useState(false)
 
   // ── Phase 2: sound (Ivy's bgm + the cat's meow) ──
   useEffect(() => {
@@ -295,7 +301,10 @@ export default function App({ cloud = false }) {
   // immediately (she sees it) and the card waits for the calm afterwards.
   // (the meadow counts as busy too — a signed congratulations card should be
   // read at home in the quiet, not mid-visit; the queue simply waits)
-  const worldBusy = !!(math || station || farewellMap || placing || shopOpen || fading || meadow)
+  // 5-B: her record book counts as busy too — a congratulations card bursting
+  // in over the quiet review screen would talk across it (and she can't earn a
+  // level while reading, so the queue loses nothing by waiting).
+  const worldBusy = !!(math || station || farewellMap || placing || shopOpen || fading || meadow || progressOpen)
   useEffect(() => {
     if (levelPopup || worldBusy || !levelQueue.length) return
     const [next, ...rest] = levelQueue
@@ -650,7 +659,7 @@ export default function App({ cloud = false }) {
           right: 16 + 104 + 12, // left of the minimap (SIZE 104 + gutter)
         }}
       >
-        <LevelBar points={points} onLevelUp={onLevelUp} />
+        <LevelBar points={points} onLevelUp={onLevelUp} onOpen={() => setProgressOpen(true)} />
       </div>
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
       {!moved && !meadow && <MoveHint />}
@@ -746,6 +755,15 @@ export default function App({ cloud = false }) {
           message={levelPopup.message}
           from={levelPopup.from}
           onClose={closeLevelPopup}
+        />
+      )}
+
+      {/* ── Phase 5-B: her record book — review only, opened from the bar ── */}
+      {progressOpen && (
+        <ProgressPopup
+          totalPoints={points}
+          topicProgress={getState().topicProgress}
+          onClose={() => setProgressOpen(false)}
         />
       )}
 

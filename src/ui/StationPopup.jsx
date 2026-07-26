@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { solve } from '../math'
 import { SKINS } from './skins'
-import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput } from './mathkit'
+import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose } from './mathkit'
 
 /*
  * StationPopup — Oscar's station mini-quest, lifted from
@@ -114,17 +114,15 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
   const dismissable = phase === 'ask' || phase === 'intro'
 
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <div onClick={dismissable ? () => close(false) : undefined}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(50,42,80,.44)', backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)', animation: 'scrimIn .25s ease-out both' }} />
-      {flyGems.map((g) => <FlyGem key={g.id} {...g} />)}
-
-      <div ref={cardRef} className={shake ? 'shakeit' : ''}
-        style={{ position: 'relative', width: 'min(520px,100%)', maxHeight: 'calc(100vh - 32px)',
-          overflowY: 'auto', background: '#fff', borderRadius: T.radius,
-          boxShadow: '0 24px 60px rgba(40,30,70,.28)', padding: '0 0 26px',
-          animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
+    // The shared shell (mathkit <Modal>, docs/modal-system.md) — identical frame
+    // to the math and progress popups; only the header tint differs.
+    <Modal
+      onScrim={dismissable ? () => close(false) : undefined}
+      cardRef={cardRef}
+      cardClass={shake ? 'shakeit' : ''}
+      cardStyle={{ padding: '0 0 26px' }}
+      overlay={flyGems.map((g) => <FlyGem key={g.id} {...g} />)}
+      label={skin.tag}>
 
         {/* quest banner — skin banner + a QUEST badge so it reads as the bigger encounter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
@@ -134,11 +132,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           <span style={{ fontWeight: 700, fontSize: 11.5, letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff',
             background: skin.accent, borderRadius: 9, padding: '4px 9px' }}>Quest</span>
           <div style={{ flex: 1 }} />
-          {dismissable && (
-            <button onClick={() => close(false)} aria-label="close"
-              style={{ border: 'none', background: '#f2f2f2', width: 32, height: 32, borderRadius: '50%', cursor: 'pointer',
-                color: T.ink3, fontSize: 16, lineHeight: 1 }}>✕</button>
-          )}
+          {dismissable && <ModalClose onClick={() => close(false)} />}
         </div>
 
         <div style={{ padding: '20px 26px 4px' }}>
@@ -221,7 +215,6 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
             </div>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   )
 }
