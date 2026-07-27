@@ -76,7 +76,9 @@ canvas { touch-action: none; display: block; }
 /* the bar */
 @keyframes shineSweep { 0% { transform: translateX(-140%) skewX(-18deg); } 100% { transform: translateX(340%) skewX(-18deg); } }
 @keyframes nearShimmer { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.28); } }
-@keyframes surgeGlow { 0% { box-shadow: 0 0 0 0 rgba(127,34,254,0); } 45% { box-shadow: 0 0 0 7px rgba(127,34,254,.22); } 100% { box-shadow: 0 0 0 0 rgba(127,34,254,0); } }
+/* pastel level identity (2026-07-26) — 167,139,250 is LVL.main; the saturated
+   127,34,254 ring read as a hard purple flash against the softened bar */
+@keyframes surgeGlow { 0% { box-shadow: 0 0 0 0 rgba(167,139,250,0); } 45% { box-shadow: 0 0 0 7px rgba(167,139,250,.30); } 100% { box-shadow: 0 0 0 0 rgba(167,139,250,0); } }
 @keyframes rollOut { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-115%); opacity: 0; } }
 @keyframes rollIn { 0% { transform: translateY(115%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 @keyframes tickPop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }

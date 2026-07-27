@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { T } from './mathkit'
+import { T, LVL } from './mathkit'
 import { levelState, fmtPoints, SIGNATURES } from '../levels'
 
 /*
@@ -12,12 +12,9 @@ import { levelState, fmtPoints, SIGNATURES } from '../levels'
  * Three celebrations, three colors, so she can tell them apart at a glance.
  */
 
-const LVL = {
-  main: T.violet,
-  soft: '#F3E8FF',
-  deep: '#59168B',
-  grad: 'linear-gradient(135deg,#9810FA 0%,#7F22FE 55%,#615FFF 100%)',
-}
+/* LVL (the level violet) lives in mathkit — see the note there. It went PASTEL
+ * on 2026-07-26 and the bar, this file's congratulations card and the progress
+ * popup all moved together, because they're one identity. */
 
 /* ============================== THE BAR ================================= */
 /* White house pill in the top-right HUD, left of the minimap.
@@ -157,7 +154,9 @@ const popStyles = {
   kicker: { fontSize: 13, fontWeight: 800, letterSpacing: '.14em', color: LVL.main, textTransform: 'uppercase' },
   badgeWrap: { position: 'relative', width: 112, height: 112, margin: '18px auto 14px' },
   halo: { position: 'absolute', inset: -10, borderRadius: '50%', border: '3px solid ' + LVL.main, opacity: 0.4, animation: 'haloPulse 1.4s ease-out .3s 2' },
-  badge: { position: 'absolute', inset: 0, borderRadius: '50%', background: LVL.grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 26px rgba(127,34,254,.42), inset 0 -5px 0 rgba(0,0,0,.14)', animation: 'badgeBounce .55s cubic-bezier(.22,1.4,.36,1) .1s both' },
+  // the inset lip softened with the palette (was -5px/.14 under the saturated
+  // violet — too heavy a shadow for a pastel badge, it read as a dark rim)
+  badge: { position: 'absolute', inset: 0, borderRadius: '50%', background: LVL.grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 10px 26px rgba(${LVL.glow},.42), inset 0 -4px 0 rgba(0,0,0,.10)`, animation: 'badgeBounce .55s cubic-bezier(.22,1.4,.36,1) .1s both' },
   badgeNum: { position: 'relative', overflow: 'hidden', height: 56, width: '100%', textAlign: 'center', color: '#fff', fontWeight: 800, fontSize: 46, lineHeight: '56px', textShadow: '0 2px 0 rgba(0,0,0,.18)' },
   msg: { fontSize: 19, lineHeight: 1.45, fontWeight: 700, color: T.ink, textWrap: 'pretty', padding: '0 6px' },
   // The signature (Amy's ask): right-aligned like a signed note, because that
@@ -168,7 +167,9 @@ const popStyles = {
   btn: { marginTop: 18, width: '100%', height: 54, border: 'none', borderRadius: 16, background: T.blue, color: '#fff', fontSize: 18, fontWeight: 800, cursor: 'pointer', boxShadow: '0 5px 0 ' + T.blueDarker, transition: 'transform .08s ease, box-shadow .08s ease' },
   piece: { position: 'absolute', top: -8, width: 9, height: 14, borderRadius: 3, animation: 'confettiFall var(--dur) ease-in var(--delay) forwards', pointerEvents: 'none' },
 }
-const CONFETTI = [T.violet, '#9810FA', T.teal, T.amber, T.blue, '#F6339A']
+// pastel confetti to match the softened level identity (was T.violet/#9810FA —
+// the two saturated purples popped out of the card once it went pastel)
+const CONFETTI = [LVL.main, '#C4B5FD', '#9FE0D2', '#FBCE7E', '#A9C5F5', '#F5B8D0']
 
 export function LevelUpPopup({ level, message, from, onClose }) {
   const [pieces] = useState(() =>

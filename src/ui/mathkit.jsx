@@ -44,6 +44,27 @@ export const MODAL = {
   close: 40, closeBg: '#ECEAF1', closeFg: '#6E6685',
 }
 
+/* ---- LEVEL IDENTITY — the one violet -----------------------------------
+ * Colour reservation across the app: teal = gems (the wallet) · amber =
+ * station bonus · VIOLET = levels (permanent progress). Three celebrations,
+ * three colours, so Ivy can tell them apart at a glance.
+ *
+ * PASTEL since 2026-07-26 (Amy: "for all the popup bar, gentle pastel /
+ * lighter approach"). It replaced the saturated 5-A violet everywhere at once
+ * — the HUD bar, the congratulations card and the progress record book all
+ * read from HERE. Declaring it per-file is what made the bar and its own
+ * popup two different purples in the first place; don't reintroduce a local
+ * copy.
+ */
+export const LVL = {
+  main: '#A78BFA',
+  soft: '#F1ECFE',
+  deep: '#5B44C4', // text weight — ≈6:1 on white, safe for the points readout
+  softLine: '#E7DEFA',
+  grad: 'linear-gradient(135deg,#C4B5FD 0%,#A78BFA 58%,#8E7BF2 100%)',
+  glow: '139,123,242', // rgb triplet for the soft shadows/halos around level art
+}
+
 /** The close ✕. One implementation so the tap target can never drift again. */
 export function ModalClose({ onClick, style }) {
   return (

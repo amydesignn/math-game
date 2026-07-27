@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { T, Modal, ModalClose } from './mathkit'
+import { T, LVL, Modal, ModalClose } from './mathkit'
 import { levelState, fmtPoints, STAGE_LABELS } from '../levels'
 import { TOPIC_META, stageCounts, startedTopics } from '../topicMeta'
 
@@ -33,14 +33,11 @@ import { TOPIC_META, stageCounts, startedTopics } from '../topicMeta'
  */
 
 /* Level identity = VIOLET (teal = gems · amber = station bonus), softened to
- * PASTEL for this card so it sits inside the app's pastel skin. Note the bar
- * itself still wears the saturated 5-A violet — mirroring the pastel into the
- * bar is Amy's open taste call, and a one-line change in LevelBar if she says
- * yes (Oscar flagged it in the comp). */
-const LVL = {
-  main: '#A78BFA', soft: '#F1ECFE', deep: '#5B44C4', softLine: '#E7DEFA',
-  grad: 'linear-gradient(135deg,#C4B5FD 0%,#A78BFA 58%,#8E7BF2 100%)',
-}
+ * PASTEL for this card so it sits inside the app's pastel skin — and since
+ * 2026-07-26 (Amy) the BAR and the congratulations card wear the same pastel,
+ * so LVL is imported from mathkit rather than declared here. One identity, one
+ * declaration: a local copy is exactly how the bar and this card drifted into
+ * two different purples. */
 
 /* One ascending pastel-violet ramp so the SYSTEM reads at a glance:
  * light → deep = easier → harder. Distinct from the ⭐ badge track (5-C). */
