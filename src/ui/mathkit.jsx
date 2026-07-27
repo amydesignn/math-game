@@ -63,6 +63,19 @@ export const LVL = {
   softLine: '#E7DEFA',
   grad: 'linear-gradient(135deg,#C4B5FD 0%,#A78BFA 58%,#8E7BF2 100%)',
   glow: '139,123,242', // rgb triplet for the soft shadows/halos around level art
+
+  /* The level NUMERAL wherever it sits on `grad` — medallion, reached ladder
+   * nodes, the congratulations badge. violet-950 from the primitive ramp.
+   *
+   * It is not white, and that is a hard constraint rather than a preference:
+   * white cannot meet 4.5:1 on a pastel violet at all (violet-300 = 1.86,
+   * violet-400 = 2.85, and even violet-500 only reaches 4.40). Pastel field or
+   * white text — you cannot have both. Amy's call (2026-07-26) was to keep the
+   * pastel and deepen the numeral: this gives 4.55 on the gradient's deepest
+   * corner, 5.60 mid, 8.25 on the lightest — passing everywhere.
+   *
+   * If anyone ever "restores" white here, the card silently drops below AA. */
+  onFill: '#2F0D68',
 }
 
 /** The close ✕. One implementation so the tap target can never drift again. */

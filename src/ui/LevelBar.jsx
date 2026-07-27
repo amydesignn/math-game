@@ -157,7 +157,10 @@ const popStyles = {
   // the inset lip softened with the palette (was -5px/.14 under the saturated
   // violet — too heavy a shadow for a pastel badge, it read as a dark rim)
   badge: { position: 'absolute', inset: 0, borderRadius: '50%', background: LVL.grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 10px 26px rgba(${LVL.glow},.42), inset 0 -4px 0 rgba(0,0,0,.10)`, animation: 'badgeBounce .55s cubic-bezier(.22,1.4,.36,1) .1s both' },
-  badgeNum: { position: 'relative', overflow: 'hidden', height: 56, width: '100%', textAlign: 'center', color: '#fff', fontWeight: 800, fontSize: 46, lineHeight: '56px', textShadow: '0 2px 0 rgba(0,0,0,.18)' },
+  // numeral = LVL.onFill (violet-950), not white — see the note in mathkit.
+  // The drop shadow goes with it: it existed to lift white off the saturated
+  // violet, and under a deep numeral it just muddies the pastel.
+  badgeNum: { position: 'relative', overflow: 'hidden', height: 56, width: '100%', textAlign: 'center', color: LVL.onFill, fontWeight: 800, fontSize: 46, lineHeight: '56px' },
   msg: { fontSize: 19, lineHeight: 1.45, fontWeight: 700, color: T.ink, textWrap: 'pretty', padding: '0 6px' },
   // The signature (Amy's ask): right-aligned like a signed note, because that
   // is the visual grammar for "a person wrote this to you" — which is the

@@ -56,7 +56,9 @@ const S = {
   head: { position: 'relative', padding: '30px 24px 22px', textAlign: 'center', flex: 'none',
     background: 'linear-gradient(180deg,#E9E2FA 0%,#F8F5FE 100%)', borderBottom: '1px solid #E7DEF4', overflow: 'hidden' },
   lvlLabel: { position: 'relative', fontSize: 14, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: LVL.deep, marginBottom: 16, zIndex: 2 },
-  circle: { position: 'relative', width: 80, height: 80, margin: '0 auto 16px', borderRadius: '50%', background: LVL.grad, color: '#fff', fontWeight: 700, fontSize: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 22px rgba(139,123,242,.42), inset 0 -4px 0 rgba(0,0,0,.10)', zIndex: 2 },
+  // numeral = LVL.onFill (violet-950), not white — white cannot reach 4.5:1 on
+  // a pastel violet at any step of the ramp. See the note in mathkit.
+  circle: { position: 'relative', width: 80, height: 80, margin: '0 auto 16px', borderRadius: '50%', background: LVL.grad, color: LVL.onFill, fontWeight: 700, fontSize: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 10px 22px rgba(${LVL.glow},.42), inset 0 -4px 0 rgba(0,0,0,.10)`, zIndex: 2 },
   totalLine: { position: 'relative', fontSize: 17, fontWeight: 400, color: '#5C5470', zIndex: 2 },
   totalStrong: { color: LVL.deep, fontWeight: 700 },
 
@@ -165,8 +167,12 @@ export function ClimbLadder({ points }) {
           const done = L < st.level
           const current = L === st.level
           const face = (done || current)
-            ? { background: LVL.grad, color: '#fff', boxShadow: current ? '0 6px 14px rgba(139,123,242,.46)' : '0 3px 9px rgba(139,123,242,.30)' }
-            : { background: '#EFEDF2', color: '#A79FB4' } // upcoming — inactive indicator (WCAG 1.4.3 exempt)
+            // reached: numeral in LVL.onFill, since white can't make 4.5:1 on pastel
+            ? { background: LVL.grad, color: LVL.onFill, boxShadow: current ? `0 6px 14px rgba(${LVL.glow},.46)` : `0 3px 9px rgba(${LVL.glow},.30)` }
+            // upcoming: stays light ON PURPOSE. An inactive indicator is WCAG
+            // 1.4.3 exempt (Amy confirmed), and darkening it would make a level
+            // she hasn't reached read as one she has — meaning beats ratio here.
+            : { background: '#EFEDF2', color: '#A79FB4' }
           return (
             <span key={L} style={{ position: 'absolute', top: '50%', left: center(i) + '%',
               transform: `translate(-50%,-50%) scale(${current ? 1.1 : 1})`, zIndex: current ? 2 : 1 }}>
