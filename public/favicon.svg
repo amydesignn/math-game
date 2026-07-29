@@ -1,0 +1,13 @@
+<!-- Ivy's Math World — the gem, with the plus. Amy's artwork ("Math version 3"). -->
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M30 33H66L57 45H39L30 33Z" fill="#A5F3FC"/>
+  <path d="M30 33L39 45H21L30 33Z" fill="#22D3EE"/>
+  <path d="M66 33L57 45H75L66 33Z" fill="#22D3EE"/>
+  <path d="M21 45H39L48 78L21 45Z" fill="#0E7490"/>
+  <path d="M39 45H57L48 78L39 45Z" fill="#0891B2"/>
+  <path d="M57 45H75L48 78L57 45Z" fill="#0E7490"/>
+  <g opacity="0.92">
+    <path d="M52.65 37.65H43.35C42.6044 37.65 42 38.2544 42 39V39.15C42 39.8956 42.6044 40.5 43.35 40.5H52.65C53.3956 40.5 54 39.8956 54 39.15V39C54 38.2544 53.3956 37.65 52.65 37.65Z" fill="white"/>
+    <path d="M48.075 33H47.925C47.1794 33 46.575 33.6044 46.575 34.35V43.65C46.575 44.3956 47.1794 45 47.925 45H48.075C48.8206 45 49.425 44.3956 49.425 43.65V34.35C49.425 33.6044 48.8206 33 48.075 33Z" fill="white"/>
+  </g>
+</svg>

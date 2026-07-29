@@ -1,6 +1,7 @@
 # Publishing to lumio.land — status & handoff
 
-_Last updated: 2026-07-29 (Amy + Nathan)_
+_Last updated: 2026-07-29, evening (Amy + Nathan) — apex redirect live, auth
+working on the new domain, favicon shipped._
 
 The record of taking Ivy's Math World from a sandbox build to a real public
 product. Read this first if you're picking the work up in a new session.
@@ -28,17 +29,86 @@ users, links, and traffic history never have to migrate later.
 | Git link | Vercel ↔ `github.com/amydesignn/math-game` — **every push to `main` auto-deploys to production** |
 | Live URL | **https://math.lumio.land** — HTTPS valid, verified 200 end-to-end |
 | Analytics | `@vercel/analytics` wired in `src/main.jsx` (commit `797f07c`) |
+| Apex + www | `lumio.land` / `www.lumio.land` → **302** → `math.lumio.land` (verified 2026-07-29) |
+| Auth on the new domain | Supabase redirect allowlist + Site URL updated; **full magic-link round-trip verified from `math.lumio.land`** (2026-07-29 22:12 UTC) |
+| Favicon | `public/favicon.svg` — Amy's gem mark, the same gem the game pays in |
 
-### DNS record (in Cloudflare, `lumio.land` zone)
+### DNS records (in Cloudflare, `lumio.land` zone)
 
 | Type | Name | Content | Proxy |
 |---|---|---|---|
 | CNAME | `math` | `92baac53b29db479.vercel-dns-017.com` | **DNS only** (grey cloud) |
+| AAAA | `@` | `100::` | **Proxied** (orange cloud) |
+| AAAA | `www` | `100::` | **Proxied** (orange cloud) |
 
-> ⚠️ **The grey cloud is mandatory.** If Cloudflare proxying is ON (orange
-> cloud), Vercel cannot verify the domain or issue the HTTPS cert. Cloudflare's
-> dashboard actively nags you to enable proxying — **ignore that banner** for
-> Vercel-pointed records.
+> ⚠️ **Grey cloud is mandatory for Vercel-pointed records.** If Cloudflare
+> proxying is ON (orange cloud), Vercel cannot verify the domain or issue the
+> HTTPS cert. Cloudflare's dashboard actively nags you to enable proxying —
+> **ignore that banner** for Vercel-pointed records.
+
+> ⚠️ **The apex and `www` records are the exception — they MUST be orange.**
+> They exist only so a Redirect Rule has something to attach to; `100::` is the
+> IPv6 discard address and nothing is ever served from it. Cloudflare can only
+> run a redirect on traffic it proxies, so grey cloud there breaks the redirect.
+> Do not "fix" these to grey to match the rule above.
+
+### The apex redirect (Rules → Redirect Rules)
+
+One rule, named `apex + www → math`, matching **both** hostnames:
+
+```
+http.host in {"lumio.land" "www.lumio.land"}
+```
+
+Then: **Static** · `https://math.lumio.land` · **302 — Temporary Redirect**.
+
+**302, not 301, deliberately.** The apex is reserved for a future arcade landing
+page. A 301 is cached by browsers for months, so returning visitors would keep
+being bounced to `math.` long after the landing page exists.
+
+> ⚠️ **Two ways to break this rule, both silent:**
+> 1. **`and` instead of `or`.** Building the condition as two rows joined by
+>    **And** produces `http.host in {"lumio.land"} and http.host in
+>    {"www.lumio.land"}` — a hostname can never be both, so the rule matches
+>    nothing while still reporting **Active**. The symptom is **HTTP 522** on the
+>    apex: no redirect fires, so Cloudflare tries to reach `100::` and times out.
+>    The fix is one condition with both values in the set, as above. (Hit and
+>    fixed 2026-07-29.)
+> 2. **A wildcard or `contains` match.** Anything matching `*lumio.land` also
+>    catches `math.lumio.land` and redirects it to itself — an infinite loop that
+>    takes the live app down. Exact hostnames only.
+
+Verify from outside the dashboard, because the rule list's "Match against"
+column can show stale text after an edit:
+
+```bash
+curl -sS -o /dev/null -w "%{http_code} -> %{redirect_url}\n" https://lumio.land
+curl -sS -o /dev/null -w "%{http_code} -> %{redirect_url}\n" https://www.lumio.land
+curl -sS -o /dev/null -w "math: %{http_code}\n" -L https://math.lumio.land   # must stay 200
+```
+
+### Auth on a new domain (do this for every app you add)
+
+`src/auth.js` builds the magic-link return address from wherever the user is:
+`emailRedirectTo: window.location.origin + import.meta.env.BASE_URL`. So a new
+domain needs **two** Supabase changes or logins silently land on the old host:
+
+1. **Authentication → URL Configuration → Redirect URLs** — add
+   `https://<app>.lumio.land/**` (the `/**` matters). **Keep the old URL** while
+   both copies are live.
+2. **Site URL** → the new domain. This is the fallback when a redirect isn't
+   allowlisted, and it's the reason a login *begun* on the new domain can bounce
+   back to the old one.
+
+Ground truth is the auth log, not the browser: Supabase → Logs → Auth, and check
+the `referer` field on `/otp` and `/verify`. Or via the supabase MCP,
+`get_logs(service:'auth')`.
+
+> ⚠️ **The built-in SMTP is rate-limited** (`429 over_email_send_rate_limit`
+> after a handful of sends in an hour). A burst of "send me the key" taps will
+> lock you out for a while — that's the throttle, not a broken config. It is also
+> a real argument for guest-first: the magic link must never be the front door
+> for a public app.
 
 ### Build config gotcha
 
@@ -93,7 +163,27 @@ parallel. Two live copies split traffic numbers and confuse search engines.
 Once `math.lumio.land` has been stable a while, retire the Pages workflow so
 there is one true home. Not urgent; do it as a deliberate step.
 
-### 4. Later / when there's demand
+**⚠️ The hard prerequisite: every player must sign in on the new domain first.**
+Saves are localStorage-per-origin, so `math.lumio.land` is a blank slate for a
+browser that has only ever used the Pages URL — the gems come back only when the
+account signs in there and the cloud row loads. Nothing is lost either way, but
+retiring Pages before a player has moved leaves them staring at a dead bookmark.
+
+Status (2026-07-29): **Amy ✅ signed in on `math.lumio.land`** (verified in the
+auth log, cloud write at 22:15 UTC). **Ivy ❌ not yet** — her last cloud write
+came from `github.io` at 20:09. Her iPad is the bookmark that matters, so *she
+signs in on the new domain* is the gate on this whole item.
+
+### 4. iPad home-screen icon (small, needs an asset)
+
+`public/favicon.svg` covers browser tabs and bookmarks. The **home-screen** icon
+needs `apple-touch-icon` pointing at a **180×180 PNG** — iOS will not accept an
+SVG. Until it exists, "Add to Home Screen" on Ivy's iPad shows a *screenshot of
+the page* instead of the gem, and the iPad is how she actually plays. There is no
+SVG→PNG converter installed on Amy's machine, so this needs a 180×180 export from
+the design tool; wiring it up afterwards is one `<link>` tag.
+
+### 5. Later / when there's demand
 
 - Arcade landing page at `lumio.land` itself
 - `planner.lumio.land` for Ivy's Planner (same recipe as this doc)
