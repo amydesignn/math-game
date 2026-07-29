@@ -32,6 +32,8 @@ jobs:
       # (Finn's C1 spec: "CI fails if the generator drifts.")
       - run: npm test
       - run: npm run build
+        env:
+          DEPLOY_TARGET: pages
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
