@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import { Analytics } from '@vercel/analytics/react'
 import App from './App.jsx'
 import { initStore } from './store.js'
 import { localBackend, supabaseBackend } from './backend.js'
@@ -237,5 +238,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Oops>
       <Boot />
     </Oops>
+    {/* Cookieless, privacy-friendly traffic counting (no personal data, no
+      * consent banner needed) — the whole point of moving to a real domain. */}
+    <Analytics />
   </React.StrictMode>,
 )
