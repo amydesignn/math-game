@@ -9,21 +9,39 @@ import MathPopup, { SKINS } from './ui/MathPopup'
 import StationPopup from './ui/StationPopup'
 import LevelBar, { LevelUpPopup } from './ui/LevelBar'
 import ProgressPopup from './ui/ProgressPopup'
+import Door from './ui/Door'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { levelOf, pickLevelMessage } from './levels'
-import { stationFor, currentWindow } from './stations'
-import { getState, setMap, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
+import { stationFor, currentWindow, ensureStations } from './stations'
+import { getState, setMap, setPos, markPlayed, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache } from './auth'
-import { WORLD } from './config'
-import { MAPS, arrivalPoint, preloadMap } from './maps'
+import { WORLD, REFRESH } from './config'
+import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
 
 export default function App({ cloud = false }) {
   const [state] = useState(getState)
   const [moved, setMoved] = useState(false)
+
+  // ── The hub (Door) vs the world ──
+  // She lands on the Door every boot; Play / Resume enter a world, and the
+  // in-world Door button (top-right, by the minimap) returns here. Leaving is
+  // non-destructive — the world persists her map + spot on the way out.
+  const [view, setView] = useState('door') // 'door' | 'world'
+  const [played, setPlayed] = useState(state.played) // New→Guest signal for the hub
+  const [soundOn, setSoundState] = useState(state.soundOn) // lifted so hub + world toggles stay in sync
+
+  // Sound toggle shared by the hub header and the in-world speaker. `next`
+  // optional → plain flip; persists to the store and applies to the audio bus.
+  function toggleSound(next) {
+    const on = next ?? !soundOn
+    setSoundState(on)
+    setSoundOn(on)
+    setAudioEnabled(on)
+  }
 
   // ── Gems (uncapped since the beta cap retired 2026-07-18) ──
   const [gems, setGems] = useState(state.gems)
@@ -304,7 +322,10 @@ export default function App({ cloud = false }) {
   // 5-B: her record book counts as busy too — a congratulations card bursting
   // in over the quiet review screen would talk across it (and she can't earn a
   // level while reading, so the queue loses nothing by waiting).
-  const worldBusy = !!(math || station || farewellMap || placing || shopOpen || fading || meadow || progressOpen)
+  // The hub counts as busy too — a signed congratulations card is meant to be
+  // read in the quiet of the world, not layered over the Door on boot; the
+  // retroactive queue simply waits until she enters a world.
+  const worldBusy = view !== 'world' || !!(math || station || farewellMap || placing || shopOpen || fading || meadow || progressOpen)
   useEffect(() => {
     if (levelPopup || worldBusy || !levelQueue.length) return
     const [next, ...rest] = levelQueue
@@ -507,6 +528,74 @@ export default function App({ cloud = false }) {
     onPetReact() // own character emote-yes + pet dance — the local feedback
   }
 
+  // ── The Door hub seams (Play / Resume / back-to-Door) ──
+  // Same white-fade theatre as gate travel, but between the hub and a world.
+  function enterWorld(toId, at) {
+    if (travelling.current) return
+    travelling.current = true
+    setFading(true)
+    setTimeout(() => {
+      charPosRef.current.set(at[0], 0, at[1])
+      petPosRef.current.set(at[0] + 1.4, 0, at[1] + 1.4)
+      targetRef.current = null
+      setSpawn(at)
+      setMapId(toId)
+      setMap(toId) // persist the world she's in…
+      setPos(at[0], at[1]) // …and where Resume will drop her
+      markPlayed()
+      setPlayed(true)
+      setView('world')
+      setToast(MAPS[toId].name)
+      clearTimeout(toastTimer.current)
+      toastTimer.current = setTimeout(() => setToast(null), 2400)
+      setTimeout(() => {
+        setFading(false)
+        travelling.current = false
+      }, FADE_MS)
+    }, FADE_MS)
+  }
+
+  // Play → drop in the MIDDLE of the chosen world (a fresh entrance). The meadow
+  // card is "Coming soon" this release, so its id never reaches here.
+  function onPlay(id) {
+    if (id === 'meadow') return
+    enterWorld(id, [0, 0])
+  }
+
+  // Resume → her last world, at her saved spot (nudged clear of any gate).
+  function onResume() {
+    const persisted = getState().map
+    const home = MAPS[persisted] && !MAPS[persisted].together ? persisted : 'clearing'
+    enterWorld(home, resumePoint(MAPS[home], getState().pos))
+  }
+
+  // Back to the hub — remember exactly where she stood so Resume returns her here.
+  function goToDoor() {
+    if (travelling.current) return
+    travelling.current = true
+    if (mapId !== 'meadow') setPos(charPosRef.current.x, charPosRef.current.z)
+    setFading(true)
+    setTimeout(() => {
+      setView('door')
+      setTimeout(() => {
+        setFading(false)
+        travelling.current = false
+      }, FADE_MS)
+    }, FADE_MS)
+  }
+
+  // The hub's "Today's quest" strip — the first uncompleted station in today's
+  // real plan (or null → the strip hides itself; no invented quest). Computed
+  // only while the Door is showing.
+  function todaysQuest() {
+    const byMap = ensureStations()
+    const entry = Object.entries(byMap).find(([, s]) => !s.completed)
+    if (!entry) return null
+    const period = REFRESH.periodHours * 3600_000
+    const hrs = Math.max(1, Math.ceil(((currentWindow() + 1) * period - Date.now()) / 3600_000))
+    return { worldName: MAPS[entry[0]].name, gems: entry[1].bonus, hrs }
+  }
+
   function travel(toId) {
     if (travelling.current) return false // caller may retry next frame
     travelling.current = true
@@ -521,6 +610,7 @@ export default function App({ cloud = false }) {
       setSpawn(at)
       setMapId(toId)
       setMap(toId) // persist — she resumes in the map she left
+      setPos(at[0], at[1]) // and where Resume drops her if she closes here
       setToast(MAPS[toId].name)
       clearTimeout(toastTimer.current)
       toastTimer.current = setTimeout(() => setToast(null), 2400)
@@ -531,6 +621,25 @@ export default function App({ cloud = false }) {
     }, FADE_MS)
     return true
   }
+
+  // Remember her spot if she closes the app mid-walk (never hitting the Door
+  // button) — so Resume still returns her where she was. Local write is
+  // synchronous; the cloud catches up on the next interaction. Never the meadow
+  // (its position doesn't persist).
+  useEffect(() => {
+    const savePos = () => {
+      if (view === 'world' && mapId !== 'meadow' && !MAPS[mapId]?.together) {
+        setPos(charPosRef.current.x, charPosRef.current.z)
+      }
+    }
+    const onHidden = () => document.visibilityState === 'hidden' && savePos()
+    window.addEventListener('pagehide', savePos)
+    document.addEventListener('visibilitychange', onHidden)
+    return () => {
+      window.removeEventListener('pagehide', savePos)
+      document.removeEventListener('visibilitychange', onHidden)
+    }
+  }, [view, mapId])
 
   // Preload: current map's models right away, the other maps once things settle
   // (so walking into a gate never lands on a half-loaded world).
@@ -597,6 +706,11 @@ export default function App({ cloud = false }) {
     zoomRef.current = clampZoom(zoomRef.current * Math.exp(e.deltaY * 0.0015))
   }
 
+  // ── Derived for the hub ──
+  const mode = cloud ? 'account' : played ? 'guest' : 'new'
+  const name = cloud ? labelFor(sessionCache()?.email) : null
+  const quest = view === 'door' ? todaysQuest() : null
+
   return (
     <div
       style={{ position: 'fixed', inset: 0 }}
@@ -606,6 +720,22 @@ export default function App({ cloud = false }) {
       onPointerCancel={onPointerUp}
       onWheel={onWheel}
     >
+      {view === 'door' ? (
+        <Door
+          mode={mode}
+          name={name}
+          points={points}
+          gems={gems}
+          map={getState().map}
+          quest={quest}
+          meadowOpen={false}
+          sound={soundOn}
+          setSound={toggleSound}
+          onResume={onResume}
+          onPlay={onPlay}
+        />
+      ) : (
+      <>
       <Canvas
         shadows={false}
         dpr={[1, 2]}
@@ -651,7 +781,7 @@ export default function App({ cloud = false }) {
 
       {/* ── HUD ── */}
       <GemCounter count={gems} innerRef={hudGemRef} />
-      <SpeakerButton />
+      <SpeakerButton on={soundOn} onToggle={() => toggleSound()} />
       <div
         style={{
           position: 'absolute',
@@ -662,6 +792,11 @@ export default function App({ cloud = false }) {
         <LevelBar points={points} onLevelUp={onLevelUp} onOpen={() => setProgressOpen(true)} />
       </div>
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
+      {/* leave the world, back to the hub — grouped under the minimap (top-right),
+          out of the iPad thumb-zone. Leaving is non-destructive (map + spot saved). */}
+      {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
+        <DoorButton onTap={goToDoor} />
+      )}
       {!moved && !meadow && <MoveHint />}
       {toast && <MapToast name={toast} />}
       {note && <NoteToast text={note} />}
@@ -673,8 +808,10 @@ export default function App({ cloud = false }) {
 
       {/* ── Phase B: the Together Space HUD ── */}
       {/* home: one quiet button, no status, no badge — the agreement to play
-          together happens in the living room, not in the app */}
-      {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
+          together happens in the living room, not in the app. Account only:
+          the meadow needs a realtime session a guest doesn't have, and it's
+          "Coming soon" on the hub until Account launches publicly. */}
+      {cloud && !placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
         <TogetherButton onTap={enterMeadow} />
       )}
       {meadow && (
@@ -767,7 +904,10 @@ export default function App({ cloud = false }) {
         />
       )}
 
-      {/* gate-travel fade (also swallows taps mid-travel) */}
+      </>
+      )}
+
+      {/* gate-travel fade (also swallows taps mid-travel) — over both hub + world */}
       <div
         style={{
           position: 'absolute',
@@ -842,6 +982,33 @@ function HomeButton({ onTap }) {
       }}
     >
       🏡
+    </button>
+  )
+}
+
+/** 🚪 — leave the world, back to the Choose-your-world hub. Sits under the
+ *  minimap (top-right), out of the thumb-zone; leaving saves her map + spot. */
+function DoorButton({ onTap }) {
+  return (
+    <button
+      aria-label="Back to world select"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={onTap}
+      style={{
+        position: 'absolute',
+        top: 'calc(max(16px, env(safe-area-inset-top)) + 104px + 12px)', // under the 104px minimap
+        right: 16,
+        width: 44,
+        height: 44,
+        borderRadius: 999,
+        border: 'none',
+        background: '#ffffff',
+        boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
+        fontSize: 20,
+        cursor: 'pointer',
+      }}
+    >
+      🚪
     </button>
   )
 }
@@ -937,18 +1104,12 @@ function GemCounter({ count, innerRef }) {
   )
 }
 
-function SpeakerButton() {
-  const [on, setOn] = useState(getState().soundOn)
+function SpeakerButton({ on, onToggle }) {
   return (
     <button
       aria-label={on ? 'Sound on' : 'Sound off'}
       onPointerDown={(e) => e.stopPropagation()} // a speaker tap is not a walk/pinch
-      onClick={() => {
-        const next = !on
-        setOn(next)
-        setSoundOn(next) // persist
-        setAudioEnabled(next) // apply
-      }}
+      onClick={onToggle}
       style={{
         position: 'absolute',
         top: 'max(64px, calc(env(safe-area-inset-top) + 48px))',

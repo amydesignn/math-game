@@ -281,6 +281,24 @@ export function arrivalPoint(map, fromId) {
   return [x * (1 - pull), z * (1 - pull)]
 }
 
+/** Where to drop her on Resume: her saved spot, eased clear of any gate so she
+ *  doesn't instantly trigger travel back out. `pos` is a place she legally stood
+ *  (always in-bounds); if it happens to sit inside a gate's trigger radius (she
+ *  closed the app right at a gate edge), ease toward the centre — always safe
+ *  and in-bounds — until clear. No saved spot yet → the centre. */
+export function resumePoint(map, pos) {
+  if (!pos) return [0, 0]
+  let { x, z } = pos
+  const nearGate = map.gates.some((g) => Math.hypot(x - g.position[0], z - g.position[2]) < 2.4)
+  if (nearGate) {
+    const len = Math.hypot(x, z) || 1
+    const pull = Math.min(1, 3 / len) // up to 3 units inward — clears the 1.7 gate trigger with margin
+    x *= 1 - pull
+    z *= 1 - pull
+  }
+  return [x, z]
+}
+
 /** Preload every model a map uses (called for the current map at startup,
  *  and lazily for the rest so travel never pops in raw). */
 export function preloadMap(map) {

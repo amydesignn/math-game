@@ -45,6 +45,66 @@ canvas { touch-action: none; display: block; }
   100% { opacity: .85; transform: translate(-50%, -50%) scale(1.06); }
 }
 
+/* ── Door hub (Oscar's math-door comp, lifted) ── */
+/* the app is position:fixed/overflow:hidden, so the hub is its own scroll
+   container (world grid scrolls, left identity column stays pinned). */
+.doorScreen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(180deg, #f6f3fd 0%, #eee9f8 100%);
+  color: #262626;
+}
+.doorHdr {
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(74, 54, 110, 0.07), 0 3px 14px rgba(74, 54, 110, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.doorHdrIn {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: max(12px, env(safe-area-inset-top)) max(26px, env(safe-area-inset-right)) 12px max(26px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.doorWrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 26px max(26px, env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom)) max(26px, env(safe-area-inset-left));
+}
+.doorGrid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 26px;
+  align-items: start;
+}
+.doorLeft {
+  position: sticky;
+  top: 84px;
+  align-self: start;
+}
+.doorWorlds {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (min-width: 1000px) {
+  .doorWorlds { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 860px) {
+  .doorGrid { grid-template-columns: 1fr; }
+  .doorLeft { position: static; top: auto; }
+}
+@keyframes doorPop {
+  0% { transform: scale(0.96) translateY(8px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
 /* gem counter pop — replays via key={count} remount on each collect */
 @keyframes gempop {
   0% { transform: scale(1); }

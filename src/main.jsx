@@ -8,14 +8,18 @@ import { getSessionOnce, onAuthChange, sendMagicLink } from './auth.js'
 import './index.css'
 
 /*
- * Backend choice (Phase A2, docs/accounts-boot-gate.md): production is the
- * hard sign-in wall — exactly two accounts, cloud sync is the whole point
- * (DECIDED: no guest mode; the one-line flip lives on the SignIn screen if
- * that ever changes). Dev stays on the local backend so pane QA and offline
- * hacking need no session — `?cloud` in the URL exercises the real flow.
+ * Backend choice (public release scope, Amy 2026-07-31): the public gets the
+ * hub straight away — New + Guest, localStorage only, no sign-in wall. Account
+ * is opt-in via `?account` (the two family accounts today; it rolls out to new
+ * users later, at which point the sign-in becomes a visible affordance). The
+ * account code is fully intact — this is a promotion switch, not a removal.
+ *   guest   → default: local backend, no wall, lands on the Door.
+ *   account → `?account` (or `?cloud` for dev): the Supabase sign-in wall.
+ * Guest never touches the cloud, so the two family cloud saves stay untouched;
+ * signing in via ?account reconciles local vs cloud by the monotonic ledger.
  */
-const CLOUD =
-  import.meta.env.PROD || new URLSearchParams(window.location.search).has('cloud')
+const params = new URLSearchParams(window.location.search)
+const CLOUD = params.has('account') || params.has('cloud')
 
 /*
  * The boot gate: <App> mounts only after initStore() settles, so every

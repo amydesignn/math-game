@@ -21,6 +21,17 @@ function freshState() {
     character: 'character-female-a', // Ivy's avatar (chosen later in a picker)
     pet: 'animal-cat', // her companion
     map: 'clearing', // which map she's in (walks through gates to change it)
+    // The Door hub's New→Guest signal. `played` flips true the first time she
+    // enters ANY world from the hub — that's the honest line between "nothing to
+    // continue yet" (New: no stats, no Resume) and "has a world to come back to"
+    // (Guest). A fresh save has map:'clearing' by default, so "has a map" can
+    // never mean "has played" — this flag is what makes Resume truthful.
+    played: false,
+    // Her last standing spot in `map`, so the Door's Resume drops her exactly
+    // where she left off (Play drops at the map's centre instead). Always paired
+    // with `map`: every write that changes the map also writes pos, so it can
+    // never be stale relative to the map it belongs to. { x, z } | null.
+    pos: null,
     gems: 0, // spendable balance — uncapped since the beta cap retired (2026-07-18)
     // lifetimeGems = every gem ever EARNED (never decremented by spending). It
     // is the ledger the gem economy's badges read, and — the Cozy Closet lesson
@@ -260,6 +271,12 @@ function migrate(parsed) {
   // she already spent. Reconstruct that floor so no past earnings are lost.
   if (!merged.lifetimeGems) merged.lifetimeGems = (merged.gems || 0) + spent
 
+  // A save from before the `played` field: any earnings or things she owns mean
+  // she has clearly played, so the Door shows Guest (with Resume), not New.
+  if (!merged.played && ((merged.lifetimeGems || 0) > 0 || (merged.owned || []).length || (merged.world || []).length)) {
+    merged.played = true
+  }
+
   // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
   // While the 15-gem beta cap was live, a correct answer over the cap paid
   // NOTHING — Ivy solved 6 problems, was told she was right, and got zero.
@@ -306,6 +323,23 @@ export function setPet(id) {
 
 export function setMap(id) {
   state.map = id
+  save()
+}
+
+/** She has entered a world at least once — the Door hub reads this to graduate
+ *  her from New to Guest. Idempotent (only the first flip writes). */
+export function markPlayed() {
+  if (!state.played) {
+    state.played = true
+    save()
+  }
+}
+
+/** Remember where she's standing in the current map, so the Door's Resume
+ *  returns her here. Written wherever `map` changes (Play, gate travel) and at
+ *  every exit point (Home button, pagehide) — kept in lockstep with `map`. */
+export function setPos(x, z) {
+  state.pos = { x: Math.round(x * 100) / 100, z: Math.round(z * 100) / 100 }
   save()
 }
 
