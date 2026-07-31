@@ -293,6 +293,56 @@ Closed by moving presence from PER-TAB keys to PER-IDENTITY (the account uid):
   transport is per-tab identity by design. Pane-verified: meadow join path boots
   + renders with zero console errors.
 
+## The Math Door (hub) ✅ SHIPPED 2026-07-31 — the world-select landing screen
+Oscar's `~/Downloads/delivery — math door/math-door-flow.html` lifted into
+`src/ui/Door.jsx`, drawn to my `docs/door-data-contract.md`. It's now the screen
+she lands on every boot: identity + progress left, "Choose your world" right.
+Flow: boot → Door → Play/Resume → world → 🚪 (top-right, under the minimap) →
+back to Door. Verified LIVE on math.lumio.land.
+- **One number, one origin:** the Door reads `lifetimeGems` through the SAME
+  `levelState`/`fmtPoints` as the in-game bar (`src/levels.js`) — no invented XP.
+- **Scope (Amy, public launch):** New + Guest only. **Account is parked behind
+  `?account`** — `main.jsx` no longer forces the sign-in wall in prod (guest =
+  default `local` backend, no wall). The Supabase account path is fully intact,
+  reachable at `math.lumio.land/?account` (the two family accounts). Guest never
+  touches the cloud, so the family saves are untouched. When Account launches
+  publicly it's a promotion switch (open signups + surface a Sign-in), not a
+  rebuild.
+- **New→Guest signal = `store.played`** (new field). A fresh save has
+  `map:'clearing'` by default, so "has a map" can't mean "has played" — `played`
+  flips true on first world entry (`markPlayed`), and `migrate()` seeds it true
+  for any existing save with earnings/owned/placed things.
+- **Resume position = `store.pos`** (new field). Play drops her at map CENTRE
+  (`enterWorld(id,[0,0])`); Resume returns her to her exact spot. `setPos` writes
+  on world exit + `pagehide`; `resumePoint()` (maps.js) eases the spot clear of
+  any gate so Resume can't instantly re-travel. `pagehide` order caveat: the
+  store's own flush registers first, so the CLOUD copy of `pos` can lag one
+  session (local is always correct) — fine, pos is a convenience field, not the
+  ledger.
+- **Meadow card = visible "Coming soon"** for everyone — the hook that sells
+  accounts later. The in-world 💞 Together button is now gated behind `cloud`
+  (account only) — a guest has no realtime session, so a guest tap would error.
+  Dev meadow QA still uses `window.__enterMeadow` (unchanged), not the button.
+- **Hero stage = `src/ui/HeroStage.jsx`:** a live R3F render of the default
+  character + cat — **ONE build for everyone, not per-account** (Amy) — same
+  models/lighting/scale as the world, idle + the cat's bob + a slow sway.
+  Transparent canvas over the card's lavender gradient; blob shadows ground it.
+  Only ever one canvas alive (Door XOR world), so no dual-canvas cost.
+- **World-card art = real in-game captures** in `public/worlds/{id}.jpg` (Amy
+  shot them from the built maps at a larger scale; ~20–25KB each via `sips -Z
+  900 -s formatOptions 82`). Each world's `gateColor` is the load-time fallback
+  behind the photo. Swappable if Oscar ever does polished art.
+- **`worldBusy` now includes `view !== 'world'`** so retroactive level-up
+  congratulations wait until she's IN a world, never layering over the hub.
+- **Door CSS** (`index.css`, `.door*`) is its own scroll container (the app is
+  `position:fixed/overflow:hidden`), sticky left column ≥860px, 3-up worlds
+  ≥1000px, single-column scroll on iPad-portrait. Verified at 768 + desktop.
+- **Tests:** `src/__tests__/door.test.js` (9) — `resumePoint` gate-nudge,
+  `markPlayed` idempotency, `setPos` rounding, `migrate` played-seeding. 118 green.
+- ⚠️ **Not verifiable without Amy's inbox:** the Account *state* (real name in
+  greeting, in-world Together) needs a live magic-link session — same caveat as
+  Phase A2/B. The `?account` wall itself is verified.
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).
