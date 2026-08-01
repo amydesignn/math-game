@@ -17,7 +17,13 @@ outside land renders muted so "the end of the map" is visible in-world), plus
 — `.github/workflows/deploy.yml` no longer builds the app, it publishes a
 redirect to math.lumio.land (canonical + noindex + carries query/hash). Vercel
 Web Analytics is now fully on (package + dashboard toggle, 2026-08-01). Original
-Pages launch was 2026-07-16; that history follows. Note: localStorage saves are
+Pages launch was 2026-07-16; that history follows. **Public brand = "Lumio Math"**
+(family-agreed 2026-08-01; "Ivy's Math World" retired — the `<title>` is now Lumio
+Math). SEO/social basics shipped for the IG push: `index.html` has title +
+description + Open Graph + Twitter card, `public/og.jpg` (1200x630 door crop) is
+the share-preview image, plus `public/robots.txt` + `public/sitemap.xml`. Open:
+Google Search Console submission (Amy, low-priority — fresh-domain indexing is
+slow; IG is the driver). Note: localStorage saves are
 per-browser-per-device, so Amy playing on her own Mac gets her own world
 automatically; shared iPad = shared save until the Supabase account layer.
 
