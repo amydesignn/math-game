@@ -343,6 +343,34 @@ back to Door. Verified LIVE on math.lumio.land.
   greeting, in-world Together) needs a live magic-link session — same caveat as
   Phase A2/B. The `?account` wall itself is verified.
 
+## HUD — two zones ✅ SHIPPED 2026-07-31 (Amy's pre-publish pass)
+The in-world HUD was four scattered corners; kids read two clean zones better,
+so it's now **top-left = actions, top-right = stats/location** (`src/App.jsx`).
+- **TOP-LEFT column** (auto-collapses hidden members): a labelled **`‹ Exit`**
+  pill (arrow + the word — clearest "leave" for a child; = the old 🚪, back to
+  the Door), **💞 together** (account-only, gating unchanged), **🛍️ shop**.
+  The old bottom-left/bottom-right placements are gone.
+- **TOP-RIGHT row**: the level bar and the gem counter are now **ONE pill**
+  (`Level · track · lifetime points · hairline · 💎 wallet`) — mirrors the Door
+  card so a player never sees the two stats in two places. **Speaker + a
+  ProfileChip** sit beside it. The **gem's flying-award target moved onto the
+  pill** (`LevelBar` takes `gems` + `gemRef`; App passes `hudGemRef`).
+- **Minimap keeps its corner** (Amy) and the **map NAME now stands permanently
+  under it** (`MapLabel`) — the "you are here" the 2.4s arrival toast only
+  flashed. **Both kept on purpose:** the toast is arrival feedback, the label is
+  the standing signpost (Amy's framing).
+- **Reuse without drift:** `GemIcon` + `ProfileChip` were lifted out of
+  `Door.jsx` into a shared **`src/ui/hudkit.jsx`** that BOTH the Door and the HUD
+  import — one source, so hub and world can't render two different diamonds or
+  avatars (same move as `mathkit.jsx`). Door output is byte-for-byte unchanged.
+- **Kept deliberately:** the stat pill stays **tappable** (opens the 5-B
+  progress record — Amy confirmed it should, after a "wait, is it interactive?"
+  double-check). The **level-up theatre is untouched** — folding the gem in
+  doesn't trigger it (gems display, points animate). Guest shows no 💞.
+- Verified live on math.lumio.land (enter world, level-up card fires in the new
+  spot, Exit round-trips to the Door), lint + build clean, 118/118. Commit
+  `7a30365`.
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).
