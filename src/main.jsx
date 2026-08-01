@@ -19,7 +19,35 @@ import './index.css'
  * signing in via ?account reconciles local vs cloud by the monotonic ledger.
  */
 const params = new URLSearchParams(window.location.search)
-const CLOUD = params.has('account') || params.has('cloud')
+/*
+ * Account mode is entered by ?account (or ?cloud in dev) — but ALSO when a
+ * magic link is redeeming (its tokens ride in the URL hash) and when this
+ * device has signed in before. Without those two, the guest-first boot never
+ * constructs the auth client, so a magic link redeeming on the bare origin
+ * (emailRedirectTo carries no ?account) is silently dropped — the device
+ * "signs in" yet boots the empty guest world. That is exactly the bug Ivy hit
+ * 2026-08-01, and this restores auth.js's stated intent: "sign in once per
+ * device and never see a login screen again."
+ */
+const REDEEMING = window.location.hash.includes('access_token')
+const REMEMBERED = (() => {
+  try {
+    return localStorage.getItem('lumio.account') === '1'
+  } catch {
+    return false
+  }
+})()
+const CLOUD = params.has('account') || params.has('cloud') || REDEEMING || REMEMBERED
+
+// Mark this device as an account device (set ONLY on a confirmed session), so
+// future visits to the bare bookmark open straight into her cloud world.
+function rememberAccount() {
+  try {
+    localStorage.setItem('lumio.account', '1')
+  } catch {
+    /* private mode — nothing to persist */
+  }
+}
 
 /*
  * The boot gate: <App> mounts only after initStore() settles, so every
@@ -42,12 +70,19 @@ function Boot() {
     else
       getSessionOnce().then((session) => {
         if (!on) return
-        if (session) enter()
-        else {
+        if (session) {
+          rememberAccount()
+          enter()
+        } else {
           setPhase('signin')
           // Leave the SignIn screen the moment a magic link is redeemed —
           // including the redeem happening in this very tab (URL-hash tokens).
-          unsub = onAuthChange((s) => s && enter())
+          unsub = onAuthChange((s) => {
+            if (s) {
+              rememberAccount()
+              enter()
+            }
+          })
         }
       })
     return () => {

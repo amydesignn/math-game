@@ -78,8 +78,10 @@ export async function sendMagicLink(email) {
     email: email.trim(),
     options: {
       shouldCreateUser: false,
-      // Must match the dashboard's redirect allowlist exactly:
-      // the Pages URL in prod, http://localhost:5180 in dev.
+      // Must match the dashboard's redirect allowlist exactly: the bare origin
+      // (https://math.lumio.land/ in prod, http://localhost:5180 in dev). The
+      // redeem lands here WITHOUT ?account — main.jsx now detects the URL-hash
+      // tokens and boots account mode anyway, so the allowlist needs no change.
       emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,
     },
   })
