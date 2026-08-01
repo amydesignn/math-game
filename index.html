@@ -3,9 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <!-- Vite rewrites these against `base`, so they resolve on Vercel (/) AND Pages (/math-game/). -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Ivy's Math World</title>
+
+    <title>Lumio Math</title>
+    <meta
+      name="description"
+      content="Explore five worlds with your companion, solve math to earn gems, and spend them to build a world of your own."
+    />
+
+    <!-- Open Graph — the link-preview card on IG / messaging / social. og:image
+         MUST be an absolute URL; scrapers don't resolve relative paths. The
+         image (public/og.jpg) is a 1200x630 crop of the Lumio Math door. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Lumio Math" />
+    <meta property="og:title" content="Lumio Math" />
+    <meta
+      property="og:description"
+      content="Explore five worlds with your companion, solve math to earn gems, and spend them to build a world of your own."
+    />
+    <meta property="og:url" content="https://math.lumio.land/" />
+    <meta property="og:image" content="https://math.lumio.land/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Lumio Math — a character and cat beside a menu of five colorful worlds to explore."
+    />
+
+    <!-- Large-image card for X and other scrapers that read twitter:* tags. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Lumio Math" />
+    <meta
+      name="twitter:description"
+      content="Explore five worlds with your companion, solve math to earn gems, and spend them to build a world of your own."
+    />
+    <meta name="twitter:image" content="https://math.lumio.land/og.jpg" />
   </head>
   <body>
     <div id="root"></div>
