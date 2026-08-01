@@ -150,29 +150,48 @@ Phase A2 reasoning. **That decision was made when this was a family-only app.**
 Going public changes the premise, so the reversal is intentional, not a mistake.
 Keep the signed-in path fully intact — Ivy's own cloud save must not regress.
 
-### 2. Turn Analytics on in the dashboard
+### 2. Turn Analytics on in the dashboard — ✅ DONE 2026-08-01
 
-The package now ships in the bundle, but the project toggle still needs
-flipping: **Vercel → project `math-game` → Analytics → Enable**.
-(Both halves are required — package *and* toggle.)
+Amy flipped **Vercel → project `math-game` → Analytics → Enable**. The package
+(`@vercel/analytics`, `<Analytics/>` in `src/main.jsx`) was already live from
+2026-07-29, so both halves are now in place and data collects on the next
+visits. Note: the "Get Started" placeholder panel shows until Vercel receives
+its first event — it is NOT a sign anything is missing. Caveat: an ad/content
+blocker in your OWN browser can block the beacon, so your own visit may not
+register (real visitors without blockers still count); test in a private window
+for a clean self-check.
 
-### 3. Retire the GitHub Pages copy
+### 3. Retire the GitHub Pages copy — ✅ DONE 2026-08-01 (as a redirect)
 
-`amydesignn.github.io/math-game/` is **still live and still auto-deploying** in
-parallel. Two live copies split traffic numbers and confuse search engines.
-Once `math.lumio.land` has been stable a while, retire the Pages workflow so
-there is one true home. Not urgent; do it as a deliberate step.
+`amydesignn.github.io/math-game/` was live and auto-deploying a SECOND copy of
+the game in parallel — splitting traffic numbers and confusing search. Retired
+2026-08-01 (commit `d76bdbd`): the Pages workflow (`.github/workflows/deploy.yml`)
+no longer builds the app — it now publishes a tiny **redirect** to
+`https://math.lumio.land/` (canonical tag + `robots noindex` so search
+consolidates; no-JS `<meta refresh>` fallback + JS `location.replace` that
+carries `?query`/`#hash`). Verified live: the old URL serves the redirect,
+`math.lumio.land` still serves the app. To FULLY un-publish instead (if ever
+wanted): repo Settings → Pages → disable.
 
-**⚠️ The hard prerequisite: every player must sign in on the new domain first.**
-Saves are localStorage-per-origin, so `math.lumio.land` is a blank slate for a
-browser that has only ever used the Pages URL — the gems come back only when the
-account signs in there and the cloud row loads. Nothing is lost either way, but
-retiring Pages before a player has moved leaves them staring at a dead bookmark.
+**Why redirect, not takedown:** the original worry below was a *dead bookmark*.
+A redirect eliminates that failure mode entirely — an old bookmark now bounces
+cleanly to the real home instead of 404ing.
 
-Status (2026-07-29): **Amy ✅ signed in on `math.lumio.land`** (verified in the
-auth log, cloud write at 22:15 UTC). **Ivy ❌ not yet** — her last cloud write
-came from `github.io` at 20:09. Her iPad is the bookmark that matters, so *she
-signs in on the new domain* is the gate on this whole item.
+**⚠️ RESIDUAL, still true — the save, not the bookmark (flag for Amy):** saves
+are localStorage-per-origin and the public app defaults to **guest** (account is
+behind `?account`). Ivy's real progress lives in her Supabase cloud row (written
+from `github.io`); the cloud is the source of truth, so **nothing is lost**. But
+until she signs in on the NEW domain, her old bookmark now lands her on a
+`math.lumio.land` **guest world (0 gems)**, not her real one. The one-time fix:
+open **`math.lumio.land/?account`** on Ivy's iPad and sign her in — the cloud row
+loads and her gems are there. This migration step is unchanged by the redirect;
+the redirect just made the pre-migration state "guest world" instead of "dead
+link."
+
+Sign-in status: **Amy ✅** on `math.lumio.land` (auth log, cloud write 2026-07-29
+22:15 UTC). **Ivy — confirm** (last recorded cloud write was from `github.io`;
+verify she's since signed in on the new domain, else do the `?account` step above
+on her iPad).
 
 ### 4. iPad home-screen icon (small, needs an asset)
 

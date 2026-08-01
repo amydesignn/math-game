@@ -11,10 +11,13 @@ outside land renders muted so "the end of the map" is visible in-world), plus
 **pinch-to-zoom** (iPad) / wheel (desktop). Zero console errors; `npm run build`
 + `oxlint` both clean.
 
-**🎉 LIVE since 2026-07-16: https://amydesignn.github.io/math-game/** — public
-repo `amydesignn/math-game`, auto-deploys on push to `main` via
-`.github/workflows/deploy.yml` (same rails as ivy-planner). Verified live:
-page + models 200, world renders, minimap tracks. Note: localStorage saves are
+**🌍 LIVE at https://math.lumio.land** (Vercel, auto-deployed from `main` — see
+`docs/lumio-land-deploy.md`). The old GitHub Pages URL
+`amydesignn.github.io/math-game/` was a second live copy; **retired 2026-08-01**
+— `.github/workflows/deploy.yml` no longer builds the app, it publishes a
+redirect to math.lumio.land (canonical + noindex + carries query/hash). Vercel
+Web Analytics is now fully on (package + dashboard toggle, 2026-08-01). Original
+Pages launch was 2026-07-16; that history follows. Note: localStorage saves are
 per-browser-per-device, so Amy playing on her own Mac gets her own world
 automatically; shared iPad = shared save until the Supabase account layer.
 
