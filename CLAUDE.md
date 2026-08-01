@@ -345,6 +345,21 @@ back to Door. Verified LIVE on math.lumio.land.
 - ⚠️ **Not verifiable without Amy's inbox:** the Account *state* (real name in
   greeting, in-world Together) needs a live magic-link session — same caveat as
   Phase A2/B. The `?account` wall itself is verified.
+- **🐞→✅ MAGIC-LINK REDEEM BUG — FIXED 2026-08-01 (commit `3cce96f`, live-confirmed by Ivy's sign-in).**
+  This "not verifiable without an inbox" caveat bit for real. The Door keyed
+  account mode on `?account` (`main.jsx`: `CLOUD = params.has('account')`), but
+  `emailRedirectTo` is the bare origin (`auth.js`, no `?account`) — so a
+  redeeming magic link lands in GUEST boot, which never constructs the Supabase
+  client, so `detectSessionInUrl` never fires and the login is silently dropped
+  (device "signs in" → empty guest world, 0 gems). Ivy was the first real
+  post-Door sign-in and hit it. **Fix (additive — public guests byte-identical):**
+  `CLOUD` now also true when a magic link is redeeming (`location.hash` has
+  `access_token`) OR the device signed in before (`localStorage 'lumio.account'`,
+  set only on a CONFIRMED session, via `rememberAccount()`). The remembered flag
+  restores auth.js's "sign in once per device, never see a login screen again,"
+  which the Door had broken. No Supabase redirect-allowlist change needed.
+  **Standing lesson: before the public Account launch, LIVE-test the redeem with
+  a real inbox** — the `?account` gate + bare-origin redirect is the trap.
 
 ## HUD — two zones ✅ SHIPPED 2026-07-31 (Amy's pre-publish pass)
 The in-world HUD was four scattered corners; kids read two clean zones better,
