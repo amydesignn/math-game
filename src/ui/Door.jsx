@@ -22,6 +22,7 @@
 
 import { levelState, fmtPoints } from '../levels'
 import HeroStage from './HeroStage'
+import { GemIcon, ProfileChip } from './hudkit'
 
 /* level math is imported from levels.js — the comp inlined a verbatim copy of it;
    in-app we read the real source so the two can never drift. */
@@ -61,23 +62,7 @@ const WORLDS = [
 const MEADOW = { id: 'meadow', name: 'The Meadow', blurb: 'Play together', tint: '#b48fe0' }
 
 /* ── icons (crafted, not emoji) ── */
-/* Gem — Amy's exact cut-diamond w/ white "+" (Math version 3.svg), tight viewBox */
-function GemIcon({ size = 24 }) {
-  return (
-    <svg width={size} height={size} viewBox="18 25.5 60 60" fill="none" aria-hidden="true">
-      <path d="M30 33H66L57 45H39L30 33Z" fill="#A5F3FC" />
-      <path d="M30 33L39 45H21L30 33Z" fill="#22D3EE" />
-      <path d="M66 33L57 45H75L66 33Z" fill="#22D3EE" />
-      <path d="M21 45H39L48 78L21 45Z" fill="#0E7490" />
-      <path d="M39 45H57L48 78L39 45Z" fill="#0891B2" />
-      <path d="M57 45H75L48 78L57 45Z" fill="#0E7490" />
-      <g opacity="0.92" fill="#fff">
-        <rect x="42" y="37.65" width="12" height="2.85" rx="1.425" />
-        <rect x="46.575" y="33" width="2.85" height="12" rx="1.425" />
-      </g>
-    </svg>
-  )
-}
+/* GemIcon + ProfileChip now live in hudkit.jsx (shared with the in-world HUD). */
 function Trophy({ size = 22 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -255,7 +240,6 @@ const hS = {
   word: { fontSize: 23, fontWeight: 600, color: T.iris, letterSpacing: '-.02em' },
   right: { display: 'flex', alignItems: 'center', gap: 10 },
   round: { width: 42, height: 42, borderRadius: '50%', background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 20 },
-  profile: { position: 'relative', width: 44, height: 44, borderRadius: '50%', overflow: 'hidden', boxShadow: '0 0 0 2px #fff, 0 0 0 3.5px ' + V.softLine, background: 'radial-gradient(120% 120% at 30% 25%, #EFE9FD, ' + V.main + ')', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 },
 }
 function Header({ sound, setSound }) {
   return (
@@ -265,7 +249,7 @@ function Header({ sound, setSound }) {
         <div style={hS.right}>
           <button style={hS.round} onClick={() => setSound(!sound)} title={sound ? 'Sound on' : 'Sound off'} aria-label="Toggle sound">{sound ? '🔈' : '🔇'}</button>
           {/* Profile — the affordance settings lives inside later; soft avatar for now */}
-          <span style={hS.profile} title="Profile" role="button" aria-label="Profile">🙂</span>
+          <ProfileChip />
         </div>
       </div>
     </header>

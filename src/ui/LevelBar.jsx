@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { T, LVL } from './mathkit'
+import { GemIcon } from './hudkit'
 import { levelState, fmtPoints, SIGNATURES } from '../levels'
 
 /*
@@ -18,11 +19,15 @@ import { levelState, fmtPoints, SIGNATURES } from '../levels'
 
 /* ============================== THE BAR ================================= */
 /* White house pill in the top-right HUD, left of the minimap.
-   "Level N" · track+fill · lifetime points. No icon by design (Amy) — the gem
-   pill owns iconography, this one is words. */
+   "Level N" · track+fill · lifetime points · gem wallet. The gem was its own
+   top-left counter until 2026-07-31 (Amy) — folded in here so the stats live in
+   ONE place, mirroring the Door card. The gem chip is the flying-gem target now
+   (App passes hudGemRef as gemRef), so a solved problem's gems land right on it. */
 
 const barStyles = {
   pill: { position: 'relative', display: 'flex', alignItems: 'center', gap: 10, background: T.surface, borderRadius: 999, padding: '0 16px', height: 44, boxShadow: '0 4px 14px rgba(43,32,90,0.16)', userSelect: 'none' },
+  div: { width: 1, height: 20, background: '#ECE7F5', flex: 'none' }, // hair rule between points and the gem wallet
+  gem: { display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 800, fontSize: 14, color: '#0E7490', flex: 'none' }, // teal = the gem wallet
   label: { display: 'flex', alignItems: 'baseline', gap: 4, fontWeight: 800, fontSize: 15, color: T.ink, whiteSpace: 'nowrap' },
   lvlWrap: { position: 'relative', display: 'inline-block', overflow: 'hidden', height: 20, minWidth: '2ch', textAlign: 'center' },
   track: { position: 'relative', width: 96, height: 12, borderRadius: 999, background: LVL.soft, overflow: 'hidden', flex: 'none' },
@@ -38,7 +43,7 @@ const barStyles = {
  * level-up theatre and only then calls onLevelUp — so the popup is pure
  * applause, arriving after the bar has already told the story.
  */
-export default function LevelBar({ points, onLevelUp, onOpen }) {
+export default function LevelBar({ points, gems, gemRef, onLevelUp, onOpen }) {
   const [shown, setShown] = useState(points) // the points the bar renders (lags during theatre)
   const [phase, setPhase] = useState('idle') // idle | surge | flip | regrow
   const [burst, setBurst] = useState(null)
@@ -139,6 +144,13 @@ export default function LevelBar({ points, onLevelUp, onOpen }) {
         {shine > 0 && <span key={shine} style={barStyles.shine} />}
       </span>
       <span key={points} style={{ ...barStyles.pts, animation: 'tickPop .4s ease-out 1' }}>{fmtPoints(points)}</span>
+      {gems != null && (
+        <>
+          <span style={barStyles.div} />
+          {/* the gem wallet — ref'd so solved-problem gems fly here (App's hudGemRef) */}
+          <span ref={gemRef} style={barStyles.gem}><GemIcon size={16} />{gems}</span>
+        </>
+      )}
       {floater && <span key={floater.key} style={barStyles.floater}>+{floater.n}</span>}
       {stars}
     </div>

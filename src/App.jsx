@@ -4,12 +4,12 @@ import * as THREE from 'three'
 import Scene from './world/Scene'
 import Minimap from './ui/Minimap'
 import Shop from './ui/Shop'
-import Gem from './ui/Gem'
 import MathPopup, { SKINS } from './ui/MathPopup'
 import StationPopup from './ui/StationPopup'
 import LevelBar, { LevelUpPopup } from './ui/LevelBar'
 import ProgressPopup from './ui/ProgressPopup'
 import Door from './ui/Door'
+import { ProfileChip } from './ui/hudkit'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
@@ -779,41 +779,44 @@ export default function App({ cloud = false }) {
         </Suspense>
       </Canvas>
 
-      {/* ── HUD ── */}
-      <GemCounter count={gems} innerRef={hudGemRef} />
-      <SpeakerButton on={soundOn} onToggle={() => toggleSound()} />
-      <div
-        style={{
-          position: 'absolute',
-          top: 'max(16px, env(safe-area-inset-top))',
-          right: 16 + 104 + 12, // left of the minimap (SIZE 104 + gutter)
-        }}
-      >
-        <LevelBar points={points} onLevelUp={onLevelUp} onOpen={() => setProgressOpen(true)} />
+      {/* ── HUD — two zones only (Amy 2026-07-31): top-left actions, top-right
+          stats. Easier for a kid than four scattered corners. ── */}
+
+      {/* TOP-LEFT: exit → the Door · play together · shop. A column, so hidden
+          members collapse cleanly (💞 is account-only; shop/exit hide during a
+          placement or a problem). Exit is a labelled pill — ‹ arrow + the word,
+          the clearest "leave" affordance for a child. */}
+      <div style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', left: 16, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-start' }}>
+        {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
+          <ExitButton onTap={goToDoor} />
+        )}
+        {/* Account only: the meadow needs a realtime session a guest doesn't have,
+            and it's "Coming soon" on the hub until Account launches publicly. */}
+        {cloud && !placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
+          <RoundHudButton aria="Play together in the meadow" emoji="💞" onTap={enterMeadow} />
+        )}
+        {!placing && !shopOpen && selectedId == null && !meadow && (
+          <RoundHudButton aria="Open the Gem Shop" emoji="🛍️" onTap={() => setShopOpen(true)} />
+        )}
+      </div>
+
+      {/* TOP-RIGHT: the stat (level + gem, one pill) · speaker · profile, sitting
+          just left of the minimap. The minimap keeps its corner (Amy), and the
+          map name stands right below it — the "you are here" that the arrival
+          toast used to say and then forget. */}
+      <div style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16 + 104 + 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <LevelBar points={points} gems={gems} gemRef={hudGemRef} onLevelUp={onLevelUp} onOpen={() => setProgressOpen(true)} />
+        <SpeakerButton on={soundOn} onToggle={() => toggleSound()} />
+        <ProfileChip />
       </div>
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
-      {/* leave the world, back to the hub — grouped under the minimap (top-right),
-          out of the iPad thumb-zone. Leaving is non-destructive (map + spot saved). */}
-      {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
-        <DoorButton onTap={goToDoor} />
-      )}
+      <MapLabel name={MAPS[mapId].name} />
+
       {!moved && !meadow && <MoveHint />}
       {toast && <MapToast name={toast} />}
       {note && <NoteToast text={note} />}
 
-      {/* ── Phase 3: shop + placement HUD ── */}
-      {!placing && !shopOpen && selectedId == null && !meadow && (
-        <ShopButton onOpen={() => setShopOpen(true)} />
-      )}
-
-      {/* ── Phase B: the Together Space HUD ── */}
-      {/* home: one quiet button, no status, no badge — the agreement to play
-          together happens in the living room, not in the app. Account only:
-          the meadow needs a realtime session a guest doesn't have, and it's
-          "Coming soon" on the hub until Account launches publicly. */}
-      {cloud && !placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
-        <TogetherButton onTap={enterMeadow} />
-      )}
+      {/* ── Phase B: the Together Space HUD (meadow only — leave via 🏡, emote) ── */}
       {meadow && (
         <>
           <HomeButton onTap={leaveMeadow} />
@@ -934,28 +937,69 @@ function withTimeout(promise, ms) {
   })
 }
 
-/** 💞 — the only Together surface in the solo game (bottom-left, quiet). */
-function TogetherButton({ onTap }) {
+/** ‹ arrow — the "back/exit" glyph on the Exit pill (Amy: keep it simple, an
+ *  arrow + the word). Left-pointing because Exit lives top-left and means
+ *  "back to the Door". currentColor so the pill controls the ink. */
+function BackArrow({ size = 18 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M13 5l-7 7 7 7" />
+      <path d="M6 12h13" />
+    </svg>
+  )
+}
+
+/** ‹ Exit — leave the world, back to the Choose-your-world Door. Top-left, the
+ *  universal "back" corner. Leaving is non-destructive (map + spot saved). */
+function ExitButton({ onTap }) {
   return (
     <button
-      aria-label="Play together in the meadow"
+      aria-label="Exit to the Door"
       onPointerDown={(e) => e.stopPropagation()}
       onClick={onTap}
       style={{
-        position: 'absolute',
-        bottom: 'max(20px, env(safe-area-inset-bottom))',
-        left: 16,
-        width: 54,
-        height: 54,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        height: 44,
+        padding: '0 16px 0 12px',
         borderRadius: 999,
         border: 'none',
         background: '#ffffff',
-        boxShadow: '0 4px 14px rgba(43,32,90,0.2)',
-        fontSize: 24,
+        boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
+        color: 'var(--brand-iris-900)',
+        fontWeight: 800,
+        fontSize: 15,
         cursor: 'pointer',
       }}
     >
-      💞
+      <BackArrow /> Exit
+    </button>
+  )
+}
+
+/** A white round icon chip — the shared shape for the top-left actions (💞 shop). */
+function RoundHudButton({ aria, emoji, onTap }) {
+  return (
+    <button
+      aria-label={aria}
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={onTap}
+      style={{
+        width: 50,
+        height: 50,
+        borderRadius: 999,
+        border: 'none',
+        background: '#ffffff',
+        boxShadow: '0 4px 14px rgba(43,32,90,0.18)',
+        fontSize: 23,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {emoji}
     </button>
   )
 }
@@ -986,30 +1030,38 @@ function HomeButton({ onTap }) {
   )
 }
 
-/** 🚪 — leave the world, back to the Choose-your-world hub. Sits under the
- *  minimap (top-right), out of the thumb-zone; leaving saves her map + spot. */
-function DoorButton({ onTap }) {
+/** The map's name, a STANDING label right under the minimap (Amy 2026-07-31) —
+ *  the persistent "you are here" the arrival toast only flashed for 2.4s.
+ *  Centred on the minimap, a quiet white chip that reads on any world colour. */
+function MapLabel({ name }) {
   return (
-    <button
-      aria-label="Back to world select"
-      onPointerDown={(e) => e.stopPropagation()}
-      onClick={onTap}
+    <div
       style={{
         position: 'absolute',
-        top: 'calc(max(16px, env(safe-area-inset-top)) + 104px + 12px)', // under the 104px minimap
+        top: 'calc(max(16px, env(safe-area-inset-top)) + 104px + 8px)', // under the 104px minimap
         right: 16,
-        width: 44,
-        height: 44,
-        borderRadius: 999,
-        border: 'none',
-        background: '#ffffff',
-        boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
-        fontSize: 20,
-        cursor: 'pointer',
+        width: 104, // = minimap width, so the chip centres on it
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none',
       }}
     >
-      🚪
-    </button>
+      <span
+        style={{
+          padding: '4px 12px',
+          background: 'rgba(255,255,255,0.94)',
+          color: 'var(--brand-iris-900)',
+          borderRadius: 999,
+          fontWeight: 700,
+          fontSize: 12.5,
+          letterSpacing: 0.1,
+          whiteSpace: 'nowrap',
+          boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
+        }}
+      >
+        {name}
+      </span>
+    </div>
   )
 }
 
@@ -1076,34 +1128,8 @@ function MapToast({ name }) {
   )
 }
 
-function GemCounter({ count, innerRef }) {
-  return (
-    <div
-      key={count} // remount on change → the pop animation replays
-      ref={innerRef}
-      style={{
-        position: 'absolute',
-        top: 'max(16px, env(safe-area-inset-top))',
-        left: 16,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        padding: '8px 14px 8px 10px',
-        background: '#ffffff',
-        borderRadius: 999,
-        boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
-        fontWeight: 700,
-        color: 'var(--brand-iris-900)',
-        fontSize: 18,
-        animation: count > 0 ? 'gempop 0.35s ease' : undefined,
-      }}
-    >
-      <Gem />
-      {count.toLocaleString()}
-    </div>
-  )
-}
-
+/** Speaker toggle — now a white chip in the top-right stat row (was top-left).
+ *  Positioned by its flex parent, so no absolute placement of its own. */
 function SpeakerButton({ on, onToggle }) {
   return (
     <button
@@ -1111,11 +1137,9 @@ function SpeakerButton({ on, onToggle }) {
       onPointerDown={(e) => e.stopPropagation()} // a speaker tap is not a walk/pinch
       onClick={onToggle}
       style={{
-        position: 'absolute',
-        top: 'max(64px, calc(env(safe-area-inset-top) + 48px))',
-        left: 16,
-        width: 42,
-        height: 42,
+        flex: 'none',
+        width: 44,
+        height: 44,
         borderRadius: 999,
         border: 'none',
         background: '#ffffff',
@@ -1123,35 +1147,12 @@ function SpeakerButton({ on, onToggle }) {
         fontSize: 19,
         cursor: 'pointer',
         opacity: on ? 1 : 0.72,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       {on ? '🔊' : '🔇'}
-    </button>
-  )
-}
-
-
-function ShopButton({ onOpen }) {
-  return (
-    <button
-      aria-label="Open the Gem Shop"
-      onPointerDown={(e) => e.stopPropagation()}
-      onClick={onOpen}
-      style={{
-        position: 'absolute',
-        bottom: 'max(20px, env(safe-area-inset-bottom))',
-        right: 16,
-        width: 54,
-        height: 54,
-        borderRadius: 999,
-        border: 'none',
-        background: '#ffffff',
-        boxShadow: '0 4px 14px rgba(43,32,90,0.2)',
-        fontSize: 24,
-        cursor: 'pointer',
-      }}
-    >
-      🛍️
     </button>
   )
 }
