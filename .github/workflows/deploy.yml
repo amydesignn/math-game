@@ -1,4 +1,14 @@
-name: Deploy to GitHub Pages
+name: Redirect old Pages site to math.lumio.land
+
+# Lumio Math's permanent home is https://math.lumio.land (hosted on Vercel,
+# auto-deployed from this same repo). This repo used to ALSO publish the app to
+# GitHub Pages at https://amydesignn.github.io/math-game/ — two live copies of
+# the same game split traffic, muddy analytics, and confuse search.
+#
+# Rather than take the old URL down (which would dead-link anyone who bookmarked
+# or shared it), this workflow now publishes a tiny REDIRECT to the real home.
+# The app itself is no longer built here — Vercel owns production. To fully
+# un-publish the Pages site instead, disable Pages in repo Settings → Pages.
 
 on:
   push:
@@ -18,22 +28,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          # 22+: supabase-js's realtime client needs native WebSocket if it is
-          # ever constructed under Node (the auth client is lazy, so tests
-          # don't — this is belt-and-braces, run 29703622528 was the lesson).
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      # The calibration set gates the deploy: if the generator drifts away from
-      # the levels in Ivy's real workbook, the build fails and nothing ships.
-      # (Finn's C1 spec: "CI fails if the generator drifts.")
-      - run: npm test
-      - run: npm run build
-        env:
-          DEPLOY_TARGET: pages
+      - name: Generate redirect site
+        run: |
+          mkdir -p dist
+          cat > dist/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Lumio Math has moved</title>
+            <!-- Tell search engines the canonical home is math.lumio.land so the
+                 two URLs consolidate instead of competing. noindex retires this
+                 copy from search results. -->
+            <link rel="canonical" href="https://math.lumio.land/">
+            <meta name="robots" content="noindex">
+            <!-- No-JS fallback: refresh after 0s. -->
+            <meta http-equiv="refresh" content="0; url=https://math.lumio.land/">
+            <!-- With JS: replace() so the old URL doesn't sit in history, and
+                 carry any ?query / #hash across to the new home. -->
+            <script>
+              location.replace("https://math.lumio.land/" + location.search + location.hash);
+            </script>
+            <style>
+              html,body{height:100%;margin:0}
+              body{display:flex;align-items:center;justify-content:center;
+                   font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+                   background:#efe9fb;color:#4b3f7a;text-align:center;padding:24px}
+              a{color:#5b4bdd;font-weight:600}
+            </style>
+          </head>
+          <body>
+            <p>Lumio Math has a new home.<br>
+               Taking you to <a href="https://math.lumio.land/">math.lumio.land</a>…</p>
+          </body>
+          </html>
+          HTML
+          # Same redirect for any deep path under /math-game/ (SPA had none, but
+          # this catches stale shared links to sub-paths just in case).
+          cp dist/index.html dist/404.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
