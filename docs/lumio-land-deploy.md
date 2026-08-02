@@ -161,37 +161,34 @@ blocker in your OWN browser can block the beacon, so your own visit may not
 register (real visitors without blockers still count); test in a private window
 for a clean self-check.
 
-### 3. Retire the GitHub Pages copy — ✅ DONE 2026-08-01 (as a redirect)
+### 3. Retire the GitHub Pages copy — ✅ FULLY REMOVED 2026-08-02
 
 `amydesignn.github.io/math-game/` was live and auto-deploying a SECOND copy of
-the game in parallel — splitting traffic numbers and confusing search. Retired
-2026-08-01 (commit `d76bdbd`): the Pages workflow (`.github/workflows/deploy.yml`)
-no longer builds the app — it now publishes a tiny **redirect** to
-`https://math.lumio.land/` (canonical tag + `robots noindex` so search
-consolidates; no-JS `<meta refresh>` fallback + JS `location.replace` that
-carries `?query`/`#hash`). Verified live: the old URL serves the redirect,
-`math.lumio.land` still serves the app. To FULLY un-publish instead (if ever
-wanted): repo Settings → Pages → disable.
+the game in parallel — splitting traffic numbers and confusing search. Two steps:
+- **2026-08-01 (commit `d76bdbd`) — retired to a redirect:** the Pages workflow
+  stopped building the app and published a tiny redirect to the real home instead
+  (canonical + `robots noindex`; no-JS `<meta refresh>` + JS `location.replace`
+  carrying `?query`/`#hash`), so no bookmark 404'd.
+- **2026-08-02 — removed outright:** Amy confirmed the github.io link was never
+  shared externally, so the redirect was no longer needed (and github.io referrals
+  were just analytics noise). Deleted `.github/workflows/deploy.yml` **and** the
+  Pages site itself (`gh api -X DELETE repos/amydesignn/math-game/pages`), and
+  cleaned the now-dead `DEPLOY_TARGET`/`/math-game/` base logic out of
+  `vite.config.js` (everything serves from root). **Vercel owns production; there
+  is no GitHub Pages deploy anymore, and the old URL now 404s** — acceptable, per
+  Amy's call.
 
-**Why redirect, not takedown:** the original worry below was a *dead bookmark*.
-A redirect eliminates that failure mode entirely — an old bookmark now bounces
-cleanly to the real home instead of 404ing.
+**⚠️ Consequence of the takedown (flag for Amy):** the github.io URL now **404s**
+(no redirect anymore). Amy confirmed it was never shared externally, so the only
+stale bookmark is **Ivy's iPad**, which pointed at github.io. Her cloud save is
+safe regardless — it lives in her Supabase row, not the bookmark. The fix is
+already scheduled: at Ivy's **2026-08-03 re-sign-in on `math.luxi.land`**, make the
+luxi link her new bookmark. Until then, if she taps the old github.io bookmark
+she'll get a 404 — use `math.luxi.land` (or `math.lumio.land`, which 308-redirects
+to luxi) instead.
 
-**⚠️ RESIDUAL, still true — the save, not the bookmark (flag for Amy):** saves
-are localStorage-per-origin and the public app defaults to **guest** (account is
-behind `?account`). Ivy's real progress lives in her Supabase cloud row (written
-from `github.io`); the cloud is the source of truth, so **nothing is lost**. But
-until she signs in on the NEW domain, her old bookmark now lands her on a
-`math.lumio.land` **guest world (0 gems)**, not her real one. The one-time fix:
-open **`math.lumio.land/?account`** on Ivy's iPad and sign her in — the cloud row
-loads and her gems are there. This migration step is unchanged by the redirect;
-the redirect just made the pre-migration state "guest world" instead of "dead
-link."
-
-Sign-in status: **Amy ✅** on `math.lumio.land` (auth log, cloud write 2026-07-29
-22:15 UTC). **Ivy — confirm** (last recorded cloud write was from `github.io`;
-verify she's since signed in on the new domain, else do the `?account` step above
-on her iPad).
+Sign-in status: **Amy ✅** on the live domain. **Ivy — 2026-08-03** re-sign-in on
+`math.luxi.land` (her cloud row is safe: 248 lifetime / 136 wallet / 4 owned).
 
 ### 4. iPad home-screen icon (small, needs an asset)
 

@@ -1,5 +1,5 @@
-// Asset registry + world tuning. Paths resolve against BASE_URL so the same code
-// works in dev ('/') and on GitHub Pages ('/math-game/').
+// Asset registry + world tuning. Paths resolve against BASE_URL, which is always
+// '/' now that everything serves from the root (Vercel, dev, preview).
 
 const B = import.meta.env.BASE_URL
 

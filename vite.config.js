@@ -1,13 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Base path depends on the deploy target:
-//   - GitHub Pages serves under /math-game/  → set DEPLOY_TARGET=pages (Pages workflow only)
-//   - Vercel (math.luxi.land) + dev + preview serve from the root → '/'
-const base = process.env.DEPLOY_TARGET === 'pages' ? '/math-game/' : '/'
-
+// Everything serves from the root: Vercel (math.luxi.land), dev, and preview.
+// (The GitHub Pages copy under /math-game/ was removed 2026-08-02.)
 export default defineConfig({
-  base,
+  base: '/',
   plugins: [react()],
   server: { port: 5180 },
 })

@@ -13,9 +13,11 @@ outside land renders muted so "the end of the map" is visible in-world), plus
 
 **🌍 LIVE at https://math.lumio.land** (Vercel, auto-deployed from `main` — see
 `docs/lumio-land-deploy.md`). The old GitHub Pages URL
-`amydesignn.github.io/math-game/` was a second live copy; **retired 2026-08-01**
-— `.github/workflows/deploy.yml` no longer builds the app, it publishes a
-redirect to math.lumio.land (canonical + noindex + carries query/hash). Vercel
+`amydesignn.github.io/math-game/` was a second live copy; **fully removed
+2026-08-02** — first retired to a redirect (2026-08-01, `d76bdbd`), then the Pages
+site + `.github/workflows/deploy.yml` were deleted outright once Amy confirmed the
+link was never shared externally (no dead-bookmark risk). Vercel owns production;
+there is no GitHub Pages deploy anymore (the old URL 404s). Vercel
 Web Analytics is now fully on (package + dashboard toggle, 2026-08-01). Original
 Pages launch was 2026-07-16; that history follows. **Public brand = "Luxi Math"**
 (family-agreed 2026-08-01 as "Lumio Math", then **RENAMED to "Luxi Math" the same
