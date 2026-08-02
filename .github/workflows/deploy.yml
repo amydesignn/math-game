@@ -1,6 +1,6 @@
-name: Redirect old Pages site to math.lumio.land
+name: Redirect old Pages site to math.luxi.land
 
-# Luxi Math's permanent home is https://math.lumio.land (hosted on Vercel,
+# Luxi Math's permanent home is https://math.luxi.land (hosted on Vercel,
 # auto-deployed from this same repo). This repo used to ALSO publish the app to
 # GitHub Pages at https://amydesignn.github.io/math-game/ — two live copies of
 # the same game split traffic, muddy analytics, and confuse search.
@@ -38,17 +38,17 @@ jobs:
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <title>Luxi Math has moved</title>
-            <!-- Tell search engines the canonical home is math.lumio.land so the
+            <!-- Tell search engines the canonical home is math.luxi.land so the
                  two URLs consolidate instead of competing. noindex retires this
                  copy from search results. -->
-            <link rel="canonical" href="https://math.lumio.land/">
+            <link rel="canonical" href="https://math.luxi.land/">
             <meta name="robots" content="noindex">
             <!-- No-JS fallback: refresh after 0s. -->
-            <meta http-equiv="refresh" content="0; url=https://math.lumio.land/">
+            <meta http-equiv="refresh" content="0; url=https://math.luxi.land/">
             <!-- With JS: replace() so the old URL doesn't sit in history, and
                  carry any ?query / #hash across to the new home. -->
             <script>
-              location.replace("https://math.lumio.land/" + location.search + location.hash);
+              location.replace("https://math.luxi.land/" + location.search + location.hash);
             </script>
             <style>
               html,body{height:100%;margin:0}
@@ -60,7 +60,7 @@ jobs:
           </head>
           <body>
             <p>Luxi Math has a new home.<br>
-               Taking you to <a href="https://math.lumio.land/">math.lumio.land</a>…</p>
+               Taking you to <a href="https://math.luxi.land/">math.luxi.land</a>…</p>
           </body>
           </html>
           HTML

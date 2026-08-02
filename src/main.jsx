@@ -32,7 +32,15 @@ const params = new URLSearchParams(window.location.search)
 const REDEEMING = window.location.hash.includes('access_token')
 const REMEMBERED = (() => {
   try {
-    return localStorage.getItem('lumio.account') === '1'
+    // 'luxi.account' is the key going forward. 'lumio.account' is read as a
+    // TRANSITIONAL fallback so a device already remembered on the old
+    // math.lumio.land origin stays signed in until the lumio.land → luxi.land
+    // redirect settles (no repeat of Ivy's guest-world drop). Safe to delete the
+    // lumio fallback in a later cleanup once the redirect has been live a while.
+    return (
+      localStorage.getItem('luxi.account') === '1' ||
+      localStorage.getItem('lumio.account') === '1'
+    )
   } catch {
     return false
   }
@@ -43,7 +51,7 @@ const CLOUD = params.has('account') || params.has('cloud') || REDEEMING || REMEM
 // future visits to the bare bookmark open straight into her cloud world.
 function rememberAccount() {
   try {
-    localStorage.setItem('lumio.account', '1')
+    localStorage.setItem('luxi.account', '1')
   } catch {
     /* private mode — nothing to persist */
   }

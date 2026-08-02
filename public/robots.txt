@@ -1,7 +1,7 @@
-# Luxi Math — https://math.lumio.land
+# Luxi Math — https://math.luxi.land
 # Everything is public and crawlable, including AI crawlers (GPTBot, ClaudeBot,
 # PerplexityBot, Google-Extended, etc.) — no rules block them.
 User-agent: *
 Allow: /
 
-Sitemap: https://math.lumio.land/sitemap.xml
+Sitemap: https://math.luxi.land/sitemap.xml
