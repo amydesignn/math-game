@@ -6,7 +6,7 @@
  * ONE build for everyone (Amy, 2026-07-31): this is always character-female-a +
  * animal-cat — the game's default avatar — not a per-account render. When a real
  * avatar picker lands, this reads the chosen ids; until then it's the one face of
- * Lumio Math. Models + animations are the SAME assets the world uses (already
+ * Luxi Math. Models + animations are the SAME assets the world uses (already
  * preloaded there), so it paints instantly and can never drift from in-game.
  */
 import { Suspense, useEffect, useMemo, useRef } from 'react'

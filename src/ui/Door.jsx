@@ -1,5 +1,5 @@
 /*
- * Door.jsx — the hub a player lands on before a world (Lumio Math).
+ * Door.jsx — the hub a player lands on before a world (Luxi Math).
  * Lifted 1:1 from Oscar's `math-door-flow.html` (delivery — math door, 2026-07-31),
  * drawn to Nathan's door-data-contract. Left = who they are + how far they've
  * climbed; right = Choose your world.
@@ -245,7 +245,7 @@ function Header({ sound, setSound }) {
   return (
     <header className="doorHdr">
       <div className="doorHdrIn">
-        <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Lumio Math</span></div>
+        <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Luxi Math</span></div>
         <div style={hS.right}>
           <button style={hS.round} onClick={() => setSound(!sound)} title={sound ? 'Sound on' : 'Sound off'} aria-label="Toggle sound">{sound ? '🔈' : '🔇'}</button>
           {/* Profile — the affordance settings lives inside later; soft avatar for now */}

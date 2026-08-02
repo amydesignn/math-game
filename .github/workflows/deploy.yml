@@ -1,6 +1,6 @@
 name: Redirect old Pages site to math.lumio.land
 
-# Lumio Math's permanent home is https://math.lumio.land (hosted on Vercel,
+# Luxi Math's permanent home is https://math.lumio.land (hosted on Vercel,
 # auto-deployed from this same repo). This repo used to ALSO publish the app to
 # GitHub Pages at https://amydesignn.github.io/math-game/ — two live copies of
 # the same game split traffic, muddy analytics, and confuse search.
@@ -37,7 +37,7 @@ jobs:
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>Lumio Math has moved</title>
+            <title>Luxi Math has moved</title>
             <!-- Tell search engines the canonical home is math.lumio.land so the
                  two URLs consolidate instead of competing. noindex retires this
                  copy from search results. -->
@@ -59,7 +59,7 @@ jobs:
             </style>
           </head>
           <body>
-            <p>Lumio Math has a new home.<br>
+            <p>Luxi Math has a new home.<br>
                Taking you to <a href="https://math.lumio.land/">math.lumio.land</a>…</p>
           </body>
           </html>
