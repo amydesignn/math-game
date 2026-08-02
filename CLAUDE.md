@@ -17,13 +17,23 @@ outside land renders muted so "the end of the map" is visible in-world), plus
 — `.github/workflows/deploy.yml` no longer builds the app, it publishes a
 redirect to math.lumio.land (canonical + noindex + carries query/hash). Vercel
 Web Analytics is now fully on (package + dashboard toggle, 2026-08-01). Original
-Pages launch was 2026-07-16; that history follows. **Public brand = "Lumio Math"**
-(family-agreed 2026-08-01; "Ivy's Math World" retired — the `<title>` is now Lumio
-Math). SEO/social basics shipped for the IG push: `index.html` has title +
-description + Open Graph + Twitter card, `public/og.jpg` (1200x630 door crop) is
-the share-preview image, plus `public/robots.txt` + `public/sitemap.xml`. Open:
-Google Search Console submission (Amy, low-priority — fresh-domain indexing is
-slow; IG is the driver). Note: localStorage saves are
+Pages launch was 2026-07-16; that history follows. **Public brand = "Luxi Math"**
+(family-agreed 2026-08-01 as "Lumio Math", then **RENAMED to "Luxi Math" the same
+day** — Amy + Finn found "Lumio" is trademarked, caught before the IG push. The
+`<title>`, the Door wordmark, all OG/Twitter meta, the redirect page copy, and
+`public/og.jpg` are now Luxi Math; commit `99c8652`, live-verified. **"Ivy's Math
+World" stays retired.** ⚠️ **The DOMAIN `lumio.land` / `math.lumio.land` deliberately
+did NOT change** — Amy's call to keep it for now; a domain migration is a separate,
+staged decision. The internal localStorage key `'lumio.account'` also stays as-is
+(invisible; renaming it would make signed-in devices forget they signed in, re-breaking
+the `3cce96f` magic-link fix). So "lumio" surviving in the domain + that key is
+intentional, not a missed rename.) SEO/social basics shipped for the IG push:
+`index.html` has title + description + Open Graph + Twitter card, `public/og.jpg`
+(1200x630 door crop, re-made from the renamed door) is the share-preview image, plus
+`public/robots.txt` + `public/sitemap.xml`. Open:
+Google Search Console — after the rename, **re-request indexing** so the result
+title refreshes (property is the unchanged domain). Fresh-domain indexing is
+slow; IG is the driver. Note: localStorage saves are
 per-browser-per-device, so Amy playing on her own Mac gets her own world
 automatically; shared iPad = shared save until the Supabase account layer.
 
