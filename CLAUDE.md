@@ -22,18 +22,24 @@ Pages launch was 2026-07-16; that history follows. **Public brand = "Luxi Math"*
 day** — Amy + Finn found "Lumio" is trademarked, caught before the IG push. The
 `<title>`, the Door wordmark, all OG/Twitter meta, the redirect page copy, and
 `public/og.jpg` are now Luxi Math; commit `99c8652`, live-verified. **"Ivy's Math
-World" stays retired.** ⚠️ **The DOMAIN `lumio.land` / `math.lumio.land` deliberately
-did NOT change** — Amy's call to keep it for now; a domain migration is a separate,
-staged decision. The internal localStorage key `'lumio.account'` also stays as-is
-(invisible; renaming it would make signed-in devices forget they signed in, re-breaking
-the `3cce96f` magic-link fix). So "lumio" surviving in the domain + that key is
-intentional, not a missed rename.) SEO/social basics shipped for the IG push:
+World" stays retired.** ✅ **The DOMAIN migrated too, 2026-08-02: `math.luxi.land`
+is now the canonical home** (Vercel — added the subdomain, Cloudflare CNAME `math` →
+`92baac53b29db479.vercel-dns-017.com` grey-cloud/DNS-only, cert issued; merged
+`59ae137` so OG/canonical/sitemap/robots + the Pages-redirect target all point to
+luxi — verified live). **`math.lumio.land` is KEPT as a 301/308 redirect to
+`math.luxi.land`** (not dropped — old bookmarks/shares still resolve). The
+remembered-device key was renamed `'lumio.account'` → `'luxi.account'`; `main.jsx`
+reads BOTH transitionally so no signed-in device dropped during cutover (safe to
+delete the lumio fallback in a later cleanup). ⚠️ **Everyone re-signs-in ONCE on the
+new origin** (localStorage is per-origin; cloud saves are account-keyed → safe,
+nothing lost). **Supabase redirect allowlist must include `https://math.luxi.land/**`**
+or magic-link sign-in on the new origin breaks (same family as `3cce96f`).) SEO/social basics shipped for the IG push:
 `index.html` has title + description + Open Graph + Twitter card, `public/og.jpg`
 (1200x630 door crop, re-made from the renamed door) is the share-preview image, plus
 `public/robots.txt` + `public/sitemap.xml`. Open:
-Google Search Console — after the rename, **re-request indexing** so the result
-title refreshes (property is the unchanged domain). Fresh-domain indexing is
-slow; IG is the driver. Note: localStorage saves are
+Google Search Console — the domain changed, so add a **NEW property for
+`luxi.land`** (verify + submit `math.luxi.land`). Fresh-domain indexing is slow;
+IG is the driver. Note: localStorage saves are
 per-browser-per-device, so Amy playing on her own Mac gets her own world
 automatically; shared iPad = shared save until the Supabase account layer.
 
