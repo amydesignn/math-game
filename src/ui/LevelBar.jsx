@@ -116,6 +116,7 @@ export default function LevelBar({ points, gems, gemRef, onLevelUp, onOpen }) {
       onKeyDown={onOpen ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen() } } : undefined}
       role={onOpen ? 'button' : undefined}
       tabIndex={onOpen ? 0 : undefined}
+      className="lvlbar-pill"
       style={{ ...barStyles.pill,
         cursor: tappable ? 'pointer' : 'default',
         // No icon by design (Amy) — it's words plus press feedback, discovered
@@ -139,14 +140,14 @@ export default function LevelBar({ points, gems, gemRef, onLevelUp, onOpen }) {
           )}
         </span>
       </span>
-      <span style={barStyles.track}>
+      <span className="lvlbar-track" style={barStyles.track}>
         <span style={{ ...barStyles.fill, width: pct + '%', animation: near ? 'nearShimmer 1.6s ease-in-out infinite' : 'none' }} />
         {shine > 0 && <span key={shine} style={barStyles.shine} />}
       </span>
-      <span key={points} style={{ ...barStyles.pts, animation: 'tickPop .4s ease-out 1' }}>{fmtPoints(points)}</span>
+      <span className="lvlbar-pts" key={points} style={{ ...barStyles.pts, animation: 'tickPop .4s ease-out 1' }}>{fmtPoints(points)}</span>
       {gems != null && (
         <>
-          <span style={barStyles.div} />
+          <span className="lvlbar-div" style={barStyles.div} />
           {/* the gem wallet — ref'd so solved-problem gems fly here (App's hudGemRef) */}
           <span ref={gemRef} style={barStyles.gem}><GemIcon size={16} />{gems}</span>
         </>

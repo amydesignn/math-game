@@ -9,7 +9,6 @@ import StationPopup from './ui/StationPopup'
 import LevelBar, { LevelUpPopup } from './ui/LevelBar'
 import ProgressPopup from './ui/ProgressPopup'
 import Door from './ui/Door'
-import { ProfileChip } from './ui/hudkit'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
@@ -782,10 +781,12 @@ export default function App({ cloud = false }) {
       {/* ── HUD — two zones only (Amy 2026-07-31): top-left actions, top-right
           stats. Easier for a kid than four scattered corners. ── */}
 
-      {/* TOP-LEFT: exit → the Door · play together · shop. A column, so hidden
-          members collapse cleanly (💞 is account-only; shop/exit hide during a
-          placement or a problem). Exit is a labelled pill — ‹ arrow + the word,
-          the clearest "leave" affordance for a child. */}
+      {/* TOP-LEFT: exit → the Door · play together · shop · speaker. A column, so
+          hidden members collapse cleanly (💞 is account-only; shop/exit hide
+          during a placement or a problem). Exit is a labelled pill — ‹ arrow +
+          the word, the clearest "leave" affordance for a child. The speaker
+          lives here (was in the right stat row) — utility, out of the stats
+          zone; it folds into a single gear menu here in a later pass (Amy). */}
       <div style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', left: 16, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-start' }}>
         {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
           <ExitButton onTap={goToDoor} />
@@ -798,16 +799,20 @@ export default function App({ cloud = false }) {
         {!placing && !shopOpen && selectedId == null && !meadow && (
           <RoundHudButton aria="Open the Gem Shop" emoji="🛍️" onTap={() => setShopOpen(true)} />
         )}
+        {!placing && !shopOpen && selectedId == null && !meadow && (
+          <SpeakerButton on={soundOn} onToggle={() => toggleSound()} />
+        )}
       </div>
 
-      {/* TOP-RIGHT: the stat (level + gem, one pill) · speaker · profile, sitting
-          just left of the minimap. The minimap keeps its corner (Amy), and the
-          map name stands right below it — the "you are here" that the arrival
-          toast used to say and then forget. */}
+      {/* TOP-RIGHT: the stat pill (level + gem, one pill), sitting just left of
+          the minimap. It's the ONLY thing in the stats zone now — speaker moved
+          to the left utility column, and the profile chip is gone from the world
+          (Amy: a world stays clean, profile lives on the Door). On phones the
+          pill compacts to "Level · 💎" (the track/points fold away, still one
+          tap from the record). The minimap keeps its corner and the map name
+          stands right below it — the standing "you are here". */}
       <div style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16 + 104 + 12, display: 'flex', alignItems: 'center', gap: 8 }}>
         <LevelBar points={points} gems={gems} gemRef={hudGemRef} onLevelUp={onLevelUp} onOpen={() => setProgressOpen(true)} />
-        <SpeakerButton on={soundOn} onToggle={() => toggleSound()} />
-        <ProfileChip />
       </div>
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
       <MapLabel name={MAPS[mapId].name} />
@@ -1128,8 +1133,9 @@ function MapToast({ name }) {
   )
 }
 
-/** Speaker toggle — now a white chip in the top-right stat row (was top-left).
- *  Positioned by its flex parent, so no absolute placement of its own. */
+/** Speaker toggle — a white chip in the top-left utility column, matching the
+ *  💞/🛍️ RoundHudButton shape (50px). Positioned by its flex-column parent, so
+ *  no absolute placement of its own. Folds into a single gear menu here later. */
 function SpeakerButton({ on, onToggle }) {
   return (
     <button
@@ -1138,13 +1144,13 @@ function SpeakerButton({ on, onToggle }) {
       onClick={onToggle}
       style={{
         flex: 'none',
-        width: 44,
-        height: 44,
+        width: 50,
+        height: 50,
         borderRadius: 999,
         border: 'none',
         background: '#ffffff',
-        boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
-        fontSize: 19,
+        boxShadow: '0 4px 14px rgba(43,32,90,0.18)',
+        fontSize: 23,
         cursor: 'pointer',
         opacity: on ? 1 : 0.72,
         display: 'flex',

@@ -97,12 +97,33 @@ canvas { touch-action: none; display: block; }
   .doorWorlds { grid-template-columns: repeat(3, 1fr); }
 }
 @media (max-width: 860px) {
-  .doorGrid { grid-template-columns: 1fr; }
+  /* minmax(0,1fr), not plain 1fr: a bare 1fr track keeps its implicit
+     min-width:auto (= min-content), and the left column's widest unbreakable
+     content (the quest line, the level rows) measured ~356px > the 338px track,
+     so the track grew and the whole column bled ~18px to the RIGHT — 26px pad
+     on the left, only ~8px on the right. minmax(0,…) lets the track shrink to
+     its container so the padding stays even and the quest line ellipsizes in
+     bounds as designed. */
+  .doorGrid { grid-template-columns: minmax(0, 1fr); }
   .doorLeft { position: static; top: auto; }
 }
 @keyframes doorPop {
   0% { transform: scale(0.96) translateY(8px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* ── In-world stat pill: compact on phones ──
+   On iPad the top-right row (level bar + minimap) fits; on a phone the full
+   pill (Level · track · points · │ · 💎) is ~289px and, anchored left of the
+   minimap, ran right off the left edge. Below 600px we fold the progress track,
+   the points number and the hairline away, leaving "Level N  💎 gems" — the
+   glance stats — with the full record still one tap away (the pill stays
+   tappable). !important is required because barStyles.pill sets padding/gap
+   inline; the hidden spans set no `display` inline, so display:none alone wins
+   for them. 600px clears every phone-portrait and sits well below iPad (768). */
+@media (max-width: 600px) {
+  .lvlbar-track, .lvlbar-pts, .lvlbar-div { display: none; }
+  .lvlbar-pill { padding: 0 13px !important; gap: 8px !important; }
 }
 
 /* gem counter pop — replays via key={count} remount on each collect */
