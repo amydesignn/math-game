@@ -413,6 +413,42 @@ so it's now **top-left = actions, top-right = stats/location** (`src/App.jsx`).
   spot, Exit round-trips to the Door), lint + build clean, 118/118. Commit
   `7a30365`.
 
+### Mobile layout pass ✅ SHIPPED 2026-08-04 (Amy caught two phone-only bugs)
+Both were fine on iPad, broken on phones (math.luxi.land, portrait). Commit
+`ff35919`, live-verified on luxi (Door margins even; in-world compact pill fully
+on-screen, speaker top-left, no profile chip; `__award` stripped in prod).
+- **Door was off-centre.** The single-column media query (`≤860px`) used
+  `grid-template-columns: 1fr`. A bare `1fr` keeps its implicit `min-width:auto`
+  (= min-content); the left column's widest unbreakable content (the quest line
+  / level rows) measured ~356px > the 338px track, so the track grew and the
+  whole column bled ~18px RIGHT → 26px pad left, ~8px right. Fix: `minmax(0,1fr)`
+  so the track can't exceed its container. **Lesson: any single-column grid here
+  wants `minmax(0,…)`, never bare `1fr`.**
+- **In-world stat pill clipped off the LEFT edge.** The top-right row (level bar
+  + speaker + profile) is ~393px and, anchored left of the minimap
+  (`right: 16+104+12`), only had ~258px on a phone → pill started at x≈−135,
+  losing "Level" + the progress track. Fix (Amy's "compact + relocate" call):
+  · **pill compacts below 600px** to `Level N · 💎 gems` — track/points/hairline
+    fold via `@media` on `.lvlbar-track/.lvlbar-pts/.lvlbar-div` (`display:none`
+    needs no `!important` — those spans set no inline `display`; the pill's
+    padding/gap DO need `!important` since `barStyles.pill` sets them inline).
+    Still tappable → the full record is one tap deeper. iPad (≥600) unchanged.
+  · **speaker moved** from the right stat row into the top-left utility column
+    (resized 44→50 to match the 💞/🛍️ RoundHudButton).
+  · **profile chip removed from the world entirely** (it lives on the Door only
+    now — Amy's read from Minefun: a world stays clean). `ProfileChip` import
+    dropped from App.jsx; still used by Door.jsx.
+- **Two zones now:** left = `‹ Exit / 🛍️ / 🔊`, right = compact stat pill +
+  minimap. **NEXT (parked, Amy): fold speaker + settings into a single ⚙️ gear**
+  in the left column — waits for Amy's full menu-tidy plan so it ships in one
+  clean move. End-state she named: **stats bar · cart · gear**.
+- Edge accepted: at the 360px extreme the pill sits 4px from Exit (no overlap);
+  every iPhone 375+ and iPad has room, and this is iPad-first.
+- ⚠️ **Test flake seen this session:** stations' "across many rebuilds" and
+  store-boot's async race fixtures FAIL under heavy CPU load (build + dev server
+  + pane running) — a 14s run failed 3, an unloaded 1.6s re-run was 118/118.
+  They're timing-sensitive, not broken. Re-run alone before trusting a red.
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).
