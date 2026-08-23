@@ -331,28 +331,33 @@ export function MultiColumnMath({ snap }) {
   )
 }
 
-/* ---- numeric keypad (touch-friendly, no OS keyboard needed) ---- */
-export function Keypad({ onKey }) {
+/* ---- numeric keypad (touch-friendly, no OS keyboard needed) ----
+ * `okDisabled` greys out the Check key (division uses it — Check waits until both
+ * the quotient AND remainder fields have a value). Additive + defaulted, so the
+ * single-answer screens (× / +) that never pass it render byte-identical. */
+export function Keypad({ onKey, okDisabled = false }) {
   const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'del', '0', 'ok']
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10, width: '100%', maxWidth: 320, margin: '0 auto' }}>
       {keys.map((k) => (
-        <KeypadKey key={k} k={k} isOk={k === 'ok'} isDel={k === 'del'} onKey={onKey} />
+        <KeypadKey key={k} k={k} isOk={k === 'ok'} isDel={k === 'del'} onKey={onKey} disabled={k === 'ok' && okDisabled} />
       ))}
     </div>
   )
 }
-function KeypadKey({ k, isOk, isDel, onKey }) {
+function KeypadKey({ k, isOk, isDel, onKey, disabled = false }) {
   const [down, setDown] = useState(false)
-  const base = { height: 58, borderRadius: 14, border: 'none', fontWeight: 700, fontSize: 22, cursor: 'pointer',
+  const base = { height: 58, borderRadius: 14, border: 'none', fontWeight: 700, fontSize: 22, cursor: disabled ? 'default' : 'pointer',
     fontVariantNumeric: 'tabular-nums', transition: 'transform .06s, box-shadow .06s' }
   let sty
-  if (isOk) sty = { ...base, background: T.blue, color: '#fff', boxShadow: down ? `0 1px 0 ${T.blueDarker}` : `0 4px 0 ${T.blueDarker}`, fontSize: 16 }
+  if (isOk && disabled) sty = { ...base, background: '#EDEBF2', color: '#b5aec4', boxShadow: '0 4px 0 #dcd8e4', fontSize: 16 } // Oscar's disabled Check
+  else if (isOk) sty = { ...base, background: T.blue, color: '#fff', boxShadow: down ? `0 1px 0 ${T.blueDarker}` : `0 4px 0 ${T.blueDarker}`, fontSize: 16 }
   else if (isDel) sty = { ...base, background: '#fff', color: T.ink3, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
   else sty = { ...base, background: '#fff', color: T.ink, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
   return (
-    <button onPointerDown={() => setDown(true)} onPointerUp={() => setDown(false)} onPointerLeave={() => setDown(false)}
-      onClick={() => onKey(k)} style={{ ...sty, transform: down ? 'translateY(3px)' : 'none' }}
+    <button onPointerDown={() => !disabled && setDown(true)} onPointerUp={() => setDown(false)} onPointerLeave={() => setDown(false)}
+      onClick={() => !disabled && onKey(k)} disabled={disabled}
+      style={{ ...sty, transform: down && !disabled ? 'translateY(3px)' : 'none' }}
       aria-label={isDel ? 'delete' : isOk ? 'check' : k}>
       {isDel ? '⌫' : isOk ? 'Check' : k}
     </button>

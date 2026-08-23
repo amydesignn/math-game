@@ -52,7 +52,10 @@ export const TOPIC_META = {
   /* ── The curriculum roadmap. These render the moment their topics exist and
      have counts; until then they're invisible (a kid needs no backlog). Adding
      C2 = give `division` its topic id here — the fixture will insist on it. */
-  division: { label: 'Division', icon: '÷', topics: [], stages: 3 }, // C2
+  // C2 long division — FLAT by Finn's spec (topLevel 1, phases are release bands
+  // not rungs), so ONE total, no Warm-up/Challenge/Expert list. `stages` must
+  // stay 1 to match `long-div`'s topLevel (fixture 3 enforces it).
+  division: { label: 'Division', icon: '÷', topics: ['long-div'], stages: 1 },
   fractions: { label: 'Fractions', icon: '½', topics: [], stages: 3 }, // C3
   decimals: { label: 'Decimals', icon: '.5', topics: [], stages: 3 }, // C4
 }

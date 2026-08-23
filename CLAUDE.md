@@ -101,6 +101,125 @@ to earn gems; gems buy assets she places to build a small world.
   being taken — interleave screenshots as the frame pump, and never diagnose
   "the character is frozen" from JS polls alone.
 
+## C2 — Long division ✅ SHIPPED 2026-08-23 (Track 1 recovery + Track 2 ask & generator — LIVE on math.luxi.land)
+**The whole topic is now live** (see the "Track 2" block at the end of this
+section for the ask screen, the generator, the rotation, and the standard-long-
+division fix). What follows first is how Track 1 — the recovery walkthrough —
+was built.
+
+Oscar's C2 comp `~/Downloads/Luxi Math design_handoff_division_worked_example/`
+("Let's share the candy" — long division as fair sharing, canonical 815 ÷ 4 =
+203 R3 with the celebrated *sneaky zero*), lifted 1:1. His handoff is explicit:
+this is the **teaching walkthrough the wrong-answer layer recovers into**, NOT the
+solve/input. Built ahead of Ivy's return to school (division first).
+- **`buildDivisionStages(a,b)` (math.js)** — his `build()` ported VERBATIM (the
+  captions ARE the teaching). Pure/framework-free → unit-testable. Emits a list
+  of `snap` view-states (the bracket notation, a DIFFERENT model than the rows
+  grid — long division's representation genuinely differs). Four-move spine per
+  digit DIVIDE→MULTIPLY→SUBTRACT→BRING_DOWN + a final seal; returns
+  `{stages,a,b,n,q,work,remainder,quotientNum}`.
+- **`src/ui/DivisionWalkthrough.jsx`** — his `_diagram()` + two-phase flow
+  (Intro: name dividend/divisor/quotient with the candy metaphor · Work: step the
+  algorithm with the moving Sharing-Table spotlight, dashed→solid Answer Box,
+  "keeps the line!" sneaky-zero tag, confetti seal). Class→function-component;
+  Props (seams): `problem{a,b}`, `showMathTerms`, `autoAdvanceMs`, `onDone`.
+- **Adaptations (all commented at their site):** keyframes namespaced **`dv*`** in
+  index.css — his comp redefined `popIn` and `cellPop` with DIFFERENT curves than
+  the ones MathPopup/ColumnMath use (overwriting either would silently retune
+  them; same lesson as `lvlPopIn`); completion `window` event → the `onDone`
+  callback seam; his `uploads/*.png` → staged+optimized `public/worked/{candies,
+  friend}.png` (644K/424K → 56K/36K via sips). **No bugs found in his comp** this
+  time (traced the state through — unlike the level-bar lift).
+- **Integration (Amy's calls, 2026-08-22):** (1) **wrong-answer recovery**,
+  mirroring multiplication — MathPopup's `recover` phase renders the walkthrough
+  when `problem.op === '÷'` (else the inline `WorkedExample`); it teaches
+  `problem.similar || problem` then `onDone`=`backToAsk` (try hers again). (2)
+  **intro shows every time** (the component's default). (3) **worked-example
+  FIRST** — the `long-div` generator + ask + rotation were **Track 2**, now
+  SHIPPED 2026-08-23 (see the Track-2 block below; Finn's spec landed, and there
+  is no 2-digit workbook set to photograph — Ivy's book goes straight to 3-digit,
+  which becomes the Phase-2 calibration set).
+- **`OPSYM['÷']` added; `solve()` still does NOT handle '÷'** on purpose — a
+  division answer is quotient+remainder, checked as `q===quotient && r===remainder`
+  in `DivisionAsk` (Track 2), never via solve().
+- **[Track-2 update] ÷ problems are now generated + in the rotation, so this whole
+  path is live.** App `onResult` keeps its `TOPICS[p.type]?.topLevel` guard (belt
+  and braces; `long-div` is registered now).
+- **Verified** (zero console errors): the standalone walkthrough via the dev
+  harness **`/?divdemo`** (`&ex=85` for 85÷4 = 21 R1) — intro → work → sneaky zero
+  → sealed 203 R3 → "I got it!" fires onDone; AND in the real MathPopup shell via
+  **`window.__divRecover(a,b)`** (dev hook: opens a ÷ problem; type any wrong
+  answer → the walkthrough opens under the banner; ✕ dismisses cleanly). Both are
+  DEV-only (DCE'd from prod). **11 new tests** (`division-worked.test.js`: maths +
+  sneaky-zero detection + Oscar's captions verbatim) → **129 total green.**
+- **The two Track-1 open items are now RESOLVED (2026-08-23):** the skin banner is
+  HIDDEN on the walkthrough (Amy's call — the banner belongs on the calculation
+  screen; the walkthrough shows a floating ✕ instead); Oscar's "01" sneaky-zero
+  copy STAYS (Amy: "Ivy follows that model").
+
+### C2 Track 2 ✅ SHIPPED 2026-08-23 — the ask screen, the generator, and a REAL BUG fixed
+The rest of C2: how Ivy is *asked* division and how the problems are *generated*.
+
+- **🐞→✅ THE "03" BUG — found + fixed (the big one).** `buildDivisionStages` walked
+  the dividend digit-by-digit and wrote a quotient digit for EVERY position, so a
+  first-digit-<-divisor problem (≈ a third of Phase 1: `15÷4`, `23÷5`, …) rendered
+  a **leading zero** — `15 ÷ 4` showed **"03"** and mis-celebrated a sneaky zero.
+  Track 1 only ever tested `8xx÷4`, which hid it. **Fix = standard long division:**
+  `divideSteps(a,b)` finds the smallest leading group ≥ b (`startCol`), absorbs the
+  leading digits into it (no leading zero), and emits ONE step per quotient digit
+  aligned to a dividend COLUMN. Interior/trailing zeros (`815÷4=203`, `90÷9=10`)
+  stay the real sneaky zeros. `buildDivisionStages` + `renderDiagram` were both
+  reworked off the step model (round↔column decoupled). **Oscar should know his
+  comp had this gap** (it renders correctly now; the shipped diagram is the fix).
+  New intro beat for the absorbed case: *"4 can't share just 1, so we look at the
+  first 2 digits together — 15."* Locked by `division-worked.test.js` (sabotage-
+  proven: reintroducing the leading zero fails 5 fixtures).
+- **The generator (`long-div` in `math.js`), Finn's C2 Phase-1 spec:** 2-digit
+  dividend (10–99), 1-digit divisor 2–9 (never ÷1), ~50/50 remainder (the tuning
+  knob is `wantRem` at 0.5). `topLevel:1` — **FLAT band, no in-topic ladder**;
+  the phases are RELEASE bands via `DIV_PHASE` (Amy flips 1→2 by hand; no mastery
+  gate, per Finn). Carries `{quotient, remainder, sneakyZero, grade, gems, similar}`.
+  **`similar`** matches difficulty anatomy (same has-remainder + sneaky-zero) so the
+  walkthrough teaches the right shape.
+- **Payout = `divGems(sneakyZero, phase)` (exported, one source):** Phase 1 flat 1 ·
+  Phase 2 standard 2, sneaky-zero 3 (Finn — the sneaky zero is Ivy's "results go
+  underground" slip). **⚠️ `generateStation` no longer does `p.gems = p.level`** —
+  that line was redundant for multiplication and would FLATTEN division's Phase-2
+  bump; never reintroduce it (a test guards it).
+- **Grade tags** on every topic (Finn's grade-tagging note): `long-mult` G5,
+  `long-div` phase-level (P1 G5 / P2 G6 via `DIV_GRADE`), confidence pool G4. The
+  future grade selector reads these; `topicMeta.js` `division` card = `stages:1`
+  (flat), CI-enforced against `long-div`'s `topLevel`.
+- **The ask screen (`DivisionAsk` in `MathPopup.jsx`) — Oscar's comp
+  `~/Downloads/design_handoff_division_ask_screen/`, on the REAL shared atoms.** A
+  division answer is TWO numbers, so `op==='÷'` swaps the single-entry AskState for
+  a two-field `a ÷ b = [q] R [r]`. Correctness = `Number(q)===quotient &&
+  Number(r)===remainder` (solve() never touches ÷). Decisions baked in: **R always
+  present** (type `R 0` on a clean share); **Check lives in the keypad**, disabled
+  until both fields are filled (additive `okDisabled` on the shared `KeypadKey` —
+  multiplication byte-identical); **NO digit-count auto-advance** (it'd leak the
+  quotient length — the R label lights once the quotient has a digit, focus jumps
+  only at the 3-digit cap); **remainder-only first miss → one gentle nudge** ("The
+  share is right! Now look again at what's left over"), keeps her share, refocuses
+  R; **second miss / wrong quotient → the walkthrough**; **"Show me how" opens the
+  walkthrough with NO wrong answer recorded**.
+- **Amy's calls (2026-08-23):** NO berry accent — the banner keeps the skin's mint
+  accent (the 4-colours-per-op idea is parked; the walkthrough keeps its own
+  internal candy-bag pink, untouched). Scenario copy = the existing station
+  `skin.ask` (unchanged — don't rewrite the skins). Record every submit (a
+  remainder-only miss counts incorrect, same as multiplication). Close 40px, keypad
+  left at 58/14 → logged to the inconsistency backlog, not refactored mid-scope.
+- **LIVE ROTATION:** `nextProblem` + `generateStation` now serve `long-div` as a
+  second frontier topic — **35% long-mult / 35% long-div / 30% confidence**
+  (FINN-SPEC, one-line tune). Division is her new school focus; multiplication
+  stays in the mix for spaced retention.
+- **Verified LIVE in the pane** (zero console errors): correct answer (`15÷4=3 R3`)
+  → +1 gem; the leading-zero walkthrough (shows `3`, not `03`); a trailing sneaky
+  zero (`80÷8=10`); the remainder-only nudge → correct → paid; banner hidden on the
+  walkthrough. Dev hooks: `window.__divAsk(a,b)` (specific shape) / `__divAsk()`
+  (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
+  walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
+
 ## Phase 5-A ✅ SHIPPED 2026-07-18 — the level bar + signed congratulations
 Oscar's `~/Downloads/math-level-bar-flow.html` lifted into `src/ui/LevelBar.jsx`
 (bar + popup) + `src/levels.js` (ladder maths + message packs). Decisions were

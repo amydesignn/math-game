@@ -19,7 +19,11 @@
 
 import { getState, setTopicLevel } from './store'
 
-export const OPSYM = { '+': '+', '×': '×', '-': '−' }
+export const OPSYM = { '+': '+', '×': '×', '-': '−', '÷': '÷' }
+// NOTE: solve() intentionally does NOT handle '÷' — a division answer is a
+// quotient + remainder, not one number. The division ask compares the typed
+// quotient AND remainder against `problem.quotient` / `problem.remainder`
+// directly (see MathPopup's ÷ branch), so it never routes through solve().
 export const solve = (op, a, b) => (op === '+' ? a + b : op === '×' ? a * b : a - b)
 
 const rand = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1))
@@ -73,6 +77,52 @@ export function levelOfLongMult(a, b) {
   return (p1Carries ? 1 : 0) + (p2Carries ? 1 : 0) + 1
 }
 
+/* ── long division (C2) — Finn's C2 spec + grade-tagging note ───────────
+ * Divisor 2–9 (dividing by 1 is trivial). Dividend by RELEASE PHASE, which Amy
+ * flips by hand when Ivy is ready — no mastery gate yet (Finn). The phase IS a
+ * grade band in disguise (Finn's grade note): P1 = Grade 5, P2 = Grade 6.
+ * Phase 3 (mixed 2-/3-digit) waits until Phase 2 settles — add here when it does.
+ */
+export const DIV_PHASE = 1 // 1 = 2-digit dividend (G5) · 2 = 3-digit (G6)
+const DIV_DIVIDEND = { 1: [10, 99], 2: [100, 999] }
+const DIV_GRADE = { 1: 5, 2: 6 }
+
+/** Finn's C2 payout: Phase 1 flat 1 gem · Phase 2 standard 2, sneaky-zero 3.
+ *  Exported + phase-parameterised so BOTH phases' rules are unit-tested now,
+ *  before Phase 2 is ever flipped on — and so the payout lives in ONE place the
+ *  station loop can't accidentally flatten (the `p.gems = p.level` trap). */
+export function divGems(sneakyZero, phase = DIV_PHASE) {
+  return phase === 1 ? 1 : sneakyZero ? 3 : 2
+}
+
+/**
+ * Quotient, remainder, and the SNEAKY-ZERO flag = a 0 in a NON-leading place of
+ * the quotient (203, 10 — the interior/trailing zeros standard long division
+ * must still write to keep the line). A leading digit that doesn't divide is NOT
+ * a sneaky zero: 15 ÷ 4 = 3, never "03". Finn pays extra for the sneaky zero in
+ * Phase 2 — it's Ivy's diagnosed "results go underground" slip.
+ */
+function divAnatomy(a, b) {
+  const quotient = Math.floor(a / b)
+  const qStr = String(quotient)
+  return { quotient, remainder: a % b, sneakyZero: qStr.length > 1 && qStr.slice(1).includes('0') }
+}
+
+/** A DIFFERENT division of the same difficulty ANATOMY (same has-remainder AND
+ *  same sneaky-zero shape) for the worked example — so the method transfers. */
+function similarLongDiv(a, b, an) {
+  const [lo, hi] = DIV_DIVIDEND[DIV_PHASE]
+  let s
+  let guard = 0
+  do {
+    const bb = rand(2, 9)
+    const aa = rand(lo, hi)
+    const sn = divAnatomy(aa, bb)
+    s = { a: aa, b: bb, quotient: sn.quotient, remainder: sn.remainder, sneakyZero: sn.sneakyZero }
+  } while ((s.a === a || s.sneakyZero !== an.sneakyZero || (s.remainder > 0) !== (an.remainder > 0)) && guard++ < 500)
+  return s
+}
+
 /* ── topic registry ────────────────────────────────────────────────── */
 // Each topic: generate(level) → problem, topLevel, and its mix role.
 // FINN-SPEC: ranges + level rules are provisional data.
@@ -80,6 +130,7 @@ export const TOPICS = {
   'long-mult': {
     name: 'Long multiplication',
     topLevel: 3,
+    grade: 5, // Finn's grade tag — long multiplication (2×2-digit) = Grade 5
     levelUpAfter: 5, // correct at current level → next rung (FINN-SPEC)
     generate(level) {
       const range = level === 1 ? [12, 43] : level === 2 ? [12, 69] : [24, 89]
@@ -99,6 +150,7 @@ export const TOPICS = {
   'mult-2x1': {
     name: 'Multiplication (2-digit × 1-digit)',
     topLevel: 1,
+    grade: 4, // confidence pool — pre-C1 (≈ Grade 4)
     levelUpAfter: Infinity,
     generate() {
       const a = rand(12, 49)
@@ -113,6 +165,7 @@ export const TOPICS = {
   'add-2x2': {
     name: 'Column addition',
     topLevel: 1,
+    grade: 4, // confidence pool — pre-C1 (≈ Grade 4)
     levelUpAfter: Infinity,
     generate() {
       const a = rand(14, 68)
@@ -122,6 +175,33 @@ export const TOPICS = {
         s = { a: rand(14, 68), b: rand(13, 59) }
       } while (s.a === a || addCarries(s.a, s.b) !== addCarries(a, b))
       return { type: 'add-2x2', level: 1, op: '+', a, b, similar: s, gems: 1 }
+    },
+  },
+  'long-div': {
+    name: 'Long division',
+    // FLAT band — Finn's C2 spec has no in-topic ladder; the phases are RELEASE
+    // bands (Amy flips DIV_PHASE), not difficulty rungs. So topLevel 1, never up.
+    topLevel: 1,
+    levelUpAfter: Infinity,
+    grade: DIV_GRADE[DIV_PHASE], // phase-level grade (Finn): P1 = G5, P2 = G6
+    generate() {
+      const [lo, hi] = DIV_DIVIDEND[DIV_PHASE]
+      const wantRem = Math.random() < 0.5 // Finn's ~50/50 with/without remainder (the tuning knob)
+      let a, b, an
+      let guard = 0
+      do {
+        b = rand(2, 9)
+        a = rand(lo, hi)
+        an = divAnatomy(a, b)
+      } while ((an.remainder > 0) !== wantRem && guard++ < 200)
+      // Payout carried on the problem so a sparkle and a station problem pay the
+      // same (Finn's C2 rule, via the shared helper).
+      const gems = divGems(an.sneakyZero)
+      return {
+        type: 'long-div', level: 1, op: '÷', a, b,
+        quotient: an.quotient, remainder: an.remainder, sneakyZero: an.sneakyZero,
+        grade: DIV_GRADE[DIV_PHASE], gems, similar: similarLongDiv(a, b, an),
+      }
     },
   },
 }
@@ -144,12 +224,14 @@ function similarLongMult(a, b, level) {
  * 75–85%-band scheduler is Layer-2 work with its own phase).
  */
 export function nextProblem() {
-  if (Math.random() < 0.7) {
-    const level = currentLevel('long-mult')
-    return TOPICS['long-mult'].generate(level)
-  }
-  const confidence = Math.random() < 0.6 ? 'mult-2x1' : 'add-2x2'
-  return TOPICS[confidence].generate()
+  // TWO frontier topics now: multiplication (C1, retained via spacing) and
+  // division (C2, her new school focus). Even frontier split; the pre-C1 shapes
+  // stay the confidence pool. FINN-SPEC: the 35/35/30 mix is a provisional
+  // one-line tune (division-first weighting is a knob if Finn wants it).
+  const roll = Math.random()
+  if (roll < 0.35) return TOPICS['long-mult'].generate(currentLevel('long-mult'))
+  if (roll < 0.7) return TOPICS['long-div'].generate()
+  return TOPICS[Math.random() < 0.6 ? 'mult-2x1' : 'add-2x2'].generate()
 }
 
 /** The topic's current ladder rung (diagnostic sets the start; store persists). */
@@ -166,14 +248,19 @@ export function currentLevel(topicId) {
  * (L1=1 … L3=3), per the economy spec. Length is data — 2 today, 3 later.
  */
 export function generateStation(count = 2) {
-  const topicId = Math.random() < 0.7 ? 'long-mult' : Math.random() < 0.6 ? 'mult-2x1' : 'add-2x2'
+  const roll = Math.random()
+  const topicId = roll < 0.35 ? 'long-mult' : roll < 0.7 ? 'long-div' : Math.random() < 0.6 ? 'mult-2x1' : 'add-2x2'
   const level = currentLevel(topicId)
   const problems = []
   let guard = 0
   while (problems.length < count && guard++ < 200) {
     const p = TOPICS[topicId].generate(level)
     if (problems.some((q) => q.a === p.a && q.b === p.b)) continue // no repeat in one quest
-    p.gems = p.level // per-problem payout = ladder level
+    // Payout stays exactly as the generator set it: long-mult by ladder level,
+    // long-div by Finn's phase rule (flat 1 in P1, the sneaky-zero bump in P2).
+    // The old `p.gems = p.level` line is GONE on purpose — it was redundant for
+    // multiplication (generate already sets gems=level) and would flatten
+    // division's Phase-2 bump to 1. Never reintroduce it.
     problems.push(p)
   }
   return problems
@@ -194,7 +281,10 @@ export function maybeLevelUp(topicId) {
 
 // QA hook (dev builds only): exercise the engine from the console
 if (import.meta.env.DEV && typeof window !== 'undefined') {
-  window.__math = { nextProblem, buildStages: (p) => buildStages(p), buildStagesMulti, TOPICS, currentLevel }
+  window.__math = {
+    nextProblem, buildStages: (p) => buildStages(p), buildStagesMulti, TOPICS, currentLevel,
+    divProblem: () => TOPICS['long-div'].generate(), buildDivisionStages, divideSteps,
+  }
 }
 
 /* ══════════════════ WORKED-EXAMPLE BUILDERS ═══════════════════════ */
@@ -346,6 +436,131 @@ function buildMult2x1(a, b) {
   stages.push({ caption: `Read it together: ${answer}.`, snap: s })
 
   return { stages, answer }
+}
+
+/* ══════════════════ C2 — LONG DIVISION WALKTHROUGH ═══════════════════ */
+/*
+ * buildDivisionStages(a, b) — the pedagogy of Oscar's "Let's share the candy"
+ * comp, as a list of `snap` view-states the <DivisionWalkthrough> diagram
+ * renders (bracket notation, not the column grid — long division's
+ * representation genuinely differs, per math-game-topic §4). Pure + framework-
+ * free so it stays unit-testable; the React lives in DivisionWalkthrough.jsx.
+ *
+ * ✅ STANDARD long division (fixed 2026-08-23, C2 Phase 1): the first quotient
+ * digit sits above the LAST digit of the smallest leading group b divides into —
+ * NO leading zero is ever written (15 ÷ 4 = 3, never "03"). Leading digits that
+ * can't be divided are absorbed into that first group. INTERIOR/TRAILING zeros
+ * (815 ÷ 4 = 203, 90 ÷ 9 = 10) are the real "sneaky zeros" and keep their
+ * celebration. The pre-fix build wrote a leading "0" and mis-celebrated it as a
+ * sneaky zero for every first-digit-<-divisor problem (~a third of Phase 1);
+ * Track 1 only ever tested 8xx ÷ 4, which hid it.
+ *
+ * Model: one STEP per quotient digit (indexed by si), each aligned to a dividend
+ * COLUMN (step.col). Four-move spine DIVIDE → MULTIPLY → SUBTRACT → BRING DOWN,
+ * then a FINAL seal.
+ */
+export function divideSteps(a, b) {
+  const digits = String(a).split('').map(Number)
+  const n = digits.length
+  // startCol = last column of the smallest leading group that b divides into;
+  // the leading digits before it are absorbed (no leading zero is written).
+  let acc = 0
+  let startCol = 0
+  while (startCol < n) {
+    acc = acc * 10 + digits[startCol]
+    if (acc >= b) break
+    startCol++
+  }
+  const steps = []
+  let carry = 0
+  for (let col = startCol; col < n; col++) {
+    const w = col === startCol ? acc : carry * 10 + digits[col]
+    const qd = Math.floor(w / b)
+    const prod = qd * b
+    steps.push({ col, w, qd, prod, sub: w - prod, first: col === startCol })
+    carry = w - prod
+  }
+  return { digits, n, startCol, steps, remainder: carry, quotient: Number(steps.map((s) => s.qd).join('')) }
+}
+
+export function buildDivisionStages(a, b) {
+  const { digits, n, startCol, steps, remainder, quotient } = divideSteps(a, b)
+  const quotientNum = String(quotient)
+  const candies = (v) => (String(v) === '1' ? 'candy' : 'candies')
+
+  // quotient digit per COLUMN (blank for the absorbed leading columns)
+  const q = Array(n).fill('')
+  steps.forEach((s) => { q[s.col] = String(s.qd) })
+
+  // the number being shared at step si, as a string:
+  //   first step  → the leading group ("15" for 15÷4, "8" for 85÷4)
+  //   later steps → leftover + brought-down digit ("01" for the 815÷4 zero)
+  const groupStr = (si) =>
+    si === 0 ? String(steps[0].w) : String(steps[si - 1].sub) + String(digits[steps[si].col])
+  // Sharing-Table rectangle for step si (dividend row + the columns it spans)
+  const tableFor = (si) =>
+    si === 0 ? { row: 1, cols: [0, startCol] } : { row: 1 + 2 * si, cols: [steps[si].col - 1, steps[si].col] }
+
+  const st = {
+    qShown: Array(n).fill(false), qSneaky: Array(n).fill(false), dim: Array(n).fill(false),
+    multShown: Array(steps.length).fill(false), subShown: Array(steps.length).fill(false),
+    bdShown: Array(steps.length).fill(false),
+    table: null, move: null, round: null, final: false, celebrate: null,
+  }
+  const stages = []
+  // deep-clone the mutable state into an immutable stage snapshot (Oscar's snap)
+  const snap = (caption, hot) => {
+    const s = JSON.parse(JSON.stringify({
+      qShown: st.qShown, qSneaky: st.qSneaky, dim: st.dim,
+      multShown: st.multShown, subShown: st.subShown, bdShown: st.bdShown,
+      table: st.table, move: st.move, round: st.round, final: st.final, celebrate: st.celebrate,
+    }))
+    s.caption = caption
+    s.hot = hot || {}
+    stages.push(s)
+  }
+
+  // ── intro ──
+  st.move = null; st.round = null; st.table = null
+  snap(`We have ${a} candies to share equally among ${b} friends. Let's find out how many each friend gets! 🍬`)
+  st.dim = digits.map((_, i) => i > startCol); st.table = tableFor(0)
+  snap(startCol === 0
+    ? `We only look at a little at a time. This glowing box is the Sharing Table — the candies we're splitting right now. The faded ones wait their turn.`
+    : `${b} can't share just ${digits[0]}, so we look at the first ${startCol + 1} digits together — ${groupStr(0)}. That glowing box is the Sharing Table; the faded candies wait their turn.`)
+
+  // ── one round per quotient digit ──
+  for (let si = 0; si < steps.length; si++) {
+    const s = steps[si]
+    const col = s.col
+    const last = si === steps.length - 1
+    st.round = si; st.table = tableFor(si)
+    st.move = 'DIVIDE'; st.qShown[col] = true; st.qSneaky[col] = s.qd === 0
+    if (s.qd === 0) {
+      st.celebrate = 'sneaky'
+      snap(`How many times does ${b} fit into ${groupStr(si)}? It can't — not even once! So each friend gets 0 here. We still WRITE the 0 so the shares stay lined up. You caught the sneaky zero! 🎉`, { q: col })
+    } else {
+      st.celebrate = null
+      snap(`How many times does ${b} fit into ${groupStr(si)}? ${s.qd}! Each friend gets ${s.qd} so far. 🔎`, { q: col })
+    }
+    st.move = 'MULTIPLY'; st.multShown[si] = true; st.celebrate = null
+    snap(`Now count what we handed out: ${s.qd} for each of the ${b} friends = ${s.qd} × ${b} = ${s.prod} ${candies(s.prod)}.`, { mult: si })
+    st.move = 'SUBTRACT'; st.subShown[si] = true; st.celebrate = 'round'
+    snap(last
+      ? `${groupStr(si)} − ${s.prod} = ${s.sub}. ${s.sub > 0 ? `That's the remainder — ${s.sub} leftover ${candies(s.sub)}! 🍬` : 'It shares perfectly evenly — nothing left over! 🎉'}`
+      : `${groupStr(si)} − ${s.prod} = ${s.sub}. ${s.sub === 0 ? 'Nothing left in this group! ✨' : `${s.sub} ${candies(s.sub)} still waiting to be shared.`}`,
+      { sub: si })
+    if (!last) {
+      const nextCol = steps[si + 1].col
+      st.move = 'BRINGDOWN'; st.bdShown[si] = true; st.round = si + 1; st.table = tableFor(si + 1)
+      st.dim = digits.map((_, i) => i > nextCol); st.celebrate = null
+      const lastBring = si + 1 === steps.length - 1
+      snap(`Invite the ${lastBring ? 'last' : 'next'} candy down! Bring the ${digits[nextCol]} down to join the leftover. Now we're sharing ${groupStr(si + 1)}. ⬇️`, { bd: si })
+    }
+  }
+  st.move = null; st.table = null; st.final = true; st.round = null; st.celebrate = 'final'
+  snap(`Done! Each of the ${b} friends gets ${quotientNum} ${candies(quotientNum)}${remainder > 0 ? `, with ${remainder} left over 🍬` : ` — it shares perfectly evenly! 🎉`}.`)
+
+  return { stages, a, b, n, digits, startCol, steps, q, remainder, quotient, quotientNum }
 }
 
 /* ---- C1: long multiplication (2-digit × 2-digit, partial products) ---- */

@@ -5,6 +5,8 @@ import App from './App.jsx'
 import { initStore } from './store.js'
 import { localBackend, supabaseBackend } from './backend.js'
 import { getSessionOnce, onAuthChange, sendMagicLink } from './auth.js'
+import DivisionWalkthrough from './ui/DivisionWalkthrough.jsx'
+import { Modal } from './ui/mathkit.jsx'
 import './index.css'
 
 /*
@@ -280,10 +282,31 @@ class Oops extends React.Component {
   }
 }
 
+/*
+ * Dev-only preview harness for the C2 division walkthrough (Oscar's lift):
+ * open `/?divdemo` (add `&ex=85` for the simpler 85 ÷ 4). It mounts the
+ * walkthrough in the house <Modal>, exactly the frame it wears in the game.
+ * `import.meta.env.DEV` guards it, so it's dead-code-eliminated from prod.
+ */
+function DivDemo() {
+  const p = new URLSearchParams(window.location.search)
+  const ex = p.get('ex') === '85' ? { a: 85, b: 4 } : { a: 815, b: 4 }
+  const [done, setDone] = React.useState(0)
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: '#c8c0da' }}>
+      <Modal label="Division walkthrough (dev preview)" cardStyle={{ padding: 0 }}>
+        <DivisionWalkthrough key={`${ex.a}-${done}`} problem={ex} onDone={() => setDone((d) => d + 1)} />
+      </Modal>
+    </div>
+  )
+}
+const DEV_DEMO =
+  import.meta.env.DEV && new URLSearchParams(window.location.search).has('divdemo')
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      <Boot />
+      {DEV_DEMO ? <DivDemo /> : <Boot />}
     </Oops>
     {/* Cookieless, privacy-friendly traffic counting (no personal data, no
       * consent banner needed) — the whole point of moving to a real domain. */}

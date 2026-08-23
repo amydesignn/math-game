@@ -175,3 +175,27 @@ canvas { touch-action: none; display: block; }
 @keyframes confettiFall { 0% { transform: translate(0,-10px) rotate(0deg); opacity: 0; } 12% { opacity: 1; } 100% { transform: translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity: 0; } }
 @keyframes badgeBounce { 0% { transform: scale(.3) rotate(-10deg); opacity: 0; } 55% { transform: scale(1.12) rotate(3deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
 @keyframes haloPulse { 0% { transform: scale(.8); opacity: .5; } 100% { transform: scale(1.55); opacity: 0; } }
+
+/* ── Division worked example (Oscar's C2 comp, lifted 2026-08-21) ──
+   ALL of Oscar's walkthrough keyframes are namespaced `dv*`. His comp
+   redefined `popIn` (scale .92/16px) and `cellPop` (scale .4→1.18) with
+   DIFFERENT curves than the math card's `popIn` (line 138) and the column
+   grid's `cellPop` (line 143) — overwriting either would silently retune
+   MathPopup and the worked-example grids. Same lesson as `lvlPopIn` above.
+   The rest are prefixed too, so a future comp can't collide with them. */
+@keyframes dvPop { 0% { transform: scale(.92) translateY(16px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes dvCellPop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.18); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes dvQuoUp { 0% { transform: translateY(30px) scale(.5); opacity: 0; } 60% { transform: translateY(-4px) scale(1.16); } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes dvBringArc { 0% { transform: translate(var(--ax,8px),var(--ay,-100px)) scale(.72); opacity: 0; } 35% { opacity: 1; } 60% { transform: translate(calc(var(--ax,8px) * -1),calc(var(--ay,-100px) * .34)) scale(1.12); } 100% { transform: translate(0,0) scale(1); opacity: 1; } }
+@keyframes dvArrowInOut { 0% { opacity: 0; } 22% { opacity: .95; } 66% { opacity: .95; } 100% { opacity: 0; } }
+@keyframes dvShimmer { 0% { transform: scale(.3) rotate(-20deg); opacity: 0; } 45% { transform: scale(1.32) rotate(12deg); opacity: 1; } 72% { transform: scale(.94) rotate(-5deg); } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+@keyframes dvTablePulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(98,116,142,.12); } 50% { box-shadow: 0 0 0 9px rgba(98,116,142,.18); } }
+@keyframes dvAnswerSeal { 0% { transform: scale(1); } 40% { transform: scale(1.045); } 100% { transform: scale(1); } }
+@keyframes dvBurst { 0% { transform: scale(.2); opacity: .85; } 100% { transform: scale(2.6); opacity: 0; } }
+@keyframes dvConfetti { 0% { transform: translateY(-8px) rotate(0); opacity: 0; } 12% { opacity: 1; } 100% { transform: translateY(380px) rotate(560deg); opacity: 0; } }
+@keyframes dvFadeSlide { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
+/* division ASK screen (C2 Phase 1) */
+@keyframes dvCaret { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+@keyframes dvTapMe { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,109,246,0); } 50% { box-shadow: 0 0 0 6px rgba(45,109,246,.14); } }
+@keyframes dvDigitPop { 0% { transform: scale(.55); opacity: 0; } 60% { transform: scale(1.16); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes dvShakeCell { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }

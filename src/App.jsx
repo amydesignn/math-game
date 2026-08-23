@@ -288,6 +288,19 @@ export default function App({ cloud = false }) {
     if (!import.meta.env.DEV) return
     window.__award = (n = 1) => { onMathAward(n); return getState().lifetimeGems }
     window.__level = () => ({ points: getState().lifetimeGems, level: levelOf(getState().lifetimeGems), celebrated: getState().celebratedLevel, levelUps: getState().levelUps })
+    // A COMPLETE long-div problem (what the generator emits) for a given a,b, so
+    // the C2 ask screen and its recovery can be QA'd on specific shapes.
+    const divProb = (a, b) => {
+      const quotient = Math.floor(a / b), remainder = a % b, qs = String(quotient)
+      const sneakyZero = qs.length > 1 && qs.slice(1).includes('0')
+      return { type: 'long-div', level: 1, op: '÷', a, b, quotient, remainder, sneakyZero, grade: 5, gems: 1, similar: { a, b, quotient, remainder, sneakyZero } }
+    }
+    const openDiv = (p) => { mathBusyRef.current = true; setFocusMode(true); setMath({ sparkleId: -1, problem: p, skin: SKINS.feedPet }) }
+    // __divAsk() = a random Phase-1 problem from the real generator; __divAsk(15,4)
+    // = a specific shape (15,4 leading-zero · 815,4 sneaky zero · 84,4 no remainder).
+    window.__divAsk = (a, b) => openDiv(a && b ? divProb(a, b) : TOPICS['long-div'].generate())
+    // __divRecover(a,b): open a ÷ problem; any wrong answer opens the walkthrough.
+    window.__divRecover = (a = 815, b = 4) => openDiv(divProb(a, b))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -871,8 +884,13 @@ export default function App({ cloud = false }) {
           onPetReact={onPetReact}
           onResult={(correct) => {
             const p = math.problem
-            recordAnswer(p.type, p.level, correct, TOPICS[p.type].topLevel)
-            if (correct) maybeLevelUp(p.type)
+            // Guard an unregistered topic — a division problem before Track 2
+            // adds 'long-div' to TOPICS — so a wrong ÷ answer still recovers.
+            const top = TOPICS[p.type]?.topLevel
+            if (top != null) {
+              recordAnswer(p.type, p.level, correct, top)
+              if (correct) maybeLevelUp(p.type)
+            }
           }}
           onClose={onMathClose}
         />
