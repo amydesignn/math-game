@@ -51,10 +51,13 @@ export const stageLabel = (level) => STAGE_LABELS[level] || STAGE_LABELS[3]
  * their own, Amy's call was five apiece. Finn's other seven are parked in the
  * Notion spec, not deleted — any of them can swap in here as a one-line change.
  *
- * THIS IS IVY'S BUILD. `from` is what makes it personal, and it is also the
- * only thing that needs to change for a public release: swap MESSAGE_PACKS for
- * unsigned copy and the popup simply renders no signature (see LevelUpPopup —
- * the signature line is conditional, our names are not baked into the card).
+ * PUBLIC vs FAMILY (2026-08-29): the signed packs below are Ivy's family build.
+ * They are shown ONLY to a family account (Ivy/Mum). Guests — and any future
+ * public account — get PUBLIC_MESSAGES instead (unsigned, generic). The `signed`
+ * flag on pickLevelMessage chooses, and it DEFAULTS TO false so a forgotten flag
+ * fails safe to generic and can never leak the personal copy to a stranger. The
+ * popup renders no signature when `from` is absent (see LevelUpPopup — the
+ * signature line is conditional, our names are not baked into the card).
  */
 export const TEAM = ['finn', 'oscar', 'nathan'] // rotation order
 
@@ -88,8 +91,23 @@ export const MESSAGE_PACKS = {
   ],
 }
 
-/** Level 10 is the one milestone with its own line. Finn wrote it. */
+/** Level 10 is the one milestone with its own line. Finn wrote it. Its wording
+ *  is already name-free, so the public build reuses the same text, unsigned. */
 const LEVEL10 = { text: 'Level 10! Double digits. This is where it gets interesting. 🎉', from: 'finn' }
+
+/* The PUBLIC pool — unsigned, generic, age-neutral (Amy approved 2026-08-29).
+ * One flat rotation: steps through in order so no line repeats until all eight
+ * have shown. General-audience voice, never targeted at children. */
+export const PUBLIC_MESSAGES = [
+  "Level [X]! That wasn't luck — that was you. ⭐",
+  'Level [X]! The problems got harder. You got better. 🌟',
+  "Level [X]! Right answers, zero panic. That's skill. ✨",
+  'Level [X]! You earned every point of this. 💎',
+  "Level [X]! Look how far you've climbed. 🧗",
+  'Level [X]! Another level, and you made it look easy. 🎯',
+  "Level [X]! Steady work, big result. That's how it's done. 🏆",
+  'Level [X]! Math bends for people who keep showing up — and here you are. 📈',
+]
 
 /**
  * Which message she gets, given how many level-up popups she has seen before.
@@ -101,7 +119,14 @@ const LEVEL10 = { text: 'Level 10! Double digits. This is where it gets interest
  * would have clustered one voice and repeated lines while others went unheard;
  * the whole point is that three people are cheering, not one.
  */
-export function pickLevelMessage(newLevel, seenCount = 0) {
+export function pickLevelMessage(newLevel, seenCount = 0, signed = false) {
+  // Public/guest (signed === false, the safe default) — unsigned generic pool.
+  if (!signed) {
+    if (newLevel === 10) return { text: LEVEL10.text }
+    const text = PUBLIC_MESSAGES[seenCount % PUBLIC_MESSAGES.length]
+    return { text: text.replace('[X]', newLevel) }
+  }
+  // Family (Ivy) — the signed team messages, author-rotated.
   if (newLevel === 10) return { text: LEVEL10.text, from: LEVEL10.from }
   const from = TEAM[seenCount % TEAM.length]
   const pack = MESSAGE_PACKS[from]

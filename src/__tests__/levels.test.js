@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { requiredFor, levelState, levelOf, fmtPoints, pickLevelMessage, MESSAGE_PACKS, TEAM } from '../levels'
+import { requiredFor, levelState, levelOf, fmtPoints, pickLevelMessage, MESSAGE_PACKS, PUBLIC_MESSAGES, TEAM } from '../levels'
 
 /*
  * The level ladder is Amy's rule and Finn's table — so the table itself is the
@@ -63,7 +63,7 @@ describe('points display', () => {
   })
 })
 
-describe('level-up messages', () => {
+describe('level-up messages — family (signed)', () => {
   it('gives every teammate five', () => {
     for (const who of TEAM) expect(MESSAGE_PACKS[who]).toHaveLength(5)
   })
@@ -71,7 +71,7 @@ describe('level-up messages', () => {
   it('rotates the voice — never the same teammate twice in a row', () => {
     let prev = null
     for (let n = 0; n < 30; n++) {
-      const { from } = pickLevelMessage(3, n)
+      const { from } = pickLevelMessage(3, n, true)
       expect(from).not.toBe(prev)
       prev = from
     }
@@ -79,21 +79,59 @@ describe('level-up messages', () => {
 
   it('shows all fifteen before repeating any of them', () => {
     const seen = new Set()
-    for (let n = 0; n < 15; n++) seen.add(pickLevelMessage(3, n).text)
+    for (let n = 0; n < 15; n++) seen.add(pickLevelMessage(3, n, true).text)
     expect(seen.size).toBe(15)
   })
 
   it('signs the Level 10 special from Finn, and keeps its own wording', () => {
-    const m = pickLevelMessage(10, 7)
+    const m = pickLevelMessage(10, 7, true)
     expect(m.from).toBe('finn')
     expect(m.text).toContain('Double digits')
   })
 
   it('puts the real level into the message', () => {
     for (let n = 0; n < 15; n++) {
-      const { text } = pickLevelMessage(7, n)
+      const { text } = pickLevelMessage(7, n, true)
       expect(text).toContain('Level 7!')
       expect(text).not.toContain('[X]')
     }
+  })
+})
+
+describe('level-up messages — public (generic)', () => {
+  it('defaults to unsigned — a forgotten flag fails SAFE, never leaking the family copy', () => {
+    for (let n = 0; n < 16; n++) expect(pickLevelMessage(3, n).from).toBeUndefined()
+  })
+
+  it('never carries a signature, Level 10 included', () => {
+    for (let n = 0; n < 16; n++) expect(pickLevelMessage(5, n, false).from).toBeUndefined()
+    expect(pickLevelMessage(10, 0, false).from).toBeUndefined()
+  })
+
+  it('never contains a family name (no personal line reaches a stranger)', () => {
+    for (let n = 0; n < PUBLIC_MESSAGES.length; n++) {
+      const { text } = pickLevelMessage(4, n, false)
+      expect(text).not.toMatch(/\bIvy\b|\bMum\b/)
+    }
+  })
+
+  it('cycles through all eight before repeating any', () => {
+    const seen = new Set()
+    for (let n = 0; n < PUBLIC_MESSAGES.length; n++) seen.add(pickLevelMessage(4, n, false).text)
+    expect(seen.size).toBe(PUBLIC_MESSAGES.length)
+  })
+
+  it('puts the real level in and drops the [X] placeholder', () => {
+    for (let n = 0; n < 12; n++) {
+      const { text } = pickLevelMessage(7, n, false)
+      expect(text).toContain('Level 7!')
+      expect(text).not.toContain('[X]')
+    }
+  })
+
+  it('reuses the Level 10 wording, unsigned', () => {
+    const m = pickLevelMessage(10, 3, false)
+    expect(m.text).toContain('Double digits')
+    expect(m.from).toBeUndefined()
   })
 })

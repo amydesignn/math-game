@@ -413,7 +413,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
                 <div style={{ fontSize: 40, fontWeight: 800, color: P.ink, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{a}</div>
                 {showMathTerms && <span style={badge(P.berry, '#FDF2F8')}>DIVIDEND</span>}
               </div>
-              <div style={copyStyle}>Ivy has {a} candies to share.</div>
+              <div style={copyStyle}>You have {a} candies to share.</div>
             </div>
             {/* Card 2 — The Friends / DIVISOR */}
             <div style={cardStyle(2)}>
@@ -424,7 +424,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
                 <div style={{ width: 44, height: 44, borderRadius: '50%', border: `2.5px solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800, color: P.ink }}>{b}</div>
                 {showMathTerms && <span style={badge(P.teal, P.tealTint)}>DIVISOR</span>}
               </div>
-              <div style={copyStyle}>She shares them with {b} friends.</div>
+              <div style={copyStyle}>You share them with {b} friends.</div>
             </div>
             {/* Card 3 — Quotient / QUOTIENT */}
             <div style={cardStyle(3)}>

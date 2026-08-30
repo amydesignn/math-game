@@ -341,7 +341,12 @@ export default function App({ cloud = false }) {
   useEffect(() => {
     if (levelPopup || worldBusy || !levelQueue.length) return
     const [next, ...rest] = levelQueue
-    const { text, from } = pickLevelMessage(next, getLevelUps())
+    // Family (Ivy) sees the signed team messages; guests — and any future
+    // public account — get the generic pool. labelFor returns 'Friend' for
+    // anyone not in the family map, so this stays correct once public sign-up
+    // exists: no stranger ever inherits her personal lines.
+    const signed = cloud && labelFor(sessionCache()?.email) !== 'Friend'
+    const { text, from } = pickLevelMessage(next, getLevelUps(), signed)
     setLevelPopup({ level: next, message: text, from })
     setLevelQueue(rest)
   }, [levelPopup, worldBusy, levelQueue])
