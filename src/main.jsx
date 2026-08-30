@@ -445,7 +445,7 @@ function SettingsDemo() {
       </div>
 
       {view === 'settings' && (
-        <SettingsSheet surface={surface} auth={auth} sound={sound} onToggleSound={setSound} onOpenSignup={() => alert('→ opens SignupModal')} onSignOut={() => setSignedIn(false)} onClose={() => setView('none')} />
+        <SettingsSheet auth={auth} sound={sound} onToggleSound={setSound} onOpenSignup={() => alert('→ opens SignupModal')} onSignOut={() => setSignedIn(false)} onClose={() => setView('none')} />
       )}
       {view === 'profile' && <ProfilePopover auth={auth} onUploadAvatar={() => alert('→ upload avatar')} onClose={() => setView('none')} />}
     </div>

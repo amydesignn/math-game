@@ -272,11 +272,15 @@ Settings Gear + Profile …`) onto the house system.
   `sendMagicLink(email, {create:true})`; Sound → `toggleSound`; Sign out →
   `signOut()` + clear the remembered flag + reboot to a clean guest. `justSignedIn`
   (= main.jsx `REDEEMING`) → `SavedToast` once on a redeem-return.
-- **Chrome changes:** Door header = 🙂 profile + ⚙️ gear (speaker removed; profile
-  opens `ProfilePopover`). In-world rail = ‹ Exit · 🛍️ · ⚙️ — `SpeakerButton`
-  retired (Sound lives in the sheet), 💞 Together REMOVED (the Meadow is a Door
-  card now; **meadow PAUSED** — `enterMeadow` kept for the dev hook + Door card),
-  no profile in-world.
+- **Chrome changes (final placement, Amy's 2026-08-30 review):** Door header =
+  ⚙️ gear THEN 🙂 profile (gear first, profile at the corner; profile opens
+  `ProfilePopover`, speaker removed). In-world = ‹ Exit · 🛍️ rail (left) + the ⚙️
+  gear TOP-RIGHT next to the level bar (moved off the rail; `LevelBar` track
+  shortened 96→72 to make room). `SpeakerButton` retired (Sound lives in the
+  sheet), 💞 Together REMOVED (the Meadow is a Door card; **meadow PAUSED** —
+  `enterMeadow` kept for the dev hook + Door card), no profile in-world. The
+  Settings sheet drops from the **top-right on BOTH surfaces** (uniform anchor;
+  the `surface` prop was dropped). Mobile: compact pill + gear + minimap fit.
 - **auth.js:** `sendMagicLink(email, {create})` — `create:false` = legacy family
   sign-in (unknown email → generic error); `create:true` = public signup. Added
   `signOut()`. Legacy "Ask Mum" wall copy genericized (main.jsx, COPPA posture).

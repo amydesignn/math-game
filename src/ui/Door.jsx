@@ -251,8 +251,9 @@ function Header({ onOpenSettings, onOpenProfile, settingsActive }) {
       <div className="doorHdrIn">
         <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Luxi Math</span></div>
         <div style={hS.right}>
-          <button style={hS.profileBtn} onClick={onOpenProfile} aria-label="Profile" title="Profile"><ProfileChip /></button>
+          {/* Gear first, profile at the corner (Amy 2026-08-30). */}
           <button style={{ ...hS.gear, background: settingsActive ? '#E7DEFA' : '#F1ECFE' }} onClick={onOpenSettings} aria-label="Settings" title="Settings">⚙️</button>
+          <button style={hS.profileBtn} onClick={onOpenProfile} aria-label="Profile" title="Profile"><ProfileChip /></button>
         </div>
       </div>
     </header>

@@ -30,7 +30,7 @@ const barStyles = {
   gem: { display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 800, fontSize: 14, color: '#0E7490', flex: 'none' }, // teal = the gem wallet
   label: { display: 'flex', alignItems: 'baseline', gap: 4, fontWeight: 800, fontSize: 15, color: T.ink, whiteSpace: 'nowrap' },
   lvlWrap: { position: 'relative', display: 'inline-block', overflow: 'hidden', height: 20, minWidth: '2ch', textAlign: 'center' },
-  track: { position: 'relative', width: 96, height: 12, borderRadius: 999, background: LVL.soft, overflow: 'hidden', flex: 'none' },
+  track: { position: 'relative', width: 72, height: 12, borderRadius: 999, background: LVL.soft, overflow: 'hidden', flex: 'none' }, // 96→72: shortened to make room for the top-right gear (Amy 2026-08-30)
   fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: LVL.grad, transition: 'width .45s cubic-bezier(.22,1.2,.36,1)' },
   shine: { position: 'absolute', top: 0, bottom: 0, width: '34%', background: 'linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.75) 50%,rgba(255,255,255,0) 100%)', animation: 'shineSweep .7s ease-out 1' },
   pts: { fontWeight: 700, fontSize: 14, color: LVL.deep, whiteSpace: 'nowrap', minWidth: 26, textAlign: 'right' },

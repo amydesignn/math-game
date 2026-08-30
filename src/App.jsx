@@ -837,27 +837,32 @@ export default function App({ cloud = false, justSignedIn = false }) {
         {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
           <ExitButton onTap={goToDoor} />
         )}
-        {/* Rail = Exit · Cart · Gear (Amy 2026-08-30). 💞 Together removed — the
-            Meadow lives as a Door card now (meadow paused); the speaker folded
-            into the gear's Settings sheet (Sound toggle). enterMeadow stays for
-            the dev hook + the Door card. */}
+        {/* Rail = Exit · Cart (Amy 2026-08-30). 💞 Together removed (the Meadow is
+            a Door card now, meadow paused); the ⚙️ gear moved to the top-right by
+            the level bar (Amy 2026-08-30). enterMeadow stays for the dev hook +
+            the Door card. */}
         {!placing && !shopOpen && selectedId == null && !meadow && (
           <RoundHudButton aria="Open the Gem Shop" emoji="🛍️" onTap={() => setShopOpen(true)} />
         )}
-        {!placing && !shopOpen && selectedId == null && !meadow && (
-          <RoundHudButton aria="Open Settings" emoji="⚙️" onTap={() => setSettingsOpen(true)} />
-        )}
       </div>
 
-      {/* TOP-RIGHT: the stat pill (level + gem, one pill), sitting just left of
-          the minimap. It's the ONLY thing in the stats zone now — speaker moved
-          to the left utility column, and the profile chip is gone from the world
-          (Amy: a world stays clean, profile lives on the Door). On phones the
-          pill compacts to "Level · 💎" (the track/points fold away, still one
-          tap from the record). The minimap keeps its corner and the map name
-          stands right below it — the standing "you are here". */}
+      {/* TOP-RIGHT: the stat pill (level + gem) + the ⚙️ gear, sitting just left of
+          the minimap (Amy 2026-08-30: gear moved here from the left rail; the level
+          bar shortened a touch to make room). Profile stays off the world (lives on
+          the Door). On phones the pill compacts to "Level · 💎". The minimap keeps
+          its corner and the map name stands right below it. */}
       <div style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16 + 104 + 12, display: 'flex', alignItems: 'center', gap: 8 }}>
         <LevelBar points={points} gems={gems} gemRef={hudGemRef} onLevelUp={onLevelUp} onOpen={() => setProgressOpen(true)} />
+        {!placing && !shopOpen && selectedId == null && !meadow && (
+          <button
+            aria-label="Open Settings"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => setSettingsOpen(true)}
+            style={{ flex: 'none', width: 44, height: 44, borderRadius: '50%', border: 'none', background: '#fff', boxShadow: '0 4px 14px rgba(43,32,90,0.16)', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            ⚙️
+          </button>
+        )}
       </div>
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
       <MapLabel name={MAPS[mapId].name} />
@@ -969,7 +974,6 @@ export default function App({ cloud = false, justSignedIn = false }) {
           Door and the world (position:fixed, so placement here is fine) ── */}
       {settingsOpen && (
         <SettingsSheet
-          surface={view === 'door' ? 'door' : 'game'}
           auth={authInfo}
           sound={soundOn}
           onToggleSound={toggleSound}

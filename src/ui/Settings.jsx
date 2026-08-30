@@ -102,17 +102,16 @@ const rowIcon = { color: LILAC700, display: 'flex' }
  * The shared settings sheet. surface: 'door' | 'game' (anchor + animation only).
  * auth: { signedIn, email, initial }. onOpenSignup opens the shared SignupModal.
  */
-export function SettingsSheet({ surface = 'game', auth = {}, sound = true, onToggleSound, onOpenSignup, onSignOut, privacyHref = '#', onClose }) {
+export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSignup, onSignOut, privacyHref = '#', onClose }) {
   const [view, setView] = useState('menu') // menu | howto
-  const isDoor = surface === 'door'
-  const anchor = isDoor ? { top: 72, right: 16 } : { top: 16, left: 72 }
-  const anim = isDoor ? 'suSheetIn' : 'suSheetInUp'
+  // The gear lives top-right on BOTH surfaces now (Door header + in-world, by the
+  // level bar), so the sheet drops from the top-right uniformly.
   const close = () => onClose?.()
 
   return (
     <>
       <div style={scrimStyle} onClick={close} />
-      <div style={{ position: 'fixed', ...anchor, width: 320, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <div style={{ position: 'fixed', top: 72, right: 16, width: 320, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
         <div
           style={{
             background: '#fff',
@@ -120,7 +119,7 @@ export function SettingsSheet({ surface = 'game', auth = {}, sound = true, onTog
             border: '1px solid #ECE7F5',
             boxShadow: '0 24px 60px rgba(50,38,80,.30), 0 4px 16px rgba(50,38,80,.12)',
             overflow: 'hidden',
-            animation: anim + ' .28s cubic-bezier(.2,.9,.3,1.1) both',
+            animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both',
           }}
         >
           {view === 'menu' && (
@@ -232,7 +231,7 @@ export function SettingsSheet({ surface = 'game', auth = {}, sound = true, onTog
                 </button>
                 <span style={{ fontSize: 16, fontWeight: 800, color: '#262626' }}>How to Play</span>
               </div>
-              <div style={{ padding: '0 20px 8px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[
                   'Explore a world and walk up to the glowing gems to start a math challenge.',
                   'Answer correctly to earn gems and points — points raise your level.',
@@ -245,9 +244,6 @@ export function SettingsSheet({ surface = 'game', auth = {}, sound = true, onTog
                     <span style={{ fontSize: 14, fontWeight: 500, color: '#4d4d4d', lineHeight: 1.5, paddingTop: 3, textWrap: 'pretty' }}>{step}</span>
                   </div>
                 ))}
-              </div>
-              <div style={{ margin: '12px 16px 16px', padding: '10px 14px', background: '#FFF7EA', border: '1px solid #FBE3B6', borderRadius: 12, fontSize: 12, fontWeight: 600, color: '#8A5300', lineHeight: 1.5, textWrap: 'pretty' }}>
-                Placeholder copy — final text is shared with the homepage &ldquo;How it works&rdquo; (Finn/Amy), one source.
               </div>
             </div>
           )}
