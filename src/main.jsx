@@ -7,6 +7,9 @@ import { localBackend, supabaseBackend } from './backend.js'
 import { getSessionOnce, onAuthChange, sendMagicLink } from './auth.js'
 import DivisionWalkthrough from './ui/DivisionWalkthrough.jsx'
 import { Modal } from './ui/mathkit.jsx'
+import SignupModal, { SavedToast } from './ui/SignupModal.jsx'
+import { SettingsSheet, ProfilePopover } from './ui/Settings.jsx'
+import { GemIcon } from './ui/hudkit.jsx'
 import './index.css'
 
 /*
@@ -100,7 +103,10 @@ function Boot() {
       unsub?.()
     }
   }, [])
-  if (phase === 'ready') return <App cloud={CLOUD} />
+  // justSignedIn: this boot is a magic-link redeem → App shows the "progress saved"
+  // toast once. REDEEMING is read at module load (hash still present); the URL is
+  // cleaned right after, so a later reload passes false.
+  if (phase === 'ready') return <App cloud={CLOUD} justSignedIn={REDEEMING} />
   if (phase === 'signin') return <SignIn />
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'var(--lilac-50)' }}>
@@ -206,9 +212,9 @@ function SignIn() {
       <div style={si.cover}>
         <div style={si.card}>
           <div style={si.big}>📬</div>
-          <h1 style={si.head}>Check your email!</h1>
+          <h1 style={si.head}>Check your inbox</h1>
           <p style={si.sub}>
-            Tap the link inside and your world will open all by itself ✨
+            Tap the link inside and your world opens right up ✨
           </p>
           <span style={si.again} onPointerDown={() => setState('idle')}>
             Send it again
@@ -220,23 +226,23 @@ function SignIn() {
     <div style={si.cover}>
       <div style={si.card}>
         <div style={si.big}>💜</div>
-        <h1 style={si.head}>Ask Mum to open your world</h1>
-        <p style={si.sub}>Your world is safe in the cloud — a grown-up sends the magic key.</p>
+        <h1 style={si.head}>Open your world</h1>
+        <p style={si.sub}>Enter your email and we’ll send you a link to sign in — no password needed.</p>
         <input
           style={si.input}
           type="email"
           inputMode="email"
           autoCapitalize="none"
-          placeholder="grown-up's email"
+          placeholder="you@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}
         />
         <button style={{ ...si.btn, opacity: state === 'sending' ? 0.6 : 1 }} onPointerDown={send}>
-          {state === 'sending' ? 'Sending…' : 'Send the magic key ✉️'}
+          {state === 'sending' ? 'Sending…' : 'Send my link'}
         </button>
         {state === 'error' && (
-          <div style={si.note}>Hmm, that key didn’t fly — check the email and try again 💜</div>
+          <div style={si.note}>That didn’t send — check the email and try again.</div>
         )}
       </div>
     </div>
@@ -303,10 +309,155 @@ function DivDemo() {
 const DEV_DEMO =
   import.meta.env.DEV && new URLSearchParams(window.location.search).has('divdemo')
 
+/*
+ * Dev-only preview for the Save-Your-Progress signup surfaces (Oscar's lift):
+ * open `/?signupdemo`. A faux game backdrop + a control bar to flip entry
+ * (form / guest), simulate a failing send, and fire the success toast. The
+ * real onSend is wired at integration (Settings account row); here it's a
+ * 1.2s stub. DEV-guarded → dead-code-eliminated from prod.
+ */
+function SignupDemo() {
+  const [entry, setEntry] = React.useState('form')
+  const [fail, setFail] = React.useState(false)
+  const [toast, setToast] = React.useState(false)
+  const [open, setOpen] = React.useState(true)
+  const [k, setK] = React.useState(0) // remount to reset the modal's internal phase
+  const onSend = () =>
+    new Promise((res, rej) => setTimeout(() => (fail ? rej(new Error('demo')) : res(true)), 1200))
+  const reopen = (e) => {
+    setEntry(e)
+    setOpen(true)
+    setK((n) => n + 1)
+  }
+  const bar = { padding: '6px 12px', borderRadius: 999, border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer' }
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'radial-gradient(120% 90% at 20% 0%, #cdeccb, #a9d3a6)',
+        fontFamily: "'Inter', system-ui, sans-serif",
+      }}
+    >
+      <div
+        style={{
+          position: 'fixed',
+          top: 12,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 90,
+          display: 'flex',
+          gap: 8,
+          alignItems: 'center',
+          background: 'rgba(255,255,255,.9)',
+          borderRadius: 999,
+          padding: '8px 12px',
+          boxShadow: '0 6px 18px rgba(0,0,0,.15)',
+          flexWrap: 'wrap',
+        }}
+      >
+        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.07em', color: '#8A7FB8' }}>DEMO</span>
+        <button style={{ ...bar, background: '#4B54DD', color: '#fff' }} onClick={() => reopen('form')}>
+          Modal
+        </button>
+        <button style={{ ...bar, background: '#EDE7FC', color: '#4B54DD' }} onClick={() => reopen('guest')}>
+          Guest popup
+        </button>
+        <button style={{ ...bar, background: fail ? '#FB2C36' : '#EDEBF2', color: fail ? '#fff' : '#6e6e6e' }} onClick={() => setFail((f) => !f)}>
+          {fail ? 'send: FAIL' : 'send: ok'}
+        </button>
+        <button style={{ ...bar, background: '#DCFCE7', color: '#00A63E' }} onClick={() => setToast(true)}>
+          Success toast
+        </button>
+      </div>
+      {open && (
+        <SignupModal key={k} entry={entry} onSend={onSend} onClose={() => setOpen(false)} />
+      )}
+      {toast && <SavedToast onDone={() => setToast(false)} />}
+    </div>
+  )
+}
+const SIGNUP_DEMO =
+  import.meta.env.DEV && new URLSearchParams(window.location.search).has('signupdemo')
+
+/*
+ * Dev-only preview for the Settings gear + Profile lift: `/?settingsdemo`.
+ * Faux Door / in-game chrome with the emoji gear (Amy's chrome call) + a
+ * surface/auth toggle bar, so both anchors + both sign-in states are viewable.
+ * DEV-guarded → stripped from prod.
+ */
+function SettingsDemo() {
+  const [surface, setSurface] = React.useState('door')
+  const [signedIn, setSignedIn] = React.useState(false)
+  const [sound, setSound] = React.useState(true)
+  const [view, setView] = React.useState('none') // none | settings | profile
+  const auth = { signedIn, email: 'ivy@email.com', initial: 'I' }
+  const isDoor = surface === 'door'
+  const chip = (on) => ({
+    border: 'none',
+    borderRadius: 999,
+    padding: '6px 14px',
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: 'pointer',
+    background: on ? '#4B54DD' : 'transparent',
+    color: on ? '#fff' : '#6e6e6e',
+  })
+  const gearBtnDoor = { width: 44, height: 44, borderRadius: '50%', border: 'none', background: view === 'settings' ? '#E7DEFA' : '#F1ECFE', cursor: 'pointer', fontSize: 20, lineHeight: 1 }
+  const railBtn = { width: 50, height: 50, borderRadius: '50%', border: 'none', background: '#fff', boxShadow: '0 4px 14px rgba(50,38,80,.16)', cursor: 'pointer', fontSize: 22, lineHeight: 1 }
+  return (
+    <div style={{ position: 'fixed', inset: 0, fontFamily: "'Inter', system-ui, sans-serif", background: isDoor ? 'linear-gradient(180deg,#F6F3FD,#EEE9F8)' : 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
+      {/* faux chrome */}
+      {isDoor ? (
+        <div style={{ height: 64, background: '#fff', boxShadow: '0 1px 0 rgba(74,54,110,.07),0 3px 14px rgba(74,54,110,.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <GemIcon size={26} />
+            <span style={{ fontSize: 20, fontWeight: 600, color: '#4B54DD' }}>Luxi Math</span>
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <button aria-label="Profile" onClick={() => setView('profile')} style={{ width: 44, height: 44, borderRadius: '50%', border: 'none', background: '#F1ECFE', boxShadow: '0 0 0 2px #fff,0 0 0 3.5px #E7DEFA', cursor: 'pointer', fontSize: 20 }}>
+              {signedIn ? '🅸' : '🙂'}
+            </button>
+            <button aria-label="Settings" onClick={() => setView('settings')} style={gearBtnDoor}>
+              ⚙️
+            </button>
+          </span>
+        </div>
+      ) : (
+        <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ height: 44, background: '#fff', borderRadius: 999, padding: '0 18px 0 14px', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 14px rgba(50,38,80,.16)', color: '#3B3266', fontWeight: 700 }}>‹ Exit</div>
+          <button aria-label="Shop" style={railBtn}>🛍️</button>
+          <button aria-label="Settings" onClick={() => setView('settings')} style={railBtn}>⚙️</button>
+        </div>
+      )}
+
+      {/* control bar */}
+      <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 90, display: 'flex', gap: 8, alignItems: 'center', background: 'rgba(255,255,255,.92)', borderRadius: 999, padding: '8px 12px', boxShadow: '0 6px 18px rgba(50,38,80,.16)' }}>
+        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.07em', color: '#8A7FB8' }}>DEMO</span>
+        <span style={{ display: 'flex', gap: 4, background: '#F1ECF8', borderRadius: 999, padding: 4 }}>
+          <button style={chip(isDoor)} onClick={() => { setSurface('door'); setView('none') }}>Door</button>
+          <button style={chip(!isDoor)} onClick={() => { setSurface('game'); setView('none') }}>In-game</button>
+        </span>
+        <span style={{ display: 'flex', gap: 4, background: '#F1ECF8', borderRadius: 999, padding: 4 }}>
+          <button style={chip(!signedIn)} onClick={() => setSignedIn(false)}>Guest</button>
+          <button style={chip(signedIn)} onClick={() => setSignedIn(true)}>Account</button>
+        </span>
+      </div>
+
+      {view === 'settings' && (
+        <SettingsSheet surface={surface} auth={auth} sound={sound} onToggleSound={setSound} onOpenSignup={() => alert('→ opens SignupModal')} onSignOut={() => setSignedIn(false)} onClose={() => setView('none')} />
+      )}
+      {view === 'profile' && <ProfilePopover auth={auth} onUploadAvatar={() => alert('→ upload avatar')} onClose={() => setView('none')} />}
+    </div>
+  )
+}
+const SETTINGS_DEMO =
+  import.meta.env.DEV && new URLSearchParams(window.location.search).has('settingsdemo')
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      {DEV_DEMO ? <DivDemo /> : <Boot />}
+      {DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
     </Oops>
     {/* Cookieless, privacy-friendly traffic counting (no personal data, no
       * consent banner needed) — the whole point of moving to a real domain. */}

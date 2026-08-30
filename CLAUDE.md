@@ -220,6 +220,84 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## Public-copy genericization ✅ SHIPPED 2026-08-29 — level-up messages + division walkthrough
+Item 1 of the pre-marketing launch checklist (Finn's list). Luxi Math is public
+now and strangers play as GUESTS, so personalized copy must not reach them.
+- **Level-up popup (`levels.js` + `App.jsx`):** the 15 signed team messages
+  (Finn/Oscar/Nathan → Ivy) were shown to EVERY player. Added `PUBLIC_MESSAGES`
+  — 8 generic unsigned lines (Amy-approved) + the already-generic Level-10 line,
+  unsigned — and a **`signed` flag on `pickLevelMessage` that DEFAULTS TO false**
+  (public/generic), so a forgotten flag fails safe and can never re-leak the
+  family copy. Gate in App: `signed = cloud && labelFor(email) !== 'Friend'` →
+  **Ivy's family account keeps her signed messages; guests + any future public
+  account get the generic pool.** Already correct for when public sign-up lands
+  (a public account reads as 'Friend' → generic) — no follow-up needed.
+- **Division walkthrough (`DivisionWalkthrough.jsx`):** the intro cards said
+  "Ivy has {a} candies to share" / "She shares them with {b} friends" — a live
+  leak for any guest recovering into the walkthrough. Changed to second person
+  ("You have…" / "You share…"); metaphor intact, no name, no gendered pronoun.
+  The `math.js` captions were ALREADY generic ("We have 815 candies…"). ⚠️
+  **Oscar: patch your C2 comp** — the "Ivy/She" copy lived in the design source.
+- **Deliberately NOT done:** the sign-in screen copy ("Ask Mum to open your
+  world", `main.jsx`) stays — it's behind `?account`, never shown to a public
+  guest today. It gets the generic treatment in **item 2 (public sign-up)** with
+  Oscar's modal.
+- **Tests:** +6 generic-path fixtures incl. a name-leak guard; existing signed
+  tests opt into `signed=true`. **154 green**, oxlint clean, build clean.
+- **Verified:** guest path live in the dev pane (Level 2/3 generic, no signature;
+  walkthrough "You have 85 candies"); prod (commit `412e7b3`, `dpl_92aJDD…`
+  READY) boots clean on math.luxi.land with dev hooks stripped. Ivy's signed path
+  is test-covered (not live-verifiable without her inbox — the standing caveat).
+
+## Save Your Progress signup + Settings gear/Profile ✅ SHIPPED 2026-08-30 — items 2 + 3
+The launch checklist's email sign-up (item 2) + settings-menu redesign (item 3),
+lifted from Oscar's two comps (`~/Downloads/Luxi Save Your Progress …`, `Luxi
+Settings Gear + Profile …`) onto the house system.
+- **`src/ui/SignupModal.jsx`** — passwordless magic-link signup. `<SignupModal>` =
+  the modal (form → sending → check → error) + the return-visit guest popup
+  (`entry='guest'`); `<SavedToast>` = the post-redirect success toast. Sign-up ==
+  sign-in (one email, one link). Error is GENERIC — never reveals if an account
+  exists (mirrors the allowlist-never-leaks rule). 30s resend cooldown. Colours are
+  Oscar's exact comp values; keyframes namespaced `su*` in index.css.
+- **`src/ui/Settings.jsx`** — `<SettingsSheet surface={'door'|'game'}>` (ONE shared
+  sheet on BOTH surfaces; only the anchor/animation differs) + `<ProfilePopover>`
+  (Door only). Menu: Account (guest → opens signup / signed-in → status + Sign out;
+  uses the house `GemIcon`) · Sound (→ `store.soundOn`) · How to Play (copy shared
+  with the homepage, Finn/Amy) · Privacy Policy (stubbed `'#'`). Feedback + Help
+  "SOON" rows DROPPED (Amy: hide, not disabled). Sheet-internal icons are Oscar's
+  line-icons; CHROME icons are emoji ⚙️/🙂/🛍️ matching the Door (Amy 2026-08-30:
+  chrome matches the Door's existing button look, NOT Oscar's stroke gear).
+- **Wiring (App.jsx):** the gear opens the same sheet from the Door header AND the
+  in-world rail; the Account row opens the signup modal; `onSend` →
+  `sendMagicLink(email, {create:true})`; Sound → `toggleSound`; Sign out →
+  `signOut()` + clear the remembered flag + reboot to a clean guest. `justSignedIn`
+  (= main.jsx `REDEEMING`) → `SavedToast` once on a redeem-return.
+- **Chrome changes:** Door header = 🙂 profile + ⚙️ gear (speaker removed; profile
+  opens `ProfilePopover`). In-world rail = ‹ Exit · 🛍️ · ⚙️ — `SpeakerButton`
+  retired (Sound lives in the sheet), 💞 Together REMOVED (the Meadow is a Door
+  card now; **meadow PAUSED** — `enterMeadow` kept for the dev hook + Door card),
+  no profile in-world.
+- **auth.js:** `sendMagicLink(email, {create})` — `create:false` = legacy family
+  sign-in (unknown email → generic error); `create:true` = public signup. Added
+  `signOut()`. Legacy "Ask Mum" wall copy genericized (main.jsx, COPPA posture).
+- **⚠️ SIGNUPS ARE OFF server-side — the modal ships DARK.** Verified live: a real
+  submit → Supabase **422** → generic error (safe). **To go LIVE:** enable signups
+  (Supabase Auth → Providers → Email → "Allow new users to sign up") AND wire Resend
+  before any marketing (built-in SMTP throttles — magic links fail to send under
+  load). The guest→account merge rides main.jsx's EXISTING redeem path (`REDEEMING`
+  → cloud boot → monotonic-ledger merge) — no new merge code.
+- **DEFERRED (built but not armed):** the guest-popup return-visit AUTO-TRIGGER
+  (arms when signups go live; a prompt that 422s would frustrate — the on-demand
+  Settings → Sign up path covers the dark period). Profile photo upload = "coming
+  soon" note (Amy: we'll talk before building it). Privacy Policy popup = next phase
+  (a simple white modal; keep the `'#'` link until then).
+- **Governance (Amy 2026-08-30):** 4px grid — new components at radius 24/20/12;
+  the Door hero card snapped 26→24 to match. A full Door grid-audit is an optional
+  separate pass (ties to the living-DS work), NOT done here.
+- **Dev harnesses:** `/?signupdemo` (state chips) + `/?settingsdemo` (surface/auth
+  toggles), DEV-guarded → DCE'd from prod (like `/?divdemo`). 154 tests green, lint
+  + build clean.
+
 ## Phase 5-A ✅ SHIPPED 2026-07-18 — the level bar + signed congratulations
 Oscar's `~/Downloads/math-level-bar-flow.html` lifted into `src/ui/LevelBar.jsx`
 (bar + popup) + `src/levels.js` (ladder maths + message packs). Decisions were

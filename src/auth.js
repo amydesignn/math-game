@@ -71,13 +71,18 @@ export function onAuthChange(cb) {
   return () => data.subscription.unsubscribe()
 }
 
-/** Send the magic link. shouldCreateUser:false + signups OFF server-side —
- *  an unknown email gets a (deliberately generic) error, never an account. */
-export async function sendMagicLink(email) {
+/** Send the magic link. `create` controls signup-vs-signin-only:
+ *  - create:false (default) → the legacy family path: unknown email gets a
+ *    generic error, never an account (works while signups are OFF server-side).
+ *  - create:true → the public "Save Your Progress" flow: sign-up == sign-in, an
+ *    unknown email creates an account. Needs signups ENABLED in the Supabase
+ *    dashboard (Auth → Providers → Email → "Allow new users to sign up"); until
+ *    then it errors the same generic way, so the modal is safe to ship dark. */
+export async function sendMagicLink(email, { create = false } = {}) {
   const { error } = await client().auth.signInWithOtp({
     email: email.trim(),
     options: {
-      shouldCreateUser: false,
+      shouldCreateUser: create,
       // Must match the dashboard's redirect allowlist exactly: the bare origin
       // (https://math.luxi.land/ in prod, http://localhost:5180 in dev). The
       // redeem lands here WITHOUT ?account — main.jsx now detects the URL-hash
@@ -87,4 +92,10 @@ export async function sendMagicLink(email) {
   })
   if (error) throw error
   return true
+}
+
+/** Sign out — clears the Supabase session. The caller drops back to guest
+ *  (and clears the remembered-device flag) so the next boot is a clean guest. */
+export async function signOut() {
+  await client().auth.signOut()
 }

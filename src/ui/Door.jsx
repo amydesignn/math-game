@@ -118,7 +118,7 @@ function ChunkyButton({ color = V.btn, dark = V.btnDark, onClick, children, styl
 
 /* ── hero: character stage + level readout + saved line ── */
 const heroS = {
-  card: { background: T.surface, borderRadius: 26, boxShadow: '0 2px 14px rgba(74,54,110,.07)', padding: 16, animation: 'doorPop .4s ease-out both' },
+  card: { background: T.surface, borderRadius: 24, boxShadow: '0 2px 14px rgba(74,54,110,.07)', padding: 16, animation: 'doorPop .4s ease-out both' }, // 26→24: 4px-grid align to the new Settings sheet (Amy 2026-08-30)
   stage: { position: 'relative', width: '100%', height: 196, borderRadius: 20, overflow: 'hidden', background: 'radial-gradient(120% 100% at 50% 18%, #F6F1FF 0%, #ECE4FB 62%, #E4D9F6 100%)' },
   lvlRow: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 18 },
   lvlNum: { fontSize: 20, fontWeight: 600, color: T.ink, letterSpacing: '-.01em' },
@@ -239,17 +239,20 @@ const hS = {
   mark: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
   word: { fontSize: 23, fontWeight: 600, color: T.iris, letterSpacing: '-.02em' },
   right: { display: 'flex', alignItems: 'center', gap: 10 },
-  round: { width: 42, height: 42, borderRadius: '50%', background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 20 },
+  // Profile (personalization) and the gear (settings, incl. sound + account) — the
+  // two Door chrome buttons. Emoji glyph, matching the Door's existing button look
+  // (Amy 2026-08-30: chrome icons stay emoji, not Oscar's stroke gear).
+  profileBtn: { border: 'none', background: 'transparent', padding: 0, cursor: 'pointer', display: 'flex', borderRadius: '50%' },
+  gear: { width: 44, height: 44, borderRadius: '50%', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 20, lineHeight: 1 },
 }
-function Header({ sound, setSound }) {
+function Header({ onOpenSettings, onOpenProfile, settingsActive }) {
   return (
     <header className="doorHdr">
       <div className="doorHdrIn">
         <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Luxi Math</span></div>
         <div style={hS.right}>
-          <button style={hS.round} onClick={() => setSound(!sound)} title={sound ? 'Sound on' : 'Sound off'} aria-label="Toggle sound">{sound ? '🔈' : '🔇'}</button>
-          {/* Profile — the affordance settings lives inside later; soft avatar for now */}
-          <ProfileChip />
+          <button style={hS.profileBtn} onClick={onOpenProfile} aria-label="Profile" title="Profile"><ProfileChip /></button>
+          <button style={{ ...hS.gear, background: settingsActive ? '#E7DEFA' : '#F1ECFE' }} onClick={onOpenSettings} aria-label="Settings" title="Settings">⚙️</button>
         </div>
       </div>
     </header>
@@ -263,11 +266,11 @@ const dS = {
   colTitle: { fontSize: 24, fontWeight: 600, color: T.ink, letterSpacing: '-.01em' },
   colNote: { fontSize: BODY, fontWeight: 400, color: T.ink3 },
 }
-export default function Door({ mode, name, points, gems, map, quest, meadowOpen = false, sound, setSound, onResume, onPlay }) {
+export default function Door({ mode, name, points, gems, map, quest, meadowOpen = false, onOpenSettings, onOpenProfile, settingsActive = false, onResume, onPlay }) {
   const greet = mode === 'account' && name ? 'Welcome back, ' + name + '!' : 'Welcome, player!'
   return (
     <div className="doorScreen">
-      <Header sound={sound} setSound={setSound} />
+      <Header onOpenSettings={onOpenSettings} onOpenProfile={onOpenProfile} settingsActive={settingsActive} />
       <main className="doorWrap">
         <div className="doorGrid">
           <div className="doorLeft">

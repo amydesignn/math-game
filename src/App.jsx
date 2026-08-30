@@ -9,19 +9,21 @@ import StationPopup from './ui/StationPopup'
 import LevelBar, { LevelUpPopup } from './ui/LevelBar'
 import ProgressPopup from './ui/ProgressPopup'
 import Door from './ui/Door'
+import SignupModal, { SavedToast } from './ui/SignupModal'
+import { SettingsSheet, ProfilePopover } from './ui/Settings'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
 import { getState, setMap, setPos, markPlayed, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
-import { sessionCache } from './auth'
+import { sessionCache, signOut, sendMagicLink } from './auth'
 import { WORLD, REFRESH } from './config'
 import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
 
-export default function App({ cloud = false }) {
+export default function App({ cloud = false, justSignedIn = false }) {
   const [state] = useState(getState)
   const [moved, setMoved] = useState(false)
 
@@ -40,6 +42,31 @@ export default function App({ cloud = false }) {
     setSoundState(on)
     setSoundOn(on)
     setAudioEnabled(on)
+  }
+
+  // ── Settings gear + Profile + the Save-Your-Progress signup (2026-08-30) ──
+  // The gear opens the SAME <SettingsSheet> from the Door AND the in-world rail;
+  // Profile (avatar) is Door-only; the Account row opens <SignupModal>. Sign-up
+  // stays server-side OFF until launch, so onSignupSend errors the generic way.
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const [signup, setSignup] = useState(null) // null | 'form' | 'guest'
+  const [savedToast, setSavedToast] = useState(justSignedIn) // fires once on redeem-return
+  const authInfo = {
+    signedIn: cloud,
+    email: cloud ? sessionCache()?.email || '' : '',
+    initial: cloud ? (labelFor(sessionCache()?.email)?.[0] || sessionCache()?.email?.[0] || '★').toUpperCase() : '',
+  }
+  const onSignupSend = (email) => sendMagicLink(email, { create: true })
+  function onSignOut() {
+    try {
+      localStorage.removeItem('luxi.account')
+      localStorage.removeItem('lumio.account')
+    } catch { /* private mode */ }
+    // Full reboot to a clean guest session (drops the ?account/redeem URL too).
+    signOut().finally(() => {
+      window.location.href = window.location.origin + import.meta.env.BASE_URL
+    })
   }
 
   // ── Gems (uncapped since the beta cap retired 2026-07-18) ──
@@ -746,8 +773,9 @@ export default function App({ cloud = false }) {
           map={getState().map}
           quest={quest}
           meadowOpen={false}
-          sound={soundOn}
-          setSound={toggleSound}
+          onOpenSettings={() => setSettingsOpen(true)}
+          onOpenProfile={() => setProfileOpen(true)}
+          settingsActive={settingsOpen}
           onResume={onResume}
           onPlay={onPlay}
         />
@@ -809,16 +837,15 @@ export default function App({ cloud = false }) {
         {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
           <ExitButton onTap={goToDoor} />
         )}
-        {/* Account only: the meadow needs a realtime session a guest doesn't have,
-            and it's "Coming soon" on the hub until Account launches publicly. */}
-        {cloud && !placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
-          <RoundHudButton aria="Play together in the meadow" emoji="💞" onTap={enterMeadow} />
-        )}
+        {/* Rail = Exit · Cart · Gear (Amy 2026-08-30). 💞 Together removed — the
+            Meadow lives as a Door card now (meadow paused); the speaker folded
+            into the gear's Settings sheet (Sound toggle). enterMeadow stays for
+            the dev hook + the Door card. */}
         {!placing && !shopOpen && selectedId == null && !meadow && (
           <RoundHudButton aria="Open the Gem Shop" emoji="🛍️" onTap={() => setShopOpen(true)} />
         )}
         {!placing && !shopOpen && selectedId == null && !meadow && (
-          <SpeakerButton on={soundOn} onToggle={() => toggleSound()} />
+          <RoundHudButton aria="Open Settings" emoji="⚙️" onTap={() => setSettingsOpen(true)} />
         )}
       </div>
 
@@ -937,6 +964,26 @@ export default function App({ cloud = false }) {
 
       </>
       )}
+
+      {/* ── Settings gear · Profile · Save-Your-Progress signup — over both the
+          Door and the world (position:fixed, so placement here is fine) ── */}
+      {settingsOpen && (
+        <SettingsSheet
+          surface={view === 'door' ? 'door' : 'game'}
+          auth={authInfo}
+          sound={soundOn}
+          onToggleSound={toggleSound}
+          onOpenSignup={() => {
+            setSettingsOpen(false)
+            setSignup('form')
+          }}
+          onSignOut={onSignOut}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
+      {profileOpen && <ProfilePopover auth={authInfo} onClose={() => setProfileOpen(false)} />}
+      {signup && <SignupModal entry={signup} onSend={onSignupSend} onClose={() => setSignup(null)} />}
+      {savedToast && <SavedToast onDone={() => setSavedToast(false)} />}
 
       {/* gate-travel fade (also swallows taps mid-travel) — over both hub + world */}
       <div
@@ -1156,35 +1203,8 @@ function MapToast({ name }) {
   )
 }
 
-/** Speaker toggle — a white chip in the top-left utility column, matching the
- *  💞/🛍️ RoundHudButton shape (50px). Positioned by its flex-column parent, so
- *  no absolute placement of its own. Folds into a single gear menu here later. */
-function SpeakerButton({ on, onToggle }) {
-  return (
-    <button
-      aria-label={on ? 'Sound on' : 'Sound off'}
-      onPointerDown={(e) => e.stopPropagation()} // a speaker tap is not a walk/pinch
-      onClick={onToggle}
-      style={{
-        flex: 'none',
-        width: 50,
-        height: 50,
-        borderRadius: 999,
-        border: 'none',
-        background: '#ffffff',
-        boxShadow: '0 4px 14px rgba(43,32,90,0.18)',
-        fontSize: 23,
-        cursor: 'pointer',
-        opacity: on ? 1 : 0.72,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      {on ? '🔊' : '🔇'}
-    </button>
-  )
-}
+/* SpeakerButton retired 2026-08-30 — Sound is now the toggle inside the Settings
+   sheet (the gear absorbed the standalone speaker on both the Door and the rail). */
 
 /** Bottom-center pill of big kid-sized buttons (placement + edit modes). */
 function ActionBar({ hint, buttons }) {

@@ -199,3 +199,14 @@ canvas { touch-action: none; display: block; }
 @keyframes dvTapMe { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,109,246,0); } 50% { box-shadow: 0 0 0 6px rgba(45,109,246,.14); } }
 @keyframes dvDigitPop { 0% { transform: scale(.55); opacity: 0; } 60% { transform: scale(1.16); } 100% { transform: scale(1); opacity: 1; } }
 @keyframes dvShakeCell { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
+
+/* Save-Your-Progress signup modal + Settings gear (Oscar's lift, 2026-08-30).
+ * Namespaced `su*` so they can't retune the shared popIn/scrimIn/floaty curves
+ * (the lesson from the division dv* set). scrimIn/floaty/popIn are reused as-is. */
+@keyframes suSpin { to { transform: rotate(360deg); } }
+@keyframes suFadeSlide { 0% { opacity: 0; transform: translateY(-6px); } 100% { opacity: 1; transform: translateY(0); } }
+/* vertical + scale only — horizontal centering is the wrapper's translateX(-50%),
+ * so keeping it out of here avoids a double-translate that shoves the toast left. */
+@keyframes suToastIn { 0% { opacity: 0; transform: translateY(12px) scale(.94); } 60% { transform: translateY(-2px) scale(1.02); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes suSheetIn { 0% { transform: scale(.94) translateY(-10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes suSheetInUp { 0% { transform: scale(.94) translateY(10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
