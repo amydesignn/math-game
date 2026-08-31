@@ -30,7 +30,7 @@ const IRIS = '#4B54DD',
   LILAC200 = '#DDD1F7'
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function PrivacyLine({ href = '#' }) {
+function PrivacyLine({ href = '/privacy.html' }) {
   return (
     <div
       style={{
@@ -42,8 +42,8 @@ function PrivacyLine({ href = '#' }) {
         textWrap: 'pretty',
       }}
     >
-      We only use your email to save your game.{' '}
-      <a href={href} style={{ color: '#6E5BC0', fontWeight: 600 }}>
+      We only use a parent&rsquo;s email to save the game.{' '}
+      <a href={href} target="_blank" rel="noopener noreferrer" style={{ color: '#6E5BC0', fontWeight: 600 }}>
         Privacy Policy
       </a>
     </div>
@@ -127,7 +127,7 @@ export default function SignupModal({
   entry = 'form',
   defaultEmail = '',
   resendSeconds = 30,
-  privacyHref = '#',
+  privacyHref = '/privacy.html',
   onSend,
   onClose,
 }) {
@@ -219,7 +219,7 @@ export default function SignupModal({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ ...S.title, fontSize: 20 }}>Save your progress</div>
               <div style={{ ...S.sub, lineHeight: 1.5 }}>
-                Create a free account to keep your gems and the world you&rsquo;re building &mdash; on any device.
+                Ask a parent to make a free account, so your gems and the world you&rsquo;re building stay saved on any device.
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', marginTop: 4 }}>
@@ -273,7 +273,7 @@ export default function SignupModal({
             <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={S.title}>Save your progress</div>
-                <div style={S.sub}>Enter your email and we&rsquo;ll send you a link &mdash; no password needed.</div>
+                <div style={S.sub}>Enter a parent&rsquo;s email and we&rsquo;ll send a sign-in link &mdash; no password needed.</div>
               </div>
 
               {phase === 'error' && (
@@ -300,7 +300,7 @@ export default function SignupModal({
                 type="email"
                 inputMode="email"
                 autoComplete="email"
-                placeholder="you@email.com"
+                placeholder="parent@email.com"
                 value={email}
                 disabled={sending}
                 onChange={(e) => setEmail(e.target.value)}
@@ -356,7 +356,7 @@ export default function SignupModal({
                     }}
                   />
                 )}
-                <span>{sending ? 'Sending…' : 'Send my link'}</span>
+                <span>{sending ? 'Sending…' : 'Send the link'}</span>
               </button>
 
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 4 }}>
@@ -390,7 +390,7 @@ export default function SignupModal({
                 <div style={{ ...S.sub, lineHeight: 1.5 }}>
                   We sent a link to{' '}
                   <strong style={{ color: '#262626', fontWeight: 700 }}>{canSend ? trimmed : 'your email'}</strong>. Open it to
-                  save your progress.
+                  save this game.
                 </div>
               </div>
               <div
