@@ -119,8 +119,8 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     }} />,
   )
   els.push(
-    <div key="ql" style={{ position: 'absolute', left: xL(0) - 7, top: yT(0) - 32, width: n * CELL + 14, textAlign: 'center', zIndex: 2 }}>
-      <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 0, color: ink3 }}>Each friend&apos;s share</span>
+    <div key="ql" style={{ position: 'absolute', left: xL(0) - 7, top: yT(0) - 46, width: n * CELL + 14, textAlign: 'center', zIndex: 2 }}>
+      <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 0, color: ink3, whiteSpace: 'nowrap' }}>Each friend&apos;s share</span>
       {showTerms && <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, color: ink3, opacity: 0.75, textTransform: 'uppercase', letterSpacing: '.05em' }}>Quotient</span>}
     </div>,
   )
@@ -394,7 +394,10 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ fontSize: 22, fontWeight: 800, color: P.ink, letterSpacing: '-.01em' }}>Let&apos;s share the candy 🍬</div>
         {phase === 'work' && (
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: '#404040', background: '#F5F5F5', borderRadius: 999, padding: '6px 13px', whiteSpace: 'nowrap' }}>{roundLabel}</span>
+          // marginRight reserves the parent modal's floating ✕ gutter (ModalClose
+          // 40px at right:14) so the round pill clears the close button by a
+          // governed ~12px gap (golden 4px rule; 44 = 4×11, Amy 2026-08-31).
+          <span style={{ fontSize: 12.5, fontWeight: 700, color: '#404040', background: '#F5F5F5', borderRadius: 999, padding: '6px 13px', whiteSpace: 'nowrap', marginRight: 44 }}>{roundLabel}</span>
         )}
       </div>
 
