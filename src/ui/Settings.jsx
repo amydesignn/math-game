@@ -102,7 +102,7 @@ const rowIcon = { color: LILAC700, display: 'flex' }
  * The shared settings sheet. surface: 'door' | 'game' (anchor + animation only).
  * auth: { signedIn, email, initial }. onOpenSignup opens the shared SignupModal.
  */
-export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSignup, onSignOut, privacyHref = '#', onClose }) {
+export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSignup, onSignOut, privacyHref = '/privacy.html', onClose }) {
   const [view, setView] = useState('menu') // menu | howto
   // The gear lives top-right on BOTH surfaces now (Door header + in-world, by the
   // level bar), so the sheet drops from the top-right uniformly.
@@ -215,7 +215,7 @@ export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSi
               </div>
 
               <div style={{ padding: '12px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #F1ECF8' }}>
-                <a href={privacyHref} style={{ fontSize: 13, fontWeight: 600, color: '#8A7FB8' }}>
+                <a href={privacyHref} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, fontWeight: 600, color: '#8A7FB8' }}>
                   Privacy Policy
                 </a>
                 <span style={{ fontSize: 12, fontWeight: 500, color: '#c3bcd0', whiteSpace: 'nowrap' }}>Luxi Math</span>
