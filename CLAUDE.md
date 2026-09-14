@@ -220,6 +220,32 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## C2 walkthrough spacing fix + golden 4px governance ✅ SHIPPED 2026-08-31
+Two layout regressions in the "Let's share the candy" recovery walkthrough
+(`DivisionWalkthrough.jsx`), surfaced after the 08-30 chrome shift + Amy's live
+test — and the **FIRST application of the golden 4px governance rule** (spacing /
+dimension / radius on a 4px base, 2px only under extreme constraint; doc =
+`nathan-mcp-codebase-01/docs/governance-layer.md`, mirrored to the Notion
+"Governance Layer" page).
+- **"Let's begin" round pill ran under the modal's floating ✕.** The header row
+  is `space-between` (title left, pill right) but the parent modal floats
+  `ModalClose` (40px) at `right:14`. Reserve the gutter: `marginRight:44` on the
+  pill → clears ✕ by a governed **12px** (44 = 4×11, on-grid).
+- **"Each friend's share" wrapped to 2 lines → QUOTIENT overlapped the answer
+  box.** The quotient label sits in an `n·CELL+14` container (~102px at 2 digits)
+  → wrapped. `whiteSpace:nowrap` keeps it one line; the label block lifts
+  `yT(0)-32 → yT(0)-46` so QUOTIENT sits a governed **8px** above the box.
+- **Governance note:** the pill gap is a clean 4px value; the label offset used
+  the **2px exception** because the answer box inherits an odd y (`yT(0)+1`) from
+  Oscar's not-yet-normalized diagram geometry — so the *visible* gap lands on 8px
+  (snap what the eye measures, not the raw offset). Retrofitting Oscar's raw
+  diagram values is a separate future normalization pass, NOT this fix.
+- Verified sub-pixel + screenshot at 2-digit, 3-digit, phone + desktop; no
+  element shifted. 154 tests green, lint + build clean. Commit `be926b1`,
+  `dpl_BmZsh…` READY, live on math.luxi.land (hooks stripped, `marginRight:44`
+  confirmed in the shipped bundle). **Oscar: reapply the 4px governance to the C2
+  comp** (same label copy + spacing).
+
 ## Public-copy genericization ✅ SHIPPED 2026-08-29 — level-up messages + division walkthrough
 Item 1 of the pre-marketing launch checklist (Finn's list). Luxi Math is public
 now and strangers play as GUESTS, so personalized copy must not reach them.
