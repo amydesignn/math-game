@@ -25,3 +25,6 @@ dist-ssr
 .idea
 .DS_Store
 *.sw?
+
+# Feedback digests — kids' free text stays LOCAL, never in the public repo
+docs/feedback-digests/
