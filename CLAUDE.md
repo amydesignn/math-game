@@ -676,6 +676,38 @@ on-screen, speaker top-left, no profile chip; `__award` stripped in prod).
   + pane running) — a 14s run failed 3, an unloaded 1.6s re-run was 118/118.
   They're timing-sensitive, not broken. Re-run alone before trusting a red.
 
+## The Door footer ✅ SHIPPED 2026-09-19 — Oscar's Luxi Land footer
+Oscar's `~/Downloads/Luxi Footer.dc.html` (his newer **design-code `.dc`** export —
+inline styles + a `style-hover` attribute, not the old React-UMD comp) lifted 1:1
+into **`src/ui/Footer.jsx`**, rendered full-bleed at the foot of the Door's scroll
+container (`Door.jsx`, after `</main>`) — **Door-only, never in-world**. Visual
+language verbatim (dark `#1D1730` bar, Luxi Land gem mark, tagline, social row,
+three nav columns, © + Kenney CC0 bottom bar). Commit `522b1c9`,
+`dpl_7usgfU…` READY, live-verified on math.luxi.land. Branch `footer-on-door`
+→ ff-merged to main.
+- **Link targets adapted (Amy's calls, "keep the columns, wire what I can"):**
+  `/privacy`→`/privacy.html`; `/coppa`→`/privacy.html#coppa` (no separate COPPA
+  page — added `id="coppa"` to the COPPA `<h2>` in `public/privacy.html`); Worlds
+  (`#worlds`) scrolls to the "Choose your world" grid (added `id="worlds"` +
+  `scrollMarginTop:90` on the right column so it clears the sticky `.doorHdr`);
+  `hello@luxi.land` is the real inbox (already in privacy.html); social handles
+  shipped **AS-IS** (unverified placeholders, Amy's call), `target=_blank`
+  `rel=noopener`.
+- **Visible-but-INERT** (marketing pages that don't exist on the app Door yet):
+  Play Luxi Math (self-link on the Door), How it works, Send feedback — rendered
+  as `<Muted>` spans so the column layout matches Oscar's comp exactly.
+- **⚠️ Hover in CSS, not inline:** an inline style overrides a CSS `:hover`, so
+  Oscar's `style-hover` moved to a namespaced `.luxiFooter*` block in `index.css`
+  (link/social/kenney colour + social bg). `Footer.jsx` keeps only static geometry
+  inline. Same class of lesson as the `dv*`/`su*` keyframe namespacing.
+- **Brand reads "Luxi Land"** (the umbrella brand) by Oscar's design, though the
+  app itself is "Luxi Math" — kept verbatim.
+- **📮 Oscar to patch his standalone comp:** `/privacy` + `/coppa` are dead routes
+  (real ones are `/privacy.html[#coppa]`); the social handles are unverified.
+- Verified: desktop matches the comp; mobile 375px reflows with no horizontal
+  overflow; zero console errors; Worlds anchor + COPPA deep-link both scroll
+  correctly; oxlint + build clean. No new tests (pure presentational markup).
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).
