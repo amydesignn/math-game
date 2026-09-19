@@ -755,6 +755,46 @@ live-verified on math.luxi.land (first-run modal shows step 1 with its image).
 - **📮 Oscar to patch his standalone comps:** the same 4px snaps apply; the
   `/privacy`-style dead routes don't recur here (no links in this comp).
 
+## Feedback Flow ✅ SHIPPED 2026-09-19 — Send Feedback live (Oscar's comp)
+Oscar's `~/Downloads/delivery/Luxi Feedback Flow.dc.html` (pass-2 governed,
+handoff in the same folder) lifted into **`src/ui/FeedbackModal.jsx`** +
+**`src/feedback.js`**. Commit `90d8108`, `dpl_AKvYb2…` READY, live-verified.
+- **Entries:** Settings gear → **Send Feedback** row (returned LIVE — it was
+  dropped as SOON 08-30; Help stays hidden) + the Door footer's "Send
+  feedback" (was inert, now the same modal via Door→Footer prop threading).
+- **The contract (Amy 2026-08-31):** `rating` 1–5 REQUIRED (rating alone is a
+  complete submission) + `liked`/`improve` optional ≤500, both always shown,
+  never gated by the rating. **ZERO PII by schema** — `public.feedback` has no
+  name/email/age/uid column; silent context is coarse WORDS the app attaches
+  (world = store.map, screen = door|world, player = guest|account word,
+  app_version = `__BUILD_ID__` → VERCEL_GIT_COMMIT_SHA·7, 'dev' locally).
+- **Optimistic (Oscar's seam #2):** thanks immediately, insert behind. Fail
+  card only if the insert truly fails while the card is open (payload
+  retained — Try again re-submits, no retyping); failure after close = ONE
+  quiet retry (`retryFeedbackOnce`), never a re-opened modal over gameplay.
+- **Transport:** raw PostgREST `fetch(keepalive)` (the saveRemote pattern) —
+  guests insert on the publishable key alone; supabase-js never constructed
+  (the CI WebSocket lesson). **RLS = INSERT-only** for anon+authenticated, no
+  read policy — verified: anon select returns `[]`. Reading the report is
+  dashboard/MCP only.
+- **Adaptations (commented at site):** comp's MENU state not lifted (the gear
+  sheet IS the entry, Oscar's own trigger note); SENDING state not routed
+  (optimistic); keyframes namespaced `fb*` (comp's `popIn`/`pop` name-collide
+  with different curves — the standing lesson); hover/focus/active in
+  index.css `.luxiFb-*` (inline beats :hover); press depth governed
+  translateY(3)→(4)+shadow-0 (the onboarding's 09-19 press snap).
+- **⚠️ Comment gotcha that bit this build:** writing `su*/dv*` inside a `/* */`
+  block comment TERMINATES it (`*/` in the text). Write `su-, dv-` in prose.
+- **Tests:** `src/__tests__/feedback.test.js` (+6) — row shape, rating
+  required, 500 clamp, guest word fallback, and a **no-PII whitelist guard**
+  (adding an email/name/uid field fails there first). **165 green**, oxlint +
+  build clean. Verified in the pane end-to-end incl. a stubbed-offline fail →
+  restore → Try again → row lands; test rows deleted after.
+- **📮 Oscar:** no bugs found in the comp this time. Optional patch: the press
+  depth (3px/1px) pre-dates the 4px press snap we now use everywhere.
+- **Open (Amy's call):** no new "?" affordance was added (per handoff — flag
+  if wanted); feedback report surfacing (Notion/Airtable digest?) unbuilt.
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).
