@@ -23,6 +23,7 @@
 import { levelState, fmtPoints } from '../levels'
 import HeroStage from './HeroStage'
 import { GemIcon, ProfileChip } from './hudkit'
+import Footer from './Footer'
 
 /* level math is imported from levels.js — the comp inlined a verbatim copy of it;
    in-app we read the real source so the two can never drift. */
@@ -279,7 +280,9 @@ export default function Door({ mode, name, points, gems, map, quest, meadowOpen 
             <Hero mode={mode} points={points} gems={gems} />
             <QuestCard quest={quest} />
           </div>
-          <div>
+          {/* id + scroll-margin: the footer's "Worlds" link (#worlds) lands here,
+              clear of the sticky .doorHdr (~70px). */}
+          <div id="worlds" style={{ scrollMarginTop: 90 }}>
             <div style={dS.colHead}>
               <span style={dS.colTitle}>Choose your world</span>
               <span style={dS.colNote}>{WORLDS.length} worlds{meadowOpen ? ' · Meadow open' : ''}</span>
@@ -293,6 +296,8 @@ export default function Door({ mode, name, points, gems, map, quest, meadowOpen 
           </div>
         </div>
       </main>
+      {/* full-bleed dark footer at the foot of the Door's scroll container */}
+      <Footer />
     </div>
   )
 }

@@ -210,3 +210,16 @@ canvas { touch-action: none; display: block; }
 @keyframes suToastIn { 0% { opacity: 0; transform: translateY(12px) scale(.94); } 60% { transform: translateY(-2px) scale(1.02); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes suSheetIn { 0% { transform: scale(.94) translateY(-10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 @keyframes suSheetInUp { 0% { transform: scale(.94) translateY(10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+
+/* ── Luxi Land footer (Door) — lifted 1:1 from Oscar's "Luxi Footer.dc.html" (2026-09-19) ──
+ * Hover states live HERE, not inline, because an inline style overrides a CSS
+ * :hover rule (Oscar's `style-hover` attribute isn't real CSS). Footer.jsx keeps
+ * only the static geometry inline; every property that changes on hover is below. */
+.luxiFooter a { text-decoration: none; }
+.luxiFooter .lf-link { color: #C9C2E0; transition: color .12s ease; }
+.luxiFooter .lf-link:hover { color: #fff; }
+.luxiFooter .lf-muted { color: #C9C2E0; cursor: default; }
+.luxiFooter .lf-social { background: rgba(255,255,255,.06); color: #C9C2E0; transition: background .12s ease, color .12s ease; }
+.luxiFooter .lf-social:hover { background: rgba(255,255,255,.14); color: #fff; }
+.luxiFooter .lf-kenney { color: #9990B3; text-decoration: underline; text-underline-offset: 2px; transition: color .12s ease; }
+.luxiFooter .lf-kenney:hover { color: #fff; }
