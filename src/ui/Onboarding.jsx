@@ -45,14 +45,6 @@ const CORE = [
   { num: 4, title: 'Add some sparkle', body: 'Treat your character to a sparkle trail and other playful extras.', media: '/onboarding/step-4.jpg' },
 ]
 
-function BackChevron() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M15 5l-7 7 7 7" />
-    </svg>
-  )
-}
-
 /**
  * The 5-step carousel. Owns its own step cursor (like Oscar's comp).
  * onClose = the header back-control (dismiss). onFinish = the final CTA.
@@ -86,15 +78,18 @@ export function OnboardingCard({ onClose, onFinish }) {
         boxShadow: '0 24px 60px rgba(74,54,110,.22), inset 0 0 0 1px rgba(255,255,255,.6)',
       }}
     >
-      {/* Header — modal chrome: back-control + title */}
-      <div style={{ padding: '20px 24px', background: 'linear-gradient(180deg,#E9E2FA,#F8F5FE)', borderBottom: '1px solid #E7E0F3' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {/* Oscar's aria-label was "Back to menu"; here the control simply closes
-              the walkthrough (first-run dismiss / return from Settings) → "Close". */}
-          <button className="luxiOb-close" aria-label="Close" onClick={onClose}>
-            <BackChevron />
-          </button>
+      {/* Header — modal chrome: title + ✕ close.
+          FIX (Amy, 2026-09-19 live test): the lifted ‹ back-chevron DID close, but
+          read as "back a step", so it was invisible as an exit — she got stuck on
+          both surfaces. Now a real ✕ on the RIGHT (the house header idiom —
+          Settings / Feedback / Signup all close there); the footer's own "Back"
+          button covers stepping. */}
+      <div style={{ padding: '16px 16px 16px 24px', background: 'linear-gradient(180deg,#E9E2FA,#F8F5FE)', borderBottom: '1px solid #E7E0F3' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <span style={{ fontSize: 20, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>How to Play</span>
+          <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>
+            ✕
+          </button>
         </div>
       </div>
 
@@ -181,9 +176,11 @@ export function OnboardingCard({ onClose, onFinish }) {
 
 /**
  * The full-screen modal: scrim + centered card. `onClose` dismisses (and, for
- * first-run, marks it seen — App owns that). Tapping the scrim does NOT close
- * (Oscar's design — a child can't dismiss it by accident); only the header
- * control / final CTA close it.
+ * first-run, marks it seen — App owns that). Tapping OUTSIDE the card closes.
+ * (Oscar's comp made the scrim non-dismissing so a child couldn't lose it by
+ * accident; Amy's live test 2026-09-19 found the real failure was the inverse —
+ * players felt trapped with no visible exit. Amy's call: scrim-click + ✕ both
+ * dismiss, matching every other modal in the app.)
  */
 export function Onboarding({ onClose }) {
   return (
@@ -192,6 +189,7 @@ export function Onboarding({ onClose }) {
       // stopPropagation so a tap on the overlay never falls through to the R3F
       // canvas underneath and walks the character (the lift-skill rule).
       onPointerDown={(e) => e.stopPropagation()}
+      onClick={onClose}
       style={{
         position: 'fixed',
         inset: 0,
@@ -205,7 +203,8 @@ export function Onboarding({ onClose }) {
         padding: 20,
       }}
     >
-      <div style={{ width: '100%', maxWidth: 440 }}>
+      {/* clicks INSIDE the card must not bubble to the scrim's onClick */}
+      <div style={{ width: '100%', maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
         <OnboardingCard onClose={onClose} onFinish={onClose} />
       </div>
     </div>
