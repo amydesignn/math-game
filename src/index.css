@@ -244,3 +244,23 @@ canvas { touch-action: none; display: block; }
 .luxiOb-cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #7C6CE8; color: #fff; font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 #5B44C4; cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
 .luxiOb-cta:hover { filter: brightness(1.04); }
 .luxiOb-cta:active { transform: translateY(4px); box-shadow: 0 0 0 #5B44C4; }
+
+/* ── Feedback Flow (Oscar's "Luxi Feedback Flow.dc.html", lifted 2026-09-19
+   → src/ui/FeedbackModal.jsx) ──
+   Keyframes namespaced fb* — the comp's `popIn`/`pop` share names with, but
+   NOT curves with, the globals above (the lvlPopIn, dv-, su- lesson: overwrite
+   a shared keyframe and someone else's component silently retunes). scrimIn
+   is reused — identical fade. Interactive states live here, not inline
+   (inline beats :hover). Press = the governed translateY(4)+shadow-0 snap
+   (same 4px press as .luxiOb-cta); Oscar's comp had 3px/1px pre-snap. */
+@keyframes fbPopIn { 0% { transform: scale(.94) translateY(16px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes fbPop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
+.luxiFb-close { background: rgba(94,75,158,.08); transition: background .15s; }
+.luxiFb-close:hover { background: rgba(94,75,158,.16); }
+.luxiFb-star:hover { transform: scale(1.22) rotate(-6deg) !important; } /* !important: the on/off scale is inline */
+.luxiFb-ta { border: 1.5px solid #DDD1F7; outline: none; transition: border-color .15s; }
+.luxiFb-ta:focus { border-color: #4B54DD; }
+.luxiFb-press { transition: transform .07s, box-shadow .07s, background .15s; }
+.luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #3D43BE !important; } /* !important: base shadow is inline */
+.luxiFb-notnow { transition: background .15s; }
+.luxiFb-notnow:hover { background: #F6F2FF; }

@@ -12,6 +12,8 @@ import Door from './ui/Door'
 import SignupModal, { SavedToast } from './ui/SignupModal'
 import { SettingsSheet, ProfilePopover } from './ui/Settings'
 import { Onboarding } from './ui/Onboarding'
+import { FeedbackModal } from './ui/FeedbackModal'
+import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
@@ -59,6 +61,26 @@ export default function App({ cloud = false, justSignedIn = false }) {
     setShowOnboarding(false)
   }
   const [signup, setSignup] = useState(null) // null | 'form' | 'guest'
+  // Feedback Flow (Oscar's comp, lifted 2026-09-19) — gear → Send Feedback.
+  // Silent context is attached HERE, never asked of the child (COPPA): the
+  // map word, door-vs-world, guest-vs-account WORD (never a uid), build id.
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
+  const feedbackCtx = () => ({
+    world: getState().map,
+    screen: view,
+    player: cloud ? 'account' : 'guest',
+    appVersion: typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev',
+  })
+  const onFeedbackSubmit = (payload) => {
+    const row = buildFeedbackRow(payload, feedbackCtx())
+    if (!row) return Promise.resolve() // no rating — the button was disabled anyway
+    return submitFeedback(row)
+  }
+  // insert failed after the thank-you closed — quiet retry, never a re-opened modal
+  const onFeedbackLost = (payload) => {
+    const row = buildFeedbackRow(payload, feedbackCtx())
+    if (row) retryFeedbackOnce(row)
+  }
   const [savedToast, setSavedToast] = useState(justSignedIn) // fires once on redeem-return
   const authInfo = {
     signedIn: cloud,
@@ -783,6 +805,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
           meadowOpen={false}
           onOpenSettings={() => setSettingsOpen(true)}
           onOpenProfile={() => setProfileOpen(true)}
+          onOpenFeedback={() => setFeedbackOpen(true)}
           settingsActive={settingsOpen}
           onResume={onResume}
           onPlay={onPlay}
@@ -993,6 +1016,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
             setSettingsOpen(false)
             setShowOnboarding(true)
           }}
+          onOpenFeedback={() => setFeedbackOpen(true)}
           onSignOut={onSignOut}
           onClose={() => setSettingsOpen(false)}
         />
@@ -1002,6 +1026,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
       {savedToast && <SavedToast onDone={() => setSavedToast(false)} />}
       {/* First-run walkthrough / gear → How to Play — over the Door and the world */}
       {showOnboarding && <Onboarding onClose={closeOnboarding} />}
+      {/* Feedback Flow — gear → Send Feedback, over the Door and the world */}
+      {feedbackOpen && <FeedbackModal onSubmit={onFeedbackSubmit} onLostSubmit={onFeedbackLost} onClose={() => setFeedbackOpen(false)} />}
 
       {/* gate-travel fade (also swallows taps mid-travel) — over both hub + world */}
       <div

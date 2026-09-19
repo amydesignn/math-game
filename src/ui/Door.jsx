@@ -268,7 +268,7 @@ const dS = {
   colTitle: { fontSize: 24, fontWeight: 600, color: T.ink, letterSpacing: '-.01em' },
   colNote: { fontSize: BODY, fontWeight: 400, color: T.ink3 },
 }
-export default function Door({ mode, name, points, gems, map, quest, meadowOpen = false, onOpenSettings, onOpenProfile, settingsActive = false, onResume, onPlay }) {
+export default function Door({ mode, name, points, gems, map, quest, meadowOpen = false, onOpenSettings, onOpenProfile, onOpenFeedback, settingsActive = false, onResume, onPlay }) {
   const greet = mode === 'account' && name ? 'Welcome back, ' + name + '!' : 'Welcome, player!'
   return (
     <div className="doorScreen">
@@ -297,7 +297,7 @@ export default function Door({ mode, name, points, gems, map, quest, meadowOpen 
         </div>
       </main>
       {/* full-bleed dark footer at the foot of the Door's scroll container */}
-      <Footer />
+      <Footer onFeedback={onOpenFeedback} />
     </div>
   )
 }

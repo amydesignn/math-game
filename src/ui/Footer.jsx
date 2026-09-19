@@ -57,7 +57,7 @@ function Muted({ children }) {
   return <span className="lf-muted" style={F.link} title="Coming soon">{children}</span>
 }
 
-export default function Footer() {
+export default function Footer({ onFeedback }) {
   return (
     <footer className="luxiFooter" style={F.root}>
       <div style={F.wrap}>
@@ -110,8 +110,11 @@ export default function Footer() {
 
             <nav style={F.nav}>
               <div style={F.colHead}>Support</div>
-              {/* Send feedback = Feedback was dropped from Settings, no handler → inert (Amy) */}
-              <Muted>Send feedback</Muted>
+              {/* Send feedback went LIVE 2026-09-19 (Oscar's Feedback Flow) —
+                  same modal as the gear row, so the inert span retired. */}
+              <button onClick={() => onFeedback?.()} className="lf-link" style={{ ...F.link, background: 'none', border: 'none', padding: 0, font: 'inherit', textAlign: 'left', cursor: 'pointer' }}>
+                Send feedback
+              </button>
             </nav>
 
             <nav style={F.nav}>

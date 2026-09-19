@@ -17,6 +17,8 @@
  *
  * Amy's calls folded in: Feedback + Help "SOON" rows DROPPED (hidden until they ship,
  * not shown disabled). The Account row opens the shared <SignupModal> (onOpenSignup).
+ * 2026-09-19: Send Feedback SHIPPED — the row is back, live (onOpenFeedback →
+ * <FeedbackModal>, Oscar's Feedback Flow comp). Help stays hidden.
  *
  * Governance (Amy 2026-08-30): 4px grid — sheet radius 20, rows 44–48, toggle 48×28
  * (knob 24), gaps 4/8/12/16, padding 16/20/24. Colours are Oscar's comp values.
@@ -44,6 +46,14 @@ function HelpCircle() {
       <circle cx="12" cy="12" r="9" />
       <path d="M9.2 9a2.8 2.8 0 0 1 5.4 1c0 1.8-2.6 2.4-2.6 2.4" />
       <path d="M12 17h.01" />
+    </svg>
+  )
+}
+function MessageBubble() {
+  // Oscar's feedback icon (Luxi Feedback Flow comp, 2026-08-31)
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...strokeBase} aria-hidden="true">
+      <path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.5 8.5 0 0 1-.9-3.8A8.38 8.38 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z" />
     </svg>
   )
 }
@@ -95,7 +105,7 @@ const rowIcon = { color: LILAC700, display: 'flex' }
  * The shared settings sheet. surface: 'door' | 'game' (anchor + animation only).
  * auth: { signedIn, email, initial }. onOpenSignup opens the shared SignupModal.
  */
-export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSignup, onOpenHowTo, onSignOut, privacyHref = '/privacy.html', onClose }) {
+export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSignup, onOpenHowTo, onOpenFeedback, onSignOut, privacyHref = '/privacy.html', onClose }) {
   // The gear lives top-right on BOTH surfaces now (Door header + in-world, by the
   // level bar), so the sheet drops from the top-right uniformly.
   const close = () => onClose?.()
@@ -190,7 +200,9 @@ export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSi
 
               <div style={{ height: 1, background: '#F1ECF8', margin: '8px 16px 0' }} />
 
-              {/* HELP (Feedback + Help "SOON" rows dropped — hidden until they ship) */}
+              {/* HELP — Send Feedback went LIVE 2026-09-19 (Oscar's Feedback Flow
+                  lifted; the row returns exactly where the SOON row once sat).
+                  The Help row stays hidden until it ships (Amy's 08-30 call). */}
               <div style={{ padding: '12px 16px 8px' }}>
                 <div style={sectionLabel}>Help</div>
                 <button
@@ -201,6 +213,19 @@ export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSi
                     <HelpCircle />
                   </span>
                   <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#262626' }}>How to Play</span>
+                  <ChevronR />
+                </button>
+                <button
+                  onClick={() => {
+                    close()
+                    onOpenFeedback?.()
+                  }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', border: 'none', padding: '10px 8px', borderRadius: 10, cursor: 'pointer', textAlign: 'left' }}
+                >
+                  <span style={rowIcon}>
+                    <MessageBubble />
+                  </span>
+                  <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#262626' }}>Send Feedback</span>
                   <ChevronR />
                 </button>
               </div>
