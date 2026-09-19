@@ -37,9 +37,7 @@ const CORE = [
   { num: 1, title: 'Pick your character & map', body: 'Choose your character and a companion, then pick a map to explore.', media: '/onboarding/step-1.jpg' },
   { num: 2, title: 'Explore & collect gems', body: 'Guide your character across the map. Visit the gem and bonus stations and answer math questions to collect gems.', media: '/onboarding/step-2.jpg' },
   { num: 3, title: 'Build your world', body: 'Spend your gems on assets to build a world that’s entirely your own.', media: '/onboarding/step-3.jpg' },
-  // Step 4 stays text-only for now — a clean "sparkle trail" capture needs an
-  // in-game shot with an active trail (drop one at /onboarding/step-4.jpg to fill it).
-  { num: 4, title: 'Add some sparkle', body: 'Treat your character to a sparkle trail and other playful extras.', media: null },
+  { num: 4, title: 'Add some sparkle', body: 'Treat your character to a sparkle trail and other playful extras.', media: '/onboarding/step-4.jpg' },
 ]
 
 function BackChevron() {
