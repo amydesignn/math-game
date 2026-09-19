@@ -27,11 +27,17 @@
 import { useState } from 'react'
 
 // Oscar's four core steps + a fifth "What's next" step (verbatim copy).
+//
+// `media` is an optional per-step image — the illustration / screenshot / GIF
+// slot from Oscar's INLINE variant, brought into the modal (Amy's ask). It is
+// baked in as an asset like the world-card art, NOT a runtime upload: drop a
+// file in public/onboarding/ and set its path here. A step with media:null just
+// shows text and the image box collapses, so images can be added one at a time.
 const CORE = [
-  { num: 1, title: 'Pick your character & map', body: 'Choose your character and a companion, then pick a map to explore.' },
-  { num: 2, title: 'Explore & collect gems', body: 'Guide your character across the map. Visit the gem and bonus stations and answer math questions to collect gems.' },
-  { num: 3, title: 'Build your world', body: 'Spend your gems on assets to build a world that’s entirely your own.' },
-  { num: 4, title: 'Add some sparkle', body: 'Treat your character to a sparkle trail and other playful extras.' },
+  { num: 1, title: 'Pick your character & map', body: 'Choose your character and a companion, then pick a map to explore.', media: null },
+  { num: 2, title: 'Explore & collect gems', body: 'Guide your character across the map. Visit the gem and bonus stations and answer math questions to collect gems.', media: null },
+  { num: 3, title: 'Build your world', body: 'Spend your gems on assets to build a world that’s entirely your own.', media: null },
+  { num: 4, title: 'Add some sparkle', body: 'Treat your character to a sparkle trail and other playful extras.', media: null },
 ]
 
 function BackChevron() {
@@ -86,6 +92,17 @@ export function OnboardingCard({ onClose, onFinish }) {
           <span style={{ fontSize: 20, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>How to Play</span>
         </div>
       </div>
+
+      {/* Per-step media (Oscar's inline image-slot styling, brought into the
+          modal). Renders only when the current step has media, so a step without
+          an image simply shows text — the box collapses, no empty placeholder. */}
+      {cur?.media && (
+        <div style={{ padding: '16px 16px 0' }}>
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', background: 'linear-gradient(150deg,#EDE7FB,#E3DBF7)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.5)' }}>
+            <img src={cur.media} alt="" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} />
+          </div>
+        </div>
+      )}
 
       {/* Step content */}
       <div style={{ padding: '22px 24px 8px', minHeight: 150 }}>
