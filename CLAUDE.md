@@ -708,6 +708,53 @@ three nav columns, © + Kenney CC0 bottom bar). Commit `522b1c9`,
   overflow; zero console errors; Worlds anchor + COPPA deep-link both scroll
   correctly; oxlint + build clean. No new tests (pure presentational markup).
 
+## First-run onboarding ✅ SHIPPED 2026-09-19 — Oscar's "How to Play" walkthrough
+Oscar's onboarding comps (`~/Downloads/handoff — onboarding/`, his `.dc` design-
+code format: "Luxi Onboarding" + "Onboarding Card") lifted into
+**`src/ui/Onboarding.jsx`** — a 5-step walkthrough (Pick character & map →
+Explore & collect gems → Build your world → Add some sparkle → What's next) as a
+centered modal over a blurred scrim. Commit `c604d0a`, `dpl_7PaVHBtxkz…` READY,
+live-verified on math.luxi.land (first-run modal shows step 1 with its image).
+- **Two entry points, one flag.** First run: shows ONCE over the Door for a
+  brand-new player, then never again (`store.seenOnboarding`; `migrate()` seeds
+  existing saves true so Ivy/Amy are never re-onboarded — only a genuinely fresh
+  state, which `load()` returns WITHOUT going through migrate, stays false). Gear
+  → How to Play re-opens the same modal any time; it **replaced** the old in-sheet
+  3-step text list in `Settings.jsx` (the `view`/`howto` sub-view + `BackArrow`
+  were removed; the row calls a new `onOpenHowTo` prop).
+- **Only the MODAL chrome was lifted.** Oscar's INLINE chrome (eyebrow + a 16:9
+  image-slot, for a marketing webpage) is intentionally not used — BUT Amy wanted
+  images in the popup, so his inline media styling was brought into the modal:
+  each `CORE` step has an optional `media` path, rendered 16:9 above the text and
+  **collapsing when null** (so a step with no image still looks finished).
+- **Adaptations (commented at each site):** Oscar's final CTA is a marketing
+  `<a href="math.luxi.land">Play now — it's free →`; in-app it CLOSES the modal
+  instead, relabelled **"Let's play →"** (Amy approved). Hover/active + the
+  entrance animation live in `index.css` (`.luxiOb-*`), not inline (the
+  `.luxiFooter`/`su*`/`dv*` :hover-vs-inline lesson). `stopPropagation` on the
+  overlay so a tap never falls through to the R3F canvas.
+- **The images** (`public/onboarding/step-{1..4}.jpg`, 900×506, 10–26KB;
+  `README.md` documents the drop-in convention): steps 1–2 captured HUD-free from
+  the WebGL canvas, step 3 reuses `public/worlds/market.jpg` (Amy's own capture),
+  step 4 is Amy's screenshot of an active sparkle trail (the trail is a DOM/Html
+  overlay a canvas grab can't see). **Capture trick (fully reverted):** a dev-only
+  Vite `/__shot` endpoint + `Canvas gl.preserveDrawingBuffer` let the page POST
+  `canvas.toDataURL` straight to disk — HUD-free because the HUD is separate DOM.
+  Both reverted; App.jsx + vite.config.js show no diff. **Seeded placed assets do
+  NOT render in 3D** (they show on the minimap only — the placed-Prop group
+  subscribes to a buy/place event, not boot state); that's why step 3 uses a rich
+  existing map instead of a seeded campsite.
+- **Governance:** golden-4px pass applied as the final touch (Amy's call) — the
+  walkthrough's spacing/dimension/radius snapped to a 4px base (22→24, 15→16,
+  13→12, 46→48, 150→152, 7→8, 9→8, 3→4; button press translateY(3)+shadow1 →
+  translateY(4)+shadow0). Typography + colours left as Oscar's. This is the 2nd
+  golden-4px application after the C2 walkthrough spacing fix.
+- **Tests:** `src/__tests__/onboarding.test.js` (+5) — fresh save false,
+  `markOnboardingSeen` flip + persist + idempotency, migrate seeds returning
+  players true, explicit false respected. **159 green**, oxlint + build clean.
+- **📮 Oscar to patch his standalone comps:** the same 4px snaps apply; the
+  `/privacy`-style dead routes don't recur here (no links in this comp).
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).
