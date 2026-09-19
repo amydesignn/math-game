@@ -23,6 +23,11 @@
  * Hover/active + the entrance animation live in index.css (.luxiOb-*): an inline
  * style overrides a CSS :hover, so interactive states can't be inline (same
  * lesson as .luxiFooter / su* / dv*).
+ *
+ * Governance: the golden-4px pass was applied 2026-09-19 (Amy's call) as the
+ * final production touch — spacing / dimension / radius snapped to a 4px base
+ * (Oscar's off-grid 22/15/13/46/150/7/9/3 → 24/16/12/48/152/8/8/4). Typography
+ * and colours are left as Oscar's. Doc: nathan-mcp-codebase-01/docs/governance-layer.md.
  */
 import { useState } from 'react'
 
@@ -62,9 +67,9 @@ export function OnboardingCard({ onClose, onFinish }) {
   // current = pill, already-passed = faded lilac, future = light).
   const dots = []
   for (let i = 0; i < CORE.length; i++) {
-    dots.push({ w: i === step ? 22 : 8, bg: i === step ? '#7C6CE8' : i < step ? '#C6BEEC' : '#E6E1F3' })
+    dots.push({ w: i === step ? 24 : 8, bg: i === step ? '#7C6CE8' : i < step ? '#C6BEEC' : '#E6E1F3' })
   }
-  dots.push({ w: isWhatsNext ? 22 : 8, bg: isWhatsNext ? '#7C6CE8' : '#E6E1F3' })
+  dots.push({ w: isWhatsNext ? 24 : 8, bg: isWhatsNext ? '#7C6CE8' : '#E6E1F3' })
 
   const next = () => setStep((s) => Math.min(s + 1, total - 1))
   const back = () => setStep((s) => Math.max(s - 1, 0))
@@ -82,7 +87,7 @@ export function OnboardingCard({ onClose, onFinish }) {
       }}
     >
       {/* Header — modal chrome: back-control + title */}
-      <div style={{ padding: '20px 22px', background: 'linear-gradient(180deg,#E9E2FA,#F8F5FE)', borderBottom: '1px solid #E7E0F3' }}>
+      <div style={{ padding: '20px 24px', background: 'linear-gradient(180deg,#E9E2FA,#F8F5FE)', borderBottom: '1px solid #E7E0F3' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {/* Oscar's aria-label was "Back to menu"; here the control simply closes
               the walkthrough (first-run dismiss / return from Settings) → "Close". */}
@@ -105,39 +110,39 @@ export function OnboardingCard({ onClose, onFinish }) {
       )}
 
       {/* Step content */}
-      <div style={{ padding: '22px 24px 8px', minHeight: 150 }}>
+      <div style={{ padding: '24px 24px 8px', minHeight: 152 }}>
         {!isWhatsNext ? (
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-            <div style={{ width: 46, height: 46, borderRadius: '50%', background: '#EEEAFE', color: '#5B44C4', fontSize: 20, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{cur.num}</div>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#EEEAFE', color: '#5B44C4', fontSize: 20, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{cur.num}</div>
             <div>
               <div style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{cur.title}</div>
-              <p style={{ margin: '7px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{cur.body}</p>
+              <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{cur.body}</p>
             </div>
           </div>
         ) : (
           <div>
             <div style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>What&#8217;s next</div>
-            <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: '#F6F4FE', border: '1px solid #EEE9FB', borderRadius: 16, padding: 15 }}>
+            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', background: '#F6F4FE', border: '1px solid #EEE9FB', borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#EAF9FB', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0092B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2" /><path d="M3.6 19c.7-3 3-4.6 5.4-4.6s4.7 1.6 5.4 4.6" /><circle cx="17.6" cy="8" r="2.2" /><path d="M16.2 13.7c2.1.1 3.7 1.5 4.3 3.8" /></svg>
                 </div>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16, fontWeight: 700, color: '#262626' }}>Meet friends</span>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B44C4', background: '#EEEAFE', padding: '3px 8px', borderRadius: 999 }}>SOON</span>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B44C4', background: '#EEEAFE', padding: '4px 8px', borderRadius: 999 }}>SOON</span>
                   </div>
                   <p style={{ margin: '4px 0 0', fontSize: 14.5, fontWeight: 400, color: '#5C5470', lineHeight: 1.5 }}>A shared space for signed-in players. No chat &#8212; just wave and send a few emoji.</p>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: 14, alignItems: 'flex-start', background: '#F6F4FE', border: '1px solid #EEE9FB', borderRadius: 16, padding: 15 }}>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', background: '#F6F4FE', border: '1px solid #EEE9FB', borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#F3ECFF', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="#7C6CE8" aria-hidden="true"><path d="M12 2.6l2.5 5.5 6 .5-4.5 3.9 1.4 5.9L12 21l-5.4 2.9 1.4-5.9-4.5-3.9 6-.5z" /></svg>
                 </div>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16, fontWeight: 700, color: '#262626' }}>Lots more</span>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B44C4', background: '#EEEAFE', padding: '3px 8px', borderRadius: 999 }}>SOON</span>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B44C4', background: '#EEEAFE', padding: '4px 8px', borderRadius: 999 }}>SOON</span>
                   </div>
                   <p style={{ margin: '4px 0 0', fontSize: 14.5, fontWeight: 400, color: '#5C5470', lineHeight: 1.5 }}>Many more features are on the way.</p>
                 </div>
@@ -148,24 +153,24 @@ export function OnboardingCard({ onClose, onFinish }) {
       </div>
 
       {/* Progress dots */}
-      <div style={{ padding: '14px 24px 0', display: 'flex', gap: 7, alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ padding: '16px 24px 0', display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center' }}>
         {dots.map((d, i) => (
           <span key={i} style={{ height: 8, borderRadius: 99, transition: 'width .2s ease, background .2s ease', width: d.w, background: d.bg }} />
         ))}
       </div>
 
       {/* Footer nav: Back (hidden on first step) · Next / final CTA */}
-      <div style={{ padding: '16px 22px 22px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+      <div style={{ padding: '16px 24px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         {step === 0 ? <span /> : (
           <button className="luxiOb-back" onClick={back}>Back</button>
         )}
         {!isWhatsNext ? (
-          <button className="luxiOb-cta" style={{ padding: '13px 24px' }} onClick={next}>Next</button>
+          <button className="luxiOb-cta" style={{ padding: '12px 24px' }} onClick={next}>Next</button>
         ) : (
           // ADAPTATION: Oscar's last-step CTA is a marketing <a href="math.luxi.land">
           // "Play now — it's free →". In the app she is already here, so it CLOSES
           // the walkthrough instead, relabelled "Let's play →" (no "it's free").
-          <button className="luxiOb-cta" style={{ padding: '13px 22px' }} onClick={onFinish}>
+          <button className="luxiOb-cta" style={{ padding: '12px 24px' }} onClick={onFinish}>
             Let&#8217;s play <span style={{ lineHeight: 0, transform: 'translateY(1px)' }}>&#8594;</span>
           </button>
         )}
