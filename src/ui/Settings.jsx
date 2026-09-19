@@ -54,13 +54,6 @@ function ChevronR() {
     </svg>
   )
 }
-function BackArrow() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
-  )
-}
 function UploadIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" {...strokeBase} aria-hidden="true">
@@ -102,8 +95,7 @@ const rowIcon = { color: LILAC700, display: 'flex' }
  * The shared settings sheet. surface: 'door' | 'game' (anchor + animation only).
  * auth: { signedIn, email, initial }. onOpenSignup opens the shared SignupModal.
  */
-export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSignup, onSignOut, privacyHref = '/privacy.html', onClose }) {
-  const [view, setView] = useState('menu') // menu | howto
+export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSignup, onOpenHowTo, onSignOut, privacyHref = '/privacy.html', onClose }) {
   // The gear lives top-right on BOTH surfaces now (Door header + in-world, by the
   // level bar), so the sheet drops from the top-right uniformly.
   const close = () => onClose?.()
@@ -122,8 +114,7 @@ export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSi
             animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both',
           }}
         >
-          {view === 'menu' && (
-            <div>
+          <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 12px' }}>
                 <span style={{ fontSize: 16, fontWeight: 800, color: '#262626' }}>Settings</span>
                 <button aria-label="Close" onClick={close} style={closeBtn}>
@@ -203,7 +194,7 @@ export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSi
               <div style={{ padding: '12px 16px 8px' }}>
                 <div style={sectionLabel}>Help</div>
                 <button
-                  onClick={() => setView('howto')}
+                  onClick={() => onOpenHowTo?.()}
                   style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', border: 'none', padding: '10px 8px', borderRadius: 10, cursor: 'pointer', textAlign: 'left' }}
                 >
                   <span style={rowIcon}>
@@ -221,32 +212,6 @@ export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSi
                 <span style={{ fontSize: 12, fontWeight: 500, color: '#c3bcd0', whiteSpace: 'nowrap' }}>Luxi Math</span>
               </div>
             </div>
-          )}
-
-          {view === 'howto' && (
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 16px 12px' }}>
-                <button aria-label="Back" onClick={() => setView('menu')} style={{ ...closeBtn, color: LILAC700, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <BackArrow />
-                </button>
-                <span style={{ fontSize: 16, fontWeight: 800, color: '#262626' }}>How to Play</span>
-              </div>
-              <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {[
-                  'Explore a world and walk up to the glowing gems to start a math challenge.',
-                  'Answer correctly to earn gems and points — points raise your level.',
-                  'Spend gems at the shop, then try a new world for a fresh set of stalls.',
-                ].map((step, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                    <span style={{ width: 28, height: 28, borderRadius: '50%', background: '#F1ECFE', color: LILAC700, fontWeight: 800, fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                      {i + 1}
-                    </span>
-                    <span style={{ fontSize: 14, fontWeight: 500, color: '#4d4d4d', lineHeight: 1.5, paddingTop: 3, textWrap: 'pretty' }}>{step}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </>

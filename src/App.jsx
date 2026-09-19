@@ -11,10 +11,11 @@ import ProgressPopup from './ui/ProgressPopup'
 import Door from './ui/Door'
 import SignupModal, { SavedToast } from './ui/SignupModal'
 import { SettingsSheet, ProfilePopover } from './ui/Settings'
+import { Onboarding } from './ui/Onboarding'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
-import { getState, setMap, setPos, markPlayed, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
+import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
@@ -50,6 +51,13 @@ export default function App({ cloud = false, justSignedIn = false }) {
   // stays server-side OFF until launch, so onSignupSend errors the generic way.
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  // First-run onboarding: auto-shows once for a brand-new player (over the Door),
+  // and re-openable any time from the gear's "How to Play". One flag, two entries.
+  const [showOnboarding, setShowOnboarding] = useState(!state.seenOnboarding)
+  const closeOnboarding = () => {
+    markOnboardingSeen()
+    setShowOnboarding(false)
+  }
   const [signup, setSignup] = useState(null) // null | 'form' | 'guest'
   const [savedToast, setSavedToast] = useState(justSignedIn) // fires once on redeem-return
   const authInfo = {
@@ -981,6 +989,10 @@ export default function App({ cloud = false, justSignedIn = false }) {
             setSettingsOpen(false)
             setSignup('form')
           }}
+          onOpenHowTo={() => {
+            setSettingsOpen(false)
+            setShowOnboarding(true)
+          }}
           onSignOut={onSignOut}
           onClose={() => setSettingsOpen(false)}
         />
@@ -988,6 +1000,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
       {profileOpen && <ProfilePopover auth={authInfo} onClose={() => setProfileOpen(false)} />}
       {signup && <SignupModal entry={signup} onSend={onSignupSend} onClose={() => setSignup(null)} />}
       {savedToast && <SavedToast onDone={() => setSavedToast(false)} />}
+      {/* First-run walkthrough / gear → How to Play — over the Door and the world */}
+      {showOnboarding && <Onboarding onClose={closeOnboarding} />}
 
       {/* gate-travel fade (also swallows taps mid-travel) — over both hub + world */}
       <div

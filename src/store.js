@@ -27,6 +27,11 @@ function freshState() {
     // (Guest). A fresh save has map:'clearing' by default, so "has a map" can
     // never mean "has played" — this flag is what makes Resume truthful.
     played: false,
+    // First-run onboarding: the "How to Play" walkthrough shows ONCE, the first
+    // time someone plays, then never again. A brand-new player starts false (sees
+    // it); migrate() seeds existing saves true so returning players (Ivy, Amy)
+    // are never re-onboarded. Still re-openable any time from the gear menu.
+    seenOnboarding: false,
     // Her last standing spot in `map`, so the Door's Resume drops her exactly
     // where she left off (Play drops at the map's centre instead). Always paired
     // with `map`: every write that changes the map also writes pos, so it can
@@ -277,6 +282,12 @@ function migrate(parsed) {
     merged.played = true
   }
 
+  // A save from before the onboarding feature has clearly already played — never
+  // interrupt a returning player with a first-run walkthrough. Only genuinely
+  // fresh states (freshState, which load() returns WITHOUT going through migrate)
+  // keep seenOnboarding=false, so exactly the brand-new player sees it.
+  if (parsed.seenOnboarding === undefined) merged.seenOnboarding = true
+
   // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
   // While the 15-gem beta cap was live, a correct answer over the cap paid
   // NOTHING — Ivy solved 6 problems, was told she was right, and got zero.
@@ -331,6 +342,16 @@ export function setMap(id) {
 export function markPlayed() {
   if (!state.played) {
     state.played = true
+    save()
+  }
+}
+
+/** The first-run "How to Play" walkthrough has been dismissed — never auto-show
+ *  it again. Idempotent (only the first flip writes). Still re-openable from the
+ *  gear menu, which doesn't depend on this flag. */
+export function markOnboardingSeen() {
+  if (!state.seenOnboarding) {
+    state.seenOnboarding = true
     save()
   }
 }
