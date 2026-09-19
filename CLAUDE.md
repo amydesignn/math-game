@@ -754,6 +754,12 @@ live-verified on math.luxi.land (first-run modal shows step 1 with its image).
   players true, explicit false respected. **159 green**, oxlint + build clean.
 - **📮 Oscar to patch his standalone comps:** the same 4px snaps apply; the
   `/privacy`-style dead routes don't recur here (no links in this comp).
+- **🔧 Close fix (2026-09-19, `3f5551c`, Amy's live test):** the lifted ‹
+  back-chevron closed but READ as "back a step" — players felt trapped on both
+  surfaces. Now a real ✕ on the header right (house idiom) + scrim-click
+  dismisses (card stopPropagation's its clicks). This OVERRIDES Oscar's
+  no-accidental-dismiss scrim — tell him if he reuses the comp. Lesson: a
+  close control must read as an exit, not a step.
 
 ## Feedback Flow ✅ SHIPPED 2026-09-19 — Send Feedback live (Oscar's comp)
 Oscar's `~/Downloads/delivery/Luxi Feedback Flow.dc.html` (pass-2 governed,
