@@ -801,6 +801,53 @@ handoff in the same folder) lifted into **`src/ui/FeedbackModal.jsx`** +
 - **Open (Amy's call):** no new "?" affordance was added (per handoff — flag
   if wanted); feedback report surfacing (Notion/Airtable digest?) unbuilt.
 
+## Profile photo ✅ SHIPPED 2026-09-20 — on-device avatar (the deferred upload, wired)
+The Profile popover's "Upload a photo" button had been an inert placeholder since
+2026-08-30 ("we'll talk before building it" — a child's photo is the one feature
+Amy wanted a conversation about first). That talk happened 2026-09-20 (competition
+prep) and the call was **on-device only, never uploaded.** Commit `b406ce2`, Vercel
+deploy READY, **live-verified on math.luxi.land** (prod upload PNG→JPEG, persisted
+~4.5KB, dev hooks stripped, popover copy live).
+- **`src/avatar.js`** — the whole privacy guarantee lives here. `fileToAvatar`
+  takes the File from the OS picker → `createImageBitmap` with EXIF orientation
+  APPLIED (portraits stay upright) → centre cover-crop to a 256px square →
+  `canvas.toDataURL('image/jpeg')`. The JPEG re-encode drops ALL EXIF — camera,
+  timestamp, and any GPS **location** a phone baked in. ~4–7KB out. Falls back to
+  `<img>`+`decode()` if createImageBitmap rejects the orientation option. The pure
+  `isImageFile` guard is the unit-testable seam; the canvas path is verified LIVE
+  (vitest env is `node` — jsdom has no canvas, so don't try to unit-test the draw).
+- **`store.js`** — `avatar` field (data URL | null; migrate defaults old saves to
+  null and preserves an existing photo) + `setAvatar`/`clearAvatar`. It persists to
+  localStorage and NOWHERE else — it is never in a cloud push payload. `clearAvatar`
+  no-ops when already null (no needless save/push).
+- **`Settings.jsx` ProfilePopover** — a hidden `<input type=file accept=image/*>`
+  (the iPad picker offers Camera / Photo Library / Files); Upload → **Change photo**
+  + **Remove photo**; `busy`/`err` states (a file that won't decode → a gentle "try
+  another one?"). The old `soon` "coming soon" fallback is gone. Caption now reads
+  "Your photo stays on this device."
+- **ONE source everywhere** an avatar shows: the Door header chip (`hudkit.jsx`
+  `ProfileChip src=`, `overflow:hidden` clips the photo to the circle), the popover,
+  and the signed-in Settings Account row. App threads `avatar` (a lifted `useState`
+  seeded from `state.avatar`) + `onUploadAvatar`/`onRemoveAvatar` to all three.
+  In-world has no avatar (removed 08-04) — nothing to change there.
+- **COPPA posture:** because the photo is never collected or transmitted, there is
+  no consent obligation — the same reasoning as guest mode. `public/privacy.html`
+  gained a truthful line ("Profile photos … stored only … on that device and is
+  never uploaded to our servers") right where "photo" sits in the "we do NOT
+  collect" list, so the feature and the policy agree. **Deliberately NOT built:**
+  account-synced photos (cross-device) — that IS a data-collection event
+  (verifiable parental consent + policy changes) and is off the table for a
+  deadline. Local-only is the shippable posture (Amy's call, 2026-09-20).
+- **`main.jsx` `/?settingsdemo`** now holds real avatar state, so the demo runs the
+  true picker → avatar.js → render path (not an `alert` stub).
+- **Tests:** `src/__tests__/avatar.test.js` (+10) — the `isImageFile` guard,
+  `fileToAvatar` rejecting non-images before it touches a canvas, setAvatar/
+  clearAvatar persist, migrate default-null + preserve-existing. **175 green**,
+  oxlint + build clean.
+- **📮 Oscar:** the popover already existed in his Settings comp; the only additions
+  are the Change/Remove states + the on-device caption — no bug in his comp. If he
+  ever adds an avatar to a new comp, note the photo is on-device only by design.
+
 ## Phase 5-B / 5-C (next)
 5-B = tap the bar → history popup (total points + per-topic stage counts, NO
 accuracy — Design Principle 4; the data already exists in `topicProgress`).
