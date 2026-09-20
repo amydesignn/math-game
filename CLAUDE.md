@@ -692,7 +692,9 @@ three nav columns, © + Kenney CC0 bottom bar). Commit `522b1c9`,
   `scrollMarginTop:90` on the right column so it clears the sticky `.doorHdr`);
   `hello@luxi.land` is the real inbox (already in privacy.html); social handles
   shipped **AS-IS** (unverified placeholders, Amy's call), `target=_blank`
-  `rel=noopener`.
+  `rel=noopener`. **Instagram is now the REAL link** (`https://www.instagram.com/luxiland_/`,
+  updated 2026-09-20); Facebook + LinkedIn stay placeholders until Amy creates them
+  (~end of the week of 2026-09-28).
 - **Visible-but-INERT** (marketing pages that don't exist on the app Door yet):
   Play Luxi Math (self-link on the Door), How it works, Send feedback — rendered
   as `<Muted>` spans so the column layout matches Oscar's comp exactly.
@@ -703,7 +705,8 @@ three nav columns, © + Kenney CC0 bottom bar). Commit `522b1c9`,
 - **Brand reads "Luxi Land"** (the umbrella brand) by Oscar's design, though the
   app itself is "Luxi Math" — kept verbatim.
 - **📮 Oscar to patch his standalone comp:** `/privacy` + `/coppa` are dead routes
-  (real ones are `/privacy.html[#coppa]`); the social handles are unverified.
+  (real ones are `/privacy.html[#coppa]`); the social handles were placeholders —
+  Instagram is now real (`instagram.com/luxiland_`), Facebook + LinkedIn still TBD.
 - Verified: desktop matches the comp; mobile 375px reflows with no horizontal
   overflow; zero console errors; Worlds anchor + COPPA deep-link both scroll
   correctly; oxlint + build clean. No new tests (pure presentational markup).

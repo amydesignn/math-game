@@ -86,7 +86,7 @@ export default function Footer({ onFeedback }) {
               <a href="https://facebook.com/luxiland" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on Facebook" className="lf-social" style={F.socialLink}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5H17V3.6c-.3-.04-1.3-.13-2.47-.13-2.45 0-4.13 1.5-4.13 4.25v2.17H7.6V13h2.8v8h3.1z" /></svg>
               </a>
-              <a href="https://instagram.com/luxiland_" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on Instagram" className="lf-social" style={F.socialLink}>
+              <a href="https://www.instagram.com/luxiland_/" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on Instagram" className="lf-social" style={F.socialLink}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5" /><circle cx="12" cy="12" r="3.4" /><circle cx="16.6" cy="7.4" r="1.1" fill="currentColor" stroke="none" /></svg>
               </a>
               <a href="https://linkedin.com/company/luxiland" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on LinkedIn" className="lf-social" style={F.socialLink}>
