@@ -1,0 +1,23 @@
+# Luxi Math
+
+> Luxi Math is a free browser-based 3D math learning game for K–8 students (ages 5–14). Children roam bright 3D worlds with their character, answer math quests to earn gems, and spend gems building a world that is entirely their own. When a child gets a question wrong, a gentle step-by-step walkthrough appears — teaching the method, not just marking the answer wrong.
+
+## Key features
+
+- 3D open worlds: Forest Clearing, Sunny Town, Rosy Garden, Merry Market, Star Arcade
+- Math quests: curriculum-aligned arithmetic and operations for K–8
+- Teaching modal: step-by-step method explanation shown when a child gets stuck
+- Gem economy: correct answers earn gems; gems purchase world customisation items
+- No ads, no chat, no personal data. COPPA compliant.
+- Free while in beta. No download, no account required to start.
+
+## About
+
+Built by Amy Ngo.
+Platform: Browser-based (phone, tablet, laptop).
+Homepage: luxi.land
+
+## Contact
+
+Site: math.luxi.land
+Homepage: luxi.land
