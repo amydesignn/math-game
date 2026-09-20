@@ -26,10 +26,11 @@ export function GemIcon({ size = 24 }) {
   )
 }
 
-/* Profile — the soft avatar chip (settings will live inside it later). It carries
-   its OWN lavender radial fill + white ring, so it reads on the Door's white
-   header AND floating over the 3D world. Decorative for now, same as the Door. */
-export function ProfileChip({ size = 44 }) {
+/* Profile — the soft avatar chip. It carries its OWN lavender radial fill + white
+   ring, so it reads on the Door's white header. When `src` is set (the on-device
+   profile photo, see avatar.js) it shows the photo clipped to the circle; with no
+   photo it falls back to the friendly 🙂, same as before. */
+export function ProfileChip({ size = 44, src = null }) {
   return (
     <span
       role="button"
@@ -40,6 +41,7 @@ export function ProfileChip({ size = 44 }) {
         height: size,
         flex: 'none',
         borderRadius: '50%',
+        overflow: 'hidden', // clip a photo to the circle
         boxShadow: '0 0 0 2px #fff, 0 0 0 3.5px #E7DEFA',
         background: 'radial-gradient(120% 120% at 30% 25%, #EFE9FD, #A78BFA)',
         display: 'flex',
@@ -48,7 +50,7 @@ export function ProfileChip({ size = 44 }) {
         fontSize: Math.round(size * 0.5),
       }}
     >
-      🙂
+      {src ? <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : '🙂'}
     </span>
   )
 }

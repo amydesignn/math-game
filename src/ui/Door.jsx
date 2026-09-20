@@ -246,7 +246,7 @@ const hS = {
   profileBtn: { border: 'none', background: 'transparent', padding: 0, cursor: 'pointer', display: 'flex', borderRadius: '50%' },
   gear: { width: 44, height: 44, borderRadius: '50%', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: 20, lineHeight: 1 },
 }
-function Header({ onOpenSettings, onOpenProfile, settingsActive }) {
+function Header({ onOpenSettings, onOpenProfile, settingsActive, avatar }) {
   return (
     <header className="doorHdr">
       <div className="doorHdrIn">
@@ -254,7 +254,7 @@ function Header({ onOpenSettings, onOpenProfile, settingsActive }) {
         <div style={hS.right}>
           {/* Gear first, profile at the corner (Amy 2026-08-30). */}
           <button style={{ ...hS.gear, background: settingsActive ? '#E7DEFA' : '#F1ECFE' }} onClick={onOpenSettings} aria-label="Settings" title="Settings">⚙️</button>
-          <button style={hS.profileBtn} onClick={onOpenProfile} aria-label="Profile" title="Profile"><ProfileChip /></button>
+          <button style={hS.profileBtn} onClick={onOpenProfile} aria-label="Profile" title="Profile"><ProfileChip src={avatar} /></button>
         </div>
       </div>
     </header>
@@ -268,11 +268,11 @@ const dS = {
   colTitle: { fontSize: 24, fontWeight: 600, color: T.ink, letterSpacing: '-.01em' },
   colNote: { fontSize: BODY, fontWeight: 400, color: T.ink3 },
 }
-export default function Door({ mode, name, points, gems, map, quest, meadowOpen = false, onOpenSettings, onOpenProfile, onOpenFeedback, settingsActive = false, onResume, onPlay }) {
+export default function Door({ mode, name, points, gems, map, quest, meadowOpen = false, avatar = null, onOpenSettings, onOpenProfile, onOpenFeedback, settingsActive = false, onResume, onPlay }) {
   const greet = mode === 'account' && name ? 'Welcome back, ' + name + '!' : 'Welcome, player!'
   return (
     <div className="doorScreen">
-      <Header onOpenSettings={onOpenSettings} onOpenProfile={onOpenProfile} settingsActive={settingsActive} />
+      <Header onOpenSettings={onOpenSettings} onOpenProfile={onOpenProfile} settingsActive={settingsActive} avatar={avatar} />
       <main className="doorWrap">
         <div className="doorGrid">
           <div className="doorLeft">

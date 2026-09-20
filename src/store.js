@@ -20,6 +20,12 @@ function freshState() {
   return {
     character: 'character-female-a', // Ivy's avatar (chosen later in a picker)
     pet: 'animal-cat', // her companion
+    // Profile photo — a small square JPEG data URL, or null. ON-DEVICE ONLY:
+    // set from the OS photo picker, re-encoded + EXIF-stripped in avatar.js, and
+    // kept right here in localStorage. It is NEVER uploaded — a child's photo is
+    // personal information under COPPA, and we collect and transmit none of it
+    // (Amy's call, 2026-09-20). migrate() defaults it to null for old saves.
+    avatar: null,
     map: 'clearing', // which map she's in (walks through gates to change it)
     // The Door hub's New→Guest signal. `played` flips true the first time she
     // enters ANY world from the hub — that's the honest line between "nothing to
@@ -366,6 +372,19 @@ export function setPos(x, z) {
 
 export function setSoundOn(on) {
   state.soundOn = !!on
+  save()
+}
+
+// Profile photo (on-device only — see the `avatar` field + avatar.js). setAvatar
+// takes the already-processed data URL from avatar.js; anything non-string clears.
+export function setAvatar(dataUrl) {
+  state.avatar = typeof dataUrl === 'string' && dataUrl ? dataUrl : null
+  save()
+}
+
+export function clearAvatar() {
+  if (!state.avatar) return // already clear — no needless save/push
+  state.avatar = null
   save()
 }
 

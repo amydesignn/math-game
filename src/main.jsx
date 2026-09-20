@@ -391,6 +391,7 @@ function SettingsDemo() {
   const [signedIn, setSignedIn] = React.useState(false)
   const [sound, setSound] = React.useState(true)
   const [view, setView] = React.useState('none') // none | settings | profile
+  const [avatar, setAvatar] = React.useState(null) // exercises the real on-device photo path
   const auth = { signedIn, email: 'ivy@email.com', initial: 'I' }
   const isDoor = surface === 'door'
   const chip = (on) => ({
@@ -415,8 +416,8 @@ function SettingsDemo() {
             <span style={{ fontSize: 20, fontWeight: 600, color: '#4B54DD' }}>Luxi Math</span>
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button aria-label="Profile" onClick={() => setView('profile')} style={{ width: 44, height: 44, borderRadius: '50%', border: 'none', background: '#F1ECFE', boxShadow: '0 0 0 2px #fff,0 0 0 3.5px #E7DEFA', cursor: 'pointer', fontSize: 20 }}>
-              {signedIn ? '🅸' : '🙂'}
+            <button aria-label="Profile" onClick={() => setView('profile')} style={{ width: 44, height: 44, borderRadius: '50%', border: 'none', overflow: 'hidden', background: '#F1ECFE', boxShadow: '0 0 0 2px #fff,0 0 0 3.5px #E7DEFA', cursor: 'pointer', fontSize: 20, padding: 0 }}>
+              {avatar ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : signedIn ? '🅸' : '🙂'}
             </button>
             <button aria-label="Settings" onClick={() => setView('settings')} style={gearBtnDoor}>
               ⚙️
@@ -445,9 +446,9 @@ function SettingsDemo() {
       </div>
 
       {view === 'settings' && (
-        <SettingsSheet auth={auth} sound={sound} onToggleSound={setSound} onOpenSignup={() => alert('→ opens SignupModal')} onSignOut={() => setSignedIn(false)} onClose={() => setView('none')} />
+        <SettingsSheet auth={auth} avatar={avatar} sound={sound} onToggleSound={setSound} onOpenSignup={() => alert('→ opens SignupModal')} onSignOut={() => setSignedIn(false)} onClose={() => setView('none')} />
       )}
-      {view === 'profile' && <ProfilePopover auth={auth} onUploadAvatar={() => alert('→ upload avatar')} onClose={() => setView('none')} />}
+      {view === 'profile' && <ProfilePopover auth={auth} avatar={avatar} onUploadAvatar={setAvatar} onRemoveAvatar={() => setAvatar(null)} onClose={() => setView('none')} />}
     </div>
   )
 }

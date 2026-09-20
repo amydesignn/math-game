@@ -17,7 +17,7 @@ import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
 import { nextProblem, maybeLevelUp, TOPICS } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
-import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
+import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
@@ -37,6 +37,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   const [view, setView] = useState('door') // 'door' | 'world'
   const [played, setPlayed] = useState(state.played) // New→Guest signal for the hub
   const [soundOn, setSoundState] = useState(state.soundOn) // lifted so hub + world toggles stay in sync
+  const [avatar, setAvatarState] = useState(state.avatar) // on-device profile photo (data URL | null)
 
   // Sound toggle shared by the hub header and the in-world speaker. `next`
   // optional → plain flip; persists to the store and applies to the audio bus.
@@ -53,6 +54,17 @@ export default function App({ cloud = false, justSignedIn = false }) {
   // stays server-side OFF until launch, so onSignupSend errors the generic way.
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  // Profile photo — on-device only (avatar.js processes; store persists to
+  // localStorage; nothing is uploaded, per the COPPA call). The popover hands us
+  // an already-processed data URL; here we just persist it and mirror to state.
+  const onUploadAvatar = (dataUrl) => {
+    setAvatar(dataUrl)
+    setAvatarState(dataUrl)
+  }
+  const onRemoveAvatar = () => {
+    clearAvatar()
+    setAvatarState(null)
+  }
   // First-run onboarding: auto-shows once for a brand-new player (over the Door),
   // and re-openable any time from the gear's "How to Play". One flag, two entries.
   const [showOnboarding, setShowOnboarding] = useState(!state.seenOnboarding)
@@ -803,6 +815,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
           map={getState().map}
           quest={quest}
           meadowOpen={false}
+          avatar={avatar}
           onOpenSettings={() => setSettingsOpen(true)}
           onOpenProfile={() => setProfileOpen(true)}
           onOpenFeedback={() => setFeedbackOpen(true)}
@@ -1006,6 +1019,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
       {settingsOpen && (
         <SettingsSheet
           auth={authInfo}
+          avatar={avatar}
           sound={soundOn}
           onToggleSound={toggleSound}
           onOpenSignup={() => {
@@ -1021,7 +1035,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
           onClose={() => setSettingsOpen(false)}
         />
       )}
-      {profileOpen && <ProfilePopover auth={authInfo} onClose={() => setProfileOpen(false)} />}
+      {profileOpen && <ProfilePopover auth={authInfo} avatar={avatar} onUploadAvatar={onUploadAvatar} onRemoveAvatar={onRemoveAvatar} onClose={() => setProfileOpen(false)} />}
       {signup && <SignupModal entry={signup} onSend={onSignupSend} onClose={() => setSignup(null)} />}
       {savedToast && <SavedToast onDone={() => setSavedToast(false)} />}
       {/* First-run walkthrough / gear → How to Play — over the Door and the world */}

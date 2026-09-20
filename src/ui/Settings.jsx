@@ -23,8 +23,9 @@
  * Governance (Amy 2026-08-30): 4px grid — sheet radius 20, rows 44–48, toggle 48×28
  * (knob 24), gaps 4/8/12/16, padding 16/20/24. Colours are Oscar's comp values.
  */
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { GemIcon } from './hudkit.jsx'
+import { fileToAvatar } from '../avatar.js'
 
 const IRIS = '#4B54DD',
   LILAC700 = '#5B44C4'
@@ -105,7 +106,7 @@ const rowIcon = { color: LILAC700, display: 'flex' }
  * The shared settings sheet. surface: 'door' | 'game' (anchor + animation only).
  * auth: { signedIn, email, initial }. onOpenSignup opens the shared SignupModal.
  */
-export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSignup, onOpenHowTo, onOpenFeedback, onSignOut, privacyHref = '/privacy.html', onClose }) {
+export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggleSound, onOpenSignup, onOpenHowTo, onOpenFeedback, onSignOut, privacyHref = '/privacy.html', onClose }) {
   // The gear lives top-right on BOTH surfaces now (Door header + in-world, by the
   // level bar), so the sheet drops from the top-right uniformly.
   const close = () => onClose?.()
@@ -164,8 +165,8 @@ export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSi
                   </button>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F6F2FF', border: '1.5px solid #EDE7FC', borderRadius: 12, padding: '12px 16px' }}>
-                    <span style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(160deg, #C4B5FD, #8E7BF2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
-                      {auth.initial || '★'}
+                    <span style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(160deg, #C4B5FD, #8E7BF2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
+                      {avatar ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : auth.initial || '★'}
                     </span>
                     <span style={{ flex: 1, minWidth: 0 }}>
                       <span style={{ display: 'block', fontSize: 15, fontWeight: 700, color: '#262626' }}>Signed in</span>
@@ -246,13 +247,42 @@ export function SettingsSheet({ auth = {}, sound = true, onToggleSound, onOpenSi
 /**
  * Profile popover — Door only. Personalization (avatar) — account controls live
  * in the gear, cross-referenced in the caption.
+ *
+ * The photo is ON-DEVICE ONLY (Amy 2026-09-20, the "we'll talk first" gate): the
+ * OS picker hands us a File, avatar.js re-encodes it to a small EXIF-stripped
+ * JPEG data URL, and onUploadAvatar persists that in the store's localStorage.
+ * Nothing is uploaded — a child's photo is personal information under COPPA and
+ * we transmit none of it. `avatar` is the current data URL (or null).
  */
-export function ProfilePopover({ auth = {}, onUploadAvatar, onClose }) {
-  const [soon, setSoon] = useState(false)
+export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRemoveAvatar, onClose }) {
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState(null)
+  const fileRef = useRef(null)
   const close = () => onClose?.()
-  // Avatar upload is deferred (Amy 2026-08-30 — "we'll talk before building it").
-  // With no handler wired, the button says so rather than doing nothing.
-  const upload = () => (onUploadAvatar ? onUploadAvatar() : setSoon(true))
+  const pick = () => fileRef.current?.click()
+
+  async function onFile(e) {
+    const file = e.target.files?.[0]
+    e.target.value = '' // let her re-pick the same file (onChange won't fire twice otherwise)
+    if (!file) return
+    setErr(null)
+    setBusy(true)
+    try {
+      const dataUrl = await fileToAvatar(file) // decode → crop → EXIF-stripped JPEG, all local
+      onUploadAvatar?.(dataUrl)
+    } catch {
+      setErr("Hmm, that photo wouldn't open. Try another one? ✨")
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const caption = err
+    ? err
+    : busy
+      ? 'Adding your photo…'
+      : 'Your photo stays on this device. Account settings live in the gear ⚙️.'
+
   return (
     <>
       <div style={scrimStyle} onClick={close} />
@@ -266,7 +296,9 @@ export function ProfilePopover({ auth = {}, onUploadAvatar, onClose }) {
           </div>
           <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
             <div style={{ width: 96, height: 96, borderRadius: '50%', background: '#F1ECFE', boxShadow: '0 0 0 3px #fff, 0 0 0 5px #E7DEFA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, overflow: 'hidden' }}>
-              {auth.signedIn ? (
+              {avatar ? (
+                <img src={avatar} alt="Your avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              ) : auth.signedIn ? (
                 <span style={{ width: '100%', height: '100%', background: 'linear-gradient(160deg, #C4B5FD, #8E7BF2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 38 }}>
                   {auth.initial || '★'}
                 </span>
@@ -274,15 +306,31 @@ export function ProfilePopover({ auth = {}, onUploadAvatar, onClose }) {
                 <span>🙂</span>
               )}
             </div>
+
+            {/* Hidden native picker — accept=image/* offers Photo Library / Take
+                Photo / Choose File on iPad. The result never leaves avatar.js. */}
+            <input ref={fileRef} type="file" accept="image/*" onChange={onFile} style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
+
             <button
-              onClick={upload}
-              style={{ width: '100%', height: 44, borderRadius: 12, border: '1.5px solid #E7DEFA', background: '#F6F2FF', color: LILAC700, fontWeight: 700, fontSize: 15, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              onClick={pick}
+              disabled={busy}
+              style={{ width: '100%', height: 44, borderRadius: 12, border: '1.5px solid #E7DEFA', background: '#F6F2FF', color: LILAC700, fontWeight: 700, fontSize: 15, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
               <UploadIcon />
-              Upload a photo
+              {busy ? 'Adding…' : avatar ? 'Change photo' : 'Upload a photo'}
             </button>
-            <span style={{ fontSize: 12, fontWeight: 500, color: '#9a92ac', textAlign: 'center', lineHeight: 1.5, textWrap: 'pretty' }}>
-              {soon ? 'Photo upload is coming soon ✨' : 'Personalize your avatar. Account settings live in the gear ⚙️.'}
+
+            {avatar && !busy && (
+              <button
+                onClick={() => onRemoveAvatar?.()}
+                style={{ border: 'none', background: 'transparent', color: '#8A7FB8', fontWeight: 700, fontSize: 13, cursor: 'pointer', padding: 4, marginTop: -8 }}
+              >
+                Remove photo
+              </button>
+            )}
+
+            <span style={{ fontSize: 12, fontWeight: 500, color: err ? '#B4531F' : '#9a92ac', textAlign: 'center', lineHeight: 1.5, textWrap: 'pretty' }}>
+              {caption}
             </span>
           </div>
         </div>
