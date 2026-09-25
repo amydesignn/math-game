@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
 import { solve } from '../math'
 import { SKINS } from './skins'
-import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose } from './mathkit'
+import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk } from './mathkit'
+import DivisionWalkthrough from './DivisionWalkthrough'
 
 /*
  * StationPopup — Oscar's station mini-quest, lifted from
@@ -78,38 +79,49 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
     if (entry.length >= 4) return
     setEntry((e) => (e + k).replace(/^0+(?=\d)/, ''))
   }
+  // A correct answer advances the quest (per-problem payout + pet, then either the
+  // completion bonus or the next step). Shared by the single-answer check AND the
+  // division ask's onSolved, so both encounters pay + progress identically.
+  const succeed = () => {
+    const pay = problem.gems || 1
+    setEarned((g) => g + pay)
+    onPetReact?.()
+    const lastOne = step + 1 >= total
+    setPhase(lastOne ? 'complete' : 'stepdone')
+    // Awards ride plain timers so they can never be lost — rAF starves in
+    // hidden/throttled windows (iOS low-power). Only the flight visual is rAF.
+    setTimeout(() => onAward?.(pay), 620)
+    if (lastOne) {
+      setTimeout(() => onWorldReact?.(skin.id), 900)
+      setTimeout(() => onBonusAward?.(quest.bonus), 1550)
+    }
+    requestAnimationFrame(() => {
+      flyToHud(pay, false)
+      if (lastOne) setTimeout(() => flyToHud(quest.bonus, true), 950)
+    })
+  }
+  const fail = () => {
+    setShake(true)
+    setTimeout(() => setShake(false), 420)
+    setTimeout(() => setPhase('recover'), 260)
+  }
+  // single-answer check (× / + / −). Division routes through <DivisionAsk> instead
+  // — solve() has no ÷ case (for ÷ it returns a−b, the exact bug that wrong-marked
+  // correct quotients in the quest), so ÷ never reaches this comparison.
   const check = () => {
     if (entry === '') return
     const ok = Number(entry) === answer
     onResult?.(problem, ok)
-    if (ok) {
-      const pay = problem.gems || 1
-      setEarned((g) => g + pay)
-      onPetReact?.()
-      const lastOne = step + 1 >= total
-      setPhase(lastOne ? 'complete' : 'stepdone')
-      // Awards ride plain timers so they can never be lost — rAF starves in
-      // hidden/throttled windows (iOS low-power). Only the flight visual is rAF.
-      setTimeout(() => onAward?.(pay), 620)
-      if (lastOne) {
-        setTimeout(() => onWorldReact?.(skin.id), 900)
-        setTimeout(() => onBonusAward?.(quest.bonus), 1550)
-      }
-      requestAnimationFrame(() => {
-        flyToHud(pay, false)
-        if (lastOne) setTimeout(() => flyToHud(quest.bonus, true), 950)
-      })
-    } else {
-      setShake(true)
-      setTimeout(() => setShake(false), 420)
-      setTimeout(() => setPhase('recover'), 260)
-    }
+    if (ok) succeed()
+    else fail()
   }
   const nextProblem = () => { setStep((s) => s + 1); setEntry(''); setPhase('ask') }
   const backToAsk = () => { setEntry(''); setPhase('ask') }
   const close = (completed) => onClose?.({ completed, solvedCount: completed ? total : step })
 
-  useKeyInput(onKey)
+  // The station's own key handler is OFF for division — <DivisionAsk> owns its
+  // two-field keypad (same guard MathPopup uses).
+  useKeyInput(onKey, problem.op !== '÷')
 
   const dismissable = phase === 'ask' || phase === 'intro'
 
@@ -155,12 +167,23 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           {phase === 'ask' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <QuestSlots skin={skin} total={total} done={step} />
-              <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 500, color: T.ink3 }}>
-                {skin.stepNoun[0].toUpperCase() + skin.stepNoun.slice(1)} {step + 1} of {total} — {skin.askShort}
-              </div>
-              <EquationRow a={problem.a} op={problem.op} b={problem.b} entry={entry} />
-              <Keypad onKey={onKey} />
-              <div style={{ textAlign: 'center', fontSize: 12.5, color: '#9a92ac', fontWeight: 500 }}>Type your answer, then tap Check</div>
+              {problem.op === '÷' ? (
+                /* division = the shared two-field ask; a correct answer advances the
+                   quest (succeed), a wrong one opens the candy walkthrough (recover). */
+                <DivisionAsk problem={problem} skin={skin}
+                  onSolved={succeed}
+                  onResult={(ok) => onResult?.(problem, ok)}
+                  onWalkthrough={() => setPhase('recover')} />
+              ) : (
+                <>
+                  <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 500, color: T.ink3 }}>
+                    {skin.stepNoun[0].toUpperCase() + skin.stepNoun.slice(1)} {step + 1} of {total} — {skin.askShort}
+                  </div>
+                  <EquationRow a={problem.a} op={problem.op} b={problem.b} entry={entry} />
+                  <Keypad onKey={onKey} />
+                  <div style={{ textAlign: 'center', fontSize: 12.5, color: '#9a92ac', fontWeight: 500 }}>Type your answer, then tap Check</div>
+                </>
+              )}
             </div>
           )}
 
@@ -182,11 +205,19 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           {phase === 'recover' && (
             <div style={{ paddingBottom: 6 }}>
               <QuestSlots skin={skin} total={total} done={step} />
-              <div style={{ textAlign: 'center', margin: '14px 0' }}>
-                <div style={{ fontSize: 22, fontWeight: 700, color: T.ink }}>Let's look at one together 💡</div>
-                <div style={{ fontSize: 15, color: T.ink3, marginTop: 4 }}>No worries — the quest waits. Follow the steps, then try again.</div>
-              </div>
-              <WorkedExample problem={problem} onBack={backToAsk} />
+              {problem.op === '÷' ? (
+                /* division recovers into Oscar's candy walkthrough (its own header +
+                   steps) on a matched `similar` problem, then back to hers. */
+                <DivisionWalkthrough problem={problem.similar || problem} onDone={backToAsk} />
+              ) : (
+                <>
+                  <div style={{ textAlign: 'center', margin: '14px 0' }}>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: T.ink }}>Let's look at one together 💡</div>
+                    <div style={{ fontSize: 15, color: T.ink3, marginTop: 4 }}>No worries — the quest waits. Follow the steps, then try again.</div>
+                  </div>
+                  <WorkedExample problem={problem} onBack={backToAsk} />
+                </>
+              )}
             </div>
           )}
 

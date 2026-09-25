@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildDivisionStages, divideSteps } from '../math'
+import { buildDivisionStages, divideSteps, buildStages, solve, TOPICS } from '../math'
 
 /*
  * The C2 long-division builder (Oscar's "Let's share the candy" comp → the pure
@@ -131,5 +131,30 @@ describe('buildDivisionStages — captions are Oscar verbatim', () => {
     const last = buildDivisionStages(84, 4).stages.slice(-1)[0]
     expect(last.caption).toContain('shares perfectly evenly')
     expect(last.caption).not.toContain('left over')
+  })
+})
+
+/*
+ * Guards for the station-÷ bug (2026-09-25). The station quest had no division
+ * handling: it graded ÷ with solve() (which has no ÷ case → returns a−b, so the
+ * real quotient was wrong-marked) and recovered into buildStages, which silently
+ * fell through to the MULTIPLICATION worked example. Both popups now route ÷ to
+ * <DivisionAsk> + <DivisionWalkthrough>; these lock the two data facts that made
+ * the old path wrong, so a re-wiring fails here instead of shipping to a child.
+ */
+describe('division correctness is quotient+remainder, never solve() (station-÷ guard)', () => {
+  it('solve() has no ÷ case — it must never be used to grade a division answer', () => {
+    // solve('÷',a,b) returns a−b (the else branch). That is the bug: it is NOT the
+    // quotient. The generator carries quotient/remainder for the real check.
+    for (let i = 0; i < 300; i++) {
+      const p = TOPICS['long-div'].generate()
+      expect(p.op).toBe('÷')
+      expect(p.b * p.quotient + p.remainder).toBe(p.a) // the true answer reconstructs a
+      expect(solve('÷', p.a, p.b)).toBe(p.a - p.b) // solve is a−b for ÷ — do NOT grade with it
+    }
+  })
+
+  it('buildStages REFUSES division — ÷ must use DivisionWalkthrough, not the ×/+ grid', () => {
+    expect(() => buildStages({ type: 'long-div', op: '÷', a: 37, b: 6 })).toThrow(/DivisionWalkthrough/)
   })
 })

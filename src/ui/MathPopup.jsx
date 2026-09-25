@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { solve } from '../math'
 import { SKINS } from './skins'
-import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose } from './mathkit'
+import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk } from './mathkit'
 import DivisionWalkthrough from './DivisionWalkthrough'
 
 /*
@@ -173,128 +173,7 @@ function CorrectState({ skin, pay, onNext }) {
   )
 }
 
-/* ---- C2 division ask: two-part entry (quotient + remainder) ----
- * Oscar's comp (design_handoff_division_ask_screen), rebuilt on the real shared
- * atoms. A division answer is TWO numbers, so this replaces the single-entry
- * AskState for op === '÷'. Correctness = Number(q)===quotient && Number(r)===
- * remainder — solve() is never used. Decisions (Finn/Oscar/Amy): R is always
- * present (type R 0 on a clean share); Check lives in the keypad, disabled until
- * BOTH fields have a value; NO digit-count auto-advance (it would leak the
- * quotient's length) — the R label lights once the quotient has a digit, focus
- * jumps only at the 3-digit cap; a remainder-only FIRST miss gets one gentle
- * nudge, not the whole walkthrough; "Show me how" opens the walkthrough with no
- * wrong answer recorded. Scenario copy = the existing skin (Amy: don't change the
- * station copy). No berry accent — the banner keeps the skin's accent (Amy). */
-const Q_CAP = 3
-const R_CAP = 2
-
-function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }) {
-  const [q, setQ] = useState('')
-  const [r, setR] = useState('')
-  const [active, setActive] = useState('q')
-  const [nudge, setNudge] = useState(false)
-  const [misses, setMisses] = useState(0)
-  const [shakeR, setShakeR] = useState(false)
-
-  const check = () => {
-    if (q === '' || r === '') return
-    const qOk = Number(q) === problem.quotient
-    const rOk = Number(r) === problem.remainder
-    onResult?.(qOk && rOk) // record every submit, same as multiplication (Amy)
-    if (qOk && rOk) return onSolved()
-    if (qOk && misses === 0) {
-      // remainder-only first miss → keep her share, one warm nudge, refocus R
-      setNudge(true); setMisses(1); setR(''); setActive('r')
-      setShakeR(true); setTimeout(() => setShakeR(false), 420)
-      return
-    }
-    onWalkthrough() // wrong quotient, or a second miss → the full walkthrough
-  }
-
-  const onKey = (k) => {
-    if (k === 'del') {
-      if (active === 'r') {
-        if (r === '') return setActive('q') // empty R → step focus back to the share
-        return setR((v) => v.slice(0, -1))
-      }
-      return setQ((v) => v.slice(0, -1))
-    }
-    if (k === 'ok') return check()
-    if (active === 'q') {
-      if (q.length >= Q_CAP) return
-      const nq = (q + k).replace(/^0+(?=\d)/, '')
-      setQ(nq)
-      if (nq.length >= Q_CAP) setActive('r') // jump only AT the cap, never at the answer's length
-    } else {
-      if (r.length >= R_CAP) return
-      setR((v) => (v + k).replace(/^0+(?=\d)/, '')) // a lone 0 survives → "R 0" is typable
-    }
-  }
-  useKeyInput(onKey)
-
-  const ready = q !== '' && r !== ''
-  const hint = q === ''
-    ? 'Tap her share first — then the leftover.'
-    : r === ''
-      ? 'Now the leftover. Tap R, then type it — R 0 if none is left.'
-      : 'Tap Check when you’re ready.'
-  const caretStyle = { display: 'inline-block', width: 3, height: 36, borderRadius: 2, background: T.blue, animation: 'dvCaret 1.1s steps(1) infinite' }
-  const box = (f, val) => ({
-    height: 64, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, cursor: 'pointer',
-    fontSize: 40, fontWeight: 700, color: T.blue, fontVariantNumeric: 'tabular-nums', borderStyle: 'solid', borderWidth: 2.5,
-    borderColor: val !== '' || active === f ? T.blue : T.blueSubtle,
-    background: val !== '' ? T.blueTint : active === f ? '#fff' : '#fafafa',
-    boxShadow: active === f ? '0 0 0 4px rgba(45,109,246,.18)' : 'none',
-    transition: 'border-color .15s, background .15s, box-shadow .15s',
-  })
-  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.blue : '#a3a3a3' })
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.ink3 }}>{skin.ask}</div>
-
-      {/* a ÷ b = [q] R [r] — two nowrap groups, so a narrow modal drops the answer to its own line */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '10px 12px', fontVariantNumeric: 'tabular-nums' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap' }}>
-          <span style={{ fontSize: 42, fontWeight: 700, color: T.ink }}>{problem.a}</span>
-          <span style={{ fontSize: 32, fontWeight: 600, color: T.ink3 }}>÷</span>
-          <span style={{ fontSize: 42, fontWeight: 700, color: T.ink }}>{problem.b}</span>
-          <span style={{ fontSize: 32, fontWeight: 600, color: T.ink3 }}>=</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, whiteSpace: 'nowrap' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <button onClick={() => setActive('q')} style={{ ...box('q', q), minWidth: 112, padding: '0 10px' }}>
-              {q}{active === 'q' && <span style={caretStyle} />}
-            </button>
-            <span style={cap(active === 'q')}>EACH SHARE</span>
-          </div>
-          {/* R label — a real tap target that lights + pulses once the quotient has a digit */}
-          <button onClick={() => setActive('r')} aria-label="remainder"
-            style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 28, fontWeight: 800, lineHeight: 1, borderRadius: 12,
-              color: active === 'r' || r !== '' ? T.blue : '#a3a3a3', animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <button onClick={() => setActive('r')} style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
-              {r}{active === 'r' && <span style={caretStyle} />}
-            </button>
-            <span style={cap(active === 'r')}>LEFT OVER</span>
-          </div>
-        </div>
-      </div>
-
-      {nudge && (
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 14, padding: '11px 14px', animation: 'dvFadeSlide .3s ease-out both' }}>
-          <span style={{ fontSize: 16, lineHeight: 1.35 }}>🍬</span>
-          <span style={{ fontSize: 15, fontWeight: 600, color: '#9A3412', lineHeight: 1.4 }}>The share is right! Now look again at what&apos;s <strong style={{ fontWeight: 800 }}>left over</strong>.</span>
-        </div>
-      )}
-
-      <Keypad onKey={onKey} okDisabled={!ready} />
-
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, marginTop: 2 }}>
-        <div style={{ textAlign: 'center', fontSize: 12.5, color: '#9a92ac', fontWeight: 500 }}>{hint}</div>
-        <button onClick={onWalkthrough}
-          style={{ border: 'none', background: 'transparent', color: '#6E5BC0', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
-      </div>
-    </div>
-  )
-}
+/* DivisionAsk (the two-part quotient + remainder entry) now lives in ./mathkit,
+   SHARED with StationPopup so a quest division problem behaves identically to a
+   sparkle one. It used to be defined here and StationPopup had no ÷ handling at
+   all — that gap is the 2026-09-25 station-division bug. */

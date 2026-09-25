@@ -305,6 +305,12 @@ export function buildStages(problem) {
   const { op, a, b } = problem
   if (problem.type === 'long-mult') return buildLongMult(a, b)
   if (op === '+') return buildAdd(a, b)
+  // Division must NEVER reach the column-math worked example — it recovers into
+  // <DivisionWalkthrough> in BOTH popups. Silently falling through to buildMult2x1
+  // is exactly the station-÷ bug (2026-09-25): a wrong division answer showed a
+  // MULTIPLICATION lesson. Fail loud so a future re-wiring is caught in dev/tests
+  // instead of shipping a wrong lesson to a child. (Provably unreachable in prod.)
+  if (op === '÷') throw new Error('buildStages: division uses DivisionWalkthrough, not the ×/+ worked example')
   return buildMult2x1(a, b)
 }
 
