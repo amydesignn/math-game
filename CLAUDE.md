@@ -220,6 +220,39 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## Station division fix ✅ SHIPPED 2026-09-25 — the quest never got the C2 ÷ handling
+**Ivy + Amy hit this in PRODUCTION** (both, repeatedly, `12÷4`): a division problem in
+the **station / daily-quest** (~1 in 3 quests are long-div) marked the correct quotient
+WRONG and then showed a **MULTIPLICATION** lesson.
+- **Root cause:** the whole C2 division UX — the two-field quotient+remainder
+  `DivisionAsk` + the "share the candy" `DivisionWalkthrough` — was wired into
+  **MathPopup (sparkle) ONLY**. `StationPopup` still used the single-answer field +
+  `solve()` for every op, and `solve()` has **no ÷ case**, so it returned `a−b`
+  (12÷4 → 8), wrong-marking the real answer; the recovery then fell through
+  `buildStages` → `buildMult2x1` (a multiplication worked example). Broken since C2 put
+  long-div into `generateStation` (2026-08-23) — the sparkle path was verified then, the
+  quest path never was. (First investigation "cleared" prod because it tested the sparkle
+  via `__divAsk` — the one surface that already worked. Test the surface the USER hits.)
+- **Fix (Oscar's "shared modules, not copies"):** `DivisionAsk` lifted into `mathkit` and
+  used (+ `DivisionWalkthrough`) by `StationPopup`, so a quest ÷ problem behaves
+  identically to a sparkle one — two-field entry, quotient+remainder correctness, candy
+  walkthrough on a miss, quest advances/pays on correct. `succeed()` is shared by the
+  single-answer check and the division ask; `useKeyInput(onKey, problem.op !== '÷')` hands
+  ÷ keys to `DivisionAsk`.
+- **Guard so it can't silently return:** `buildStages` now **THROWS for ÷** (division must
+  use the walkthrough, never the ×/+ grid) + 2 unit guards in `division-worked.test.js`.
+  There is **no component-test harness** (pure-node vitest) — exactly why a wiring bug hid
+  for a month; the throw makes a re-wiring fail loud in dev/tests instead of on Ivy.
+- **⚠️ STANDING LESSON:** MathPopup (sparkle) and StationPopup (quest) are **TWO separate
+  encounters** — any new operation/behaviour must be wired into BOTH. They share atoms via
+  `mathkit`; keep the ask + recover routing in sync.
+- **Verified LIVE on the real quest path** (37÷6 accepted as 6 R 1; a miss → the candy
+  walkthrough, not multiplication; forced via a temp `__openStation` hook, since removed).
+  177 tests green, lint + build clean. Commit `37a920b` → main → Vercel; confirmed live on
+  math.luxi.land (served bundle carries the guard string, `window.__divAsk` undefined).
+- **Not changed:** subtraction is still NOT in production (that's the `loop/test-1-baseline`
+  experiment); the addition/×/÷ single-field paths are untouched.
+
 ## C2 walkthrough spacing fix + golden 4px governance ✅ SHIPPED 2026-08-31
 Two layout regressions in the "Let's share the candy" recovery walkthrough
 (`DivisionWalkthrough.jsx`), surfaced after the 08-30 chrome shift + Amy's live
