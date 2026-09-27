@@ -220,6 +220,21 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## Long-mult walkthrough fix ✅ SHIPPED 2026-09-27 — shaped example + every carry + a real ending
+From Amy's Luxi Math video recording + Finn's review (32 × 31, answered 895). Commit `a088dfb`.
+- **"One just like it" wasn't** — 32 × 31 got 40 × 21 (the 0 trivialises the ones pass).
+  `similarLongMult` matched only the LEVEL; it now matches the SHAPE (`multShape`): zero
+  places · per-pass carries · ×1 places · row widths · final-add carry, strictest first,
+  relaxing trailing keys only if 12–99 has no hit; prefers a pair sharing neither operand.
+- **The ending existed but was thin** (Amy's screenshot was step 4 of 5 — "no final step" did
+  NOT reproduce). `buildStagesMulti(a, b, yours)` now: tens pass gets the two-beat carry
+  (carry over the top's tens digit, like the ones pass); the add step carries in their OWN
+  `addCarry` row above the rows (never the × carry row) and names every carry; a final
+  handoff step "Your turn: 32 × 31 works exactly the same way." Shared WorkedExample → sparkle
+  AND station both get it.
+- Dev hook `window.__multAsk(a, b[, sa, sb])` (DEV-only; pin the example with sa,sb).
+  Tests `mult-worked.test.js` (+9) → 188 green.
+
 ## Station division fix ✅ SHIPPED 2026-09-25 — the quest never got the C2 ÷ handling
 **Ivy + Amy hit this in PRODUCTION** (both, repeatedly, `12÷4`): a division problem in
 the **station / daily-quest** (~1 in 3 quests are long-div) marked the correct quotient
