@@ -301,6 +301,22 @@ export function MultiColumnMath({ snap }) {
         {bDigit(snap.bO, 'O')}
       </div>
       <div style={{ height: 0, borderTop: `3px solid ${T.ink}`, margin: '8px 0' }} />
+      {/* the final addition's carries — their own small row right above the rows
+          being added, so they never mix with the multiplication carries up top */}
+      {snap.addCarry?.some((x) => x !== '') && (
+        <div style={{ display: 'flex', alignItems: 'center', height: 24, marginBottom: 4 }}>
+          {lead('')}
+          {cols.map((i) => (
+            <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
+              {snap.addCarry[i] !== '' && (
+                <div style={{ width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 14, fontWeight: 700, color: '#B45309', background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  animation: snap.hiRow === 'sum' ? 'spotIn .35s ease-out both' : 'none' }}>{snap.addCarry[i]}</div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
       <div style={{ display: 'flex', alignItems: 'center', minHeight: cell }}>
         {lead('')}
         {cols.map((i) => numCell(snap.row1[i], { hot: snap.hiRow === 'row1' && snap.row1[i] !== '', color: T.blue, key: i }))}
@@ -519,7 +535,7 @@ export function WorkedExample({ problem, onBack }) {
   const sim = problem.similar
   const useV2 = problem.op === '×' && sim.b >= 10
   const { stages } = useRef(
-    useV2 ? buildStagesMulti(sim.a, sim.b) : buildStages({ ...problem, a: sim.a, b: sim.b })
+    useV2 ? buildStagesMulti(sim.a, sim.b, problem) : buildStages({ ...problem, a: sim.a, b: sim.b })
   ).current
   const [i, setI] = useState(0)
   const last = i >= stages.length - 1

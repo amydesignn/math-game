@@ -206,13 +206,63 @@ export const TOPICS = {
   },
 }
 
-function similarLongMult(a, b, level) {
-  let s
-  let guard = 0
-  do {
-    s = { a: rand(12, 89), b: rand(12, 89) }
-  } while ((s.a === a || levelOfLongMult(s.a, s.b) !== level) && guard++ < 500)
-  return s
+/**
+ * The worked-example sibling must have the SAME STRUCTURE as her problem, not
+ * just the same level (Finn, 2026-09-27: 32 × 31 got 40 × 21 — the 0 made its
+ * ones pass trivial, so it wasn't "one just like it"). The shape, strictest
+ * first — the trailing keys relax only if nothing in 12–99 matches:
+ *   zeros    — a 0 in exactly the same digit places (no zero where she has none)
+ *   ones     — a ×1 in the same multiplier places (×1 is its own easy move)
+ *   carries  — the ones pass / tens pass carry exactly where hers do
+ *   widths   — each row has as many digits as hers (the columns line up alike)
+ *   addCarry — the final addition carries iff hers does
+ * `level` is implied by `carries`; kept in the signature for the callers.
+ */
+const digits2 = (n) => [Math.floor(n / 10), n % 10]
+function multShape(a, b) {
+  const { p1, p2, p1Carries, p2Carries } = longMultAnatomy(a, b)
+  const bd = digits2(b)
+  return {
+    zeros: [...digits2(a), ...bd].map((d) => d === 0).join(),
+    ones: bd.map((d) => d === 1).join(),
+    carries: `${p1Carries},${p2Carries}`,
+    widths: `${String(p1).length},${String(p2).length}`,
+    addCarry: String(additionCarries(p1, p2)),
+  }
+}
+function additionCarries(x, y) {
+  while (x > 0 && y > 0) {
+    if ((x % 10) + (y % 10) > 9) return true
+    x = Math.floor(x / 10); y = Math.floor(y / 10)
+  }
+  return false
+}
+const SHAPE_KEYS = ['zeros', 'carries', 'ones', 'widths', 'addCarry']
+
+export function similarLongMult(a, b, _level) {
+  const want = multShape(a, b)
+  const pool = []
+  for (let x = 12; x <= 99; x++) {
+    for (let y = 12; y <= 99; y++) {
+      if ((x === a && y === b) || (x === b && y === a)) continue // never hers, not even flipped
+      pool.push({ a: x, b: y, shape: multShape(x, y) })
+    }
+  }
+  for (let keep = SHAPE_KEYS.length; keep >= 2; keep--) {
+    const keys = SHAPE_KEYS.slice(0, keep)
+    const hits = pool.filter((c) => keys.every((k) => c.shape[k] === want[k]))
+    if (hits.length) {
+      // prefer one that shares NEITHER number with hers (21 × 31 for 32 × 31 is
+      // legal, but a fresh pair reads as its own problem)
+      const fresh = hits.filter((c) => ![a, b].includes(c.a) && ![a, b].includes(c.b))
+      const from = fresh.length ? fresh : hits
+      const s = from[rand(0, from.length - 1)]
+      return { a: s.a, b: s.b }
+    }
+  }
+  // unreachable for 2×2-digit problems (zeros+carries always has a sibling)
+  const s = pool.find((c) => c.shape.carries === want.carries)
+  return { a: s.a, b: s.b }
 }
 
 /* ── session mix + progression ─────────────────────────────────────── */
@@ -324,10 +374,10 @@ export function buildStages(problem) {
    superseded for the actual worked example by this. */
 const pad4 = (n) => padTo(n, 4)
 
-export function buildStagesMulti(a, b) {
+export function buildStagesMulti(a, b, yours) {
   const bO = b % 10, bT = Math.floor(b / 10)
   const p1 = a * bO, p2 = a * bT, answer = a * b
-  const blank = () => ({ top: pad4(a), bO, bT, spot: null, row1: pad4(''), row2: pad4(''), sum: pad4(''), hiRow: null, zeroHot: false, shifted: false, carry: pad4(''), carryHot: false })
+  const blank = () => ({ top: pad4(a), bO, bT, spot: null, row1: pad4(''), row2: pad4(''), sum: pad4(''), hiRow: null, zeroHot: false, shifted: false, carry: pad4(''), carryHot: false, addCarry: pad4('') })
   const stages = []
   let s
   s = blank()
@@ -346,10 +396,42 @@ export function buildStagesMulti(a, b) {
   }
   s = blank(); s.spot = 'T'; s.row1 = pad4(p1); s.row2 = pad4('0'); s.zeroHot = true; s.shifted = true; s.hiRow = 'row2'
   stages.push({ caption: `Tens pass: spotlight the ${bT}. It's not really ${bT} — it's ${bT}0! So this row slides one place left. Write a 0 in the ones spot first, so nothing sneaks in there.`, snap: s })
-  s = blank(); s.spot = 'T'; s.row1 = pad4(p1); s.row2 = pad4(p2 * 10); s.shifted = true; s.hiRow = 'row2'
-  stages.push({ caption: `Now the same move as before: whole ${a} × ${bT} = ${p2}. Write it next to the zero — that makes ${p2 * 10}.`, snap: s })
-  s = blank(); s.row1 = pad4(p1); s.row2 = pad4(p2 * 10); s.sum = pad4(answer); s.hiRow = 'sum'
-  stages.push({ caption: `Both passes done! Add the rows: ${p1} + ${p2 * 10} = ${answer}.`, snap: s })
+  // tens pass — the same carry beat as the ones pass (it used to jump straight
+  // to the whole row, so a carrying tens pass was never shown)
+  const tProd = aO * bT, tWrite = tProd % 10, tCarry = Math.floor(tProd / 10)
+  if (tCarry > 0) {
+    s = blank(); s.spot = 'T'; s.row1 = pad4(p1); s.row2 = ['', '', String(tWrite), '0']; s.carry[2] = String(tCarry); s.carryHot = true; s.shifted = true; s.hiRow = 'row2'
+    stages.push({ caption: `Same move as before: ${aO} × ${bT} = ${tProd} — write the ${tWrite} next to the zero, and pop the ${tCarry} up top.`, snap: s })
+    s = blank(); s.spot = 'T'; s.row1 = pad4(p1); s.row2 = pad4(p2 * 10); s.carry[2] = String(tCarry); s.shifted = true; s.hiRow = 'row2'
+    stages.push({ caption: `Keep going: ${aT} × ${bT} = ${aT * bT}, plus the ${tCarry} on top = ${aT * bT + tCarry}. Row 2 is ${p2 * 10}.`, snap: s })
+  } else {
+    s = blank(); s.spot = 'T'; s.row1 = pad4(p1); s.row2 = pad4(p2 * 10); s.shifted = true; s.hiRow = 'row2'
+    stages.push({ caption: `Now the same move as before: whole ${a} × ${bT} = ${p2}. Write it next to the zero — that makes ${p2 * 10}.`, snap: s })
+  }
+  // add the rows — Finn: this is where kids slip, so it gets its own beat, with
+  // any column carry shown in yellow exactly like the passes
+  const addCarry = pad4('')
+  const r1 = pad4(p1), r2 = pad4(p2 * 10)
+  const made = [] // the column totals that carried, right to left
+  let c = 0
+  for (let i = 3; i >= 0; i--) {
+    const col = Number(r1[i] || 0) + Number(r2[i] || 0) + c
+    c = col > 9 ? 1 : 0
+    if (c && i > 0) { addCarry[i - 1] = '1'; made.push(col) }
+  }
+  s = blank(); s.row1 = r1; s.row2 = r2; s.sum = pad4(answer); s.addCarry = addCarry; s.hiRow = 'sum'
+  stages.push({
+    caption: `Both passes done! Now add the rows, one column at a time from the right: ${p1} + ${p2 * 10} = ${answer}.` +
+      (made.length === 1 ? ` One column makes ${made[0]} — write the ${made[0] % 10}, carry the 1.`
+        : made.length > 1 ? ` When a column makes 10 or more (${made.join(', ')}), write the ones digit and carry the 1.` : ''),
+    snap: s,
+  })
+  s = blank(); s.row1 = r1; s.row2 = r2; s.sum = pad4(answer); s.addCarry = addCarry; s.hiRow = 'sum'
+  stages.push({
+    caption: `So ${a} × ${b} = ${answer}! ` +
+      (yours ? `Your turn: ${yours.a} × ${yours.b} works exactly the same way.` : 'Two passes, then add — that’s the whole trick.'),
+    snap: s,
+  })
   return { stages, answer }
 }
 

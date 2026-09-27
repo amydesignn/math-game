@@ -14,7 +14,7 @@ import { SettingsSheet, ProfilePopover } from './ui/Settings'
 import { Onboarding } from './ui/Onboarding'
 import { FeedbackModal } from './ui/FeedbackModal'
 import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
-import { nextProblem, maybeLevelUp, TOPICS } from './math'
+import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
 import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
@@ -370,6 +370,14 @@ export default function App({ cloud = false, justSignedIn = false }) {
     window.__divAsk = (a, b) => openDiv(a && b ? divProb(a, b) : TOPICS['long-div'].generate())
     // __divRecover(a,b): open a ÷ problem; any wrong answer opens the walkthrough.
     window.__divRecover = (a = 815, b = 4) => openDiv(divProb(a, b))
+    // __multAsk(a,b): open a long-mult problem for a specific shape (32,31 = the
+    // walkthrough Amy recorded); a wrong answer opens the worked example.
+    // Pass sa,sb to pin the example (e.g. __multAsk(32,31,40,21) = the recorded bug).
+    window.__multAsk = (a = 32, b = 31, sa, sb) => {
+      const level = levelOfLongMult(a, b)
+      const similar = sa && sb ? { a: sa, b: sb } : similarLongMult(a, b, level)
+      openDiv({ type: 'long-mult', level, op: '×', a, b, gems: level, similar })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
