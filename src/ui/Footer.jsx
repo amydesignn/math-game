@@ -10,7 +10,9 @@
  *                         privacy policy has a COPPA section — anchor added there)
  *   · Worlds (#worlds) → scrolls to the Door's "Choose your world" grid (id added)
  *   · hello@luxi.land  → real contact inbox (already used across privacy.html)
- *   · social handles   → shipped AS-IS from Oscar (unverified; Amy's call), new tab
+ *   · social handles   → Amy's verified accounts (2026-10-01): Instagram, LinkedIn,
+ *                         YouTube, X. Facebook parked (commented) until reactivated.
+ *                         Kept identical to luxi-land/src/ui/Footer.jsx by hand.
  *   · Play Luxi Math / How it works / Send feedback → VISIBLE but INERT — those
  *     marketing pages don't exist on the app Door yet. Rendered as <Muted> so the
  *     column layout matches Oscar's comp exactly.
@@ -83,14 +85,22 @@ export default function Footer({ onFeedback }) {
             <p style={F.tagline}>Earn gems. Build your world. A free, browser-based place where kids learn through play.</p>
             <a href="mailto:hello@luxi.land" className="lf-link" style={{ ...F.link, ...F.email }}>hello@luxi.land</a>
             <div style={F.social}>
-              <a href="https://facebook.com/luxiland" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on Facebook" className="lf-social" style={F.socialLink}>
+              {/* Facebook parked until the real page is reactivated (~Dec 2026) — restore with the real URL:
+              <a href="FACEBOOK_URL" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on Facebook" className="lf-social" style={F.socialLink}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5H17V3.6c-.3-.04-1.3-.13-2.47-.13-2.45 0-4.13 1.5-4.13 4.25v2.17H7.6V13h2.8v8h3.1z" /></svg>
               </a>
-              <a href="https://www.instagram.com/luxiland_/" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on Instagram" className="lf-social" style={F.socialLink}>
+              */}
+              <a href="https://instagram.com/luxiland_" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on Instagram" className="lf-social" style={F.socialLink}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="5" /><circle cx="12" cy="12" r="3.4" /><circle cx="16.6" cy="7.4" r="1.1" fill="currentColor" stroke="none" /></svg>
               </a>
-              <a href="https://linkedin.com/company/luxiland" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on LinkedIn" className="lf-social" style={F.socialLink}>
+              <a href="https://www.linkedin.com/company/luxi-land/" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on LinkedIn" className="lf-social" style={F.socialLink}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.94 5a1.94 1.94 0 1 1-3.88 0 1.94 1.94 0 0 1 3.88 0zM3.4 8.6h3.1V21H3.4V8.6zm5.2 0h2.97v1.7h.04c.42-.78 1.44-1.6 2.96-1.6 3.16 0 3.75 2.08 3.75 4.79V21h-3.1v-5.5c0-1.31-.03-3-1.83-3-1.83 0-2.11 1.43-2.11 2.9V21H8.6V8.6z" /></svg>
+              </a>
+              <a href="https://www.youtube.com/@LuxiLandOfficial" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on YouTube" className="lf-social" style={F.socialLink}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.76-1.77C18.3 5 12 5 12 5s-6.3 0-7.84.43A2.5 2.5 0 0 0 2.4 7.2 26 26 0 0 0 2 12a26 26 0 0 0 .4 4.8 2.5 2.5 0 0 0 1.76 1.77C5.7 19 12 19 12 19s6.3 0 7.84-.43a2.5 2.5 0 0 0 1.76-1.77A26 26 0 0 0 22 12a26 26 0 0 0-.4-4.8zM10 15V9l5.2 3L10 15z" /></svg>
+              </a>
+              <a href="https://x.com/LuxiLand_" target="_blank" rel="noopener noreferrer" aria-label="Luxi Land on X" className="lf-social" style={F.socialLink}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.77L17.75 3zm-1.08 16.2h1.7L7.4 4.73H5.58L16.67 19.2z" /></svg>
               </a>
             </div>
           </div>
