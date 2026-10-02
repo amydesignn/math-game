@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/:src(ig|yt|x|li|fb)", "destination": "/index.html" }
+    { "source": "/:src(ig|yt|x|li|fb|flyer)", "destination": "/index.html" }
   ]
 }

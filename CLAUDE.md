@@ -20,7 +20,7 @@ link was never shared externally (no dead-bookmark risk). Vercel owns production
 there is no GitHub Pages deploy anymore (the old URL 404s). Vercel
 Web Analytics is now fully on (package + dashboard toggle, 2026-08-01).
 **Social attribution paths (2026-10-02):** `vercel.json` rewrites `/ig` `/yt` `/x`
-`/li` `/fb` to `index.html`, so each platform's link opens the game normally but
+`/li` `/fb` `/flyer` (QR codes) to `index.html`, so each platform's link opens the game normally but
 lands as its own row in Analytics → Pages. This is the Hobby-plan workaround: UTM
 dimensions + custom events are paid, and IG's in-app browser strips the referrer.
 The app never reads the pathname, so these paths are pure labels — keep it that
