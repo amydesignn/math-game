@@ -39,10 +39,10 @@ const T = {
   amber: '#FE9A00', amberSoft: '#FFF7EA', amberLine: '#FBE3B6', amberInk: '#8A5300',
   pink: '#F6339A', pinkDark: '#C6005C',
 }
-/* violet — levels + all primary actions */
+/* violet — levels; primary actions wear Brand Iris (btn) */
 const V = {
   main: '#A78BFA', soft: '#F1ECFE', softLine: '#E7DEFA', deep: '#5B44C4',
-  btn: '#7C6CE8', btnDark: '#5B44C4',
+  btn: '#4B54DD', btnDark: '#3D43BE', // Brand Iris 600 / 700 — actions (5.8:1 white text; was #7C6CE8 at 4.06, failed AA)
   grad: 'linear-gradient(135deg,#C4B5FD 0%,#A78BFA 58%,#8E7BF2 100%)',
 }
 

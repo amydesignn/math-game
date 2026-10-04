@@ -241,9 +241,9 @@ canvas { touch-action: none; display: block; }
 .luxiOb-back { background: transparent; color: #6E6685; font-size: 15px; font-weight: 600; padding: 12px 16px; border: 0; border-radius: 12px; cursor: pointer; transition: background .15s ease, color .15s ease; }
 .luxiOb-back:hover { background: #F1EEF9; color: #262626; }
 /* footer primary — "Next" and the final CTA share this look (padding set inline) */
-.luxiOb-cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #7C6CE8; color: #fff; font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 #5B44C4; cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
+.luxiOb-cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #4B54DD; color: #fff; font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 #3D43BE; cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
 .luxiOb-cta:hover { filter: brightness(1.04); }
-.luxiOb-cta:active { transform: translateY(4px); box-shadow: 0 0 0 #5B44C4; }
+.luxiOb-cta:active { transform: translateY(4px); box-shadow: 0 0 0 #3D43BE; }
 
 /* ── Feedback Flow (Oscar's "Luxi Feedback Flow.dc.html", lifted 2026-09-19
    → src/ui/FeedbackModal.jsx) ──
@@ -266,6 +266,6 @@ canvas { touch-action: none; display: block; }
 .luxiFb-notnow:hover { background: #F6F2FF; }
 
 /* House focus ring (contrast audit, 2026-10-04 — Amy's interaction-states rule):
-   1px in the active blue, 2px gap so it reads on blue buttons too (WCAG 1.4.11).
+   1px in Iris 700, 2px gap so it reads on Iris buttons too (WCAG 1.4.11).
    Scoped to the shared modal shell; the app-wide pass comes with later audits. */
-[role="dialog"] button:focus-visible { outline: 1px solid #0946CA; outline-offset: 2px; }
+[role="dialog"] button:focus-visible { outline: 1px solid #3D43BE; outline-offset: 2px; }

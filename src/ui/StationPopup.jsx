@@ -160,7 +160,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                 background: '#fafafa', border: `1px solid ${T.line}`, borderRadius: 12, padding: '8px 14px' }}>
                 Finish-the-quest bonus: +{quest.bonus} <Gem size={15} />
               </div>
-              <BigButton tone="blue" onClick={() => setPhase('ask')} style={{ minWidth: 200 }}>Let's go ✨</BigButton>
+              <BigButton tone="primary" onClick={() => setPhase('ask')} style={{ minWidth: 200 }}>Let's go ✨</BigButton>
             </div>
           )}
 
@@ -190,7 +190,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           {phase === 'stepdone' && (
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
               padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
-              <Sparkles colors={['#fff', skin.accent, T.blueSubtle, T.tealLt]} n={14} />
+              <Sparkles colors={['#fff', skin.accent, T.irisSoft, T.tealLt]} n={14} />
               <QuestSlots skin={skin} total={total} done={step + 1} />
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 24, fontWeight: 700, color: T.ink }}>{skin.stepWin(step + 1, total)}</div>
@@ -198,7 +198,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                   +{problem.gems || 1} <Gem size={17} /> · {total - (step + 1)} {total - (step + 1) > 1 ? skin.stepPlural : skin.stepNoun} to go
                 </div>
               </div>
-              <BigButton tone="blue" onClick={nextProblem} style={{ marginTop: 4, minWidth: 200 }}>Next {skin.stepNoun} ▸</BigButton>
+              <BigButton tone="primary" onClick={nextProblem} style={{ marginTop: 4, minWidth: 200 }}>Next {skin.stepNoun} ▸</BigButton>
             </div>
           )}
 
@@ -242,7 +242,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                     background: '#FEF3E2', border: `1px solid #FDE0B8`, borderRadius: 12, padding: '7px 13px' }}>+{quest.bonus} <Gem size={16} /> bonus!</span>
                 </div>
               </div>
-              <BigButton tone="blue" onClick={() => close(true)} style={{ marginTop: 6, minWidth: 200 }}>Back to your world ✨</BigButton>
+              <BigButton tone="primary" onClick={() => close(true)} style={{ marginTop: 6, minWidth: 200 }}>Back to your world ✨</BigButton>
             </div>
           )}
         </div>
