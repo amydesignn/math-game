@@ -12,9 +12,12 @@ import { OPSYM, buildStages, buildStagesMulti } from '../math'
  * operand-tracking grid).
  */
 
-/* ---- house tokens (Oscar styling reference · blue controls per Amy) ---- */
+/* ---- house tokens (Oscar styling reference · Iris controls per Amy) ---- */
 export const T = {
-  blue: '#2D6DF6', blueDark: '#0A52ED', blueDarker: '#0946CA', blueSubtle: '#E0E8F8', blueTint: '#EFF4FF',
+  // Brand Iris — actions + focus: 600 face · 700 deep (shadow + text) · 100 soft · 50 tint.
+  // Replaced the off-brand blue #2D6DF6 (Amy 2026-10-04).
+  irisFace: '#6169E0', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
+  iris: '#4B54DD', irisDeep: '#3D43BE', irisSoft: '#E4E5FA', irisTint: '#F1F1FD',
   teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
   ink: '#262626', ink2: '#4d4d4d', ink3: '#6e6e6e',
   line: '#E6E6E6', surface: '#FFFFFF',
@@ -117,7 +120,7 @@ export function Modal({ children, onScrim, cardRef, cardClass, cardStyle, overla
 }
 
 /* ---- a scatter of twinkling stars (reward moments) ---- */
-export function Sparkles({ colors = ['#fff', T.tealLt, T.blueSubtle], n = 14 }) {
+export function Sparkles({ colors = ['#fff', T.tealLt, T.irisSoft], n = 14 }) {
   const items = useRef(
     [...Array(n)].map((_, i) => ({
       left: 8 + Math.random() * 84 + '%',
@@ -142,18 +145,18 @@ export function Sparkles({ colors = ['#fff', T.tealLt, T.blueSubtle], n = 14 }) 
 }
 
 /* ---- chunky house button (3D bottom shadow, presses down on tap) ---- */
-export function BigButton({ children, onClick, tone = 'blue', style }) {
+export function BigButton({ children, onClick, tone = 'primary', style }) {
   const [down, setDown] = useState(false)
   const tones = {
-    blue: { bg: T.blue, fg: '#fff', sh: T.blueDarker },
-    ghost: { bg: '#fff', fg: T.blue, sh: '#c9d6f5' },
+    primary: { bg: T.irisFace, fg: '#fff', sh: T.irisDeep },
+    ghost: { bg: '#fff', fg: T.iris, sh: '#C9CBF5' },
     amber: { bg: T.amber, fg: '#fff', sh: T.amberDeep },
   }
   const c = tones[tone]
   return (
     <button onClick={onClick}
       onPointerDown={() => setDown(true)} onPointerUp={() => setDown(false)} onPointerLeave={() => setDown(false)}
-      style={{ border: tone === 'ghost' ? `2px solid ${T.blueSubtle}` : 'none', background: c.bg, color: c.fg,
+      style={{ border: tone === 'ghost' ? `2px solid ${T.irisSoft}` : 'none', background: c.bg, color: c.fg,
         fontWeight: 700, fontSize: 17, borderRadius: 16, padding: '15px 26px', cursor: 'pointer', minHeight: 54,
         boxShadow: down ? `0 1px 0 ${c.sh}` : `0 4px 0 ${c.sh}`, transform: down ? 'translateY(3px)' : 'none',
         transition: 'transform .07s, box-shadow .07s', ...style }}>
@@ -171,9 +174,9 @@ export function EquationRow({ a, op, b, entry }) {
       <span style={{ fontSize: 40, fontWeight: 600, color: T.ink3 }}>{OPSYM[op]}</span>
       <span style={{ fontSize: 46, fontWeight: 700, color: T.ink }}>{b}</span>
       <span style={{ fontSize: 40, fontWeight: 600, color: T.ink3 }}>=</span>
-      <span style={{ minWidth: 96, height: 66, borderRadius: 14, border: `2.5px solid ${entry ? T.blue : T.blueSubtle}`,
-        background: entry ? T.blueTint : '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 40, fontWeight: 700, color: T.blue, transition: 'all .15s' }}>{entry || ''}</span>
+      <span style={{ minWidth: 96, height: 66, borderRadius: 14, border: `2.5px solid ${entry ? T.iris : T.irisSoft}`,
+        background: entry ? T.irisTint : '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 40, fontWeight: 700, color: T.iris, transition: 'all .15s' }}>{entry || ''}</span>
     </div>
   )
 }
@@ -185,9 +188,9 @@ export function ColumnMath({ snap, big = false }) {
     const hot = snap.hi.includes(key)
     return { width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-      color: isRes ? T.blue : T.ink,
-      background: hot ? T.blueTint : 'transparent', borderRadius: 12,
-      boxShadow: hot ? `inset 0 0 0 2px ${T.blue}` : 'none',
+      color: isRes ? T.iris : T.ink,
+      background: hot ? T.irisTint : 'transparent', borderRadius: 12,
+      boxShadow: hot ? `inset 0 0 0 2px ${T.iris}` : 'none',
       animation: hot && val !== '' ? 'cellPop .32s ease-out both' : 'none',
       transition: 'background .2s, box-shadow .2s' }
   }
@@ -229,8 +232,8 @@ export function MultiColumnMath({ snap }) {
   const numCell = (val, { hot, color = T.ink, key }) => (
     <div key={key} style={{ width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1, color,
-      background: hot ? T.blueTint : 'transparent', borderRadius: 12,
-      boxShadow: hot ? `inset 0 0 0 2px ${T.blue}` : 'none',
+      background: hot ? T.irisTint : 'transparent', borderRadius: 12,
+      boxShadow: hot ? `inset 0 0 0 2px ${T.iris}` : 'none',
       animation: hot && val !== '' ? 'cellPop .32s ease-out both' : 'none',
       transition: 'background .2s, box-shadow .2s' }}>{val}</div>
   )
@@ -242,9 +245,9 @@ export function MultiColumnMath({ snap }) {
       <div key={which} style={{ width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: cell - 8, height: cell - 8, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-          color: active ? T.blueDark : T.ink, opacity: dim ? 0.28 : 1,
-          border: active ? `2.5px dashed ${T.blue}` : '2.5px dashed transparent',
-          background: active ? T.blueTint : 'transparent',
+          color: active ? T.irisDeep : T.ink, opacity: dim ? 0.28 : 1,
+          border: active ? `2.5px dashed ${T.iris}` : '2.5px dashed transparent',
+          background: active ? T.irisTint : 'transparent',
           animation: active ? 'spotIn .35s ease-out both' : 'none',
           transition: 'opacity .25s' }}>{d}</div>
       </div>
@@ -254,7 +257,7 @@ export function MultiColumnMath({ snap }) {
   const rowEl = (arr, hot, anim) => (
     <div style={{ display: 'flex', alignItems: 'center', animation: anim || 'none' }}>
       {lead('')}
-      {cols.map((i) => numCell(arr[i], { hot: hot && arr[i] !== '', color: T.blue, key: i }))}
+      {cols.map((i) => numCell(arr[i], { hot: hot && arr[i] !== '', color: T.iris, key: i }))}
     </div>
   )
 
@@ -320,7 +323,7 @@ export function MultiColumnMath({ snap }) {
       )}
       <div style={{ display: 'flex', alignItems: 'center', minHeight: cell }}>
         {lead('')}
-        {cols.map((i) => numCell(snap.row1[i], { hot: snap.hiRow === 'row1' && snap.row1[i] !== '', color: T.blue, key: i }))}
+        {cols.map((i) => numCell(snap.row1[i], { hot: snap.hiRow === 'row1' && snap.row1[i] !== '', color: T.iris, key: i }))}
       </div>
       <div style={{ display: 'flex', alignItems: 'center', minHeight: cell, animation: snap.shifted && snap.hiRow === 'row2' ? 'shiftNudge .4s ease-out both' : 'none' }}>
         {lead(snap.sum.some((x) => x !== '') ? '+' : '')}
@@ -329,7 +332,7 @@ export function MultiColumnMath({ snap }) {
           return (
             <div key={i} style={{ position: 'relative' }}>
               {numCell(snap.row2[i], { hot: (snap.hiRow === 'row2' && snap.row2[i] !== '') || (isZero && snap.zeroHot),
-                color: isZero ? T.amber : T.blue, key: i })}
+                color: isZero ? T.amber : T.iris, key: i })}
               {isZero && snap.zeroHot && (
                 <span style={{ position: 'absolute', left: '50%', bottom: -16, transform: 'translateX(-50%)',
                   fontSize: 10.5, fontWeight: 700, color: T.amber, whiteSpace: 'nowrap' }}>write it!</span>
@@ -368,7 +371,7 @@ function KeypadKey({ k, isOk, isDel, onKey, disabled = false }) {
     fontVariantNumeric: 'tabular-nums', transition: 'transform .06s, box-shadow .06s' }
   let sty
   if (isOk && disabled) sty = { ...base, background: '#EDEBF2', color: '#b5aec4', boxShadow: '0 4px 0 #dcd8e4', fontSize: 16 } // Oscar's disabled Check
-  else if (isOk) sty = { ...base, background: T.blue, color: '#fff', boxShadow: down ? `0 1px 0 ${T.blueDarker}` : `0 4px 0 ${T.blueDarker}`, fontSize: 16 }
+  else if (isOk) sty = { ...base, background: T.irisFace, color: '#fff', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 16 }
   else if (isDel) sty = { ...base, background: '#fff', color: T.ink3, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
   else sty = { ...base, background: '#fff', color: T.ink, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
   return (
@@ -466,16 +469,16 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
     : r === ''
       ? 'Now the leftover. Tap R, then type it — R 0 if none is left.'
       : 'Tap Check when you’re ready.'
-  const caretStyle = { display: 'inline-block', width: 3, height: 36, borderRadius: 2, background: T.blue, animation: 'dvCaret 1.1s steps(1) infinite' }
+  const caretStyle = { display: 'inline-block', width: 3, height: 36, borderRadius: 2, background: T.iris, animation: 'dvCaret 1.1s steps(1) infinite' }
   const box = (f, val) => ({
     height: 64, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, cursor: 'pointer',
-    fontSize: 40, fontWeight: 700, color: T.blue, fontVariantNumeric: 'tabular-nums', borderStyle: 'solid', borderWidth: 2.5,
-    borderColor: val !== '' || active === f ? T.blue : T.blueSubtle,
-    background: val !== '' ? T.blueTint : active === f ? '#fff' : '#fafafa',
+    fontSize: 40, fontWeight: 700, color: T.iris, fontVariantNumeric: 'tabular-nums', borderStyle: 'solid', borderWidth: 2.5,
+    borderColor: val !== '' || active === f ? T.iris : T.irisSoft,
+    background: val !== '' ? T.irisTint : active === f ? '#fff' : '#fafafa',
     boxShadow: active === f ? '0 0 0 4px rgba(45,109,246,.18)' : 'none',
     transition: 'border-color .15s, background .15s, box-shadow .15s',
   })
-  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.blue : T.ink3 })
+  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.iris : T.ink3 })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -500,7 +503,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
           {/* a duplicate pointer target for the remainder box — skipped by keyboard + screen readers */}
           <button onClick={() => setActive('r')} tabIndex={-1} aria-hidden="true"
             style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 28, fontWeight: 800, lineHeight: 1, borderRadius: 12,
-              color: active === 'r' || r !== '' ? T.blue : T.ink3, animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
+              color: active === 'r' || r !== '' ? T.iris : T.ink3, animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <button onClick={() => setActive('r')} aria-label="remainder" style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
               {r}{active === 'r' && <span style={caretStyle} />}
@@ -556,17 +559,17 @@ export function WorkedExample({ problem, onBack }) {
         {useV2 ? <MultiColumnMath snap={st.snap} /> : <ColumnMath snap={st.snap} big />}
       </div>
       <div style={{ minHeight: 58, maxWidth: 400, textAlign: 'center', fontSize: 17, fontWeight: 500, color: T.ink,
-        lineHeight: 1.5, background: T.blueTint, borderRadius: 14, padding: '12px 18px' }}>{st.caption}</div>
+        lineHeight: 1.5, background: T.irisTint, borderRadius: 14, padding: '12px 18px' }}>{st.caption}</div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         {stages.map((_, k) => (
           <span key={k} style={{ width: k === i ? 22 : 8, height: 8, borderRadius: 5,
-            background: k === i ? T.blue : k < i ? T.blueSubtle : '#E6E6E6', transition: 'all .2s' }} />
+            background: k === i ? T.iris : k < i ? T.irisSoft : '#E6E6E6', transition: 'all .2s' }} />
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10, marginTop: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
         {i > 0 && <BigButton tone="ghost" onClick={() => setI(i - 1)}>◂ Back</BigButton>}
-        {!last && <BigButton tone="blue" onClick={() => setI(i + 1)}>Show next step ▸</BigButton>}
-        {last && <BigButton tone="blue" onClick={onBack}>Now try yours again</BigButton>}
+        {!last && <BigButton tone="primary" onClick={() => setI(i + 1)}>Show next step ▸</BigButton>}
+        {last && <BigButton tone="primary" onClick={onBack}>Now try yours again</BigButton>}
         {!last && <BigButton tone="ghost" onClick={onBack}>I've got it</BigButton>}
       </div>
     </div>

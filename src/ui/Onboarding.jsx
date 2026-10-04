@@ -18,8 +18,9 @@
  * image-slot, for a marketing webpage) is intentionally NOT lifted — the app has
  * no media to show there and never renders the card inline.
  *
- * Colours are Oscar's exact comp values (his onboarding primary is #7C6CE8, a
- * touch lighter than the app IRIS #4B54DD — his design intent for this card).
+ * Colours are Oscar's comp values, except the primary: his #7C6CE8 failed AA
+ * with white text (4.06:1), so the CTA wears Brand Iris 500 #6169E0 (active dot: Iris 600)
+ * like every other action (Amy 2026-10-04).
  * Hover/active + the entrance animation live in index.css (.luxiOb-*): an inline
  * style overrides a CSS :hover, so interactive states can't be inline (same
  * lesson as .luxiFooter / su* / dv*).
@@ -59,9 +60,9 @@ export function OnboardingCard({ onClose, onFinish }) {
   // current = pill, already-passed = faded lilac, future = light).
   const dots = []
   for (let i = 0; i < CORE.length; i++) {
-    dots.push({ w: i === step ? 24 : 8, bg: i === step ? '#7C6CE8' : i < step ? '#C6BEEC' : '#E6E1F3' })
+    dots.push({ w: i === step ? 24 : 8, bg: i === step ? '#4B54DD' : i < step ? '#C6BEEC' : '#E6E1F3' })
   }
-  dots.push({ w: isWhatsNext ? 24 : 8, bg: isWhatsNext ? '#7C6CE8' : '#E6E1F3' })
+  dots.push({ w: isWhatsNext ? 24 : 8, bg: isWhatsNext ? '#4B54DD' : '#E6E1F3' })
 
   const next = () => setStep((s) => Math.min(s + 1, total - 1))
   const back = () => setStep((s) => Math.max(s - 1, 0))

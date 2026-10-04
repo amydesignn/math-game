@@ -156,7 +156,7 @@ function CorrectState({ skin, pay, onNext }) {
   return (
     <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
       padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
-      <Sparkles colors={['#fff', skin.accent, T.blueSubtle, T.tealLt]} n={16} />
+      <Sparkles colors={['#fff', skin.accent, T.irisSoft, T.tealLt]} n={16} />
       <div style={{ position: 'relative', width: 96, height: 96, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: `${skin.accent}22`,
           animation: 'ringpulse 1.4s ease-out infinite' }} />
@@ -168,7 +168,7 @@ function CorrectState({ skin, pay, onNext }) {
           {skin.win} <span>+{pay}</span> <Gem size={18} />
         </div>
       </div>
-      <BigButton tone="blue" onClick={onNext} style={{ marginTop: 6, minWidth: 180 }}>Keep going ✨</BigButton>
+      <BigButton tone="primary" onClick={onNext} style={{ marginTop: 6, minWidth: 180 }}>Keep going ✨</BigButton>
     </div>
   )
 }

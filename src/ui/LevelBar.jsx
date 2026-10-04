@@ -180,7 +180,7 @@ const popStyles = {
   // entire job of this line. Conditional: no `from`, no signature, so a public
   // build with unsigned copy needs no change here.
   sign: { marginTop: 12, paddingRight: 6, textAlign: 'right', fontSize: 15, fontWeight: 700, color: LVL.main },
-  btn: { marginTop: 18, width: '100%', height: 54, border: 'none', borderRadius: 16, background: T.blue, color: '#fff', fontSize: 18, fontWeight: 800, cursor: 'pointer', boxShadow: '0 5px 0 ' + T.blueDarker, transition: 'transform .08s ease, box-shadow .08s ease' },
+  btn: { marginTop: 18, width: '100%', height: 54, border: 'none', borderRadius: 16, background: T.irisFace, color: '#fff', fontSize: 18, fontWeight: 800, cursor: 'pointer', boxShadow: '0 5px 0 ' + T.irisDeep, transition: 'transform .08s ease, box-shadow .08s ease' },
   piece: { position: 'absolute', top: -8, width: 9, height: 14, borderRadius: 3, animation: 'confettiFall var(--dur) ease-in var(--delay) forwards', pointerEvents: 'none' },
 }
 // pastel confetti to match the softened level identity (was T.violet/#9810FA —
@@ -232,9 +232,9 @@ export function LevelUpPopup({ level, message, from, onClose }) {
         <button
           style={popStyles.btn}
           onClick={onClose}
-          onPointerDown={(e) => { e.stopPropagation(); e.currentTarget.style.transform = 'translateY(3px)'; e.currentTarget.style.boxShadow = '0 2px 0 ' + T.blueDarker }}
-          onPointerUp={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 5px 0 ' + T.blueDarker }}
-          onPointerLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 5px 0 ' + T.blueDarker }}
+          onPointerDown={(e) => { e.stopPropagation(); e.currentTarget.style.transform = 'translateY(3px)'; e.currentTarget.style.boxShadow = '0 2px 0 ' + T.irisDeep }}
+          onPointerUp={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 5px 0 ' + T.irisDeep }}
+          onPointerLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 5px 0 ' + T.irisDeep }}
         >
           Keep going! ✨
         </button>

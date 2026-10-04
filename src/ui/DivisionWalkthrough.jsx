@@ -58,7 +58,7 @@ const CELL = 44, FS = 26, ROWH = 50, TOPPAD = 52, GUTTER = 72, LABELPAD = 124, B
 function PressBtn({ children, onClick, variant = 'primary' }) {
   const [down, setDown] = useState(false)
   const V = {
-    primary: { bg: '#2D6DF6', color: '#fff', border: 'none', shadow: '#0946CA', pad: '13px 24px', fs: 16 },
+    primary: { bg: '#6169E0', color: '#fff', border: 'none', shadow: '#3D43BE', pad: '13px 24px', fs: 16 },
     secondary: { bg: '#fff', color: '#6E5BC0', border: '2px solid #DDD1F7', shadow: '#DDD1F7', pad: '12px 20px', fs: 15.5 },
     back: { bg: '#fff', color: '#525252', border: '2px solid #E5E5E5', shadow: '#E5E5E5', pad: '12px 20px', fs: 15.5 },
   }[variant]

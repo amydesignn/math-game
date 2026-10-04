@@ -179,12 +179,12 @@ const si = {
     height: 50,
     borderRadius: 14,
     border: 'none',
-    background: '#2D6DF6',
+    background: '#6169E0', // Brand Iris 500
     color: '#fff',
     fontSize: 16.5,
     fontWeight: 800,
     cursor: 'pointer',
-    boxShadow: '0 6px 0 #0946CA',
+    boxShadow: '0 6px 0 #3D43BE', // Iris 700
   },
   note: { marginTop: 12, fontSize: 13.5, fontWeight: 700, color: '#D97706' },
   again: {
