@@ -60,9 +60,9 @@ export function OnboardingCard({ onClose, onFinish }) {
   // current = pill, already-passed = faded lilac, future = light).
   const dots = []
   for (let i = 0; i < CORE.length; i++) {
-    dots.push({ w: i === step ? 24 : 8, bg: i === step ? '#4B54DD' : i < step ? '#C6BEEC' : '#E6E1F3' })
+    dots.push({ w: i === step ? 24 : 8, bg: i === step ? '#4B54DD' : i < step ? '#C6B4F0' : '#EDE7FC' })
   }
-  dots.push({ w: isWhatsNext ? 24 : 8, bg: isWhatsNext ? '#4B54DD' : '#E6E1F3' })
+  dots.push({ w: isWhatsNext ? 24 : 8, bg: isWhatsNext ? '#4B54DD' : '#EDE7FC' })
 
   const next = () => setStep((s) => Math.min(s + 1, total - 1))
   const back = () => setStep((s) => Math.max(s - 1, 0))
@@ -109,7 +109,7 @@ export function OnboardingCard({ onClose, onFinish }) {
       <div style={{ padding: '24px 24px 8px', minHeight: 152 }}>
         {!isWhatsNext ? (
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-            <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#EEEAFE', color: '#5B44C4', fontSize: 20, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{cur.num}</div>
+            <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#EDE7FC', color: '#5B4B9E', fontSize: 20, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{cur.num}</div>
             <div>
               <div style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{cur.title}</div>
               <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{cur.body}</p>
@@ -126,19 +126,19 @@ export function OnboardingCard({ onClose, onFinish }) {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16, fontWeight: 700, color: '#262626' }}>Meet friends</span>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B44C4', background: '#EEEAFE', padding: '4px 8px', borderRadius: 999 }}>SOON</span>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B4B9E', background: '#EDE7FC', padding: '4px 8px', borderRadius: 999 }}>SOON</span>
                   </div>
                   <p style={{ margin: '4px 0 0', fontSize: 14.5, fontWeight: 400, color: '#5C5470', lineHeight: 1.5 }}>A shared space for signed-in players. No chat &#8212; just wave and send a few emoji.</p>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', background: '#F6F4FE', border: '1px solid #EEE9FB', borderRadius: 16, padding: 16 }}>
                 <div style={{ width: 40, height: 40, borderRadius: 12, background: '#F3ECFF', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#7C6CE8" aria-hidden="true"><path d="M12 2.6l2.5 5.5 6 .5-4.5 3.9 1.4 5.9L12 21l-5.4 2.9 1.4-5.9-4.5-3.9 6-.5z" /></svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#8570D2" aria-hidden="true"><path d="M12 2.6l2.5 5.5 6 .5-4.5 3.9 1.4 5.9L12 21l-5.4 2.9 1.4-5.9-4.5-3.9 6-.5z" /></svg>
                 </div>
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 16, fontWeight: 700, color: '#262626' }}>Lots more</span>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B44C4', background: '#EEEAFE', padding: '4px 8px', borderRadius: 999 }}>SOON</span>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B4B9E', background: '#EDE7FC', padding: '4px 8px', borderRadius: 999 }}>SOON</span>
                   </div>
                   <p style={{ margin: '4px 0 0', fontSize: 14.5, fontWeight: 400, color: '#5C5470', lineHeight: 1.5 }}>Many more features are on the way.</p>
                 </div>

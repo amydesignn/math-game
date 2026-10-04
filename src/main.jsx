@@ -408,7 +408,7 @@ function SettingsDemo() {
     background: on ? '#4B54DD' : 'transparent',
     color: on ? '#fff' : '#6e6e6e',
   })
-  const gearBtnDoor = { width: 44, height: 44, borderRadius: '50%', border: 'none', background: view === 'settings' ? '#E7DEFA' : '#F1ECFE', cursor: 'pointer', fontSize: 20, lineHeight: 1 }
+  const gearBtnDoor = { width: 44, height: 44, borderRadius: '50%', border: 'none', background: view === 'settings' ? '#DDD1F7' : '#EDE7FC', cursor: 'pointer', fontSize: 20, lineHeight: 1 }
   const railBtn = { width: 50, height: 50, borderRadius: '50%', border: 'none', background: '#fff', boxShadow: '0 4px 14px rgba(50,38,80,.16)', cursor: 'pointer', fontSize: 22, lineHeight: 1 }
   return (
     <div style={{ position: 'fixed', inset: 0, fontFamily: "'Inter', system-ui, sans-serif", background: isDoor ? 'linear-gradient(180deg,#F6F3FD,#EEE9F8)' : 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
@@ -420,7 +420,7 @@ function SettingsDemo() {
             <span style={{ fontSize: 20, fontWeight: 600, color: '#4B54DD' }}>Luxi Math</span>
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button aria-label="Profile" onClick={() => setView('profile')} style={{ width: 44, height: 44, borderRadius: '50%', border: 'none', overflow: 'hidden', background: '#F1ECFE', boxShadow: '0 0 0 2px #fff,0 0 0 3.5px #E7DEFA', cursor: 'pointer', fontSize: 20, padding: 0 }}>
+            <button aria-label="Profile" onClick={() => setView('profile')} style={{ width: 44, height: 44, borderRadius: '50%', border: 'none', overflow: 'hidden', background: '#EDE7FC', boxShadow: '0 0 0 2px #fff,0 0 0 3.5px #DDD1F7', cursor: 'pointer', fontSize: 20, padding: 0 }}>
               {avatar ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : signedIn ? '🅸' : '🙂'}
             </button>
             <button aria-label="Settings" onClick={() => setView('settings')} style={gearBtnDoor}>

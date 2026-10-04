@@ -34,7 +34,7 @@ const barStyles = {
   fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: LVL.grad, transition: 'width .45s cubic-bezier(.22,1.2,.36,1)' },
   shine: { position: 'absolute', top: 0, bottom: 0, width: '34%', background: 'linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.75) 50%,rgba(255,255,255,0) 100%)', animation: 'shineSweep .7s ease-out 1' },
   pts: { fontWeight: 700, fontSize: 14, color: LVL.deep, whiteSpace: 'nowrap', minWidth: 26, textAlign: 'right' },
-  floater: { position: 'absolute', top: -6, right: 10, fontWeight: 800, fontSize: 13, color: LVL.main, animation: 'floatUp .9s ease-out forwards', pointerEvents: 'none' },
+  floater: { position: 'absolute', top: -6, right: 10, fontWeight: 800, fontSize: 13, color: LVL.ink, animation: 'floatUp .9s ease-out forwards', pointerEvents: 'none' },
   star: { position: 'absolute', left: '50%', top: '50%', fontSize: 13, animation: 'barStar .8s ease-out forwards', pointerEvents: 'none' },
 }
 
@@ -164,7 +164,7 @@ export default function LevelBar({ points, gems, gemRef, onLevelUp, onOpen }) {
 const popStyles = {
   scrim: { position: 'fixed', inset: 0, background: 'rgba(38,30,60,.45)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'scrimIn .25s ease-out', zIndex: 60 },
   card: { position: 'relative', width: 'min(400px, calc(100vw - 48px))', background: T.surface, borderRadius: T.radius, padding: '34px 28px 24px', textAlign: 'center', boxShadow: '0 24px 70px rgba(38,20,80,.35)', animation: 'lvlPopIn .45s cubic-bezier(.22,1.3,.36,1) both', overflow: 'hidden' },
-  kicker: { fontSize: 13, fontWeight: 800, letterSpacing: '.14em', color: LVL.main, textTransform: 'uppercase' },
+  kicker: { fontSize: 13, fontWeight: 800, letterSpacing: '.14em', color: LVL.ink, textTransform: 'uppercase' },
   badgeWrap: { position: 'relative', width: 112, height: 112, margin: '18px auto 14px' },
   halo: { position: 'absolute', inset: -10, borderRadius: '50%', border: '3px solid ' + LVL.main, opacity: 0.4, animation: 'haloPulse 1.4s ease-out .3s 2' },
   // the inset lip softened with the palette (was -5px/.14 under the saturated
@@ -179,13 +179,13 @@ const popStyles = {
   // is the visual grammar for "a person wrote this to you" — which is the
   // entire job of this line. Conditional: no `from`, no signature, so a public
   // build with unsigned copy needs no change here.
-  sign: { marginTop: 12, paddingRight: 6, textAlign: 'right', fontSize: 15, fontWeight: 700, color: LVL.main },
+  sign: { marginTop: 12, paddingRight: 6, textAlign: 'right', fontSize: 15, fontWeight: 700, color: LVL.ink },
   btn: { marginTop: 18, width: '100%', height: 54, border: 'none', borderRadius: 16, background: T.irisFace, color: '#fff', fontSize: 18, fontWeight: 800, cursor: 'pointer', boxShadow: '0 5px 0 ' + T.irisDeep, transition: 'transform .08s ease, box-shadow .08s ease' },
   piece: { position: 'absolute', top: -8, width: 9, height: 14, borderRadius: 3, animation: 'confettiFall var(--dur) ease-in var(--delay) forwards', pointerEvents: 'none' },
 }
 // pastel confetti to match the softened level identity (was T.violet/#9810FA —
 // the two saturated purples popped out of the card once it went pastel)
-const CONFETTI = [LVL.main, '#C4B5FD', '#9FE0D2', '#FBCE7E', '#A9C5F5', '#F5B8D0']
+const CONFETTI = [LVL.main, '#C6B4F0', '#9FE0D2', '#FBCE7E', '#A9C5F5', '#F5B8D0']
 
 export function LevelUpPopup({ level, message, from, onClose }) {
   const [pieces] = useState(() =>

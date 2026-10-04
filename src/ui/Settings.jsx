@@ -29,7 +29,7 @@ import { fileToAvatar } from '../avatar.js'
 import { MUSIC_TRACKS } from '../config'
 
 const IRIS = '#4B54DD',
-  LILAC700 = '#5B44C4'
+  LILAC800 = '#5B4B9E' // Brand Lilac 800 (was off-brand #5B44C4, mislabelled 700)
 
 // ── Oscar's line-icons (kept for the sheet's internal rows) ────────────────
 const strokeBase = { fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }
@@ -110,7 +110,7 @@ const sectionLabel = {
   textTransform: 'uppercase',
   padding: '0 4px 8px',
 }
-const rowIcon = { color: LILAC700, display: 'flex' }
+const rowIcon = { color: LILAC800, display: 'flex' }
 
 /**
  * The shared settings sheet. surface: 'door' | 'game' (anchor + animation only).
@@ -175,7 +175,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                   </button>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F6F2FF', border: '1.5px solid #EDE7FC', borderRadius: 12, padding: '12px 16px' }}>
-                    <span style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(160deg, #C4B5FD, #8E7BF2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
+                    <span style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(160deg, #C6B4F0, #9B84E0)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
                       {avatar ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : auth.initial || '★'}
                     </span>
                     <span style={{ flex: 1, minWidth: 0 }}>
@@ -214,7 +214,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                     <MusicNote />
                   </span>
                   <span id="music-label" style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#262626' }}>Music</span>
-                  <div role="radiogroup" aria-labelledby="music-label" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: '#F1ECFE' }}>
+                  <div role="radiogroup" aria-labelledby="music-label" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: '#EDE7FC' }}>
                     {MUSIC_TRACKS.map((t) => {
                       const on = music === t.id
                       return (
@@ -223,7 +223,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                           role="radio"
                           aria-checked={on}
                           onClick={() => onChooseMusic?.(t.id)}
-                          style={{ height: 28, padding: '0 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'background .18s, color .18s', background: on ? IRIS : 'transparent', color: on ? '#fff' : LILAC700 }}
+                          style={{ height: 28, padding: '0 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'background .18s, color .18s', background: on ? IRIS : 'transparent', color: on ? '#fff' : LILAC800 }}
                         >
                           {t.label}
                         </button>
@@ -329,11 +329,11 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
             </button>
           </div>
           <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            <div style={{ width: 96, height: 96, borderRadius: '50%', background: '#F1ECFE', boxShadow: '0 0 0 3px #fff, 0 0 0 5px #E7DEFA', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, overflow: 'hidden' }}>
+            <div style={{ width: 96, height: 96, borderRadius: '50%', background: '#EDE7FC', boxShadow: '0 0 0 3px #fff, 0 0 0 5px #DDD1F7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, overflow: 'hidden' }}>
               {avatar ? (
                 <img src={avatar} alt="Your avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               ) : auth.signedIn ? (
-                <span style={{ width: '100%', height: '100%', background: 'linear-gradient(160deg, #C4B5FD, #8E7BF2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 38 }}>
+                <span style={{ width: '100%', height: '100%', background: 'linear-gradient(160deg, #C6B4F0, #9B84E0)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 38 }}>
                   {auth.initial || '★'}
                 </span>
               ) : (
@@ -348,7 +348,7 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
             <button
               onClick={pick}
               disabled={busy}
-              style={{ width: '100%', height: 44, borderRadius: 12, border: '1.5px solid #E7DEFA', background: '#F6F2FF', color: LILAC700, fontWeight: 700, fontSize: 15, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              style={{ width: '100%', height: 44, borderRadius: 12, border: '1.5px solid #DDD1F7', background: '#F6F2FF', color: LILAC800, fontWeight: 700, fontSize: 15, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
               <UploadIcon />
               {busy ? 'Adding…' : avatar ? 'Change photo' : 'Upload a photo'}

@@ -39,11 +39,11 @@ const T = {
   amber: '#FE9A00', amberSoft: '#FFF7EA', amberLine: '#FBE3B6', amberInk: '#8A5300',
   pink: '#F6339A', pinkDark: '#C6005C',
 }
-/* violet — levels; primary actions wear Brand Iris (btn) */
+/* Brand Lilac (400/100/200/800, grad 300→500) — levels + supporting; primary actions wear Brand Iris (btn) */
 const V = {
-  main: '#A78BFA', soft: '#F1ECFE', softLine: '#E7DEFA', deep: '#5B44C4',
+  main: '#B29BEA', soft: '#EDE7FC', softLine: '#DDD1F7', deep: '#5B4B9E',
   btn: '#6169E0', btnDark: '#3D43BE', // Brand Iris 500 face / 700 shadow — actions (4.56:1 white bold; was #7C6CE8 at 4.06, failed AA)
-  grad: 'linear-gradient(135deg,#C4B5FD 0%,#A78BFA 58%,#8E7BF2 100%)',
+  grad: 'linear-gradient(135deg,#C6B4F0 0%,#B29BEA 58%,#9B84E0 100%)',
 }
 
 /* The five REAL worlds. ids ARE the contract (they match maps.js exactly, so
@@ -253,7 +253,7 @@ function Header({ onOpenSettings, onOpenProfile, settingsActive, avatar }) {
         <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Luxi Math</span></div>
         <div style={hS.right}>
           {/* Gear first, profile at the corner (Amy 2026-08-30). */}
-          <button style={{ ...hS.gear, background: settingsActive ? '#E7DEFA' : '#F1ECFE' }} onClick={onOpenSettings} aria-label="Settings" title="Settings">⚙️</button>
+          <button style={{ ...hS.gear, background: settingsActive ? '#DDD1F7' : '#EDE7FC' }} onClick={onOpenSettings} aria-label="Settings" title="Settings">⚙️</button>
           <button style={hS.profileBtn} onClick={onOpenProfile} aria-label="Profile" title="Profile"><ProfileChip src={avatar} /></button>
         </div>
       </div>

@@ -32,7 +32,7 @@ const IRIS = '#4B54DD',
   IRISD = '#3D43BE'
 const EMPTY = '#E6DEF5'
 // each star a fixed happy hue, warming across the row and paying off on brand violet. (Oscar)
-const STARCOLORS = ['#FF8E72', '#FFA94D', '#FFC53D', '#FFD93D', '#8E7BF2']
+const STARCOLORS = ['#FF8E72', '#FFA94D', '#FFC53D', '#FFD93D', '#9B84E0']
 const STARGLOW = ['rgba(255,142,114,.4)', 'rgba(255,169,77,.4)', 'rgba(255,197,61,.4)', 'rgba(255,217,61,.4)', 'rgba(142,123,242,.4)']
 // caption per rating — playful, kid-voiced. index 0 = no rating yet. (Oscar, verbatim)
 const CAPTIONS = ['Tap the stars!', "Aw — we'll do better 🙏", 'Noted, thank you', "Glad you're here 🙂", 'Yay, thank you! 🎉', 'You love it?! 💜']
@@ -143,7 +143,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                   )
                 })}
               </div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: shown > 0 ? '#5B44C4' : '#9a92ac', minHeight: 20, lineHeight: 1.3, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: shown > 0 ? '#5B4B9E' : '#9a92ac', minHeight: 20, lineHeight: 1.3, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
             </div>
 
             <div style={{ height: 1, background: '#F1ECF8' }} />
