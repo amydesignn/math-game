@@ -475,7 +475,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
     boxShadow: active === f ? '0 0 0 4px rgba(45,109,246,.18)' : 'none',
     transition: 'border-color .15s, background .15s, box-shadow .15s',
   })
-  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.blue : '#a3a3a3' })
+  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.blue : T.ink3 })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -491,7 +491,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, whiteSpace: 'nowrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <button onClick={() => setActive('q')} style={{ ...box('q', q), minWidth: 112, padding: '0 10px' }}>
+            <button onClick={() => setActive('q')} aria-label="quotient" style={{ ...box('q', q), minWidth: 112, padding: '0 10px' }}>
               {q}{active === 'q' && <span style={caretStyle} />}
             </button>
             <span style={cap(active === 'q')}>EACH SHARE</span>
@@ -499,7 +499,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
           {/* R label — a real tap target that lights + pulses once the quotient has a digit */}
           <button onClick={() => setActive('r')} aria-label="remainder"
             style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 28, fontWeight: 800, lineHeight: 1, borderRadius: 12,
-              color: active === 'r' || r !== '' ? T.blue : '#a3a3a3', animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
+              color: active === 'r' || r !== '' ? T.blue : T.ink3, animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <button onClick={() => setActive('r')} style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
               {r}{active === 'r' && <span style={caretStyle} />}
@@ -519,7 +519,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
       <Keypad onKey={onKey} okDisabled={!ready} />
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, marginTop: 2 }}>
-        <div style={{ textAlign: 'center', fontSize: 12.5, color: '#9a92ac', fontWeight: 500 }}>{hint}</div>
+        <div style={{ textAlign: 'center', fontSize: 12.5, color: T.ink3, fontWeight: 500 }}>{hint}</div>
         <button onClick={onWalkthrough}
           style={{ border: 'none', background: 'transparent', color: '#6E5BC0', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
       </div>
@@ -549,7 +549,7 @@ export function WorkedExample({ problem, onBack }) {
         <span style={{ color: T.ink, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {problem.a} {OPSYM[problem.op]} {problem.b}
         </span>
-        <span style={{ opacity: 0.6 }}>· here's one just like it</span>
+        <span>· here's one just like it</span>
       </div>
       <div key={i} style={{ animation: 'stepIn .3s ease-out both' }}>
         {useV2 ? <MultiColumnMath snap={st.snap} /> : <ColumnMath snap={st.snap} big />}
