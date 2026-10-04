@@ -76,7 +76,7 @@ const S = {
   sectionLbl: { fontSize: 12, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#6E6685', marginBottom: 12 },
   topicHead: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 },
   topicIcon: { width: 40, height: 40, borderRadius: 12, background: LVL.soft, color: LVL.deep, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700, flex: 'none' },
-  topicName: { fontWeight: 700, fontSize: 19, color: T.ink },
+  topicName: { fontWeight: 700, fontSize: 19, color: T.textPrimary },
   stageRow: { display: 'flex', alignItems: 'center', gap: 12, padding: '6px 2px' },
   pips: { display: 'flex', gap: 4, flex: 'none' },
   pip: { width: 8, height: 8, borderRadius: '50%' },

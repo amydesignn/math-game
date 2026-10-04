@@ -127,8 +127,8 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
             {phase === 'recover' && (
               <div style={{ paddingBottom: 6 }}>
                 <div style={{ textAlign: 'center', marginBottom: 14 }}>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: T.ink }}>Let's look at one together 💡</div>
-                  <div style={{ fontSize: 15, color: T.ink3, marginTop: 4 }}>No worries — follow the steps, then give it another go.</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
+                  <div style={{ fontSize: 15, color: T.textTertiary, marginTop: 4 }}>No worries — follow the steps, then give it another go.</div>
                 </div>
                 <WorkedExample problem={problem} onBack={backToAsk} />
               </div>
@@ -142,10 +142,10 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
 function AskState({ skin, problem, entry, onKey }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.ink3 }}>{skin.ask}</div>
+      <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.textTertiary }}>{skin.ask}</div>
       <EquationRow a={problem.a} op={problem.op} b={problem.b} entry={entry} />
       <Keypad onKey={onKey} />
-      <div style={{ textAlign: 'center', fontSize: 12.5, color: T.ink3, fontWeight: 500, marginTop: 2 }}>
+      <div style={{ textAlign: 'center', fontSize: 12.5, color: T.textTertiary, fontWeight: 500, marginTop: 2 }}>
         Type your answer, then tap Check
       </div>
     </div>
@@ -163,8 +163,8 @@ function CorrectState({ skin, pay, onNext }) {
         <Gem size={72} style={{ animation: 'gemSpin .5s ease-out both', filter: 'drop-shadow(0 6px 14px rgba(46,197,197,.4))' }} />
       </div>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 26, fontWeight: 700, color: T.ink }}>Nice work!</div>
-        <div style={{ fontSize: 16, color: T.ink3, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+        <div style={{ fontSize: 26, fontWeight: 700, color: T.textPrimary }}>Nice work!</div>
+        <div style={{ fontSize: 16, color: T.textTertiary, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
           {skin.win} <span>+{pay}</span> <Gem size={18} />
         </div>
       </div>

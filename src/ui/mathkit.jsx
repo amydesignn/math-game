@@ -19,7 +19,7 @@ export const T = {
   irisFace: '#6169E0', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
   iris: '#4B54DD', irisDeep: '#3D43BE', irisSoft: '#E4E5FA', irisTint: '#F1F1FD',
   teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
-  ink: '#262626', ink2: '#4d4d4d', ink3: '#6e6e6e',
+  textPrimary: '#262626', textSecondary: '#4d4d4d', textTertiary: '#6e6e6e',
   line: '#E6E6E6', surface: '#FFFFFF',
   lilac: '#8570D2', lilacDeep: '#473B7C', // Lilac 600 / 900
   violet: '#7F22FE', amber: '#FE9A00', amberDeep: '#D97706',
@@ -174,10 +174,10 @@ export function EquationRow({ a, op, b, entry }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, padding: '6px 0 2px',
       fontVariantNumeric: 'tabular-nums' }}>
-      <span style={{ fontSize: 46, fontWeight: 700, color: T.ink }}>{a}</span>
-      <span style={{ fontSize: 40, fontWeight: 600, color: T.ink3 }}>{OPSYM[op]}</span>
-      <span style={{ fontSize: 46, fontWeight: 700, color: T.ink }}>{b}</span>
-      <span style={{ fontSize: 40, fontWeight: 600, color: T.ink3 }}>=</span>
+      <span style={{ fontSize: 46, fontWeight: 700, color: T.textPrimary }}>{a}</span>
+      <span style={{ fontSize: 40, fontWeight: 600, color: T.textTertiary }}>{OPSYM[op]}</span>
+      <span style={{ fontSize: 46, fontWeight: 700, color: T.textPrimary }}>{b}</span>
+      <span style={{ fontSize: 40, fontWeight: 600, color: T.textTertiary }}>=</span>
       <span style={{ minWidth: 96, height: 66, borderRadius: 14, border: `2.5px solid ${entry ? T.iris : T.irisSoft}`,
         background: entry ? T.irisTint : '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 40, fontWeight: 700, color: T.iris, transition: 'all .15s' }}>{entry || ''}</span>
@@ -192,7 +192,7 @@ export function ColumnMath({ snap, big = false }) {
     const hot = snap.hi.includes(key)
     return { width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-      color: isRes ? T.iris : T.ink,
+      color: isRes ? T.iris : T.textPrimary,
       background: hot ? T.irisTint : 'transparent', borderRadius: 12,
       boxShadow: hot ? `inset 0 0 0 2px ${T.iris}` : 'none',
       animation: hot && val !== '' ? 'cellPop .32s ease-out both' : 'none',
@@ -202,7 +202,7 @@ export function ColumnMath({ snap, big = false }) {
     <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch',
       background: '#fff', border: `1.5px solid ${T.line}`, borderRadius: 18, padding: '12px 16px 14px' }}>
       {snap.rows.map((r, ri) => {
-        if (r.rule) return <div key={ri} style={{ height: 0, borderTop: `3px solid ${T.ink}`, margin: '6px 0' }} />
+        if (r.rule) return <div key={ri} style={{ height: 0, borderTop: `3px solid ${T.textPrimary}`, margin: '6px 0' }} />
         if (r.style === 'carry')
           return (
             <div key={ri} style={{ display: 'flex', alignItems: 'center', height: big ? 26 : 22 }}>
@@ -215,11 +215,11 @@ export function ColumnMath({ snap, big = false }) {
           )
         return (
           <div key={ri} style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ width: cell * 0.7, textAlign: 'center', fontSize: fs, fontWeight: 700, color: T.ink3 }}>{r.lead || ''}</div>
+            <div style={{ width: cell * 0.7, textAlign: 'center', fontSize: fs, fontWeight: 700, color: T.textTertiary }}>{r.lead || ''}</div>
             {r.cells.map((c, i) => (
               <div key={i} style={cellStyle(`${r.id}-${i}`, c, r.id === 'res')}>{c}</div>
             ))}
-            {r.note && <div style={{ marginLeft: 10, fontSize: 13, fontWeight: 600, color: T.ink3, whiteSpace: 'nowrap' }}>{r.note}</div>}
+            {r.note && <div style={{ marginLeft: 10, fontSize: 13, fontWeight: 600, color: T.textTertiary, whiteSpace: 'nowrap' }}>{r.note}</div>}
           </div>
         )
       })}
@@ -233,7 +233,7 @@ export function ColumnMath({ snap, big = false }) {
 export function MultiColumnMath({ snap }) {
   const cell = 50, fs = 28
   const cols = [0, 1, 2, 3]
-  const numCell = (val, { hot, color = T.ink, key }) => (
+  const numCell = (val, { hot, color = T.textPrimary, key }) => (
     <div key={key} style={{ width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1, color,
       background: hot ? T.irisTint : 'transparent', borderRadius: 12,
@@ -241,7 +241,7 @@ export function MultiColumnMath({ snap }) {
       animation: hot && val !== '' ? 'cellPop .32s ease-out both' : 'none',
       transition: 'background .2s, box-shadow .2s' }}>{val}</div>
   )
-  const lead = (sym) => <div style={{ width: cell * 0.7, textAlign: 'center', fontSize: fs, fontWeight: 700, color: T.ink3 }}>{sym || ''}</div>
+  const lead = (sym) => <div style={{ width: cell * 0.7, textAlign: 'center', fontSize: fs, fontWeight: 700, color: T.textTertiary }}>{sym || ''}</div>
 
   const bDigit = (d, which) => {
     const active = snap.spot === which, dim = snap.spot && !active
@@ -249,7 +249,7 @@ export function MultiColumnMath({ snap }) {
       <div key={which} style={{ width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: cell - 8, height: cell - 8, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-          color: active ? T.irisDeep : T.ink, opacity: dim ? 0.28 : 1,
+          color: active ? T.irisDeep : T.textPrimary, opacity: dim ? 0.28 : 1,
           border: active ? `2.5px dashed ${T.iris}` : '2.5px dashed transparent',
           background: active ? T.irisTint : 'transparent',
           animation: active ? 'spotIn .35s ease-out both' : 'none',
@@ -308,7 +308,7 @@ export function MultiColumnMath({ snap }) {
         {bDigit(snap.bT, 'T')}
         {bDigit(snap.bO, 'O')}
       </div>
-      <div style={{ height: 0, borderTop: `3px solid ${T.ink}`, margin: '8px 0' }} />
+      <div style={{ height: 0, borderTop: `3px solid ${T.textPrimary}`, margin: '8px 0' }} />
       {/* the final addition's carries — their own small row right above the rows
           being added, so they never mix with the multiplication carries up top */}
       {snap.addCarry?.some((x) => x !== '') && (
@@ -347,7 +347,7 @@ export function MultiColumnMath({ snap }) {
       </div>
       {snap.sum.some((x) => x !== '') && (
         <>
-          <div style={{ height: 0, borderTop: `3px solid ${T.ink}`, margin: '8px 0' }} />
+          <div style={{ height: 0, borderTop: `3px solid ${T.textPrimary}`, margin: '8px 0' }} />
           {rowEl(snap.sum, snap.hiRow === 'sum')}
         </>
       )}
@@ -376,8 +376,8 @@ function KeypadKey({ k, isOk, isDel, onKey, disabled = false }) {
   let sty
   if (isOk && disabled) sty = { ...base, background: '#EDEBF2', color: '#b5aec4', boxShadow: '0 4px 0 #dcd8e4', fontSize: 16 } // Oscar's disabled Check
   else if (isOk) sty = { ...base, background: T.irisFace, color: '#fff', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 16 }
-  else if (isDel) sty = { ...base, background: '#fff', color: T.ink3, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
-  else sty = { ...base, background: '#fff', color: T.ink, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
+  else if (isDel) sty = { ...base, background: '#fff', color: T.textTertiary, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
+  else sty = { ...base, background: '#fff', color: T.textPrimary, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
   return (
     <button onPointerDown={() => !disabled && setDown(true)} onPointerUp={() => setDown(false)} onPointerLeave={() => setDown(false)}
       onClick={() => !disabled && onKey(k)} disabled={disabled}
@@ -482,19 +482,19 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
     boxShadow: active === f ? '0 0 0 4px rgba(45,109,246,.18)' : 'none',
     transition: 'border-color .15s, background .15s, box-shadow .15s',
   })
-  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.iris : T.ink3 })
+  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.iris : T.textTertiary })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.ink3 }}>{skin.ask}</div>
+      <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.textTertiary }}>{skin.ask}</div>
 
       {/* a ÷ b = [q] R [r] — two nowrap groups, so a narrow modal drops the answer to its own line */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '10px 12px', fontVariantNumeric: 'tabular-nums' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap' }}>
-          <span style={{ fontSize: 42, fontWeight: 700, color: T.ink }}>{problem.a}</span>
-          <span style={{ fontSize: 32, fontWeight: 600, color: T.ink3 }}>÷</span>
-          <span style={{ fontSize: 42, fontWeight: 700, color: T.ink }}>{problem.b}</span>
-          <span style={{ fontSize: 32, fontWeight: 600, color: T.ink3 }}>=</span>
+          <span style={{ fontSize: 42, fontWeight: 700, color: T.textPrimary }}>{problem.a}</span>
+          <span style={{ fontSize: 32, fontWeight: 600, color: T.textTertiary }}>÷</span>
+          <span style={{ fontSize: 42, fontWeight: 700, color: T.textPrimary }}>{problem.b}</span>
+          <span style={{ fontSize: 32, fontWeight: 600, color: T.textTertiary }}>=</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, whiteSpace: 'nowrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -507,7 +507,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
           {/* a duplicate pointer target for the remainder box — skipped by keyboard + screen readers */}
           <button onClick={() => setActive('r')} tabIndex={-1} aria-hidden="true"
             style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 28, fontWeight: 800, lineHeight: 1, borderRadius: 12,
-              color: active === 'r' || r !== '' ? T.iris : T.ink3, animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
+              color: active === 'r' || r !== '' ? T.iris : T.textTertiary, animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <button onClick={() => setActive('r')} aria-label="remainder" style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
               {r}{active === 'r' && <span style={caretStyle} />}
@@ -527,7 +527,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
       <Keypad onKey={onKey} okDisabled={!ready} />
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, marginTop: 2 }}>
-        <div style={{ textAlign: 'center', fontSize: 12.5, color: T.ink3, fontWeight: 500 }}>{hint}</div>
+        <div style={{ textAlign: 'center', fontSize: 12.5, color: T.textTertiary, fontWeight: 500 }}>{hint}</div>
         <button onClick={onWalkthrough}
           style={{ border: 'none', background: 'transparent', color: '#6E5BC0', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
       </div>
@@ -552,9 +552,9 @@ export function WorkedExample({ problem, onBack }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
       <div style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center',
-        color: T.ink3, fontSize: 14, fontWeight: 600 }}>
+        color: T.textTertiary, fontSize: 14, fontWeight: 600 }}>
         <span>Your problem:</span>
-        <span style={{ color: T.ink, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ color: T.textPrimary, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {problem.a} {OPSYM[problem.op]} {problem.b}
         </span>
         <span>· here's one just like it</span>
@@ -562,7 +562,7 @@ export function WorkedExample({ problem, onBack }) {
       <div key={i} style={{ animation: 'stepIn .3s ease-out both' }}>
         {useV2 ? <MultiColumnMath snap={st.snap} /> : <ColumnMath snap={st.snap} big />}
       </div>
-      <div style={{ minHeight: 58, maxWidth: 400, textAlign: 'center', fontSize: 17, fontWeight: 500, color: T.ink,
+      <div style={{ minHeight: 58, maxWidth: 400, textAlign: 'center', fontSize: 17, fontWeight: 500, color: T.textPrimary,
         lineHeight: 1.5, background: T.irisTint, borderRadius: 14, padding: '12px 18px' }}>{st.caption}</div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         {stages.map((_, k) => (

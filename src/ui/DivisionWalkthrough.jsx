@@ -35,7 +35,7 @@ import { buildDivisionStages } from '../math'
    are the lesson's SEMANTIC colours (dividend = berry, divisor = teal, Sharing
    Table = slate, quotient = the yellow Answer Box), meaningful only here. */
 const P = {
-  ink: '#262626', ink3: '#737373',
+  textPrimary: '#262626', textTertiary: '#737373',
   berry: '#E60076', berryInk: '#C6005C', // berryInk = pink-700, the AA text shade teal: '#009689', tealTint: '#F0FDFA',
   slate: '#62748E', slate400: '#90A1B9', slateTint: 'rgba(98,116,142,.10)',
   answerFill: '#FEF9C2', answerLine: '#F0B100', answerLineSolid: '#D08700',
@@ -85,7 +85,7 @@ function PressBtn({ children, onClick, variant = 'primary' }) {
 function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   const { n, steps, remainder, digits, b } = built
   const remGap = remainder > 0 ? 44 : 0
-  const ink = P.ink, ink3 = P.ink3
+  const textPrimary = P.textPrimary, textTertiary = P.textTertiary
   const xL = (c) => GUTTER + c * CELL
   const yT = (r) => TOPPAD + r * ROWH
   const totemL = Math.round((GUTTER - 46) / 2)
@@ -120,8 +120,8 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   )
   els.push(
     <div key="ql" style={{ position: 'absolute', left: xL(0) - 7, top: yT(0) - 46, width: n * CELL + 14, textAlign: 'center', zIndex: 2 }}>
-      <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 0, color: ink3, whiteSpace: 'nowrap' }}>Each friend&apos;s share</span>
-      {showTerms && <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, color: ink3, opacity: 0.75, textTransform: 'uppercase', letterSpacing: '.05em' }}>Quotient</span>}
+      <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 0, color: textTertiary, whiteSpace: 'nowrap' }}>Each friend&apos;s share</span>
+      {showTerms && <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, color: textTertiary, opacity: 0.75, textTransform: 'uppercase', letterSpacing: '.05em' }}>Quotient</span>}
     </div>,
   )
   if (!snap.qShown.some(Boolean)) {
@@ -139,7 +139,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     <div key="dv" style={{
       position: 'absolute', left: totemL, top: yT(1) + (ROWH - 46) / 2, width: 46, height: 46, borderRadius: '50%',
       border: `2.5px solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 24, fontWeight: 800, color: ink, zIndex: 2,
+      fontSize: 24, fontWeight: 800, color: textPrimary, zIndex: 2,
     }}>{String(b)}</div>,
   )
   els.push(
@@ -153,7 +153,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   const brW = n * CELL + 18, brH = ROWH + 6
   els.push(
     <svg key="br" width={brW} height={brH} viewBox={`0 0 ${brW} ${brH}`} style={{ position: 'absolute', left: GUTTER - 16, top: yT(1) - 3, zIndex: 2, overflow: 'visible' }}>
-      <path d={`M16 3 H ${brW - 2} M16 3 Q 3 ${brH * 0.5} 10 ${brH - 2}`} fill="none" stroke={ink} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={`M16 3 H ${brW - 2} M16 3 Q 3 ${brH * 0.5} 10 ${brH - 2}`} fill="none" stroke={textPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
     </svg>,
   )
 
@@ -163,7 +163,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
       <img src={CANDY} alt="candy bag" style={{ width: 54, height: 54, objectFit: 'contain', alignSelf: 'flex-start', filter: 'drop-shadow(0 3px 6px rgba(90,60,120,.18))' }} />
       <div>
         <span style={{ fontSize: 11.5, fontWeight: 800, color: P.berry }}>The Candy Bag</span>
-        <span style={{ display: 'block', fontSize: 10.5, fontWeight: 500, color: ink3, marginTop: 1, lineHeight: 1.3 }}>all the candy to share</span>
+        <span style={{ display: 'block', fontSize: 10.5, fontWeight: 500, color: textTertiary, marginTop: 1, lineHeight: 1.3 }}>all the candy to share</span>
         {showTerms && <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, color: P.berry, opacity: 0.9, marginTop: 2, letterSpacing: '.05em', textTransform: 'uppercase' }}>Dividend</span>}
       </div>
     </div>,
@@ -176,7 +176,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     els.push(
       <div key={'q' + c} style={{
         position: 'absolute', left: xL(c), top: yT(0), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: ink, zIndex: 3,
+        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
         animation: hot ? (sneaky ? 'dvShimmer .6s ease-out both' : 'dvQuoUp .5s cubic-bezier(.2,.8,.3,1.2) both') : 'none',
       }}>{String(built.q[c])}</div>,
     )
@@ -195,7 +195,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     els.push(
       <div key={'d' + c} style={{
         position: 'absolute', left: xL(c), top: yT(1), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: ink, zIndex: 3,
+        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
         opacity: snap.dim[c] ? 0.24 : 1, transition: 'opacity .4s',
       }}>{String(digits[c])}</div>,
     )
@@ -210,7 +210,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
       els.push(
         <div key={kp + '_' + j} style={{
           position: 'absolute', left: xL(c), top: yT(rowIdx), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-          justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: ink, zIndex: 3,
+          justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
           animation: anim || 'none',
         }}>{s[j]}</div>,
       )
@@ -227,7 +227,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     if (snap.multShown[si]) placeNum(s.prod, col, multRow, snap.hot.mult === si ? 'dvCellPop .34s ease-out both' : null, 'm' + si)
     if (snap.subShown[si]) {
       els.push(
-        <div key={'bar' + si} style={{ position: 'absolute', left: xL(barCols[0]) + 4, top: yT(subRow) - 3, width: (barCols[1] - barCols[0] + 1) * CELL - 8, height: 0, borderTop: `2.5px solid ${ink}`, zIndex: 2 }} />,
+        <div key={'bar' + si} style={{ position: 'absolute', left: xL(barCols[0]) + 4, top: yT(subRow) - 3, width: (barCols[1] - barCols[0] + 1) * CELL - 8, height: 0, borderTop: `2.5px solid ${textPrimary}`, zIndex: 2 }} />,
       )
       const isRem = si === steps.length - 1
       placeNum(s.sub, col, subRow, snap.hot.sub === si ? 'dvCellPop .34s ease-out both' : null, 's' + si)
@@ -250,7 +250,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
         els.push(
           <div key={'bd' + si} style={{
             position: 'absolute', left: xL(nextCol), top: yT(subRow), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-            justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: ink, zIndex: 3,
+            justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
             '--ay': -dist + 'px', '--ax': '9px', animation: 'dvBringArc .62s cubic-bezier(.3,.7,.3,1.15) both',
           }}>{String(digits[nextCol])}</div>,
         )
@@ -263,7 +263,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   if (snap.final && remainder > 0) {
     const boxR = xL(0) - 7 + n * CELL + 14
     els.push(
-      <div key="Rtop" style={{ position: 'absolute', left: boxR + 8, top: yT(0) + 1, height: ROWH - 4, display: 'flex', alignItems: 'center', fontSize: 22, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: ink, zIndex: 3, animation: 'dvCellPop .4s .15s both' }}>{'R' + remainder}</div>,
+      <div key="Rtop" style={{ position: 'absolute', left: boxR + 8, top: yT(0) + 1, height: ROWH - 4, display: 'flex', alignItems: 'center', fontSize: 22, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3, animation: 'dvCellPop .4s .15s both' }}>{'R' + remainder}</div>,
     )
   }
   if (snap.celebrate) {
@@ -384,7 +384,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
     transition: 'opacity .55s ease, transform .55s cubic-bezier(.2,.8,.3,1.2)',
   })
   const totemCol = { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 116, flexShrink: 0 }
-  const copyStyle = { fontSize: 16.5, fontWeight: 600, color: P.ink, lineHeight: 1.45, textWrap: 'pretty' }
+  const copyStyle = { fontSize: 16.5, fontWeight: 600, color: P.textPrimary, lineHeight: 1.45, textWrap: 'pretty' }
   const badge = (color, bg) => ({ fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color, background: bg, borderRadius: 999, padding: '3px 10px' })
 
   return (
@@ -392,7 +392,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
     // `20px 24px 24px` padding matches Oscar's modal inner padding
     <div ref={stageHostRef} style={{ display: 'flex', flexDirection: 'column', minHeight: Math.round(stageMinH), padding: '20px 24px 24px', fontFamily: "'Inter',system-ui,sans-serif" }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: P.ink, letterSpacing: '-.01em' }}>Let&apos;s share the candy 🍬</div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: P.textPrimary, letterSpacing: '-.01em' }}>Let&apos;s share the candy 🍬</div>
         {phase === 'work' && (
           // marginRight reserves the parent modal's floating ✕ gutter (ModalClose
           // 40px at right:14) so the round pill clears the close button by a
@@ -413,7 +413,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
             <div style={cardStyle(1)}>
               <div style={{ ...totemCol, gap: 5 }}>
                 <img src={CANDY} alt="candy bag" style={{ width: 40, height: 40, objectFit: 'contain', filter: 'drop-shadow(0 3px 6px rgba(90,60,120,.20))' }} />
-                <div style={{ fontSize: 40, fontWeight: 800, color: P.ink, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{a}</div>
+                <div style={{ fontSize: 40, fontWeight: 800, color: P.textPrimary, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{a}</div>
                 {showMathTerms && <span style={badge(P.berryInk, '#FDF2F8')}>DIVIDEND</span>}
               </div>
               <div style={copyStyle}>You have {a} candies to share.</div>
@@ -424,7 +424,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,26px)', gap: 4, justifyContent: 'center' }}>
                   {[0, 1, 2, 3].map((k) => <img key={k} src={FRIEND} alt="friend" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />)}
                 </div>
-                <div style={{ width: 44, height: 44, borderRadius: '50%', border: `2.5px solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800, color: P.ink }}>{b}</div>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', border: `2.5px solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800, color: P.textPrimary }}>{b}</div>
                 {showMathTerms && <span style={badge(P.teal, P.tealTint)}>DIVISOR</span>}
               </div>
               <div style={copyStyle}>You share them with {b} friends.</div>
@@ -445,7 +445,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
       ) : (
         <>
           {/* speech-bubble caption card with a 45° tail bottom-left */}
-          <div style={{ position: 'relative', minHeight: 72, background: '#fff', border: '1px solid #EBEBEB', borderRadius: 16, boxShadow: '0 5px 16px rgba(40,30,70,.07)', padding: '14px 18px', margin: '14px 0', display: 'flex', alignItems: 'center', fontSize: 16, lineHeight: 1.5, color: P.ink, fontWeight: 500, textWrap: 'pretty' }}>
+          <div style={{ position: 'relative', minHeight: 72, background: '#fff', border: '1px solid #EBEBEB', borderRadius: 16, boxShadow: '0 5px 16px rgba(40,30,70,.07)', padding: '14px 18px', margin: '14px 0', display: 'flex', alignItems: 'center', fontSize: 16, lineHeight: 1.5, color: P.textPrimary, fontWeight: 500, textWrap: 'pretty' }}>
             {snap.caption}
             <span style={{ content: '""', position: 'absolute', left: 38, bottom: -9, width: 17, height: 17, background: '#fff', borderRight: '1px solid #EBEBEB', borderBottom: '1px solid #EBEBEB', transform: 'rotate(45deg)' }} />
           </div>
