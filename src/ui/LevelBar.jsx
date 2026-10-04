@@ -180,7 +180,7 @@ const popStyles = {
   // entire job of this line. Conditional: no `from`, no signature, so a public
   // build with unsigned copy needs no change here.
   sign: { marginTop: 12, paddingRight: 6, textAlign: 'right', fontSize: 15, fontWeight: 700, color: LVL.main },
-  btn: { marginTop: 18, width: '100%', height: 54, border: 'none', borderRadius: 16, background: T.iris, color: '#fff', fontSize: 18, fontWeight: 800, cursor: 'pointer', boxShadow: '0 5px 0 ' + T.irisDeep, transition: 'transform .08s ease, box-shadow .08s ease' },
+  btn: { marginTop: 18, width: '100%', height: 54, border: 'none', borderRadius: 16, background: T.irisFace, color: '#fff', fontSize: 18, fontWeight: 800, cursor: 'pointer', boxShadow: '0 5px 0 ' + T.irisDeep, transition: 'transform .08s ease, box-shadow .08s ease' },
   piece: { position: 'absolute', top: -8, width: 9, height: 14, borderRadius: 3, animation: 'confettiFall var(--dur) ease-in var(--delay) forwards', pointerEvents: 'none' },
 }
 // pastel confetti to match the softened level identity (was T.violet/#9810FA —

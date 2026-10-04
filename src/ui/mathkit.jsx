@@ -16,6 +16,7 @@ import { OPSYM, buildStages, buildStagesMulti } from '../math'
 export const T = {
   // Brand Iris — actions + focus: 600 face · 700 deep (shadow + text) · 100 soft · 50 tint.
   // Replaced the off-brand blue #2D6DF6 (Amy 2026-10-04).
+  irisFace: '#6169E0', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
   iris: '#4B54DD', irisDeep: '#3D43BE', irisSoft: '#E4E5FA', irisTint: '#F1F1FD',
   teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
   ink: '#262626', ink2: '#4d4d4d', ink3: '#6e6e6e',
@@ -147,7 +148,7 @@ export function Sparkles({ colors = ['#fff', T.tealLt, T.irisSoft], n = 14 }) {
 export function BigButton({ children, onClick, tone = 'primary', style }) {
   const [down, setDown] = useState(false)
   const tones = {
-    primary: { bg: T.iris, fg: '#fff', sh: T.irisDeep },
+    primary: { bg: T.irisFace, fg: '#fff', sh: T.irisDeep },
     ghost: { bg: '#fff', fg: T.iris, sh: '#C9CBF5' },
     amber: { bg: T.amber, fg: '#fff', sh: T.amberDeep },
   }
@@ -370,7 +371,7 @@ function KeypadKey({ k, isOk, isDel, onKey, disabled = false }) {
     fontVariantNumeric: 'tabular-nums', transition: 'transform .06s, box-shadow .06s' }
   let sty
   if (isOk && disabled) sty = { ...base, background: '#EDEBF2', color: '#b5aec4', boxShadow: '0 4px 0 #dcd8e4', fontSize: 16 } // Oscar's disabled Check
-  else if (isOk) sty = { ...base, background: T.iris, color: '#fff', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 16 }
+  else if (isOk) sty = { ...base, background: T.irisFace, color: '#fff', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 16 }
   else if (isDel) sty = { ...base, background: '#fff', color: T.ink3, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
   else sty = { ...base, background: '#fff', color: T.ink, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
   return (

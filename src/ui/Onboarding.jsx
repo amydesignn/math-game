@@ -19,7 +19,7 @@
  * no media to show there and never renders the card inline.
  *
  * Colours are Oscar's comp values, except the primary: his #7C6CE8 failed AA
- * with white text (4.06:1), so the CTA + active dot wear Brand Iris 600 #4B54DD
+ * with white text (4.06:1), so the CTA wears Brand Iris 500 #6169E0 (active dot: Iris 600)
  * like every other action (Amy 2026-10-04).
  * Hover/active + the entrance animation live in index.css (.luxiOb-*): an inline
  * style overrides a CSS :hover, so interactive states can't be inline (same

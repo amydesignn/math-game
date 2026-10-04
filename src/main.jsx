@@ -179,7 +179,7 @@ const si = {
     height: 50,
     borderRadius: 14,
     border: 'none',
-    background: '#4B54DD', // Brand Iris 600
+    background: '#6169E0', // Brand Iris 500
     color: '#fff',
     fontSize: 16.5,
     fontWeight: 800,
