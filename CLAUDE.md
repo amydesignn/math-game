@@ -1006,13 +1006,16 @@ the way gems are earned, the same cap started punishing correct answers.
   seams, ships as its own deploy.
 
 ## Phase 2 (added 2026-07-16): music + gem collection
-- **Audio** (`src/audio.js`): bgm loop (Ivy's pick, `public/audio/bgm.mp3`, vol .38) +
+- **Audio** (`src/audio.js`): bgm loop — since 2026-10-04 a Settings **Music** picker over
+  `MUSIC_TRACKS` (config.js): **Island** (default, `bgm-island.mp3`) + **Soft Focus**
+  (`bgm-soft-focus.mp3`), both Suno Pro-licensed; the July free-download `bgm.mp3` was
+  retired (Ivy didn't love it). Store field `musicTrack`; per-track `gain` levels loudness. Plus
   occasional ambient meow (`meow-cat.mp3`, every 45–100s, keyed off pet id via
   `PET_SOUNDS` — non-cat pets stay silent until they get a file). Browsers block
   autoplay ⇒ `unlockAudio()` on first pointerdown (Cozy Closet pattern). Speaker
   toggle in HUD (top-left, under gem counter); `soundOn` persists via store.
-  ⚠️ Licensing (Finn's flag): Pixabay/Uppbeat tracks are fine for private beta;
-  before PUBLIC launch verify game-use coverage or swap to Kenney audio (CC0).
+  ✅ Licensing (Finn's flag) RESOLVED 2026-10-04: both bgm tracks are Suno Pro renders
+  (commercial rights); the free-download July track is gone. meow-cat.mp3 is unchanged.
 - **Gem sparkles** (`src/world/Sparkle.jsx` + spawn/collect in `Scene.jsx`):
   up to `GEMS.perMap` (3) per map visit, positions random but kept ≥4.5 from
   gates, ≥1.8 from decor, ≥4 from spawn, ≥5 apart. Tap a sparkle = walk to it;

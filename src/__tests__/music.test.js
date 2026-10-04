@@ -1,6 +1,6 @@
 /*
  * The Settings music picker (2026-10-04): Island is the default for everyone,
- * Classic (Ivy's original) stays one tap away, and a bad id can never leave a
+ * Soft Focus stays one tap away, and a bad id can never leave a
  * save without music.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
@@ -30,11 +30,17 @@ const saved = () => JSON.parse(storage.getItem(KEY)).musicTrack
 
 describe('music picker', () => {
   it('ships exactly the two tracks, Island first and default', () => {
-    expect(MUSIC_TRACKS.map((t) => t.id)).toEqual(['island', 'classic'])
+    expect(MUSIC_TRACKS.map((t) => t.id)).toEqual(['island', 'soft-focus'])
     expect(DEFAULT_MUSIC).toBe('island')
   })
 
   it('a brand-new player gets Island', async () => {
+    const store = await import('../store.js')
+    expect(store.getState().musicTrack).toBe('island')
+  })
+
+  it('a save pointing at the retired July track gets Island', async () => {
+    storage.setItem(KEY, JSON.stringify(oldSave({ musicTrack: 'classic' })))
     const store = await import('../store.js')
     expect(store.getState().musicTrack).toBe('island')
   })
@@ -46,10 +52,10 @@ describe('music picker', () => {
     expect(saved()).toBe('island')
   })
 
-  it('a save that chose Classic keeps Classic', async () => {
-    storage.setItem(KEY, JSON.stringify(oldSave({ musicTrack: 'classic' })))
+  it('a save that chose Soft Focus keeps it', async () => {
+    storage.setItem(KEY, JSON.stringify(oldSave({ musicTrack: 'soft-focus' })))
     const store = await import('../store.js')
-    expect(store.getState().musicTrack).toBe('classic')
+    expect(store.getState().musicTrack).toBe('soft-focus')
   })
 
   it('an unknown track id falls back to Island', async () => {
@@ -60,9 +66,9 @@ describe('music picker', () => {
 
   it('setMusicTrack persists a real choice and ignores junk', async () => {
     const store = await import('../store.js')
-    store.setMusicTrack('classic')
-    expect(saved()).toBe('classic')
+    store.setMusicTrack('soft-focus')
+    expect(saved()).toBe('soft-focus')
     store.setMusicTrack('nope')
-    expect(store.getState().musicTrack).toBe('classic')
+    expect(store.getState().musicTrack).toBe('soft-focus')
   })
 })

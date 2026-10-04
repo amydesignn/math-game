@@ -207,8 +207,8 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                     <span style={{ position: 'absolute', top: 2, left: 2, width: 24, height: 24, borderRadius: '50%', background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,.2)', transition: 'transform .18s', transform: 'translateX(' + (sound ? '20px' : '0px') + ')' }} />
                   </button>
                 </div>
-                {/* Music picker (2026-10-04): Island = the new default, Classic = Ivy's
-                    original. A two-option segmented control — one tap, no submenu. */}
+                {/* Music picker (2026-10-04): Island = the default, Soft Focus = the
+                    calmer Luxi song. A two-option segmented control — one tap, no submenu. */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 8px', borderRadius: 10 }}>
                   <span style={rowIcon}>
                     <MusicNote />
