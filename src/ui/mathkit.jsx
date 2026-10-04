@@ -128,7 +128,8 @@ export function Sparkles({ colors = ['#fff', T.tealLt, T.blueSubtle], n = 14 }) 
     }))
   ).current
   return (
-    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+    // decorative only — hidden from screen readers (and from the contrast audit)
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
       {items.map((s, i) => (
         <svg key={i} viewBox="0 0 24 24" width={s.sz} height={s.sz}
           style={{ position: 'absolute', left: s.left, top: s.top, transform: 'translate(-50%,-50%)',
