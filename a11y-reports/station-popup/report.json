@@ -2,7 +2,7 @@
   "component": "StationPopup",
   "file": "src/ui/StationPopup.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-04T19:32:06.235Z",
+  "ranAt": "2026-10-04T19:42:54.364Z",
   "variants": [
     "Snack time",
     "Water the tree",
@@ -216,8 +216,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 4.62,
-      "min": 3
+      "ratio": 4.13,
+      "min": 3,
+      "coverage": 0.8
     },
     {
       "variant": "Snack time",
@@ -302,11 +303,11 @@
       "elementId": 1,
       "state": "focus",
       "kind": "focus-indicator",
-      "status": "fail",
+      "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 2.21,
+      "ratio": 5.33,
       "min": 3,
-      "note": "Focus ring too faint against what it replaces."
+      "coverage": 0.56
     },
     {
       "variant": "Snack time",
@@ -346,7 +347,7 @@
       "variant": "Snack time",
       "phase": "ask",
       "state": "default",
-      "label": "18",
+      "label": "34",
       "target": "div:nth-child(3) > span:nth-child(1)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -717,8 +718,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 4.62,
-      "min": 3
+      "ratio": 4.13,
+      "min": 3,
+      "coverage": 0.8
     },
     {
       "variant": "Snack time",
@@ -805,8 +807,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -893,8 +896,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -981,8 +985,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -1069,8 +1074,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -1157,8 +1163,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -1245,8 +1252,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -1333,8 +1341,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -1421,8 +1430,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -1509,8 +1519,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -1593,8 +1604,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -1681,8 +1693,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Snack time",
@@ -1767,11 +1780,11 @@
       "elementId": 12,
       "state": "focus",
       "kind": "focus-indicator",
-      "status": "fail",
+      "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 2.37,
+      "ratio": 5.21,
       "min": 3,
-      "note": "Focus ring too faint against what it replaces."
+      "coverage": 0.63
     },
     {
       "variant": "Snack time",
@@ -1845,7 +1858,7 @@
       "variant": "Snack time",
       "phase": "recover",
       "state": "default",
-      "label": "31 × 5",
+      "label": "47 × 2",
       "target": "div:nth-child(3) > div:nth-child(1) > span:nth-child(2)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -1879,7 +1892,7 @@
       "variant": "Snack time",
       "phase": "recover",
       "state": "default",
-      "label": "2",
+      "label": "3",
       "target": "div:nth-child(2) > div:nth-child(3)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -1896,7 +1909,7 @@
       "variant": "Snack time",
       "phase": "recover",
       "state": "default",
-      "label": "1",
+      "label": "8",
       "target": "div:nth-child(2) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -1930,7 +1943,7 @@
       "variant": "Snack time",
       "phase": "recover",
       "state": "default",
-      "label": "2",
+      "label": "3",
       "target": "div:nth-child(3) > div:nth-child(2) > div > div:nth-child(3) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -2098,11 +2111,11 @@
       "elementId": 0,
       "state": "focus",
       "kind": "focus-indicator",
-      "status": "fail",
+      "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 2.21,
+      "ratio": 5.33,
       "min": 3,
-      "note": "Focus ring too faint against what it replaces."
+      "coverage": 0.56
     },
     {
       "variant": "Snack time",
@@ -2189,8 +2202,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 4.86,
-      "min": 3
+      "ratio": 5.33,
+      "min": 3,
+      "coverage": 0.91
     },
     {
       "variant": "Snack time",
@@ -2364,11 +2378,11 @@
       "elementId": 0,
       "state": "focus",
       "kind": "focus-indicator",
-      "status": "fail",
+      "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 2.21,
+      "ratio": 5.39,
       "min": 3,
-      "note": "Focus ring too faint against what it replaces."
+      "coverage": 0.56
     },
     {
       "variant": "Snack time",
@@ -2576,11 +2590,11 @@
       "elementId": 0,
       "state": "focus",
       "kind": "focus-indicator",
-      "status": "fail",
+      "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 2.21,
+      "ratio": 5.39,
       "min": 3,
-      "note": "Focus ring too faint against what it replaces."
+      "coverage": 0.55
     },
     {
       "variant": "Water the tree",
@@ -2735,7 +2749,7 @@
       "variant": "Water the tree",
       "phase": "ask",
       "state": "default",
-      "label": "35",
+      "label": "36",
       "target": "div:nth-child(3) > span:nth-child(1)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -2769,7 +2783,7 @@
       "variant": "Water the tree",
       "phase": "ask",
       "state": "default",
-      "label": "5",
+      "label": "6",
       "target": "div:nth-child(3) > span:nth-child(3)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -3097,7 +3111,7 @@
       "variant": "Water the tree",
       "phase": "recover",
       "state": "default",
-      "label": "32 × 6",
+      "label": "42 × 3",
       "target": "div:nth-child(3) > div:nth-child(1) > span:nth-child(2)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -3131,7 +3145,7 @@
       "variant": "Water the tree",
       "phase": "recover",
       "state": "default",
-      "label": "2",
+      "label": "4",
       "target": "div:nth-child(2) > div:nth-child(3)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -3148,7 +3162,7 @@
       "variant": "Water the tree",
       "phase": "recover",
       "state": "default",
-      "label": "6",
+      "label": "0",
       "target": "div:nth-child(2) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -3182,7 +3196,7 @@
       "variant": "Water the tree",
       "phase": "recover",
       "state": "default",
-      "label": "3",
+      "label": "4",
       "target": "div:nth-child(3) > div:nth-child(2) > div > div:nth-child(3) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -3632,7 +3646,7 @@
       "variant": "Bakery run",
       "phase": "ask",
       "state": "default",
-      "label": "26",
+      "label": "21",
       "target": "div:nth-child(3) > span:nth-child(1)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -3994,7 +4008,7 @@
       "variant": "Bakery run",
       "phase": "recover",
       "state": "default",
-      "label": "30 × 5",
+      "label": "21 × 2",
       "target": "div:nth-child(3) > div:nth-child(1) > span:nth-child(2)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -4028,7 +4042,7 @@
       "variant": "Bakery run",
       "phase": "recover",
       "state": "default",
-      "label": "2",
+      "label": "3",
       "target": "div:nth-child(2) > div:nth-child(3)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -4045,7 +4059,7 @@
       "variant": "Bakery run",
       "phase": "recover",
       "state": "default",
-      "label": "0",
+      "label": "3",
       "target": "div:nth-child(2) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -4079,7 +4093,7 @@
       "variant": "Bakery run",
       "phase": "recover",
       "state": "default",
-      "label": "5",
+      "label": "2",
       "target": "div:nth-child(3) > div:nth-child(2) > div > div:nth-child(3) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -4529,7 +4543,7 @@
       "variant": "Flower patch",
       "phase": "ask",
       "state": "default",
-      "label": "31",
+      "label": "23",
       "target": "div:nth-child(3) > span:nth-child(1)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -4891,7 +4905,7 @@
       "variant": "Flower patch",
       "phase": "recover",
       "state": "default",
-      "label": "35 × 2",
+      "label": "35 × 4",
       "target": "div:nth-child(3) > div:nth-child(1) > span:nth-child(2)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -4942,7 +4956,7 @@
       "variant": "Flower patch",
       "phase": "recover",
       "state": "default",
-      "label": "3",
+      "label": "6",
       "target": "div:nth-child(2) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -5426,7 +5440,7 @@
       "variant": "Arcade night",
       "phase": "ask",
       "state": "default",
-      "label": "36",
+      "label": "31",
       "target": "div:nth-child(3) > span:nth-child(1)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -5788,7 +5802,7 @@
       "variant": "Arcade night",
       "phase": "recover",
       "state": "default",
-      "label": "21 × 6",
+      "label": "33 × 3",
       "target": "div:nth-child(3) > div:nth-child(1) > span:nth-child(2)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -5822,7 +5836,7 @@
       "variant": "Arcade night",
       "phase": "recover",
       "state": "default",
-      "label": "2",
+      "label": "4",
       "target": "div:nth-child(2) > div:nth-child(3)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -5839,7 +5853,7 @@
       "variant": "Arcade night",
       "phase": "recover",
       "state": "default",
-      "label": "0",
+      "label": "3",
       "target": "div:nth-child(2) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -5873,7 +5887,7 @@
       "variant": "Arcade night",
       "phase": "recover",
       "state": "default",
-      "label": "5",
+      "label": "3",
       "target": "div:nth-child(3) > div:nth-child(2) > div > div:nth-child(3) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -6323,7 +6337,7 @@
       "variant": "Star party",
       "phase": "ask",
       "state": "default",
-      "label": "42",
+      "label": "32",
       "target": "div:nth-child(3) > span:nth-child(1)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -6685,7 +6699,7 @@
       "variant": "Star party",
       "phase": "recover",
       "state": "default",
-      "label": "14 × 5",
+      "label": "39 × 6",
       "target": "div:nth-child(3) > div:nth-child(1) > span:nth-child(2)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -6719,7 +6733,7 @@
       "variant": "Star party",
       "phase": "recover",
       "state": "default",
-      "label": "3",
+      "label": "4",
       "target": "div:nth-child(2) > div:nth-child(3)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -6736,7 +6750,7 @@
       "variant": "Star party",
       "phase": "recover",
       "state": "default",
-      "label": "4",
+      "label": "7",
       "target": "div:nth-child(2) > div:nth-child(4)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -7105,7 +7119,7 @@
       "variant": "Division ask",
       "phase": "ask",
       "state": "default",
-      "label": "16",
+      "label": "12",
       "target": "div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > span:nth-child(1)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -7139,7 +7153,7 @@
       "variant": "Division ask",
       "phase": "ask",
       "state": "default",
-      "label": "4",
+      "label": "3",
       "target": "div:nth-child(2) > div:nth-child(2) > div:nth-child(1) > span:nth-child(3)",
       "fg": "#262626",
       "bg": "#FFFFFF",
@@ -7164,23 +7178,6 @@
       "min": 4.5,
       "large": false,
       "px": 10,
-      "weight": 700,
-      "method": "axe",
-      "status": "pass",
-      "screenshot": "division--ask.png"
-    },
-    {
-      "variant": "Division ask",
-      "phase": "ask",
-      "state": "default",
-      "label": "R",
-      "target": "button[aria-label=\"remainder\"]",
-      "fg": "#6E6E6E",
-      "bg": "#FFFFFF",
-      "ratio": 5.09,
-      "min": 3,
-      "large": true,
-      "px": 28,
       "weight": 700,
       "method": "axe",
       "status": "pass",
@@ -7527,8 +7524,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 4.62,
-      "min": 3
+      "ratio": 4.13,
+      "min": 3,
+      "coverage": 0.8
     },
     {
       "variant": "Division ask",
@@ -7537,111 +7535,24 @@
       "elementId": 1,
       "state": "focus",
       "kind": "focus-indicator",
-      "status": "fail",
-      "criterion": "1.4.11",
-      "ratio": 1.32,
-      "min": 3,
-      "note": "Focus ring too faint against what it replaces."
-    },
-    {
-      "variant": "Division ask",
-      "phase": "ask",
-      "element": "remainder",
-      "elementId": 2,
-      "state": "default",
-      "label": "R",
-      "target": "button[aria-label=\"remainder\"]",
-      "fg": "#6E6E6E",
-      "bg": "#FFFFFF",
-      "ratio": 5.09,
-      "min": 3,
-      "large": true,
-      "px": 28,
-      "weight": 700,
-      "method": "axe",
-      "status": "pass",
-      "interactive": true
-    },
-    {
-      "variant": "Division ask",
-      "phase": "ask",
-      "element": "remainder",
-      "elementId": 2,
-      "state": "hover",
-      "label": "R",
-      "target": "button[aria-label=\"remainder\"]",
-      "fg": "#6E6E6E",
-      "bg": "#FFFFFF",
-      "ratio": 5.09,
-      "min": 3,
-      "large": true,
-      "px": 28,
-      "weight": 700,
-      "method": "axe",
-      "status": "pass",
-      "interactive": true
-    },
-    {
-      "variant": "Division ask",
-      "phase": "ask",
-      "element": "remainder",
-      "elementId": 2,
-      "state": "pressed",
-      "label": "R",
-      "target": "button[aria-label=\"remainder\"]",
-      "fg": "#6E6E6E",
-      "bg": "#FFFFFF",
-      "ratio": 5.09,
-      "min": 3,
-      "large": true,
-      "px": 28,
-      "weight": 700,
-      "method": "axe",
-      "status": "pass",
-      "interactive": true
-    },
-    {
-      "variant": "Division ask",
-      "phase": "ask",
-      "element": "remainder",
-      "elementId": 2,
-      "state": "focus",
-      "label": "R",
-      "target": "button[aria-label=\"remainder\"]",
-      "fg": "#6E6E6E",
-      "bg": "#FFFFFF",
-      "ratio": 5.09,
-      "min": 3,
-      "large": true,
-      "px": 28,
-      "weight": 700,
-      "method": "axe",
-      "status": "pass",
-      "interactive": true
-    },
-    {
-      "variant": "Division ask",
-      "phase": "ask",
-      "element": "remainder",
-      "elementId": 2,
-      "state": "focus",
-      "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 6.05,
+      "min": 3,
+      "coverage": 0.89
     },
     {
       "variant": "Division ask",
       "phase": "ask",
-      "element": "BUTTON",
+      "element": "remainder",
       "elementId": 3,
       "state": "focus",
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 4.86,
-      "min": 3
+      "ratio": 7.66,
+      "min": 3,
+      "coverage": 0.88
     },
     {
       "variant": "Division ask",
@@ -7728,8 +7639,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -7816,8 +7728,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -7904,8 +7817,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -7992,8 +7906,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -8080,8 +7995,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -8168,8 +8084,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -8256,8 +8173,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -8344,8 +8262,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -8432,8 +8351,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -8516,8 +8436,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -8604,8 +8525,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 5.43,
+      "min": 3,
+      "coverage": 0.92
     },
     {
       "variant": "Division ask",
@@ -8704,8 +8626,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 5.98,
-      "min": 3
+      "ratio": 7.66,
+      "min": 3,
+      "coverage": 0.98
     }
   ]
 }

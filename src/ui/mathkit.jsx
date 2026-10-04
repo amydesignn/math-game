@@ -497,11 +497,12 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
             <span style={cap(active === 'q')}>EACH SHARE</span>
           </div>
           {/* R label — a real tap target that lights + pulses once the quotient has a digit */}
-          <button onClick={() => setActive('r')} aria-label="remainder"
+          {/* a duplicate pointer target for the remainder box — skipped by keyboard + screen readers */}
+          <button onClick={() => setActive('r')} tabIndex={-1} aria-hidden="true"
             style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 28, fontWeight: 800, lineHeight: 1, borderRadius: 12,
               color: active === 'r' || r !== '' ? T.blue : T.ink3, animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <button onClick={() => setActive('r')} style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
+            <button onClick={() => setActive('r')} aria-label="remainder" style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
               {r}{active === 'r' && <span style={caretStyle} />}
             </button>
             <span style={cap(active === 'r')}>LEFT OVER</span>
