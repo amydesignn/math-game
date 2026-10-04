@@ -264,3 +264,8 @@ canvas { touch-action: none; display: block; }
 .luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #3D43BE !important; } /* !important: base shadow is inline */
 .luxiFb-notnow { transition: background .15s; }
 .luxiFb-notnow:hover { background: #F6F2FF; }
+
+/* House focus ring (contrast audit, 2026-10-04 — Amy's interaction-states rule):
+   1px in the active blue, 2px gap so it reads on blue buttons too (WCAG 1.4.11).
+   Scoped to the shared modal shell; the app-wide pass comes with later audits. */
+[role="dialog"] button:focus-visible { outline: 1px solid #0946CA; outline-offset: 2px; }

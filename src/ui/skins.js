@@ -9,6 +9,9 @@
  *   · a single sparkle problem (MathPopup) — uses tag/paw/accent/ask/win
  *   · a station mini-quest (StationPopup) — adds the quest-voice fields
  *     (marker/asset/glow/questLabel/stepNoun/questAsk/stepWin/questWin)
+ * `accentInk` = the accent's 700 step — the colour for any TEXT or text-bearing
+ * fill (tag, Quest badge). The raw accent fails WCAG AA on white; ink passes
+ * (contrast audit, 2026-10-04). `accent` stays for slots, rings and glow.
  * One skin = one marker + one asset-in-the-ring + one accent. Variety lives
  * BETWEEN stations, never inside one (locked in the Break Room review).
  *
@@ -20,7 +23,7 @@ const teal = '#00BBA7'
 export const SKINS = {
   feedPet: {
     id: 'feedPet', tag: 'Snack time', paw: '🧺', asset: '🧺', marker: '🍎',
-    accent: teal, glow: '#46ECD5',
+    accent: teal, accentInk: '#00786F', glow: '#46ECD5',
     ask: 'Your pet wants a snack! Solve it to fill the bowl.',
     askShort: 'solve it to fill the bowl',
     win: 'Yum! Your pet is happy.',
@@ -31,7 +34,7 @@ export const SKINS = {
   },
   waterTree: {
     id: 'waterTree', tag: 'Water the tree', paw: '🌳', asset: '🌳', marker: '🌱',
-    accent: '#00A63E', glow: '#7BF1A8',
+    accent: '#00A63E', accentInk: '#008236', glow: '#7BF1A8',
     ask: 'The tree is thirsty! Solve it to fill the can.',
     askShort: 'solve it to fill the can',
     win: 'Glug glug — the tree drank it up!',
@@ -42,7 +45,7 @@ export const SKINS = {
   },
   bakery: {
     id: 'bakery', tag: 'Bakery run', paw: '🍞', asset: '🍞', marker: '🥐',
-    accent: '#E17100', glow: '#FFD230',
+    accent: '#E17100', accentInk: '#BB4D00', glow: '#FFD230',
     ask: 'The oven is warm! Solve it to mix the dough.',
     askShort: 'solve it to mix the dough',
     win: 'Fresh and warm — nice work!',
@@ -53,7 +56,7 @@ export const SKINS = {
   },
   flowers: {
     id: 'flowers', tag: 'Flower patch', paw: '🪴', asset: '🪴', marker: '🌷',
-    accent: '#F6339A', glow: '#FDA5D5',
+    accent: '#F6339A', accentInk: '#C6005C', glow: '#FDA5D5',
     ask: 'The patch is ready! Solve it to plant a seed.',
     askShort: 'solve it to plant a seed',
     win: 'A new bloom — lovely!',
@@ -64,7 +67,7 @@ export const SKINS = {
   },
   arcade: {
     id: 'arcade', tag: 'Arcade night', paw: '🎯', asset: '🎯', marker: '🕹️',
-    accent: '#2B7FFF', glow: '#8EC5FF',
+    accent: '#2B7FFF', accentInk: '#1447E6', glow: '#8EC5FF',
     ask: 'Step right up! Solve it to take your shot.',
     askShort: 'solve it to take your shot',
     win: 'Bullseye! Nice shot.',
@@ -75,7 +78,7 @@ export const SKINS = {
   },
   starParty: {
     id: 'starParty', tag: 'Star party', paw: '🔭', asset: '🔭', marker: '⭐',
-    accent: '#8E51FF', glow: '#DDD6FF',
+    accent: '#8E51FF', accentInk: '#7008E7', glow: '#DDD6FF',
     ask: 'The sky is clear! Solve it to spot a star.',
     askShort: 'solve it to spot a star',
     win: 'A star for you — spotted!',

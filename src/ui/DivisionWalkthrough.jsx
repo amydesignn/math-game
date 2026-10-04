@@ -36,7 +36,7 @@ import { buildDivisionStages } from '../math'
    Table = slate, quotient = the yellow Answer Box), meaningful only here. */
 const P = {
   ink: '#262626', ink3: '#737373',
-  berry: '#E60076', teal: '#009689', tealTint: '#F0FDFA',
+  berry: '#E60076', berryInk: '#C6005C', // berryInk = pink-700, the AA text shade teal: '#009689', tealTint: '#F0FDFA',
   slate: '#62748E', slate400: '#90A1B9', slateTint: 'rgba(98,116,142,.10)',
   answerFill: '#FEF9C2', answerLine: '#F0B100', answerLineSolid: '#D08700',
   goldB: '#C2410C',
@@ -414,7 +414,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
               <div style={{ ...totemCol, gap: 5 }}>
                 <img src={CANDY} alt="candy bag" style={{ width: 40, height: 40, objectFit: 'contain', filter: 'drop-shadow(0 3px 6px rgba(90,60,120,.20))' }} />
                 <div style={{ fontSize: 40, fontWeight: 800, color: P.ink, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{a}</div>
-                {showMathTerms && <span style={badge(P.berry, '#FDF2F8')}>DIVIDEND</span>}
+                {showMathTerms && <span style={badge(P.berryInk, '#FDF2F8')}>DIVIDEND</span>}
               </div>
               <div style={copyStyle}>You have {a} candies to share.</div>
             </div>

@@ -15,7 +15,7 @@ import { OPSYM, buildStages, buildStagesMulti } from '../math'
 /* ---- house tokens (Oscar styling reference · blue controls per Amy) ---- */
 export const T = {
   blue: '#2D6DF6', blueDark: '#0A52ED', blueDarker: '#0946CA', blueSubtle: '#E0E8F8', blueTint: '#EFF4FF',
-  teal: '#00BBA7', tealLt: '#46ECD5',
+  teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
   ink: '#262626', ink2: '#4d4d4d', ink3: '#6e6e6e',
   line: '#E6E6E6', surface: '#FFFFFF',
   lilac: '#8570D2', lilacDeep: '#4b3f7a',
@@ -128,7 +128,8 @@ export function Sparkles({ colors = ['#fff', T.tealLt, T.blueSubtle], n = 14 }) 
     }))
   ).current
   return (
-    <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
+    // decorative only — hidden from screen readers (and from the contrast audit)
+    <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}>
       {items.map((s, i) => (
         <svg key={i} viewBox="0 0 24 24" width={s.sz} height={s.sz}
           style={{ position: 'absolute', left: s.left, top: s.top, transform: 'translate(-50%,-50%)',
@@ -286,7 +287,7 @@ export function MultiColumnMath({ snap }) {
                 <div style={{ position: 'absolute', inset: -3, borderRadius: 16, border: `2.5px solid ${T.teal}`,
                   background: 'rgba(0,187,167,.06)', pointerEvents: 'none' }} />
                 <span style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', fontSize: 10.5, fontWeight: 700,
-                  letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff', background: T.teal, borderRadius: 8,
+                  letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff', background: T.tealInk, borderRadius: 8,
                   padding: '2px 8px', whiteSpace: 'nowrap' }}>whole</span>
                 {cols.slice(firstIdx).map((i) => numCell(snap.top[i], { hot: false, key: i }))}
               </div>
@@ -474,7 +475,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
     boxShadow: active === f ? '0 0 0 4px rgba(45,109,246,.18)' : 'none',
     transition: 'border-color .15s, background .15s, box-shadow .15s',
   })
-  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.blue : '#a3a3a3' })
+  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.blue : T.ink3 })
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -490,17 +491,18 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, whiteSpace: 'nowrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <button onClick={() => setActive('q')} style={{ ...box('q', q), minWidth: 112, padding: '0 10px' }}>
+            <button onClick={() => setActive('q')} aria-label="quotient" style={{ ...box('q', q), minWidth: 112, padding: '0 10px' }}>
               {q}{active === 'q' && <span style={caretStyle} />}
             </button>
             <span style={cap(active === 'q')}>EACH SHARE</span>
           </div>
           {/* R label — a real tap target that lights + pulses once the quotient has a digit */}
-          <button onClick={() => setActive('r')} aria-label="remainder"
+          {/* a duplicate pointer target for the remainder box — skipped by keyboard + screen readers */}
+          <button onClick={() => setActive('r')} tabIndex={-1} aria-hidden="true"
             style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 28, fontWeight: 800, lineHeight: 1, borderRadius: 12,
-              color: active === 'r' || r !== '' ? T.blue : '#a3a3a3', animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
+              color: active === 'r' || r !== '' ? T.blue : T.ink3, animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-            <button onClick={() => setActive('r')} style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
+            <button onClick={() => setActive('r')} aria-label="remainder" style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
               {r}{active === 'r' && <span style={caretStyle} />}
             </button>
             <span style={cap(active === 'r')}>LEFT OVER</span>
@@ -518,7 +520,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
       <Keypad onKey={onKey} okDisabled={!ready} />
 
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, marginTop: 2 }}>
-        <div style={{ textAlign: 'center', fontSize: 12.5, color: '#9a92ac', fontWeight: 500 }}>{hint}</div>
+        <div style={{ textAlign: 'center', fontSize: 12.5, color: T.ink3, fontWeight: 500 }}>{hint}</div>
         <button onClick={onWalkthrough}
           style={{ border: 'none', background: 'transparent', color: '#6E5BC0', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
       </div>
@@ -548,7 +550,7 @@ export function WorkedExample({ problem, onBack }) {
         <span style={{ color: T.ink, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {problem.a} {OPSYM[problem.op]} {problem.b}
         </span>
-        <span style={{ opacity: 0.6 }}>· here's one just like it</span>
+        <span>· here's one just like it</span>
       </div>
       <div key={i} style={{ animation: 'stepIn .3s ease-out both' }}>
         {useV2 ? <MultiColumnMath snap={st.snap} /> : <ColumnMath snap={st.snap} big />}

@@ -140,9 +140,9 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
           background: `linear-gradient(180deg,${skin.accent}14,#fff)`, borderBottom: `1px solid ${T.line}` }}>
           <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
-          <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accent }}>{skin.tag}</span>
+          <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
           <span style={{ fontWeight: 700, fontSize: 11.5, letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff',
-            background: skin.accent, borderRadius: 9, padding: '4px 9px' }}>Quest</span>
+            background: skin.accentInk, borderRadius: 9, padding: '4px 9px' }}>Quest</span>
           <div style={{ flex: 1 }} />
           {dismissable && <ModalClose onClick={() => close(false)} />}
         </div>
@@ -181,7 +181,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                   </div>
                   <EquationRow a={problem.a} op={problem.op} b={problem.b} entry={entry} />
                   <Keypad onKey={onKey} />
-                  <div style={{ textAlign: 'center', fontSize: 12.5, color: '#9a92ac', fontWeight: 500 }}>Type your answer, then tap Check</div>
+                  <div style={{ textAlign: 'center', fontSize: 12.5, color: T.ink3, fontWeight: 500 }}>Type your answer, then tap Check</div>
                 </>
               )}
             </div>
@@ -238,7 +238,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10 }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14.5, fontWeight: 700, color: T.ink,
                     background: '#fafafa', border: `1px solid ${T.line}`, borderRadius: 12, padding: '7px 13px' }}>+{earned} <Gem size={16} /> earned</span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14.5, fontWeight: 700, color: T.amberDeep,
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14.5, fontWeight: 700, color: '#BB4D00' /* amber-700 · AA on the cream chip */,
                     background: '#FEF3E2', border: `1px solid #FDE0B8`, borderRadius: 12, padding: '7px 13px' }}>+{quest.bonus} <Gem size={16} /> bonus!</span>
                 </div>
               </div>

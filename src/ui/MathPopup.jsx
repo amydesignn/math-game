@@ -104,7 +104,7 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
             background: `linear-gradient(180deg,${skin.accent}14,#fff)`, borderBottom: `1px solid ${T.line}` }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
-            <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accent }}>{skin.tag}</span>
+            <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
             <div style={{ flex: 1 }} />
             {phase === 'ask' && <ModalClose onClick={() => onClose(false)} />}
           </div>
@@ -145,7 +145,7 @@ function AskState({ skin, problem, entry, onKey }) {
       <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.ink3 }}>{skin.ask}</div>
       <EquationRow a={problem.a} op={problem.op} b={problem.b} entry={entry} />
       <Keypad onKey={onKey} />
-      <div style={{ textAlign: 'center', fontSize: 12.5, color: '#9a92ac', fontWeight: 500, marginTop: 2 }}>
+      <div style={{ textAlign: 'center', fontSize: 12.5, color: T.ink3, fontWeight: 500, marginTop: 2 }}>
         Type your answer, then tap Check
       </div>
     </div>
