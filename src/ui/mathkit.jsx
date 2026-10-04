@@ -21,7 +21,7 @@ export const T = {
   teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
   ink: '#262626', ink2: '#4d4d4d', ink3: '#6e6e6e',
   line: '#E6E6E6', surface: '#FFFFFF',
-  lilac: '#8570D2', lilacDeep: '#4b3f7a',
+  lilac: '#8570D2', lilacDeep: '#473B7C', // Lilac 600 / 900
   violet: '#7F22FE', amber: '#FE9A00', amberDeep: '#D97706',
   radius: 26, radiusSm: 16,
 }
@@ -59,13 +59,17 @@ export const MODAL = {
  * popup two different purples in the first place; don't reintroduce a local
  * copy.
  */
+/* Brand Lilac steps since 2026-10-04 (Amy: Iris = actions, Lilac = highlight +
+ * supporting). main 400 · soft 100 · softLine 200 · deep 800 · ink 700 ·
+ * grad 300→400→500. `onFill` stays off-ramp on purpose — see below. */
 export const LVL = {
-  main: '#A78BFA',
-  soft: '#F1ECFE',
-  deep: '#5B44C4', // text weight — ≈6:1 on white, safe for the points readout
-  softLine: '#E7DEFA',
-  grad: 'linear-gradient(135deg,#C4B5FD 0%,#A78BFA 58%,#8E7BF2 100%)',
-  glow: '139,123,242', // rgb triplet for the soft shadows/halos around level art
+  main: '#B29BEA', // Lilac 400 — FILL identity only (2.39:1 on white: never text)
+  ink: '#6E5BC0', // Lilac 700 — coloured accent TEXT (5.36:1 on white)
+  soft: '#EDE7FC',
+  deep: '#5B4B9E', // Lilac 800 — text weight, 7.1:1 on white (5.9 on soft)
+  softLine: '#DDD1F7',
+  grad: 'linear-gradient(135deg,#C6B4F0 0%,#B29BEA 58%,#9B84E0 100%)',
+  glow: '155,132,224', // rgb triplet for the soft shadows/halos around level art
 
   /* The level NUMERAL wherever it sits on `grad` — medallion, reached ladder
    * nodes, the congratulations badge. violet-950 from the primitive ramp.

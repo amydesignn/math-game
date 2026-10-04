@@ -41,7 +41,7 @@ import { TOPIC_META, stageCounts, startedTopics } from '../topicMeta'
 
 /* One ascending pastel-violet ramp so the SYSTEM reads at a glance:
  * light → deep = easier → harder. Distinct from the ⭐ badge track (5-C). */
-const STAGE_DOT = { 1: '#C9BCF5', 2: '#A78BFA', 3: '#7C5CE0' }
+const STAGE_DOT = { 1: '#C6B4F0', 2: '#B29BEA', 3: '#8570D2' }
 
 const REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
@@ -118,12 +118,12 @@ function Count({ value, format }) {
 /* Soft pastel confetti in the header — decorative only, aria-hidden. The real
  * applause is the 5-A card; this is just a little warmth. */
 const CONFETTI = [
-  { l: '8%', t: '30%', c: '#C4B5FD', w: 9, h: 9, r: 18, br: '2px' },
+  { l: '8%', t: '30%', c: '#C6B4F0', w: 9, h: 9, r: 18, br: '2px' },
   { l: '16%', t: '60%', c: '#F5B8D0', w: 7, h: 7, r: 0, br: '50%' },
   { l: '22%', t: '16%', c: '#FBCE7E', w: 8, h: 8, r: -24, br: '2px' },
   { l: '27%', t: '72%', c: '#9FE0D2', w: 7, h: 7, r: 0, br: '50%' },
   { l: '11%', t: '46%', c: '#A9C5F5', w: 11, h: 4, r: 32, br: '2px' },
-  { l: '74%', t: '16%', c: '#C4B5FD', w: 7, h: 7, r: 0, br: '50%' },
+  { l: '74%', t: '16%', c: '#C6B4F0', w: 7, h: 7, r: 0, br: '50%' },
   { l: '89%', t: '40%', c: '#FBCE7E', w: 9, h: 9, r: 20, br: '2px' },
   { l: '80%', t: '66%', c: '#F5B8D0', w: 9, h: 4, r: -18, br: '2px' },
   { l: '92%', t: '56%', c: '#9FE0D2', w: 7, h: 7, r: 0, br: '50%' },

@@ -42,8 +42,8 @@ export function ProfileChip({ size = 44, src = null }) {
         flex: 'none',
         borderRadius: '50%',
         overflow: 'hidden', // clip a photo to the circle
-        boxShadow: '0 0 0 2px #fff, 0 0 0 3.5px #E7DEFA',
-        background: 'radial-gradient(120% 120% at 30% 25%, #EFE9FD, #A78BFA)',
+        boxShadow: '0 0 0 2px #fff, 0 0 0 3.5px #DDD1F7',
+        background: 'radial-gradient(120% 120% at 30% 25%, #EDE7FC, #B29BEA)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
