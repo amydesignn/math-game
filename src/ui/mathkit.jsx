@@ -15,7 +15,7 @@ import { OPSYM, buildStages, buildStagesMulti } from '../math'
 /* ---- house tokens (Oscar styling reference · blue controls per Amy) ---- */
 export const T = {
   blue: '#2D6DF6', blueDark: '#0A52ED', blueDarker: '#0946CA', blueSubtle: '#E0E8F8', blueTint: '#EFF4FF',
-  teal: '#00BBA7', tealLt: '#46ECD5',
+  teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
   ink: '#262626', ink2: '#4d4d4d', ink3: '#6e6e6e',
   line: '#E6E6E6', surface: '#FFFFFF',
   lilac: '#8570D2', lilacDeep: '#4b3f7a',
@@ -287,7 +287,7 @@ export function MultiColumnMath({ snap }) {
                 <div style={{ position: 'absolute', inset: -3, borderRadius: 16, border: `2.5px solid ${T.teal}`,
                   background: 'rgba(0,187,167,.06)', pointerEvents: 'none' }} />
                 <span style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', fontSize: 10.5, fontWeight: 700,
-                  letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff', background: T.teal, borderRadius: 8,
+                  letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff', background: T.tealInk, borderRadius: 8,
                   padding: '2px 8px', whiteSpace: 'nowrap' }}>whole</span>
                 {cols.slice(firstIdx).map((i) => numCell(snap.top[i], { hot: false, key: i }))}
               </div>

@@ -11,6 +11,8 @@ import SignupModal, { SavedToast } from './ui/SignupModal.jsx'
 import { SettingsSheet, ProfilePopover } from './ui/Settings.jsx'
 import { GemIcon } from './ui/hudkit.jsx'
 import StationPopup from './ui/StationPopup.jsx'
+import MathPopup from './ui/MathPopup.jsx'
+import { SKINS } from './ui/skins.js'
 import { TOPICS, solve } from './math.js'
 import './index.css'
 
@@ -486,13 +488,33 @@ function StationAudit() {
     </div>
   )
 }
+/*
+ * Dev-only audit harness for the sparkle popup: `/?a11y=math&topic=mult-2x1`
+ * (topics: mult-2x1 · long-mult · add-2x2 · long-div). The real <MathPopup> in the
+ * Snack time skin it always wears in the game; answer on `window.__audit`.
+ */
+function MathAudit() {
+  const t = new URLSearchParams(window.location.search).get('topic')
+  const topic = TOPICS[t] ? t : 'mult-2x1'
+  const [problem] = React.useState(() => TOPICS[topic].generate(1))
+  window.__audit = {
+    answers: [problem.op === '÷' ? { q: Math.floor(problem.a / problem.b), r: problem.a % problem.b } : solve(problem.op, problem.a, problem.b)],
+  }
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
+      <MathPopup problem={problem} skin={SKINS.feedPet} onClose={() => {}} />
+    </div>
+  )
+}
+const MATH_AUDIT =
+  import.meta.env.DEV && new URLSearchParams(window.location.search).get('a11y') === 'math'
 const STATION_AUDIT =
   import.meta.env.DEV && new URLSearchParams(window.location.search).get('a11y') === 'station'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      {STATION_AUDIT ? <StationAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
+      {STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
     </Oops>
     {/* Cookieless, privacy-friendly traffic counting (no personal data, no
       * consent banner needed) — the whole point of moving to a real domain. */}
