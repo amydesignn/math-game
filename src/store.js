@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { SHOP, SPARKLE } from './config'
+import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC } from './config'
 import { localBackend } from './backend'
 
 const KEY = 'math_world_v1'
@@ -61,6 +61,7 @@ function freshState() {
     celebratedLevel: 1,
     levelUps: 0,
     soundOn: true, // the speaker toggle (music + pet sounds)
+    musicTrack: DEFAULT_MUSIC, // which bgm plays — MUSIC_TRACKS id, picked in Settings
     world: [], // placed assets: [{ id, asset, pack, x, z, rot, map }] (Phase 3)
     owned: [], // bought but not yet placed: [{ id, asset, pack }] (Phase 3)
     nextId: 1, // asset id counter (persisted so ids never collide across sessions)
@@ -294,6 +295,10 @@ function migrate(parsed) {
   // keep seenOnboarding=false, so exactly the brand-new player sees it.
   if (parsed.seenOnboarding === undefined) merged.seenOnboarding = true
 
+  // Music picker (2026-10-04): saves from before it get the new default via the
+  // freshState merge above; an id we no longer ship falls back to it too.
+  if (!MUSIC_TRACKS.some((t) => t.id === merged.musicTrack)) merged.musicTrack = DEFAULT_MUSIC
+
   // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
   // While the 15-gem beta cap was live, a correct answer over the cap paid
   // NOTHING — Ivy solved 6 problems, was told she was right, and got zero.
@@ -372,6 +377,12 @@ export function setPos(x, z) {
 
 export function setSoundOn(on) {
   state.soundOn = !!on
+  save()
+}
+
+export function setMusicTrack(id) {
+  if (!MUSIC_TRACKS.some((t) => t.id === id) || state.musicTrack === id) return
+  state.musicTrack = id
   save()
 }
 

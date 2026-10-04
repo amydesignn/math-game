@@ -208,3 +208,16 @@ export const GEMS = {
   perMap: 3, // sparkles per map visit, so finding more means exploring the ring
   collectRadius: 1.0, // walk this close to a sparkle → collected
 }
+
+// ── Background music: two tracks, player's choice (2026-10-04) ──
+// "Island" is the new default (Amy's Suno brief: grounded light-adventure —
+// marimba + nylon guitar + upright bass, no piano/glockenspiel so it never reads
+// as café lo-fi). "Classic" is Ivy's original July pick, kept so anyone who grew
+// used to it can switch back from Settings. `gain` levels the two files to the
+// same perceived loudness: Classic masters at −9 LUFS × 0.38 ≈ −17.4; Island
+// masters at −15.5 LUFS, so 0.80 lands it at the same −17.4.
+export const MUSIC_TRACKS = [
+  { id: 'island', label: 'Island', file: 'bgm-island.mp3', gain: 0.8 },
+  { id: 'classic', label: 'Classic', file: 'bgm.mp3', gain: 0.38 },
+]
+export const DEFAULT_MUSIC = 'island'

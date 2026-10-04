@@ -28,3 +28,6 @@ dist-ssr
 
 # Feedback digests — kids' free text stays LOCAL, never in the public repo
 docs/feedback-digests/
+
+# Raw Suno masters (big WAVs) — the shipped loops live in public/audio
+audio-src/
