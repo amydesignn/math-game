@@ -17,8 +17,8 @@ import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
 import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
-import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
-import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode } from './audio'
+import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
+import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
 import { WORLD, REFRESH } from './config'
@@ -37,6 +37,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   const [view, setView] = useState('door') // 'door' | 'world'
   const [played, setPlayed] = useState(state.played) // New→Guest signal for the hub
   const [soundOn, setSoundState] = useState(state.soundOn) // lifted so hub + world toggles stay in sync
+  const [musicTrack, setMusicState] = useState(state.musicTrack) // Settings music picker
   const [avatar, setAvatarState] = useState(state.avatar) // on-device profile photo (data URL | null)
 
   // Sound toggle shared by the hub header and the in-world speaker. `next`
@@ -46,6 +47,12 @@ export default function App({ cloud = false, justSignedIn = false }) {
     setSoundState(on)
     setSoundOn(on)
     setAudioEnabled(on)
+  }
+
+  function chooseMusic(id) {
+    setMusicState(id)
+    setMusicTrack(id)
+    setMusic(id)
   }
 
   // ── Settings gear + Profile + the Save-Your-Progress signup (2026-08-30) ──
@@ -129,8 +136,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
 
   // ── Phase 2: sound (Ivy's bgm + the cat's meow) ──
   useEffect(() => {
-    setupAudio({ petId: state.pet, on: state.soundOn })
-  }, [state.pet, state.soundOn])
+    setupAudio({ petId: state.pet, on: state.soundOn, track: state.musicTrack })
+  }, [state.pet, state.soundOn, state.musicTrack])
 
   // ── Phase 4: the math loop — sparkles open problems ──
   const [math, setMath] = useState(null) // { sparkleId, problem, skin }
@@ -1030,6 +1037,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
           avatar={avatar}
           sound={soundOn}
           onToggleSound={toggleSound}
+          music={musicTrack}
+          onChooseMusic={chooseMusic}
           onOpenSignup={() => {
             setSettingsOpen(false)
             setSignup('form')

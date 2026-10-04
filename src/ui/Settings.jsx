@@ -26,6 +26,7 @@
 import { useRef, useState } from 'react'
 import { GemIcon } from './hudkit.jsx'
 import { fileToAvatar } from '../avatar.js'
+import { MUSIC_TRACKS } from '../config'
 
 const IRIS = '#4B54DD',
   LILAC700 = '#5B44C4'
@@ -38,6 +39,15 @@ function Speaker() {
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill="currentColor" stroke="none" />
       <path d="M15.5 8.5a5 5 0 0 1 0 7" />
       <path d="M18.8 5.5a9 9 0 0 1 0 13" />
+    </svg>
+  )
+}
+function MusicNote() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...strokeBase} aria-hidden="true">
+      <path d="M9 18V5l12-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
     </svg>
   )
 }
@@ -106,7 +116,7 @@ const rowIcon = { color: LILAC700, display: 'flex' }
  * The shared settings sheet. surface: 'door' | 'game' (anchor + animation only).
  * auth: { signedIn, email, initial }. onOpenSignup opens the shared SignupModal.
  */
-export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggleSound, onOpenSignup, onOpenHowTo, onOpenFeedback, onSignOut, privacyHref = '/privacy.html', onClose }) {
+export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggleSound, music = 'island', onChooseMusic, onOpenSignup, onOpenHowTo, onOpenFeedback, onSignOut, privacyHref = '/privacy.html', onClose }) {
   // The gear lives top-right on BOTH surfaces now (Door header + in-world, by the
   // level bar), so the sheet drops from the top-right uniformly.
   const close = () => onClose?.()
@@ -196,6 +206,30 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                   >
                     <span style={{ position: 'absolute', top: 2, left: 2, width: 24, height: 24, borderRadius: '50%', background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,.2)', transition: 'transform .18s', transform: 'translateX(' + (sound ? '20px' : '0px') + ')' }} />
                   </button>
+                </div>
+                {/* Music picker (2026-10-04): Island = the default, Soft Focus = the
+                    calmer Luxi song. A two-option segmented control — one tap, no submenu. */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 8px', borderRadius: 10 }}>
+                  <span style={rowIcon}>
+                    <MusicNote />
+                  </span>
+                  <span id="music-label" style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#262626' }}>Music</span>
+                  <div role="radiogroup" aria-labelledby="music-label" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: '#F1ECFE' }}>
+                    {MUSIC_TRACKS.map((t) => {
+                      const on = music === t.id
+                      return (
+                        <button
+                          key={t.id}
+                          role="radio"
+                          aria-checked={on}
+                          onClick={() => onChooseMusic?.(t.id)}
+                          style={{ height: 28, padding: '0 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'background .18s, color .18s', background: on ? IRIS : 'transparent', color: on ? '#fff' : LILAC700 }}
+                        >
+                          {t.label}
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               </div>
 

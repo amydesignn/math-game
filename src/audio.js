@@ -1,5 +1,6 @@
 /*
  * audio.js — Phase 2 sound (bgm + ambient pet sound, Ivy's picks).
+ * 2026-10-04: two bgm tracks (config MUSIC_TRACKS), chosen in Settings.
  *
  * Cozy Closet pattern: browsers refuse to autoplay sound, so nothing actually
  * plays until the first pointerdown calls unlockAudio(). The ambient sound
@@ -8,31 +9,34 @@
  * research: calm over busy; nothing interrupts focus).
  */
 
+import { MUSIC_TRACKS, DEFAULT_MUSIC } from './config'
+
 const BASE = import.meta.env.BASE_URL
 
 const PET_SOUNDS = { 'animal-cat': 'meow-cat.mp3' }
 const PET_SOUND_GAP_MS = [45_000, 100_000] // occasional — never spammy
 
 let bgm = null
+let bgmTrack = null // MUSIC_TRACKS id currently loaded into `bgm`
 let petSound = null
 let enabled = true
 let unlocked = false
 let petTimer = null
 let focus = false // math focus time — pet sounds hold (music stays, it soothes)
 
-export function setupAudio({ petId, on }) {
+export function setupAudio({ petId, on, track }) {
   enabled = on
   if (!bgm) {
-    bgm = new Audio(`${BASE}audio/bgm.mp3`)
+    bgm = new Audio()
     bgm.loop = true
-    bgm.volume = 0.38
   }
+  setMusic(track)
   const file = PET_SOUNDS[petId]
   petSound = file ? new Audio(`${BASE}audio/${file}`) : null
   if (petSound) petSound.volume = 0.6
   if (import.meta.env.DEV) {
     window.__meow = () => petSound?.play()
-    window.__audio = () => ({ unlocked, enabled, bgmPaused: bgm?.paused, bgmTime: bgm?.currentTime })
+    window.__audio = () => ({ unlocked, enabled, bgmTrack, bgmSrc: bgm?.src, bgmVolume: bgm?.volume, bgmPaused: bgm?.paused, bgmTime: bgm?.currentTime })
   }
 }
 
@@ -55,6 +59,18 @@ export function setAudioEnabled(on) {
     bgm?.pause()
     clearTimeout(petTimer)
   }
+}
+
+/** The Settings music picker. Swaps the loop in place: if music was playing it
+ *  starts the new track from the top; if sound is off it just preloads it. */
+export function setMusic(id) {
+  const t = MUSIC_TRACKS.find((x) => x.id === id) || MUSIC_TRACKS.find((x) => x.id === DEFAULT_MUSIC)
+  if (!bgm || bgmTrack === t.id) return
+  const wasPlaying = !bgm.paused
+  bgm.src = `${BASE}audio/${t.file}`
+  bgm.volume = t.gain
+  bgmTrack = t.id
+  if (wasPlaying && enabled && unlocked) bgm.play().catch(() => {})
 }
 
 /** Ivy's research: nothing interrupts during a problem. Meow holds in focus mode. */

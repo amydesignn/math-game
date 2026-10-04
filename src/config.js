@@ -208,3 +208,17 @@ export const GEMS = {
   perMap: 3, // sparkles per map visit, so finding more means exploring the ring
   collectRadius: 1.0, // walk this close to a sparkle → collected
 }
+
+// ── Background music: two tracks, player's choice (2026-10-04) ──
+// "Island" is the new default (Amy's Suno brief: grounded light-adventure —
+// marimba + nylon guitar + upright bass, no piano/glockenspiel so it never reads
+// as café lo-fi). "Soft Focus" is the calmer Luxi song from the award video —
+// the Suno Pro (licensed) render. Both are ours under the Pro plan's commercial
+// rights; the July free-download bgm.mp3 was retired (Ivy's call — she never
+// loved it). `gain` levels the files to the same perceived loudness, ≈ −17.4
+// LUFS: Island masters at −15.5 (×0.80), Soft Focus at −14.9 (×0.75).
+export const MUSIC_TRACKS = [
+  { id: 'island', label: 'Island', file: 'bgm-island.mp3', gain: 0.8 },
+  { id: 'soft-focus', label: 'Soft Focus', file: 'bgm-soft-focus.mp3', gain: 0.75 },
+]
+export const DEFAULT_MUSIC = 'island'
