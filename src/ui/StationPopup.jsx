@@ -153,7 +153,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
               <div style={{ fontSize: 44, lineHeight: 1, animation: 'floaty 3s ease-in-out infinite' }}>{skin.marker}</div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: T.textPrimary }}>{skin.questAsk}</div>
-                <div style={{ fontSize: 'var(--text-base)', color: T.textSecondary, marginTop: 4 }}>{total} {skin.stepPlural} to go — finish them all for a bonus gem!</div>
+                <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4 }}>{total} {skin.stepPlural} to go — finish them all for a bonus gem!</div>
               </div>
               <QuestSlots skin={skin} total={total} done={0} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 'var(--text-sm)', fontWeight: 500, color: T.textSecondary,
@@ -195,7 +195,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
               <QuestSlots skin={skin} total={total} done={step + 1} />
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>{skin.stepWin(step + 1, total)}</div>
-                <div style={{ fontSize: 'var(--text-base)', color: T.textSecondary, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+                <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
                   +{problem.gems || 1} <Gem size={17} /> · {total - (step + 1)} {total - (step + 1) > 1 ? skin.stepPlural : skin.stepNoun} to go
                 </div>
               </div>
@@ -214,7 +214,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                 <>
                   <div style={{ textAlign: 'center', margin: '14px 0' }}>
                     <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
-                    <div style={{ fontSize: 'var(--text-base)', color: T.textSecondary, marginTop: 4 }}>No worries — the quest waits. Follow the steps, then try again.</div>
+                    <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4 }}>No worries — the quest waits. Follow the steps, then try again.</div>
                   </div>
                   <WorkedExample problem={problem} onBack={backToAsk} />
                 </>
@@ -235,7 +235,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>Quest complete! 🎉</div>
-                <div style={{ fontSize: 'var(--text-base)', color: T.textSecondary, marginTop: 4 }}>{skin.questWin}</div>
+                <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4 }}>{skin.questWin}</div>
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10 }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', fontWeight: 500, color: T.textPrimary,
                     background: 'var(--color-background-subtle)', border: `1px solid ${T.line}`, borderRadius: 12, padding: '7px 13px' }}>+{earned} <Gem size={16} /> earned</span>
