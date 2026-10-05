@@ -113,7 +113,10 @@ export default function Station({ x, z, skin, resume = 0, farewell = false, onTa
 
       {/* the floating marker + quest label (pointer-transparent so the hitbox wins) */}
       {!farewell && (
-        <Html center distanceFactor={9} position={[0, 2.35, 0]} style={{ pointerEvents: 'none', userSelect: 'none' }} zIndexRange={[12, 0]}>
+        <Html center position={[0, 2.35, 0]} style={{ pointerEvents: 'none', userSelect: 'none' }} zIndexRange={[0, 0]}>
+          {/* A nameplate: NO distanceFactor, so marker + label keep one size on screen at
+              every zoom — the label is a true 16px (Amy 2026-10-05: world scaling shrank it
+              to ~6–9px zoomed out). zIndex 0 keeps it UNDER the HUD (Level pill, minimap). */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
             <div style={{ fontSize: 40, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(40,30,70,.4))', animation: 'markerOrbit 2.6s ease-in-out infinite' }}>{skin.marker}</div>
             <div style={{
