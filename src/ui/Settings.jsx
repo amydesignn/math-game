@@ -28,13 +28,15 @@ import { GemIcon } from './hudkit.jsx'
 import { fileToAvatar } from '../avatar.js'
 import { MUSIC_TRACKS } from '../config'
 
-// Datum tokens by name (2026-10-04 binding + WCAG AA pass, Amy's calls):
-// text = neutral-800 · secondary = neutral-600 (subtitles, section labels) · meta = neutral-500 · links/icons = Lilac 800
+// Datum tokens by name (2026-10-04 binding + WCAG AA pass, Amy's calls; text tiers by
+// name since 2026-10-05): text = primary · secondary (subtitles, section labels) ·
+// tertiary (Luxi Math, ✕) · resting control = interactive-default · icons = Lilac 800
 const IRIS = 'var(--brand-iris-600)',
   LILAC800 = 'var(--brand-lilac-800)',
-  TEXT = 'var(--neutral-800)',
-  TEXT2 = 'var(--neutral-600)',
-  META = 'var(--neutral-500)',
+  TEXT = 'var(--color-text-primary)',
+  TEXT2 = 'var(--color-text-secondary)',
+  META = 'var(--color-text-tertiary)',
+  CONTROL = 'var(--color-border-interactive-default)',
   WHITE = 'var(--brand-neutral-00)',
   LINE = 'var(--brand-lilac-100)'
 
@@ -212,7 +214,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                     aria-checked={sound}
                     aria-label="Sound"
                     onClick={() => onToggleSound?.(!sound)}
-                    style={{ width: 48, height: 28, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', padding: 0, transition: 'background .18s', background: sound ? IRIS : META }}
+                    style={{ width: 48, height: 28, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', padding: 0, transition: 'background .18s', background: sound ? IRIS : CONTROL }}
                   >
                     {/* OFF = unchecked, not disabled, so it holds 3:1 (WCAG 1.4.11) — Amy 2026-10-05,
                         option A: solid neutral-500 track (4.74 vs the sheet), white knob on it (4.74). */}

@@ -60,6 +60,19 @@
 
   --color-text-brand: #3D43BE; /* brand-iris-700 — Datum styling-v0.19 (was iris-600) */
 
+  /* Datum COMPONENT tokens in use — Button ghost (Settings Sign out) + link (Privacy
+     Policy), copied verbatim from datum-tokens.css (styling-v0.20). */
+  --color-component-button-ghost-text-default: #4B54DD; /* brand-iris-600 */
+  --color-component-button-ghost-background-hover: #EDE7FC; /* brand-lilac-100 */
+  --color-component-button-ghost-background-pressed: #C9CBF5; /* brand-iris-200 */
+  --color-component-button-ghost-text-pressed: #333A98; /* brand-iris-800 */
+  --color-component-button-link-text-default: #4B54DD; /* brand-iris-600 */
+  --color-component-button-link-text-hover: #3D43BE; /* brand-iris-700 */
+  --color-component-button-link-background-hover: #EDE7FC; /* brand-lilac-100 */
+  --color-component-button-link-text-pressed: #333A98; /* brand-iris-800 */
+  --color-component-button-link-background-pressed: #DDD1F7; /* brand-lilac-200 */
+  --color-component-button-link-focus-ring: #333A98; /* brand-iris-800 */
+
   /* Datum TYPE tokens in use — size + line-height ride together (globals.css
      overrides Tailwind's line-heights to 1.5 up to xl). Weights 400/500/700 only. */
   --text-xs: 0.75rem;   --text-xs--line-height: 1.5;   /* 12px */
@@ -328,13 +341,13 @@ canvas { touch-action: none; display: block; }
    ghost (Sign out): Iris 600 text · hover Lilac 100 · pressed Iris 200 + Iris 800 text · press scale .97.
    link (Privacy Policy): underlined Iris 600 · hover Iris 700 on Lilac 100 · pressed Iris 800 on Lilac 200 ·
    colour only, never scales (text under the finger shouldn't shrink). Hover/press in CSS — inline beats :hover. */
-.luxiSet-ghost { background: transparent; color: var(--brand-iris-600); transition: scale .1s cubic-bezier(.23,1,.32,1), color .15s, background-color .15s; }
-.luxiSet-ghost:hover { background: var(--brand-lilac-100); }
-.luxiSet-ghost:active { background: var(--brand-iris-200); color: var(--brand-iris-800); scale: .97; }
-.luxiSet-link { color: var(--brand-iris-600); text-decoration: underline; text-underline-offset: 4px; transition: color .15s, background-color .15s; }
-.luxiSet-link:hover { color: var(--brand-iris-700); background: var(--brand-lilac-100); }
-.luxiSet-link:active { color: var(--brand-iris-800); background: var(--brand-lilac-200); }
-.luxiSet-link:focus-visible { outline: 1px solid var(--brand-iris-800); outline-offset: 2px; }
+.luxiSet-ghost { background: transparent; color: var(--color-component-button-ghost-text-default); transition: scale .1s cubic-bezier(.23,1,.32,1), color .15s, background-color .15s; }
+.luxiSet-ghost:hover { background: var(--color-component-button-ghost-background-hover); }
+.luxiSet-ghost:active { background: var(--color-component-button-ghost-background-pressed); color: var(--color-component-button-ghost-text-pressed); scale: .97; }
+.luxiSet-link { color: var(--color-component-button-link-text-default); text-decoration: underline; text-underline-offset: 4px; transition: color .15s, background-color .15s; }
+.luxiSet-link:hover { color: var(--color-component-button-link-text-hover); background: var(--color-component-button-link-background-hover); }
+.luxiSet-link:active { color: var(--color-component-button-link-text-pressed); background: var(--color-component-button-link-background-pressed); }
+.luxiSet-link:focus-visible { outline: 1px solid var(--color-component-button-link-focus-ring); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .luxiSet-ghost:active { scale: none; } }
 
 /* House focus ring (contrast audit, 2026-10-04 — Amy's interaction-states rule):
