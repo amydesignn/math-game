@@ -61,7 +61,7 @@ const TYPE = {
   xl: { fontSize: 'var(--text-xl)', lineHeight: 'var(--text-xl--line-height)' },
 }
 const W = { normal: 'var(--font-weight-normal)', medium: 'var(--font-weight-medium)', bold: 'var(--font-weight-bold)' }
-const heading = { ...TYPE.xl, fontWeight: W.bold, color: 'var(--neutral-800)' } // one heading style across the card
+const heading = { ...TYPE.xl, fontWeight: W.bold, color: 'var(--color-text-branding)' } // one branded heading style across every popup state (Amy)
 
 const primaryBtn = {
   width: '100%',
@@ -75,7 +75,7 @@ const primaryBtn = {
   boxShadow: '0 4px 0 ' + IRISD,
   cursor: 'pointer',
 }
-const fieldLabel = { ...TYPE.sm, fontWeight: W.medium, color: 'var(--brand-iris-700)' } // the question leads (Amy)
+const fieldLabel = { ...TYPE.base, fontWeight: W.medium, color: 'var(--color-text-branding)' } // the question leads (Amy)
 const optionalTag = { fontWeight: W.medium, color: 'var(--color-text-tertiary)' } // the hint steps back
 
 /**
@@ -129,7 +129,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
         {/* header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 24px', background: 'linear-gradient(180deg, var(--brand-lilac-50), var(--brand-neutral-00))', borderBottom: '1px solid var(--brand-lilac-100)' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>💬</span>
-          <span id="luxiFb-title" style={{ ...TYPE.xs, fontWeight: W.bold, letterSpacing: 'var(--tracking-widest)', textTransform: 'uppercase', color: 'var(--brand-iris-700)' }}>Feedback</span>
+          <span id="luxiFb-title" style={{ ...TYPE.xs, fontWeight: W.bold, letterSpacing: 'var(--tracking-widest)', textTransform: 'uppercase', color: 'var(--color-text-branding)' }}>Feedback</span>
           <div style={{ flex: 1 }} />
           <button aria-label="Close" onClick={close} className="luxiFb-close" style={{ border: 'none', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', color: 'var(--neutral-500)', fontSize: 16, lineHeight: 1 }}>
             ✕
@@ -140,7 +140,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
         {phase === 'compose' && (
           <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center', textAlign: 'center' }}>
-              <div style={{ ...heading, color: 'var(--brand-iris-700)', textWrap: 'pretty' }}>How many stars for Luxi?</div>
+              <div style={{ ...heading, textWrap: 'pretty' }}>How many stars for Luxi?</div>
               <div style={{ display: 'flex', gap: 4, marginTop: 2 }}>
                 {[1, 2, 3, 4, 5].map((n) => {
                   const on = n <= shown
@@ -162,7 +162,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                   )
                 })}
               </div>
-              <div style={{ ...TYPE.sm, fontWeight: W.medium, color: shown > 0 ? 'var(--brand-iris-700)' : 'var(--brand-iris-500)', minHeight: 20, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
+              <div style={{ ...TYPE.base, fontWeight: W.medium, color: shown > 0 ? 'var(--color-text-branding)' : 'var(--brand-iris-500)', minHeight: 20, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
             </div>
 
             <div style={{ height: 1, background: 'var(--brand-lilac-100)' }} />
@@ -171,20 +171,20 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
               <div style={fieldLabel}>
                 What do you love? <span style={optionalTag}>(optional)</span>
               </div>
-              <textarea placeholder="My favorite thing is…" value={liked} onChange={(e) => setLiked(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.sm, fontWeight: W.normal, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
-              <div style={{ textAlign: 'right', ...TYPE.xs, fontWeight: W.medium, color: likedLeft <= 40 ? 'var(--amber-700)' : 'var(--color-text-tertiary)' }}>{likedLeft} characters left</div>
+              <textarea placeholder="My favorite thing is…" value={liked} onChange={(e) => setLiked(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.base, fontWeight: W.normal, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
+              <div style={{ textAlign: 'right', ...TYPE.sm, fontWeight: W.medium, color: likedLeft <= 40 ? 'var(--amber-700)' : 'var(--color-text-tertiary)' }}>{likedLeft} characters left</div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={fieldLabel}>
                 What could be better? <span style={optionalTag}>(optional)</span>
               </div>
-              <textarea placeholder="I wish Luxi…" value={improve} onChange={(e) => setImprove(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.sm, fontWeight: W.normal, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
-              <div style={{ textAlign: 'right', ...TYPE.xs, fontWeight: W.medium, color: improveLeft <= 40 ? 'var(--amber-700)' : 'var(--color-text-tertiary)' }}>{improveLeft} characters left</div>
+              <textarea placeholder="I wish Luxi…" value={improve} onChange={(e) => setImprove(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.base, fontWeight: W.normal, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
+              <div style={{ textAlign: 'right', ...TYPE.sm, fontWeight: W.medium, color: improveLeft <= 40 ? 'var(--amber-700)' : 'var(--color-text-tertiary)' }}>{improveLeft} characters left</div>
             </div>
 
             {/* no-PII guardrail (LOCKED copy — baked into the contract) */}
-            <div style={{ ...TYPE.sm, fontWeight: W.normal, color: 'var(--brand-iris-700)', textAlign: 'center', textWrap: 'pretty' }}>💎 No personal info please, just ideas. We only note which world you're in — never who you are.</div>
+            <div style={{ ...TYPE.sm, fontWeight: W.normal, color: 'var(--color-text-branding)', textAlign: 'center', textWrap: 'pretty' }}>💎 No personal info please, just ideas. We only note which world you're in — never who you are.</div>
 
             <button
               onClick={submit}
@@ -215,7 +215,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
             <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(160deg, var(--brand-lilac-100), var(--brand-lilac-200))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, animation: 'fbPop .5s cubic-bezier(.2,.9,.3,1.3) both' }}>💎</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={heading}>Thanks for the idea!</div>
-              <div style={{ ...TYPE.base, fontWeight: W.normal, color: 'var(--neutral-500)', textWrap: 'pretty' }}>Your feedback goes straight to the team building Luxi. Keep exploring! ✨</div>
+              <div style={{ ...TYPE.base, fontWeight: W.normal, color: 'var(--color-text-secondary)', textWrap: 'pretty' }}>Your feedback goes straight to the team building Luxi. Keep exploring! ✨</div>
             </div>
             <button onClick={close} className="luxiFb-press" style={{ ...primaryBtn, marginTop: 4 }}>
               Back to the game
@@ -229,13 +229,13 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
             <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--orange-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30 }}>🌙</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={heading}>We'll try again in a bit</div>
-              <div style={{ ...TYPE.base, fontWeight: W.normal, color: 'var(--neutral-500)', textWrap: 'pretty' }}>Couldn't send just now — your idea is safe and nothing's lost. You can keep playing.</div>
+              <div style={{ ...TYPE.base, fontWeight: W.normal, color: 'var(--color-text-secondary)', textWrap: 'pretty' }}>Couldn't send just now — your idea is safe and nothing's lost. You can keep playing.</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', marginTop: 4 }}>
               <button onClick={submit} className="luxiFb-press" style={primaryBtn}>
                 Try again
               </button>
-              <button onClick={close} className="luxiFb-notnow" style={{ width: '100%', height: 44, border: 'none', background: 'transparent', color: 'var(--neutral-500)', ...TYPE.base, fontWeight: W.medium, cursor: 'pointer', borderRadius: 8 }}>
+              <button onClick={close} className="luxiFb-notnow" style={{ width: '100%', height: 44, border: 'none', background: 'transparent', color: 'var(--color-text-secondary)', ...TYPE.base, fontWeight: W.medium, cursor: 'pointer', borderRadius: 8 }}>
                 Not now
               </button>
             </div>
