@@ -2,18 +2,74 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── House tokens (subset of oscar-styling-reference; iris/lilac branding) ── */
+/* ── House tokens ──
+ * Brand Iris + Brand Lilac = Datum primitives, copied VERBATIM from
+ * nathan-mcp-codebase-01 src/app/globals.css (styling-v0.18). Datum is the
+ * source of truth: change a value there first, then re-copy — never edit here.
+ * Roles (Amy): Iris = actions, text, anything that must pass WCAG.
+ *              Lilac = supporting colour, soft graphics, contrast-free detail. */
 :root {
-  --brand-iris-50: #eeeffe;
-  --brand-iris-100: #e0e2fd;
-  --brand-iris-500: #6169e8;
-  --brand-iris-600: #4b54dd;
-  --brand-iris-700: #3d43c4;
-  --brand-iris-900: #2b2f7a;
-  --brand-lilac-100: #ece6fa;
-  --brand-lilac-300: #cdbdf0;
-  --brand-lilac-500: #9b84e0;
-  --brand-lilac-900: #4a3d7a;
+  --brand-iris-50:  #F1F1FD;
+  --brand-iris-100: #E4E5FA;
+  --brand-iris-200: #C9CBF5;
+  --brand-iris-300: #A9ADEE;
+  --brand-iris-400: #8288E6;
+  --brand-iris-500: #6169E0;
+  --brand-iris-600: #4B54DD;
+  --brand-iris-700: #3D43BE;
+  --brand-iris-800: #333A98;
+  --brand-iris-900: #2C3379;
+  --brand-iris-950: #1D2050;
+
+  --brand-lilac-50:  #F6F2FF;
+  --brand-lilac-100: #EDE7FC;
+  --brand-lilac-200: #DDD1F7;
+  --brand-lilac-300: #C6B4F0;
+  --brand-lilac-400: #B29BEA;
+  --brand-lilac-500: #9B84E0;
+  --brand-lilac-600: #8570D2;
+  --brand-lilac-700: #6E5BC0;
+  --brand-lilac-800: #5B4B9E;
+  --brand-lilac-900: #473B7C;
+  --brand-lilac-950: #2F2653;
+
+  /* Other Datum steps in use — subset, copied verbatim (oklch as Datum writes them) */
+  --brand-neutral-00: #FFFFFF;
+  --neutral-500: oklch(55.6% 0 0);
+  --neutral-800: oklch(26.9% 0 0);
+  --orange-50:   oklch(98% 0.016 73.684);
+  --red-500:     oklch(63.7% 0.237 25.331);
+  --orange-600:  oklch(64.6% 0.222 41.116);
+  --amber-600:   oklch(66.6% 0.179 58.318);
+  --amber-700:   oklch(55.5% 0.163 48.998);
+
+  /* Datum SEMANTIC tokens in use — subset, copied verbatim from
+     nathan-mcp-codebase-01 src/styles/datum-tokens.css (styling-v0.18).
+     Resting controls = neutral, focus = Iris (Amy, 2026-10-04). */
+  --color-border-interactive-default: #737373; /* neutral-500 */
+  --color-border-interactive-hover: #525252; /* neutral-600 */
+  --color-border-interactive-focus: #4B54DD; /* brand-iris-600 */
+  --color-background-interactive-disabled: #F5F5F5; /* neutral-100 */
+  --color-border-disabled: #E5E5E5; /* neutral-200 */
+  --color-text-secondary: #525252; /* neutral-600 */
+  --color-text-placeholder: #737373; /* neutral-500 */
+  --color-text-disabled: #A1A1A1; /* neutral-400 */
+  --color-text-tertiary: #737373; /* neutral-500 */
+
+  --color-text-brand: #3D43BE; /* brand-iris-700 — Datum styling-v0.19 (was iris-600) */
+
+  /* Datum TYPE tokens in use — size + line-height ride together (globals.css
+     overrides Tailwind's line-heights to 1.5 up to xl). Weights 400/500/700 only. */
+  --text-xs: 0.75rem;   --text-xs--line-height: 1.5;   /* 12px */
+  --text-sm: 0.875rem;  --text-sm--line-height: 1.5;   /* 14px */
+  --text-base: 1rem;    --text-base--line-height: 1.5; /* 16px */
+  --text-xl: 1.25rem;   --text-xl--line-height: 1.5;   /* 20px */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --tracking-widest: 0.1em;
+
+  /* house-only (not Datum) */
   --lilac-50: #f6f4fd;
   /* reward accent — same gold family as the Planner */
   --star-gold: #f5b623;
@@ -255,17 +311,18 @@ canvas { touch-action: none; display: block; }
    (same 4px press as .luxiOb-cta); Oscar's comp had 3px/1px pre-snap. */
 @keyframes fbPopIn { 0% { transform: scale(.94) translateY(16px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 @keyframes fbPop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
-.luxiFb-close { background: rgba(94,75,158,.08); transition: background .15s; }
-.luxiFb-close:hover { background: rgba(94,75,158,.16); }
+.luxiFb-close { background: var(--brand-lilac-100); transition: background .15s; }
+.luxiFb-close:hover { background: var(--brand-lilac-200); }
 .luxiFb-star:hover { transform: scale(1.22) rotate(-6deg) !important; } /* !important: the on/off scale is inline */
-.luxiFb-ta { border: 1.5px solid #DDD1F7; outline: none; transition: border-color .15s; }
-.luxiFb-ta:focus { border-color: #4B54DD; }
+.luxiFb-ta { border: 1.5px solid var(--color-border-interactive-default); outline: none; transition: border-color .15s; }
+.luxiFb-ta:hover { border-color: var(--color-border-interactive-hover); }
+.luxiFb-ta:focus { border-color: var(--color-border-interactive-focus); } /* after :hover so focus wins */
 .luxiFb-press { transition: transform .07s, box-shadow .07s, background .15s; }
-.luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 #3D43BE !important; } /* !important: base shadow is inline */
+.luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
 .luxiFb-notnow { transition: background .15s; }
-.luxiFb-notnow:hover { background: #F6F2FF; }
+.luxiFb-notnow:hover { background: var(--brand-lilac-50); }
 
 /* House focus ring (contrast audit, 2026-10-04 — Amy's interaction-states rule):
    1px in Iris 700, 2px gap so it reads on Iris buttons too (WCAG 1.4.11).
    Scoped to the shared modal shell; the app-wide pass comes with later audits. */
-[role="dialog"] button:focus-visible { outline: 1px solid #3D43BE; outline-offset: 2px; }
+[role="dialog"] button:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
