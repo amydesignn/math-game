@@ -36,6 +36,7 @@
   /* Other Datum steps in use — subset, copied verbatim (oklch as Datum writes them) */
   --brand-neutral-00: #FFFFFF;
   --neutral-500: oklch(55.6% 0 0);
+  --neutral-600: oklch(43.9% 0 0);
   --neutral-800: oklch(26.9% 0 0);
   --orange-50:   oklch(98% 0.016 73.684);
   --red-500:     oklch(63.7% 0.237 25.331);

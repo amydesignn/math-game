@@ -28,8 +28,15 @@ import { GemIcon } from './hudkit.jsx'
 import { fileToAvatar } from '../avatar.js'
 import { MUSIC_TRACKS } from '../config'
 
-const IRIS = '#4B54DD',
-  LILAC800 = '#5B4B9E' // Brand Lilac 800 (was off-brand #5B44C4, mislabelled 700)
+// Datum tokens by name (2026-10-04 binding + WCAG AA pass, Amy's calls):
+// text = neutral-800 · secondary = neutral-600 · meta = neutral-500 · links/icons = Lilac 800
+const IRIS = 'var(--brand-iris-600)',
+  LILAC800 = 'var(--brand-lilac-800)',
+  TEXT = 'var(--neutral-800)',
+  TEXT2 = 'var(--neutral-600)',
+  META = 'var(--neutral-500)',
+  WHITE = 'var(--brand-neutral-00)',
+  LINE = 'var(--brand-lilac-100)'
 
 // ── Oscar's line-icons (kept for the sheet's internal rows) ────────────────
 const strokeBase = { fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }
@@ -70,7 +77,7 @@ function MessageBubble() {
 }
 function ChevronR() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A7FB8" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-lilac-700)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M9 6l6 6-6 6" />
     </svg>
   )
@@ -97,16 +104,16 @@ const closeBtn = {
   height: 36,
   borderRadius: '50%',
   border: 'none',
-  background: 'rgba(94,75,158,.08)',
+  background: LINE,
   cursor: 'pointer',
-  color: '#6e6e6e',
-  fontSize: 15,
+  color: META,
+  fontSize: 16,
 }
 const sectionLabel = {
   fontSize: 11,
-  fontWeight: 800,
+  fontWeight: 500,
   letterSpacing: '.08em',
-  color: '#9a92ac',
+  color: META,
   textTransform: 'uppercase',
   padding: '0 4px 8px',
 }
@@ -124,12 +131,12 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
   return (
     <>
       <div style={scrimStyle} onClick={close} />
-      <div style={{ position: 'fixed', top: 72, right: 16, width: 320, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <div role="dialog" aria-label="Settings" style={{ position: 'fixed', top: 72, right: 16, width: 320, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
         <div
           style={{
-            background: '#fff',
+            background: WHITE,
             borderRadius: 20,
-            border: '1px solid #ECE7F5',
+            border: '1px solid ' + LINE,
             boxShadow: '0 24px 60px rgba(50,38,80,.30), 0 4px 16px rgba(50,38,80,.12)',
             overflow: 'hidden',
             animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both',
@@ -137,7 +144,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
         >
           <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 12px' }}>
-                <span style={{ fontSize: 16, fontWeight: 800, color: '#262626' }}>Settings</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: TEXT }}>Settings</span>
                 <button aria-label="Close" onClick={close} style={closeBtn}>
                   ✕
                 </button>
@@ -156,40 +163,40 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                       display: 'flex',
                       alignItems: 'center',
                       gap: 12,
-                      background: '#F6F2FF',
-                      border: '1.5px solid #EDE7FC',
+                      background: 'var(--brand-lilac-50)',
+                      border: '1.5px solid ' + LINE,
                       borderRadius: 12,
                       padding: '12px 16px',
                       cursor: 'pointer',
                       textAlign: 'left',
                     }}
                   >
-                    <span style={{ width: 36, height: 36, borderRadius: 10, background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ width: 36, height: 36, borderRadius: 10, background: WHITE, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <GemIcon size={20} />
                     </span>
                     <span style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ display: 'block', fontSize: 15, fontWeight: 700, color: '#262626' }}>Save your progress</span>
-                      <span style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#6e6e6e' }}>Sign up or sign in</span>
+                      <span style={{ display: 'block', fontSize: 16, fontWeight: 500, color: TEXT }}>Save your progress</span>
+                      <span style={{ display: 'block', fontSize: 14, fontWeight: 400, color: TEXT2 }}>Sign up or sign in</span>
                     </span>
                     <ChevronR />
                   </button>
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: '#F6F2FF', border: '1.5px solid #EDE7FC', borderRadius: 12, padding: '12px 16px' }}>
-                    <span style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(160deg, #C6B4F0, #9B84E0)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 15, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--brand-lilac-50)', border: '1.5px solid ' + LINE, borderRadius: 12, padding: '12px 16px' }}>
+                    <span style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(160deg, var(--brand-lilac-700), var(--brand-lilac-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: WHITE, fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
                       {avatar ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : auth.initial || '★'}
                     </span>
                     <span style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ display: 'block', fontSize: 15, fontWeight: 700, color: '#262626' }}>Signed in</span>
-                      <span style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#6e6e6e', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{auth.email || ''}</span>
+                      <span style={{ display: 'block', fontSize: 16, fontWeight: 500, color: TEXT }}>Signed in</span>
+                      <span style={{ display: 'block', fontSize: 14, fontWeight: 400, color: TEXT2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{auth.email || ''}</span>
                     </span>
-                    <button onClick={() => onSignOut?.()} style={{ border: 'none', background: 'transparent', color: IRIS, fontWeight: 700, fontSize: 14, cursor: 'pointer', padding: 8, borderRadius: 8, whiteSpace: 'nowrap' }}>
+                    <button onClick={() => onSignOut?.()} style={{ border: 'none', background: 'transparent', color: IRIS, fontWeight: 500, fontSize: 14, cursor: 'pointer', padding: 8, borderRadius: 8, whiteSpace: 'nowrap' }}>
                       Sign out
                     </button>
                   </div>
                 )}
               </div>
 
-              <div style={{ height: 1, background: '#F1ECF8', margin: '0 16px' }} />
+              <div style={{ height: 1, background: LINE, margin: '0 16px' }} />
 
               {/* PREFERENCES */}
               <div style={{ padding: '12px 16px 4px' }}>
@@ -198,13 +205,18 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                   <span style={rowIcon}>
                     <Speaker />
                   </span>
-                  <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#262626' }}>Sound</span>
+                  <span style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>Sound</span>
                   <button
-                    aria-label="Toggle sound"
+                    role="switch"
+                    aria-checked={sound}
+                    aria-label="Sound"
                     onClick={() => onToggleSound?.(!sound)}
-                    style={{ width: 48, height: 28, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', transition: 'background .18s', background: sound ? IRIS : '#D8D2E4' }}
+                    style={{ width: 48, height: 28, borderRadius: 999, boxSizing: 'border-box', border: '1.5px solid ' + (sound ? IRIS : META), cursor: 'pointer', position: 'relative', padding: 0, transition: 'background .18s, border-color .18s', background: sound ? IRIS : LINE }}
                   >
-                    <span style={{ position: 'absolute', top: 2, left: 2, width: 24, height: 24, borderRadius: '50%', background: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,.2)', transition: 'transform .18s', transform: 'translateX(' + (sound ? '20px' : '0px') + ')' }} />
+                    {/* OFF = Checkbox's unchecked rule (Amy 2026-10-04, option B): outline + knob in
+                        neutral-500, both ≥3:1 (WCAG 1.4.11) — OFF is unchecked, not disabled.
+                        ON = filled Iris, the knob grows to full white. Box is 45×25 inside the border. */}
+                    <span style={{ position: 'absolute', top: sound ? 0.5 : 4.5, left: sound ? 20.5 : 4.5, width: sound ? 24 : 16, height: sound ? 24 : 16, borderRadius: '50%', background: sound ? WHITE : META, boxShadow: sound ? '0 2px 5px rgba(0,0,0,.2)' : 'none', transition: 'all .18s' }} />
                   </button>
                 </div>
                 {/* Music picker (2026-10-04): Island = the default, Soft Focus = the
@@ -213,8 +225,8 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                   <span style={rowIcon}>
                     <MusicNote />
                   </span>
-                  <span id="music-label" style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#262626' }}>Music</span>
-                  <div role="radiogroup" aria-labelledby="music-label" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: '#EDE7FC' }}>
+                  <span id="music-label" style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>Music</span>
+                  <div role="radiogroup" aria-labelledby="music-label" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: LINE }}>
                     {MUSIC_TRACKS.map((t) => {
                       const on = music === t.id
                       return (
@@ -223,7 +235,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                           role="radio"
                           aria-checked={on}
                           onClick={() => onChooseMusic?.(t.id)}
-                          style={{ height: 28, padding: '0 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 700, transition: 'background .18s, color .18s', background: on ? IRIS : 'transparent', color: on ? '#fff' : LILAC800 }}
+                          style={{ height: 28, padding: '0 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, transition: 'background .18s, color .18s', background: on ? IRIS : 'transparent', color: on ? WHITE : LILAC800 }}
                         >
                           {t.label}
                         </button>
@@ -233,7 +245,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                 </div>
               </div>
 
-              <div style={{ height: 1, background: '#F1ECF8', margin: '8px 16px 0' }} />
+              <div style={{ height: 1, background: LINE, margin: '8px 16px 0' }} />
 
               {/* HELP — Send Feedback went LIVE 2026-09-19 (Oscar's Feedback Flow
                   lifted; the row returns exactly where the SOON row once sat).
@@ -247,7 +259,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                   <span style={rowIcon}>
                     <HelpCircle />
                   </span>
-                  <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#262626' }}>How to Play</span>
+                  <span style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>How to Play</span>
                   <ChevronR />
                 </button>
                 <button
@@ -260,16 +272,16 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                   <span style={rowIcon}>
                     <MessageBubble />
                   </span>
-                  <span style={{ flex: 1, fontSize: 15, fontWeight: 600, color: '#262626' }}>Send Feedback</span>
+                  <span style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>Send Feedback</span>
                   <ChevronR />
                 </button>
               </div>
 
-              <div style={{ padding: '12px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid #F1ECF8' }}>
-                <a href={privacyHref} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, fontWeight: 600, color: '#8A7FB8' }}>
+              <div style={{ padding: '12px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid ' + LINE }}>
+                <a href={privacyHref} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 500, color: LILAC800 }}>
                   Privacy Policy
                 </a>
-                <span style={{ fontSize: 12, fontWeight: 500, color: '#c3bcd0', whiteSpace: 'nowrap' }}>Luxi Math</span>
+                <span style={{ fontSize: 12, fontWeight: 500, color: META, whiteSpace: 'nowrap' }}>Luxi Math</span>
               </div>
             </div>
         </div>
@@ -321,7 +333,7 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
     <>
       <div style={scrimStyle} onClick={close} />
       <div style={{ position: 'fixed', top: 72, right: 60, width: 288, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
-        <div style={{ background: '#fff', borderRadius: 20, border: '1px solid #ECE7F5', boxShadow: '0 24px 60px rgba(50,38,80,.30)', overflow: 'hidden', animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both' }}>
+        <div style={{ background: '#fff', borderRadius: 20, border: '1px solid ' + LINE, boxShadow: '0 24px 60px rgba(50,38,80,.30)', overflow: 'hidden', animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 12px' }}>
             <span style={{ fontSize: 16, fontWeight: 800, color: '#262626' }}>Profile</span>
             <button aria-label="Close" onClick={close} style={closeBtn}>
@@ -333,7 +345,7 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
               {avatar ? (
                 <img src={avatar} alt="Your avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               ) : auth.signedIn ? (
-                <span style={{ width: '100%', height: '100%', background: 'linear-gradient(160deg, #C6B4F0, #9B84E0)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 38 }}>
+                <span style={{ width: '100%', height: '100%', background: 'linear-gradient(160deg, var(--brand-lilac-700), var(--brand-lilac-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 38 }}>
                   {auth.initial || '★'}
                 </span>
               ) : (
@@ -348,7 +360,7 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
             <button
               onClick={pick}
               disabled={busy}
-              style={{ width: '100%', height: 44, borderRadius: 12, border: '1.5px solid #DDD1F7', background: '#F6F2FF', color: LILAC800, fontWeight: 700, fontSize: 15, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              style={{ width: '100%', height: 44, borderRadius: 12, border: '1.5px solid #DDD1F7', background: 'var(--brand-lilac-50)', color: LILAC800, fontWeight: 700, fontSize: 15, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
               <UploadIcon />
               {busy ? 'Adding…' : avatar ? 'Change photo' : 'Upload a photo'}

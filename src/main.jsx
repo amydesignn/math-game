@@ -391,10 +391,12 @@ const SIGNUP_DEMO =
  * DEV-guarded → stripped from prod.
  */
 function SettingsDemo() {
+  // `&open=settings&account&soundoff` mount it pre-opened for the contrast audit (a11y/settings-sheet.audit.mjs)
+  const q = new URLSearchParams(window.location.search)
   const [surface, setSurface] = React.useState('door')
-  const [signedIn, setSignedIn] = React.useState(false)
-  const [sound, setSound] = React.useState(true)
-  const [view, setView] = React.useState('none') // none | settings | profile
+  const [signedIn, setSignedIn] = React.useState(q.has('account'))
+  const [sound, setSound] = React.useState(!q.has('soundoff'))
+  const [view, setView] = React.useState(q.get('open') || 'none') // none | settings | profile
   const [avatar, setAvatar] = React.useState(null) // exercises the real on-device photo path
   const auth = { signedIn, email: 'ivy@email.com', initial: 'I' }
   const isDoor = surface === 'door'
