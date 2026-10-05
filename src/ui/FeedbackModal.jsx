@@ -69,14 +69,14 @@ const primaryBtn = {
   borderRadius: 12,
   border: 'none',
   ...TYPE.base,
-  fontWeight: W.bold,
+  fontWeight: W.medium, // button labels = medium (Amy's weight rule)
   background: IRIS,
   color: 'var(--brand-neutral-00)',
   boxShadow: '0 4px 0 ' + IRISD,
   cursor: 'pointer',
 }
-const fieldLabel = { ...TYPE.base, fontWeight: W.bold, color: 'var(--neutral-800)' }
-const optionalTag = { fontWeight: W.normal, color: 'var(--brand-iris-500)' }
+const fieldLabel = { ...TYPE.sm, fontWeight: W.medium, color: 'var(--brand-iris-700)' } // the question leads (Amy)
+const optionalTag = { fontWeight: W.medium, color: 'var(--color-text-tertiary)' } // the hint steps back
 
 /**
  * onSubmit(payload) → Promise (resolve = row written, reject = truly failed).
@@ -129,7 +129,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
         {/* header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 24px', background: 'linear-gradient(180deg, var(--brand-lilac-50), var(--brand-neutral-00))', borderBottom: '1px solid var(--brand-lilac-100)' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>💬</span>
-          <span id="luxiFb-title" style={{ ...TYPE.xs, fontWeight: W.bold, letterSpacing: 'var(--tracking-widest)', textTransform: 'uppercase', color: 'var(--brand-iris-600)' }}>Feedback</span>
+          <span id="luxiFb-title" style={{ ...TYPE.xs, fontWeight: W.bold, letterSpacing: 'var(--tracking-widest)', textTransform: 'uppercase', color: 'var(--brand-iris-700)' }}>Feedback</span>
           <div style={{ flex: 1 }} />
           <button aria-label="Close" onClick={close} className="luxiFb-close" style={{ border: 'none', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', color: 'var(--neutral-500)', fontSize: 16, lineHeight: 1 }}>
             ✕
@@ -140,7 +140,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
         {phase === 'compose' && (
           <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center', textAlign: 'center' }}>
-              <div style={{ ...heading, textWrap: 'pretty' }}>How many stars for Luxi?</div>
+              <div style={{ ...heading, color: 'var(--brand-iris-700)', textWrap: 'pretty' }}>How many stars for Luxi?</div>
               <div style={{ display: 'flex', gap: 4, marginTop: 2 }}>
                 {[1, 2, 3, 4, 5].map((n) => {
                   const on = n <= shown
@@ -162,7 +162,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                   )
                 })}
               </div>
-              <div style={{ ...TYPE.sm, fontWeight: W.bold, color: shown > 0 ? 'var(--brand-iris-700)' : 'var(--brand-iris-500)', minHeight: 20, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
+              <div style={{ ...TYPE.sm, fontWeight: W.medium, color: shown > 0 ? 'var(--brand-iris-700)' : 'var(--brand-iris-500)', minHeight: 20, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
             </div>
 
             <div style={{ height: 1, background: 'var(--brand-lilac-100)' }} />
@@ -171,20 +171,20 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
               <div style={fieldLabel}>
                 What do you love? <span style={optionalTag}>(optional)</span>
               </div>
-              <textarea placeholder="My favorite thing is…" value={liked} onChange={(e) => setLiked(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.base, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
-              <div style={{ textAlign: 'right', ...TYPE.xs, fontWeight: W.normal, color: likedLeft <= 40 ? 'var(--amber-700)' : 'var(--brand-iris-500)' }}>{likedLeft} characters left</div>
+              <textarea placeholder="My favorite thing is…" value={liked} onChange={(e) => setLiked(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.sm, fontWeight: W.normal, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
+              <div style={{ textAlign: 'right', ...TYPE.xs, fontWeight: W.medium, color: likedLeft <= 40 ? 'var(--amber-700)' : 'var(--color-text-tertiary)' }}>{likedLeft} characters left</div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={fieldLabel}>
                 What could be better? <span style={optionalTag}>(optional)</span>
               </div>
-              <textarea placeholder="I wish Luxi…" value={improve} onChange={(e) => setImprove(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.base, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
-              <div style={{ textAlign: 'right', ...TYPE.xs, fontWeight: W.normal, color: improveLeft <= 40 ? 'var(--amber-700)' : 'var(--brand-iris-500)' }}>{improveLeft} characters left</div>
+              <textarea placeholder="I wish Luxi…" value={improve} onChange={(e) => setImprove(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.sm, fontWeight: W.normal, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
+              <div style={{ textAlign: 'right', ...TYPE.xs, fontWeight: W.medium, color: improveLeft <= 40 ? 'var(--amber-700)' : 'var(--color-text-tertiary)' }}>{improveLeft} characters left</div>
             </div>
 
             {/* no-PII guardrail (LOCKED copy — baked into the contract) */}
-            <div style={{ ...TYPE.sm, fontWeight: W.normal, color: 'var(--brand-iris-600)', textAlign: 'center', textWrap: 'pretty' }}>💎 No personal info please, just ideas. We only note which world you're in — never who you are.</div>
+            <div style={{ ...TYPE.sm, fontWeight: W.normal, color: 'var(--brand-iris-700)', textAlign: 'center', textWrap: 'pretty' }}>💎 No personal info please, just ideas. We only note which world you're in — never who you are.</div>
 
             <button
               onClick={submit}
@@ -199,7 +199,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                 // disabled = a RESTING control → neutral (Amy's rule). The label is an instruction, so it
                 // stays readable: text-secondary on bg-interactive-disabled = 7.17:1.
                 background: canSend ? IRIS : 'var(--color-background-interactive-disabled)',
-                color: canSend ? 'var(--brand-neutral-00)' : 'var(--color-text-secondary)',
+                color: canSend ? 'var(--brand-neutral-00)' : 'var(--color-text-disabled)',
                 boxShadow: canSend ? '0 4px 0 ' + IRISD : '0 4px 0 var(--color-border-disabled)',
                 cursor: canSend ? 'pointer' : 'default',
               }}

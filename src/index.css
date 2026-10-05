@@ -52,6 +52,9 @@
   --color-background-interactive-disabled: #F5F5F5; /* neutral-100 */
   --color-border-disabled: #E5E5E5; /* neutral-200 */
   --color-text-secondary: #525252; /* neutral-600 */
+  --color-text-placeholder: #737373; /* neutral-500 */
+  --color-text-disabled: #A1A1A1; /* neutral-400 */
+  --color-text-tertiary: #737373; /* neutral-500 */
 
   /* Datum TYPE tokens in use — size + line-height ride together (globals.css
      overrides Tailwind's line-heights to 1.5 up to xl). Weights 400/500/700 only. */
