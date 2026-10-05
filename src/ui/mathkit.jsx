@@ -157,7 +157,7 @@ export function BigButton({ children, onClick, tone = 'primary', style }) {
   const [down, setDown] = useState(false)
   const tones = {
     primary: { bg: T.irisFace, fg: 'var(--color-text-on-brand)', sh: T.irisDeep },
-    ghost: { bg: '#fff', fg: T.iris, sh: '#C9CBF5' },
+    ghost: { bg: 'var(--color-background-base)', fg: T.iris, sh: 'var(--brand-iris-200)' },
     amber: { bg: T.amber, fg: '#fff', sh: T.amberDeep },
   }
   const c = tones[tone]
@@ -165,7 +165,7 @@ export function BigButton({ children, onClick, tone = 'primary', style }) {
     <button onClick={onClick}
       onPointerDown={() => setDown(true)} onPointerUp={() => setDown(false)} onPointerLeave={() => setDown(false)}
       style={{ border: tone === 'ghost' ? `2px solid ${T.irisSoft}` : 'none', background: c.bg, color: c.fg,
-        fontWeight: 700, fontSize: 17, borderRadius: 16, padding: '15px 26px', cursor: 'pointer', minHeight: 54,
+        fontWeight: 500, fontSize: 'var(--text-base)', /* Datum button 16/500 (was 17/700) */ borderRadius: 16, padding: '15px 26px', cursor: 'pointer', minHeight: 54,
         boxShadow: down ? `0 1px 0 ${c.sh}` : `0 4px 0 ${c.sh}`, transform: down ? 'translateY(3px)' : 'none',
         transition: 'transform .07s, box-shadow .07s', ...style }}>
       {children}
@@ -377,10 +377,10 @@ export function Keypad({ onKey, okDisabled = false }) {
 const KEY_BG = 'var(--color-background-interactive-default)', KEY_EDGE = 'var(--neutral-300)' // edge was #d9d9d9 (off-palette)
 function KeypadKey({ k, isOk, isDel, onKey, disabled = false }) {
   const [down, setDown] = useState(false)
-  const base = { height: 58, borderRadius: 14, border: 'none', fontWeight: 700, fontSize: 'var(--text-2xl)', // 22→24 (Datum 2xl) cursor: disabled ? 'default' : 'pointer',
+  const base = { height: 58, borderRadius: 14, border: 'none', fontWeight: 700, fontSize: 'var(--text-2xl)', /* 22→24 (Datum 2xl) */ cursor: disabled ? 'default' : 'pointer',
     fontVariantNumeric: 'tabular-nums', transition: 'transform .06s, box-shadow .06s' }
   let sty
-  if (isOk && disabled) sty = { ...base, background: '#EDEBF2', color: '#b5aec4', boxShadow: '0 4px 0 #dcd8e4', fontSize: 16 } // Oscar's disabled Check
+  if (isOk && disabled) sty = { ...base, background: 'var(--color-background-interactive-disabled)', color: 'var(--color-text-disabled)', boxShadow: '0 4px 0 var(--color-border-disabled)', fontSize: 'var(--text-base)', fontWeight: 500 } // Datum disabled (was Oscar's #EDEBF2/#b5aec4/#dcd8e4)
   else if (isOk) sty = { ...base, background: T.irisFace, color: 'var(--color-text-on-brand)', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 'var(--text-base)', fontWeight: 500 } // Datum button: 16 / 500
   else if (isDel) sty = { ...base, background: KEY_BG, color: 'var(--color-icon-tertiary)', boxShadow: down ? `0 1px 0 ${KEY_EDGE}` : `0 4px 0 ${KEY_EDGE}` }
   else sty = { ...base, background: KEY_BG, color: T.textPrimary, boxShadow: down ? `0 1px 0 ${KEY_EDGE}` : `0 4px 0 ${KEY_EDGE}` }
@@ -475,7 +475,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
 
   const ready = q !== '' && r !== ''
   const hint = q === ''
-    ? 'Tap her share first — then the leftover.'
+    ? 'Tap each share first — then the leftover.' // was "her share" — public copy stays ungendered (2026-08-29 rule)
     : r === ''
       ? 'Now the leftover. Tap R, then type it — R 0 if none is left.'
       : 'Tap Check when you’re ready.'
@@ -484,23 +484,24 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
     height: 64, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, cursor: 'pointer',
     fontSize: 40, fontWeight: 700, color: T.iris, fontVariantNumeric: 'tabular-nums', borderStyle: 'solid', borderWidth: 2.5,
     borderColor: val !== '' || active === f ? T.iris : T.irisSoft,
-    background: val !== '' ? T.irisTint : active === f ? '#fff' : '#fafafa',
-    boxShadow: active === f ? '0 0 0 4px rgba(45,109,246,.18)' : 'none',
+    background: val !== '' ? T.irisTint : active === f ? 'var(--color-background-base)' : 'var(--color-background-subtle)',
+    boxShadow: active === f ? `0 0 0 4px ${T.irisSoft}` : 'none', // was rgba of the retired blue #2D6DF6
     transition: 'border-color .15s, background .15s, box-shadow .15s',
   })
-  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.iris : T.textTertiary })
+  const cap = (on) => ({ height: 16, lineHeight: '16px', fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.05em', color: on ? T.iris : T.textTertiary }) // 10/800 -> 12/700 (Datum floor is 11)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.textTertiary }}>{skin.ask}</div>
+      <div style={{ textAlign: 'center', fontSize: 'var(--text-base)', fontWeight: 400, color: T.textPrimary }}>{skin.ask}</div>
 
       {/* a ÷ b = [q] R [r] — two nowrap groups, so a narrow modal drops the answer to its own line */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '10px 12px', fontVariantNumeric: 'tabular-nums' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap' }}>
-          <span style={{ fontSize: 42, fontWeight: 700, color: T.textPrimary }}>{problem.a}</span>
-          <span style={{ fontSize: 32, fontWeight: 600, color: T.textTertiary }}>÷</span>
-          <span style={{ fontSize: 42, fontWeight: 700, color: T.textPrimary }}>{problem.b}</span>
-          <span style={{ fontSize: 32, fontWeight: 600, color: T.textTertiary }}>=</span>
+          {/* 42 -> 40 (--text-40), operators 32 (--text-32) */}
+          <span style={{ fontSize: 'var(--text-40)', fontWeight: 700, color: T.textPrimary }}>{problem.a}</span>
+          <span style={{ fontSize: 'var(--text-32)', fontWeight: 600, color: T.textTertiary }}>÷</span>
+          <span style={{ fontSize: 'var(--text-40)', fontWeight: 700, color: T.textPrimary }}>{problem.b}</span>
+          <span style={{ fontSize: 'var(--text-32)', fontWeight: 600, color: T.textTertiary }}>=</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, whiteSpace: 'nowrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -512,7 +513,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
           {/* R label — a real tap target that lights + pulses once the quotient has a digit */}
           {/* a duplicate pointer target for the remainder box — skipped by keyboard + screen readers */}
           <button onClick={() => setActive('r')} tabIndex={-1} aria-hidden="true"
-            style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 28, fontWeight: 800, lineHeight: 1, borderRadius: 12,
+            style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 'var(--text-32)', fontWeight: 700, lineHeight: 1, borderRadius: 12, // 28/800 -> 32/700
               color: active === 'r' || r !== '' ? T.iris : T.textTertiary, animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <button onClick={() => setActive('r')} aria-label="remainder" style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
@@ -526,16 +527,17 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
       {nudge && (
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 14, padding: '11px 14px', animation: 'dvFadeSlide .3s ease-out both' }}>
           <span style={{ fontSize: 16, lineHeight: 1.35 }}>🍬</span>
-          <span style={{ fontSize: 15, fontWeight: 600, color: '#9A3412', lineHeight: 1.4 }}>The share is right! Now look again at what&apos;s <strong style={{ fontWeight: 800 }}>left over</strong>.</span>
+          <span style={{ fontSize: 'var(--text-base)', fontWeight: 400, color: '#9A3412', lineHeight: 1.4 }}>The share is right! Now look again at what&apos;s <strong style={{ fontWeight: 700 }}>left over</strong>.</span>
         </div>
       )}
 
       <Keypad onKey={onKey} okDisabled={!ready} />
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, marginTop: 2 }}>
-        <div style={{ textAlign: 'center', fontSize: 12.5, color: T.textTertiary, fontWeight: 500 }}>{hint}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 8 }}>
+        {/* same hint role as the ask screen: 14/400 secondary, 24 above */}
+        <div style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 400 }}>{hint}</div>
         <button onClick={onWalkthrough}
-          style={{ border: 'none', background: 'transparent', color: '#6E5BC0', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
+          style={{ border: 'none', background: 'transparent', color: 'var(--color-component-button-link-text-default)', fontWeight: 500, fontSize: 'var(--text-sm)', cursor: 'pointer', /* was Lilac 700 text — Lilac is decoration only; text = Iris (Datum link) */ padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
       </div>
     </div>
   )
@@ -558,7 +560,7 @@ export function WorkedExample({ problem, onBack }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
       <div style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center',
-        color: T.textTertiary, fontSize: 14, fontWeight: 600 }}>
+        color: T.textSecondary, fontSize: 'var(--text-sm)', fontWeight: 500 }}>
         <span>Your problem:</span>
         <span style={{ color: T.textPrimary, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {problem.a} {OPSYM[problem.op]} {problem.b}
@@ -568,12 +570,12 @@ export function WorkedExample({ problem, onBack }) {
       <div key={i} style={{ animation: 'stepIn .3s ease-out both' }}>
         {useV2 ? <MultiColumnMath snap={st.snap} /> : <ColumnMath snap={st.snap} big />}
       </div>
-      <div style={{ minHeight: 58, maxWidth: 400, textAlign: 'center', fontSize: 17, fontWeight: 500, color: T.textPrimary,
+      <div style={{ minHeight: 58, maxWidth: 400, textAlign: 'center', fontSize: 'var(--text-base)', fontWeight: 400, color: T.textPrimary, // content 16/400 (was 17/500)
         lineHeight: 1.5, background: T.irisTint, borderRadius: 14, padding: '12px 18px' }}>{st.caption}</div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         {stages.map((_, k) => (
           <span key={k} style={{ width: k === i ? 22 : 8, height: 8, borderRadius: 5,
-            background: k === i ? T.iris : k < i ? T.irisSoft : '#E6E6E6', transition: 'all .2s' }} />
+            background: k === i ? T.iris : k < i ? T.irisSoft : 'var(--color-border-default)', transition: 'all .2s' }} />
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10, marginTop: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
