@@ -214,7 +214,8 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                 <>
                   <div style={{ textAlign: 'center', margin: '14px 0' }}>
                     <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
-                    <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4 }}>No worries — the quest waits. Follow the steps, then try again.</div>
+                    {/* reassurance = supporting line, 14 secondary (Amy 2026-10-05) */}
+                    <div style={{ fontSize: 'var(--text-sm)', color: T.textSecondary, marginTop: 4 }}>No worries — the quest waits. Follow the steps, then try again.</div>
                   </div>
                   <WorkedExample problem={problem} onBack={backToAsk} />
                 </>

@@ -128,7 +128,8 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
               <div style={{ paddingBottom: 6 }}>
                 <div style={{ textAlign: 'center', marginBottom: 14 }}>
                   <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
-                  <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4 }}>No worries — follow the steps, then give it another go.</div>
+                  {/* reassurance = supporting line, 14 secondary (Amy 2026-10-05) */}
+                  <div style={{ fontSize: 'var(--text-sm)', color: T.textSecondary, marginTop: 4 }}>No worries — follow the steps, then give it another go.</div>
                 </div>
                 <WorkedExample problem={problem} onBack={backToAsk} />
               </div>
