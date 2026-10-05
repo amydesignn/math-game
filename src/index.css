@@ -2,18 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── House tokens (subset of oscar-styling-reference; iris/lilac branding) ── */
+/* ── House tokens ──
+ * Brand Iris + Brand Lilac = Datum primitives, copied VERBATIM from
+ * nathan-mcp-codebase-01 src/app/globals.css (styling-v0.18). Datum is the
+ * source of truth: change a value there first, then re-copy — never edit here.
+ * Roles (Amy): Iris = actions, text, anything that must pass WCAG.
+ *              Lilac = supporting colour, soft graphics, contrast-free detail. */
 :root {
-  --brand-iris-50: #eeeffe;
-  --brand-iris-100: #e0e2fd;
-  --brand-iris-500: #6169e8;
-  --brand-iris-600: #4b54dd;
-  --brand-iris-700: #3d43c4;
-  --brand-iris-900: #2b2f7a;
-  --brand-lilac-100: #ece6fa;
-  --brand-lilac-300: #cdbdf0;
-  --brand-lilac-500: #9b84e0;
-  --brand-lilac-900: #4a3d7a;
+  --brand-iris-50:  #F1F1FD;
+  --brand-iris-100: #E4E5FA;
+  --brand-iris-200: #C9CBF5;
+  --brand-iris-300: #A9ADEE;
+  --brand-iris-400: #8288E6;
+  --brand-iris-500: #6169E0;
+  --brand-iris-600: #4B54DD;
+  --brand-iris-700: #3D43BE;
+  --brand-iris-800: #333A98;
+  --brand-iris-900: #2C3379;
+  --brand-iris-950: #1D2050;
+
+  --brand-lilac-50:  #F6F2FF;
+  --brand-lilac-100: #EDE7FC;
+  --brand-lilac-200: #DDD1F7;
+  --brand-lilac-300: #C6B4F0;
+  --brand-lilac-400: #B29BEA;
+  --brand-lilac-500: #9B84E0;
+  --brand-lilac-600: #8570D2;
+  --brand-lilac-700: #6E5BC0;
+  --brand-lilac-800: #5B4B9E;
+  --brand-lilac-900: #473B7C;
+  --brand-lilac-950: #2F2653;
+
+  /* house-only (not Datum) */
   --lilac-50: #f6f4fd;
   /* reward accent — same gold family as the Planner */
   --star-gold: #f5b623;
