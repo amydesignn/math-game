@@ -29,7 +29,7 @@ import { fileToAvatar } from '../avatar.js'
 import { MUSIC_TRACKS } from '../config'
 
 // Datum tokens by name (2026-10-04 binding + WCAG AA pass, Amy's calls):
-// text = neutral-800 · secondary = neutral-600 · meta = neutral-500 · links/icons = Lilac 800
+// text = neutral-800 · secondary = neutral-600 (subtitles, section labels) · meta = neutral-500 · links/icons = Lilac 800
 const IRIS = 'var(--brand-iris-600)',
   LILAC800 = 'var(--brand-lilac-800)',
   TEXT = 'var(--neutral-800)',
@@ -113,7 +113,7 @@ const sectionLabel = {
   fontSize: 11,
   fontWeight: 500,
   letterSpacing: '.08em',
-  color: META,
+  color: TEXT2, // secondary text (Amy 2026-10-05)
   textTransform: 'uppercase',
   padding: '0 4px 8px',
 }
