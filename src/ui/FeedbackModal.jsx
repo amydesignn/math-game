@@ -31,10 +31,14 @@ import { useRef, useState } from 'react'
 // Datum tokens by name (Amy's map: Iris = text + anything WCAG; Lilac = supporting detail)
 const IRIS = 'var(--brand-iris-600)',
   IRISD = 'var(--brand-iris-700)'
-const EMPTY = 'var(--brand-lilac-200)'
+const EMPTY = 'var(--neutral-500)' // 4.74:1 — an unselected star is a RESTING control: neutral, like the
+// textarea's --color-border-interactive-default (Amy, 2026-10-04). Colour = selected only.
 // each star a fixed happy hue, warming across the row and paying off on brand violet. (Oscar)
-const STARCOLORS = ['#FF8E72', '#FFA94D', '#FFC53D', '#FFD93D', 'var(--brand-lilac-500)']
-const STARGLOW = ['rgba(255,142,114,.4)', 'rgba(255,169,77,.4)', 'rgba(255,197,61,.4)', 'rgba(255,217,61,.4)', 'rgba(142,123,242,.4)']
+// Darkened to Datum steps that reach WCAG non-text 3:1 on white — the stars are the
+// rating CONTROL, not decoration (Amy, 2026-10-04, option B: no brown yellow).
+// Star 5 moved Lilac → Iris so a 5-star rating never matches the empty star.
+const STARCOLORS = ['var(--red-500)', 'var(--orange-600)', 'var(--amber-600)', 'var(--amber-700)', 'var(--brand-iris-500)'] // 3.8 · 3.6 · 3.2 · 5.0 · 4.6
+const STARGLOW = STARCOLORS.map((c) => 'color-mix(in srgb, ' + c + ' 40%, transparent)')
 // caption per rating — playful, kid-voiced. index 0 = no rating yet. (Oscar, verbatim)
 const CAPTIONS = ['Tap the stars!', "Aw — we'll do better 🙏", 'Noted, thank you', "Glad you're here 🙂", 'Yay, thank you! 🎉', 'You love it?! 💜']
 
