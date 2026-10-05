@@ -266,7 +266,7 @@ const dS = {
   greet: { fontSize: 24, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em', lineHeight: 1.25, margin: '0 0 24px', minHeight: 38, display: 'flex', alignItems: 'center' },
   colHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, margin: '0 0 24px', minHeight: 38 },
   colTitle: { fontSize: 24, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em' },
-  colNote: { fontSize: BODY, fontWeight: 400, color: T.textTertiary },
+  colNote: { fontSize: BODY, fontWeight: 400, color: T.textSecondary }, // sits on the lavender page gradient, not white: Datum rule = tertiary only on base, so secondary (7.07; tertiary would be 4.29 ✗)
 }
 export default function Door({ mode, name, points, gems, map, quest, meadowOpen = false, avatar = null, onOpenSettings, onOpenProfile, onOpenFeedback, settingsActive = false, onResume, onPlay }) {
   const greet = mode === 'account' && name ? 'Welcome back, ' + name + '!' : 'Welcome, player!'
