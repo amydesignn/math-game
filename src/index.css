@@ -56,10 +56,7 @@
   --color-text-disabled: #A1A1A1; /* neutral-400 */
   --color-text-tertiary: #737373; /* neutral-500 */
 
-  /* LUXI semantic (not in Datum yet — candidate). Branded text in Iris: popup headings,
-     the questions, the eyebrow, the guardrail. Amy 2026-10-04. Note Datum already has
-     --color-text-brand = iris-600; this one is deliberately iris-700 (stronger). */
-  --color-text-branding: var(--brand-iris-700);
+  --color-text-brand: #3D43BE; /* brand-iris-700 — Datum styling-v0.19 (was iris-600) */
 
   /* Datum TYPE tokens in use — size + line-height ride together (globals.css
      overrides Tailwind's line-heights to 1.5 up to xl). Weights 400/500/700 only. */

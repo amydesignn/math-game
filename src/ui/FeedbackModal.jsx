@@ -61,7 +61,7 @@ const TYPE = {
   xl: { fontSize: 'var(--text-xl)', lineHeight: 'var(--text-xl--line-height)' },
 }
 const W = { normal: 'var(--font-weight-normal)', medium: 'var(--font-weight-medium)', bold: 'var(--font-weight-bold)' }
-const heading = { ...TYPE.xl, fontWeight: W.bold, color: 'var(--color-text-branding)' } // one branded heading style across every popup state (Amy)
+const heading = { ...TYPE.xl, fontWeight: W.bold, color: 'var(--color-text-brand)' } // one branded heading style across every popup state (Amy)
 
 const primaryBtn = {
   width: '100%',
@@ -75,7 +75,7 @@ const primaryBtn = {
   boxShadow: '0 4px 0 ' + IRISD,
   cursor: 'pointer',
 }
-const fieldLabel = { ...TYPE.base, fontWeight: W.medium, color: 'var(--color-text-branding)' } // the question leads (Amy)
+const fieldLabel = { ...TYPE.base, fontWeight: W.medium, color: 'var(--color-text-brand)' } // the question leads (Amy)
 const optionalTag = { fontWeight: W.medium, color: 'var(--color-text-tertiary)' } // the hint steps back
 
 /**
@@ -129,7 +129,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
         {/* header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 24px', background: 'linear-gradient(180deg, var(--brand-lilac-50), var(--brand-neutral-00))', borderBottom: '1px solid var(--brand-lilac-100)' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>💬</span>
-          <span id="luxiFb-title" style={{ ...TYPE.xs, fontWeight: W.bold, letterSpacing: 'var(--tracking-widest)', textTransform: 'uppercase', color: 'var(--color-text-branding)' }}>Feedback</span>
+          <span id="luxiFb-title" style={{ ...TYPE.xs, fontWeight: W.bold, letterSpacing: 'var(--tracking-widest)', textTransform: 'uppercase', color: 'var(--color-text-brand)' }}>Feedback</span>
           <div style={{ flex: 1 }} />
           <button aria-label="Close" onClick={close} className="luxiFb-close" style={{ border: 'none', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', color: 'var(--neutral-500)', fontSize: 16, lineHeight: 1 }}>
             ✕
@@ -162,7 +162,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                   )
                 })}
               </div>
-              <div style={{ ...TYPE.base, fontWeight: W.medium, color: shown > 0 ? 'var(--color-text-branding)' : 'var(--brand-iris-500)', minHeight: 20, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
+              <div style={{ ...TYPE.base, fontWeight: W.medium, color: shown > 0 ? 'var(--color-text-brand)' : 'var(--brand-iris-500)', minHeight: 20, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
             </div>
 
             <div style={{ height: 1, background: 'var(--brand-lilac-100)' }} />
@@ -184,7 +184,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
             </div>
 
             {/* no-PII guardrail (LOCKED copy — baked into the contract) */}
-            <div style={{ ...TYPE.sm, fontWeight: W.normal, color: 'var(--color-text-branding)', textAlign: 'center', textWrap: 'pretty' }}>💎 No personal info please, just ideas. We only note which world you're in — never who you are.</div>
+            <div style={{ ...TYPE.sm, fontWeight: W.normal, color: 'var(--color-text-brand)', textAlign: 'center', textWrap: 'pretty' }}>💎 No personal info please, just ideas. We only note which world you're in — never who you are.</div>
 
             <button
               onClick={submit}
