@@ -43,6 +43,13 @@
   --amber-600:   oklch(66.6% 0.179 58.318);
   --amber-700:   oklch(55.5% 0.163 48.998);
 
+  /* Datum SEMANTIC tokens in use — subset, copied verbatim from
+     nathan-mcp-codebase-01 src/styles/datum-tokens.css (styling-v0.18).
+     Resting controls = neutral, focus = Iris (Amy, 2026-10-04). */
+  --color-border-interactive-default: #737373; /* neutral-500 */
+  --color-border-interactive-hover: #525252; /* neutral-600 */
+  --color-border-interactive-focus: #4B54DD; /* brand-iris-600 */
+
   /* house-only (not Datum) */
   --lilac-50: #f6f4fd;
   /* reward accent — same gold family as the Planner */
@@ -288,8 +295,9 @@ canvas { touch-action: none; display: block; }
 .luxiFb-close { background: var(--brand-lilac-100); transition: background .15s; }
 .luxiFb-close:hover { background: var(--brand-lilac-200); }
 .luxiFb-star:hover { transform: scale(1.22) rotate(-6deg) !important; } /* !important: the on/off scale is inline */
-.luxiFb-ta { border: 1.5px solid var(--brand-lilac-200); outline: none; transition: border-color .15s; }
-.luxiFb-ta:focus { border-color: var(--brand-iris-600); }
+.luxiFb-ta { border: 1.5px solid var(--color-border-interactive-default); outline: none; transition: border-color .15s; }
+.luxiFb-ta:hover { border-color: var(--color-border-interactive-hover); }
+.luxiFb-ta:focus { border-color: var(--color-border-interactive-focus); } /* after :hover so focus wins */
 .luxiFb-press { transition: transform .07s, box-shadow .07s, background .15s; }
 .luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
 .luxiFb-notnow { transition: background .15s; }

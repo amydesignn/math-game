@@ -31,7 +31,8 @@ import { useRef, useState } from 'react'
 // Datum tokens by name (Amy's map: Iris = text + anything WCAG; Lilac = supporting detail)
 const IRIS = 'var(--brand-iris-600)',
   IRISD = 'var(--brand-iris-700)'
-const EMPTY = 'var(--brand-lilac-500)' // 3.10:1 — the empty star still reads as tappable
+const EMPTY = 'var(--neutral-500)' // 4.74:1 — an unselected star is a RESTING control: neutral, like the
+// textarea's --color-border-interactive-default (Amy, 2026-10-04). Colour = selected only.
 // each star a fixed happy hue, warming across the row and paying off on brand violet. (Oscar)
 // Darkened to Datum steps that reach WCAG non-text 3:1 on white — the stars are the
 // rating CONTROL, not decoration (Amy, 2026-10-04, option B: no brown yellow).
