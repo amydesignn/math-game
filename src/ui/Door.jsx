@@ -89,7 +89,7 @@ function Rocket({ size = 22, color = V.main }) {
 }
 function Saved({ size = 15 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ stroke: T.textTertiary }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ stroke: T.textSecondary }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 21a9 9 0 1 0-9-9" />
       <path d="m8.5 12 2.5 2.5 5-5" />
     </svg>
@@ -123,14 +123,14 @@ const heroS = {
   stage: { position: 'relative', width: '100%', height: 196, borderRadius: 20, overflow: 'hidden', background: 'radial-gradient(120% 100% at 50% 18%, #F6F1FF 0%, #ECE4FB 62%, #E4D9F6 100%)' },
   lvlRow: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 18 },
   lvlNum: { fontSize: 20, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em' },
-  pts: { fontSize: BODY, fontWeight: 400, color: T.textTertiary },
+  pts: { fontSize: BODY, fontWeight: 400, color: T.textSecondary },
   gems: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: BODY, fontWeight: 700, color: T.textPrimary },
   track: { position: 'relative', height: 12, borderRadius: 999, background: V.soft, overflow: 'hidden', marginTop: 10, border: '1px solid ' + V.softLine },
   fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: V.grad },
   toNextRow: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginTop: 8 },
-  toNext: { fontSize: BODY, fontWeight: 400, color: T.textTertiary },
+  toNext: { fontSize: BODY, fontWeight: 400, color: T.textSecondary },
   newLine: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, marginTop: 18, lineHeight: 1.5 },
-  saved: { display: 'flex', alignItems: 'center', gap: 7, marginTop: 14, fontSize: 12.5, fontWeight: 400, color: T.textTertiary },
+  saved: { display: 'flex', alignItems: 'center', gap: 7, marginTop: 14, fontSize: 12.5, fontWeight: 400, color: T.textSecondary },
 }
 function Hero({ mode, points, gems }) {
   const stats = mode !== 'new'
@@ -168,7 +168,7 @@ const questS = {
   mid: { minWidth: 0, flex: 1 },
   labelRow: { display: 'flex', alignItems: 'center', gap: 7 },
   label: { fontSize: 11.5, fontWeight: 600, color: T.amberInk, letterSpacing: '.02em' },
-  refresh: { fontSize: 10.5, fontWeight: 600, color: '#B4832E' },
+  refresh: { fontSize: 10.5, fontWeight: 600, color: T.amberInk }, // was #B4832E 3.17 ✗ — amberInk = the label beside it, 5.95 on amberSoft
   text: { fontSize: BODY, fontWeight: 400, color: '#6E4E15', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   reward: { flex: 'none', display: 'inline-flex', alignItems: 'center', gap: 3, fontWeight: 700, color: T.amberInk, fontSize: BODY, background: '#FFEFCF', padding: '5px 10px 5px 9px', borderRadius: 999 },
 }
@@ -200,7 +200,7 @@ const cardS = {
   soonWord: { fontSize: 13, fontWeight: 700, color: V.deep, letterSpacing: '.01em' },
   body: { padding: '13px 15px 4px' },
   name: { fontSize: 18, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em' },
-  blurb: { fontSize: BODY, fontWeight: 400, color: T.textTertiary, marginTop: 2 },
+  blurb: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, marginTop: 2 },
   foot: { padding: '11px 15px 15px', marginTop: 'auto' },
 }
 /* the world's signpost colour as a soft thumb — matches its in-world gate glow */
