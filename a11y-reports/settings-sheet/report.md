@@ -1,6 +1,6 @@
 # Contrast audit — SettingsSheet
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-05 00:22 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-05 00:33 UTC  
 **Variants:** Guest · sound on, Guest · sound off, Signed in · **Phases:** open
 
 > **160 unique checks · 157 pass · 0 fail · 0 exempt (disabled) · 0 need review**
@@ -42,7 +42,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 |---|---|---|---|---|---|---|
 | Close | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 4.33:1 · 75% of edge | open |
 | Save your progress Sign up or sign in | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.65:1 · 96% of edge | open |
-| Toggle sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
+| Sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
 | Island | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.61:1 · 85% of edge | open |
 | Soft Focus | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 6.35:1 · 89% of edge | open |
 | How to Play | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
@@ -75,7 +75,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 |---|---|---|---|---|---|---|
 | Close | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 4.33:1 · 75% of edge | open |
 | Save your progress Sign up or sign in | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.65:1 · 96% of edge | open |
-| Toggle sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
+| Sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
 | Island | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.61:1 · 85% of edge | open |
 | Soft Focus | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 6.35:1 · 89% of edge | open |
 | How to Play | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
@@ -110,7 +110,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 |---|---|---|---|---|---|---|
 | Close | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 4.33:1 · 75% of edge | open |
 | Sign out | ✅ 5.27:1 | ✅ 5.27:1 | ✅ 5.27:1 | ✅ 5.27:1 | ✅ 6.95:1 · 98% of edge | open |
-| Toggle sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
+| Sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
 | Island | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.61:1 · 85% of edge | open |
 | Soft Focus | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 6.35:1 · 89% of edge | open |
 | How to Play | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |

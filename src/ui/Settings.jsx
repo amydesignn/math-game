@@ -207,11 +207,16 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                   </span>
                   <span style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>Sound</span>
                   <button
-                    aria-label="Toggle sound"
+                    role="switch"
+                    aria-checked={sound}
+                    aria-label="Sound"
                     onClick={() => onToggleSound?.(!sound)}
-                    style={{ width: 48, height: 28, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', transition: 'background .18s', background: sound ? IRIS : '#D8D2E4' }}
+                    style={{ width: 48, height: 28, borderRadius: 999, boxSizing: 'border-box', border: '1.5px solid ' + (sound ? IRIS : META), cursor: 'pointer', position: 'relative', padding: 0, transition: 'background .18s, border-color .18s', background: sound ? IRIS : LINE }}
                   >
-                    <span style={{ position: 'absolute', top: 2, left: 2, width: 24, height: 24, borderRadius: '50%', background: WHITE, boxShadow: '0 2px 5px rgba(0,0,0,.2)', transition: 'transform .18s', transform: 'translateX(' + (sound ? '20px' : '0px') + ')' }} />
+                    {/* OFF = Checkbox's unchecked rule (Amy 2026-10-04, option B): outline + knob in
+                        neutral-500, both ≥3:1 (WCAG 1.4.11) — OFF is unchecked, not disabled.
+                        ON = filled Iris, the knob grows to full white. Box is 45×25 inside the border. */}
+                    <span style={{ position: 'absolute', top: sound ? 0.5 : 4.5, left: sound ? 20.5 : 4.5, width: sound ? 24 : 16, height: sound ? 24 : 16, borderRadius: '50%', background: sound ? WHITE : META, boxShadow: sound ? '0 2px 5px rgba(0,0,0,.2)' : 'none', transition: 'all .18s' }} />
                   </button>
                 </div>
                 {/* Music picker (2026-10-04): Island = the default, Soft Focus = the

@@ -2,7 +2,7 @@
   "component": "SettingsSheet",
   "file": "src/ui/Settings.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-05T00:22:26.779Z",
+  "ranAt": "2026-10-05T00:33:41.817Z",
   "variants": [
     "Guest · sound on",
     "Guest · sound off",
@@ -495,7 +495,7 @@
     {
       "variant": "Guest · sound on",
       "phase": "open",
-      "element": "Toggle sound",
+      "element": "Sound",
       "elementId": 2,
       "state": "focus",
       "kind": "focus-indicator",
@@ -1433,7 +1433,7 @@
     {
       "variant": "Guest · sound off",
       "phase": "open",
-      "element": "Toggle sound",
+      "element": "Sound",
       "elementId": 2,
       "state": "focus",
       "kind": "focus-indicator",
@@ -2333,7 +2333,7 @@
     {
       "variant": "Signed in",
       "phase": "open",
-      "element": "Toggle sound",
+      "element": "Sound",
       "elementId": 2,
       "state": "focus",
       "kind": "focus-indicator",
