@@ -306,4 +306,4 @@ canvas { touch-action: none; display: block; }
 /* House focus ring (contrast audit, 2026-10-04 — Amy's interaction-states rule):
    1px in Iris 700, 2px gap so it reads on Iris buttons too (WCAG 1.4.11).
    Scoped to the shared modal shell; the app-wide pass comes with later audits. */
-[role="dialog"] button:focus-visible { outline: 1px solid #3D43BE; outline-offset: 2px; }
+[role="dialog"] button:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }

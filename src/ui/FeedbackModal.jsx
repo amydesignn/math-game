@@ -62,7 +62,7 @@ const primaryBtn = {
   boxShadow: '0 4px 0 ' + IRISD,
   cursor: 'pointer',
 }
-const fieldLabel = { fontSize: 15, fontWeight: 700, color: 'var(--neutral-800)' }
+const fieldLabel = { fontSize: 16, fontWeight: 700, color: 'var(--neutral-800)' }
 const optionalTag = { fontWeight: 600, color: 'var(--brand-iris-500)' }
 
 /**
@@ -112,11 +112,11 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
     >
       <div onClick={close} style={{ position: 'absolute', inset: 0, background: 'color-mix(in srgb, var(--brand-lilac-950) 50%, transparent)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', animation: 'scrimIn .25s ease-out both' }} />
 
-      <div style={{ position: 'relative', width: 'min(400px, calc(100vw - 32px))', maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto', background: 'var(--brand-neutral-00)', border: '1.5px solid color-mix(in srgb, var(--brand-lilac-950) 10%, transparent)', borderRadius: 24, boxShadow: '0 24px 60px rgba(50,38,80,.32), 0 4px 16px rgba(50,38,80,.14)', animation: 'fbPopIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="luxiFb-title" style={{ position: 'relative', width: 'min(400px, calc(100vw - 32px))', maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto', background: 'var(--brand-neutral-00)', border: '1.5px solid color-mix(in srgb, var(--brand-lilac-950) 10%, transparent)', borderRadius: 24, boxShadow: '0 24px 60px rgba(50,38,80,.32), 0 4px 16px rgba(50,38,80,.14)', animation: 'fbPopIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
         {/* header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 24px', background: 'linear-gradient(180deg, var(--brand-lilac-50), var(--brand-neutral-00))', borderBottom: '1px solid var(--brand-lilac-100)' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>💬</span>
-          <span style={{ fontWeight: 800, fontSize: 12, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--brand-iris-600)' }}>Feedback</span>
+          <span id="luxiFb-title" style={{ fontWeight: 800, fontSize: 12, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--brand-iris-600)' }}>Feedback</span>
           <div style={{ flex: 1 }} />
           <button aria-label="Close" onClick={close} className="luxiFb-close" style={{ border: 'none', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', color: 'var(--neutral-500)', fontSize: 16, lineHeight: 1 }}>
             ✕
@@ -135,6 +135,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                     <button
                       key={n}
                       aria-label={n + (n === 1 ? ' star' : ' stars')}
+                      aria-pressed={rating === n}
                       onClick={() => setRating(n)}
                       onMouseEnter={() => setHover(n)}
                       onMouseLeave={() => setHover(0)}
@@ -157,7 +158,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
               <div style={fieldLabel}>
                 What do you love? <span style={optionalTag}>(optional)</span>
               </div>
-              <textarea placeholder="My favorite thing is…" value={liked} onChange={(e) => setLiked(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', fontSize: 15, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', lineHeight: 1.45, fontFamily: 'inherit' }} />
+              <textarea placeholder="My favorite thing is…" value={liked} onChange={(e) => setLiked(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', fontSize: 16, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', lineHeight: 1.45, fontFamily: 'inherit' }} />
               <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: likedLeft <= 40 ? 'var(--amber-700)' : 'var(--brand-iris-500)' }}>{likedLeft} characters left</div>
             </div>
 
@@ -165,7 +166,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
               <div style={fieldLabel}>
                 What could be better? <span style={optionalTag}>(optional)</span>
               </div>
-              <textarea placeholder="I wish Luxi…" value={improve} onChange={(e) => setImprove(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', fontSize: 15, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', lineHeight: 1.45, fontFamily: 'inherit' }} />
+              <textarea placeholder="I wish Luxi…" value={improve} onChange={(e) => setImprove(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', fontSize: 16, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', lineHeight: 1.45, fontFamily: 'inherit' }} />
               <div style={{ textAlign: 'right', fontSize: 12, fontWeight: 600, color: improveLeft <= 40 ? 'var(--amber-700)' : 'var(--brand-iris-500)' }}>{improveLeft} characters left</div>
             </div>
 
@@ -199,7 +200,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
             <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(160deg, var(--brand-lilac-100), var(--brand-lilac-200))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, animation: 'fbPop .5s cubic-bezier(.2,.9,.3,1.3) both' }}>💎</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--neutral-800)', lineHeight: 1.2 }}>Thanks for the idea!</div>
-              <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--neutral-500)', lineHeight: 1.5, textWrap: 'pretty' }}>Your feedback goes straight to the team building Luxi. Keep exploring! ✨</div>
+              <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--neutral-500)', lineHeight: 1.5, textWrap: 'pretty' }}>Your feedback goes straight to the team building Luxi. Keep exploring! ✨</div>
             </div>
             <button onClick={close} className="luxiFb-press" style={{ ...primaryBtn, marginTop: 4 }}>
               Back to the game
@@ -213,13 +214,13 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
             <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--orange-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30 }}>🌙</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={{ fontSize: 20, fontWeight: 800, color: 'var(--neutral-800)', lineHeight: 1.2 }}>We'll try again in a bit</div>
-              <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--neutral-500)', lineHeight: 1.5, textWrap: 'pretty' }}>Couldn't send just now — your idea is safe and nothing's lost. You can keep playing.</div>
+              <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--neutral-500)', lineHeight: 1.5, textWrap: 'pretty' }}>Couldn't send just now — your idea is safe and nothing's lost. You can keep playing.</div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%', marginTop: 4 }}>
               <button onClick={submit} className="luxiFb-press" style={primaryBtn}>
                 Try again
               </button>
-              <button onClick={close} className="luxiFb-notnow" style={{ width: '100%', height: 44, border: 'none', background: 'transparent', color: 'var(--neutral-500)', fontWeight: 600, fontSize: 15, cursor: 'pointer', borderRadius: 8 }}>
+              <button onClick={close} className="luxiFb-notnow" style={{ width: '100%', height: 44, border: 'none', background: 'transparent', color: 'var(--neutral-500)', fontWeight: 600, fontSize: 16, cursor: 'pointer', borderRadius: 8 }}>
                 Not now
               </button>
             </div>
