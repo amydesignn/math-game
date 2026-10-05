@@ -33,7 +33,7 @@ import Footer from './Footer'
    amber = station/quests. BODY = the one shared body size. */
 const BODY = 14
 const T = {
-  ink: '#262626', ink2: '#4d4d4d', ink3: '#6e6e6e',
+  textPrimary: 'var(--color-text-primary)', textSecondary: 'var(--color-text-secondary)', textTertiary: 'var(--color-text-tertiary)', // Datum text tiers by name
   line: '#ECE7F5', surface: '#FFFFFF',
   iris: '#4B54DD', // brand purple — the wordmark
   amber: '#FE9A00', amberSoft: '#FFF7EA', amberLine: '#FBE3B6', amberInk: '#8A5300',
@@ -89,7 +89,7 @@ function Rocket({ size = 22, color = V.main }) {
 }
 function Saved({ size = 15 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={T.ink3} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ stroke: T.textTertiary }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 21a9 9 0 1 0-9-9" />
       <path d="m8.5 12 2.5 2.5 5-5" />
     </svg>
@@ -122,15 +122,15 @@ const heroS = {
   card: { background: T.surface, borderRadius: 24, boxShadow: '0 2px 14px rgba(74,54,110,.07)', padding: 16, animation: 'doorPop .4s ease-out both' }, // 26→24: 4px-grid align to the new Settings sheet (Amy 2026-08-30)
   stage: { position: 'relative', width: '100%', height: 196, borderRadius: 20, overflow: 'hidden', background: 'radial-gradient(120% 100% at 50% 18%, #F6F1FF 0%, #ECE4FB 62%, #E4D9F6 100%)' },
   lvlRow: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginTop: 18 },
-  lvlNum: { fontSize: 20, fontWeight: 600, color: T.ink, letterSpacing: '-.01em' },
-  pts: { fontSize: BODY, fontWeight: 400, color: T.ink3 },
-  gems: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: BODY, fontWeight: 700, color: T.ink },
+  lvlNum: { fontSize: 20, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em' },
+  pts: { fontSize: BODY, fontWeight: 400, color: T.textTertiary },
+  gems: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: BODY, fontWeight: 700, color: T.textPrimary },
   track: { position: 'relative', height: 12, borderRadius: 999, background: V.soft, overflow: 'hidden', marginTop: 10, border: '1px solid ' + V.softLine },
   fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: V.grad },
   toNextRow: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginTop: 8 },
-  toNext: { fontSize: BODY, fontWeight: 400, color: T.ink3 },
-  newLine: { fontSize: BODY, fontWeight: 400, color: T.ink2, marginTop: 18, lineHeight: 1.5 },
-  saved: { display: 'flex', alignItems: 'center', gap: 7, marginTop: 14, fontSize: 12.5, fontWeight: 400, color: T.ink3 },
+  toNext: { fontSize: BODY, fontWeight: 400, color: T.textTertiary },
+  newLine: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, marginTop: 18, lineHeight: 1.5 },
+  saved: { display: 'flex', alignItems: 'center', gap: 7, marginTop: 14, fontSize: 12.5, fontWeight: 400, color: T.textTertiary },
 }
 function Hero({ mode, points, gems }) {
   const stats = mode !== 'new'
@@ -199,8 +199,8 @@ const cardS = {
   soonBadge: { width: 56, height: 56, borderRadius: '50%', background: 'rgba(255,255,255,.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 18px rgba(124,108,232,.22)' },
   soonWord: { fontSize: 13, fontWeight: 700, color: V.deep, letterSpacing: '.01em' },
   body: { padding: '13px 15px 4px' },
-  name: { fontSize: 18, fontWeight: 600, color: T.ink, letterSpacing: '-.01em' },
-  blurb: { fontSize: BODY, fontWeight: 400, color: T.ink3, marginTop: 2 },
+  name: { fontSize: 18, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em' },
+  blurb: { fontSize: BODY, fontWeight: 400, color: T.textTertiary, marginTop: 2 },
   foot: { padding: '11px 15px 15px', marginTop: 'auto' },
 }
 /* the world's signpost colour as a soft thumb — matches its in-world gate glow */
@@ -263,10 +263,10 @@ function Header({ onOpenSettings, onOpenProfile, settingsActive, avatar }) {
 
 /* ── the door ── */
 const dS = {
-  greet: { fontSize: 24, fontWeight: 600, color: T.ink, letterSpacing: '-.01em', lineHeight: 1.25, margin: '0 0 24px', minHeight: 38, display: 'flex', alignItems: 'center' },
+  greet: { fontSize: 24, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em', lineHeight: 1.25, margin: '0 0 24px', minHeight: 38, display: 'flex', alignItems: 'center' },
   colHead: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, margin: '0 0 24px', minHeight: 38 },
-  colTitle: { fontSize: 24, fontWeight: 600, color: T.ink, letterSpacing: '-.01em' },
-  colNote: { fontSize: BODY, fontWeight: 400, color: T.ink3 },
+  colTitle: { fontSize: 24, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em' },
+  colNote: { fontSize: BODY, fontWeight: 400, color: T.textSecondary }, // sits on the lavender page gradient, not white: Datum rule = tertiary only on base, so secondary (7.07; tertiary would be 4.29 ✗)
 }
 export default function Door({ mode, name, points, gems, map, quest, meadowOpen = false, avatar = null, onOpenSettings, onOpenProfile, onOpenFeedback, settingsActive = false, onResume, onPlay }) {
   const greet = mode === 'account' && name ? 'Welcome back, ' + name + '!' : 'Welcome, player!'

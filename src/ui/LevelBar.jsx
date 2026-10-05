@@ -28,7 +28,7 @@ const barStyles = {
   pill: { position: 'relative', display: 'flex', alignItems: 'center', gap: 10, background: T.surface, borderRadius: 999, padding: '0 16px', height: 44, boxShadow: '0 4px 14px rgba(43,32,90,0.16)', userSelect: 'none' },
   div: { width: 1, height: 20, background: '#ECE7F5', flex: 'none' }, // hair rule between points and the gem wallet
   gem: { display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 800, fontSize: 14, color: '#0E7490', flex: 'none' }, // teal = the gem wallet
-  label: { display: 'flex', alignItems: 'baseline', gap: 4, fontWeight: 800, fontSize: 15, color: T.ink, whiteSpace: 'nowrap' },
+  label: { display: 'flex', alignItems: 'baseline', gap: 4, fontWeight: 800, fontSize: 15, color: T.textPrimary, whiteSpace: 'nowrap' },
   lvlWrap: { position: 'relative', display: 'inline-block', overflow: 'hidden', height: 20, minWidth: '2ch', textAlign: 'center' },
   track: { position: 'relative', width: 72, height: 12, borderRadius: 999, background: LVL.soft, overflow: 'hidden', flex: 'none' }, // 96→72: shortened to make room for the top-right gear (Amy 2026-08-30)
   fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: LVL.grad, transition: 'width .45s cubic-bezier(.22,1.2,.36,1)' },
@@ -174,7 +174,7 @@ const popStyles = {
   // The drop shadow goes with it: it existed to lift white off the saturated
   // violet, and under a deep numeral it just muddies the pastel.
   badgeNum: { position: 'relative', overflow: 'hidden', height: 56, width: '100%', textAlign: 'center', color: LVL.onFill, fontWeight: 800, fontSize: 46, lineHeight: '56px' },
-  msg: { fontSize: 19, lineHeight: 1.45, fontWeight: 700, color: T.ink, textWrap: 'pretty', padding: '0 6px' },
+  msg: { fontSize: 19, lineHeight: 1.45, fontWeight: 700, color: T.textPrimary, textWrap: 'pretty', padding: '0 6px' },
   // The signature (Amy's ask): right-aligned like a signed note, because that
   // is the visual grammar for "a person wrote this to you" — which is the
   // entire job of this line. Conditional: no `from`, no signature, so a public
