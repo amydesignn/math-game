@@ -44,6 +44,12 @@
   --orange-600:  oklch(64.6% 0.222 41.116);
   --amber-600:   oklch(66.6% 0.179 58.318);
   --amber-700:   oklch(55.5% 0.163 48.998);
+  /* station accentInk — eyebrow + QUEST badge text (skins.js) */
+  --teal-700:    oklch(51.1% 0.096 186.391);
+  --green-700:   oklch(52.7% 0.154 150.069);
+  --blue-700:    oklch(48.8% 0.243 264.376);
+  --pink-800:    oklch(45.9% 0.187 3.815);
+  --sky-800:     oklch(44.3% 0.11 240.79);
 
   /* Datum SEMANTIC tokens in use — subset, copied verbatim from
      nathan-mcp-codebase-01 src/styles/datum-tokens.css (styling-v0.18).
