@@ -35,7 +35,7 @@ import { buildDivisionStages } from '../math'
    are the lesson's SEMANTIC colours (dividend = berry, divisor = teal, Sharing
    Table = slate, quotient = the yellow Answer Box), meaningful only here. */
 const P = {
-  textPrimary: '#262626', textTertiary: '#737373',
+  textPrimary: 'var(--color-text-primary)', textTertiary: 'var(--color-text-tertiary)', // Datum text tiers by name
   berry: '#E60076', berryInk: '#C6005C', // berryInk = pink-700, the AA text shade teal: '#009689', tealTint: '#F0FDFA',
   slate: '#62748E', slate400: '#90A1B9', slateTint: 'rgba(98,116,142,.10)',
   answerFill: '#FEF9C2', answerLine: '#F0B100', answerLineSolid: '#D08700',
@@ -153,7 +153,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   const brW = n * CELL + 18, brH = ROWH + 6
   els.push(
     <svg key="br" width={brW} height={brH} viewBox={`0 0 ${brW} ${brH}`} style={{ position: 'absolute', left: GUTTER - 16, top: yT(1) - 3, zIndex: 2, overflow: 'visible' }}>
-      <path d={`M16 3 H ${brW - 2} M16 3 Q 3 ${brH * 0.5} 10 ${brH - 2}`} fill="none" stroke={textPrimary} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={`M16 3 H ${brW - 2} M16 3 Q 3 ${brH * 0.5} 10 ${brH - 2}`} fill="none" style={{ stroke: textPrimary }} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
     </svg>,
   )
 

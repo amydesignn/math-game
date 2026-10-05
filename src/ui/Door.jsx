@@ -33,7 +33,7 @@ import Footer from './Footer'
    amber = station/quests. BODY = the one shared body size. */
 const BODY = 14
 const T = {
-  textPrimary: '#262626', textSecondary: '#4d4d4d', textTertiary: '#6e6e6e',
+  textPrimary: 'var(--color-text-primary)', textSecondary: 'var(--color-text-secondary)', textTertiary: 'var(--color-text-tertiary)', // Datum text tiers by name
   line: '#ECE7F5', surface: '#FFFFFF',
   iris: '#4B54DD', // brand purple — the wordmark
   amber: '#FE9A00', amberSoft: '#FFF7EA', amberLine: '#FBE3B6', amberInk: '#8A5300',
@@ -89,7 +89,7 @@ function Rocket({ size = 22, color = V.main }) {
 }
 function Saved({ size = 15 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={T.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ stroke: T.textTertiary }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 21a9 9 0 1 0-9-9" />
       <path d="m8.5 12 2.5 2.5 5-5" />
     </svg>

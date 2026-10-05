@@ -19,7 +19,7 @@ export const T = {
   irisFace: '#6169E0', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
   iris: '#4B54DD', irisDeep: '#3D43BE', irisSoft: '#E4E5FA', irisTint: '#F1F1FD',
   teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
-  textPrimary: '#262626', textSecondary: '#4d4d4d', textTertiary: '#6e6e6e',
+  textPrimary: 'var(--color-text-primary)', textSecondary: 'var(--color-text-secondary)', textTertiary: 'var(--color-text-tertiary)', // Datum text tiers by name
   line: '#E6E6E6', surface: '#FFFFFF',
   lilac: '#8570D2', lilacDeep: '#473B7C', // Lilac 600 / 900
   violet: '#7F22FE', amber: '#FE9A00', amberDeep: '#D97706',
