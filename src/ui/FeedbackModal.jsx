@@ -31,8 +31,8 @@ import { useRef, useState } from 'react'
 // Datum tokens by name (Amy's map: Iris = text + anything WCAG; Lilac = supporting detail)
 const IRIS = 'var(--brand-iris-600)',
   IRISD = 'var(--brand-iris-700)'
-const EMPTY = 'var(--neutral-500)' // 4.74:1 — an unselected star is a RESTING control: neutral, like the
-// textarea's --color-border-interactive-default (Amy, 2026-10-04). Colour = selected only.
+const EMPTY = 'var(--color-border-interactive-default)' // neutral-500, 4.74:1 — an unselected star is a
+// RESTING control: a hollow outline in the same token as the textarea border (Amy, 2026-10-04).
 // each star a fixed happy hue, warming across the row and paying off on brand violet. (Oscar)
 // Darkened to Datum steps that reach WCAG non-text 3:1 on white — the stars are the
 // rating CONTROL, not decoration (Amy, 2026-10-04, option B: no brown yellow).
@@ -42,9 +42,11 @@ const STARGLOW = STARCOLORS.map((c) => 'color-mix(in srgb, ' + c + ' 40%, transp
 // caption per rating — playful, kid-voiced. index 0 = no rating yet. (Oscar, verbatim)
 const CAPTIONS = ['Tap the stars!', "Aw — we'll do better 🙏", 'Noted, thank you', "Glad you're here 🙂", 'Yay, thank you! 🎉', 'You love it?! 💜']
 
-function Star() {
+// hollow = unselected: outline only (WCAG 1.4.11's own passing star pattern — the
+// state reads by SHAPE, ☆ vs ★, not just colour). Selected stars stay solid.
+function Star({ hollow = false }) {
   return (
-    <svg width="44" height="44" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden="true">
+    <svg width="44" height="44" viewBox="0 0 24 24" fill={hollow ? 'none' : 'currentColor'} stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 2.4l2.7 5.9 6.4.6c.5.05.7.66.3 1l-4.9 4.3 1.5 6.3c.12.5-.42.9-.86.62L12 17.9l-5.64 3.12c-.44.28-.98-.12-.86-.62l1.5-6.3-4.9-4.3c-.4-.34-.2-.95.3-1l6.4-.6z" />
     </svg>
   )
@@ -143,7 +145,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                       style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 4, display: 'flex', transform: on ? 'scale(1.1)' : 'scale(1)', transition: 'transform .18s cubic-bezier(.2,.9,.3,1.7)' }}
                     >
                       <span style={{ display: 'flex', color: on ? STARCOLORS[n - 1] : EMPTY, filter: on ? 'drop-shadow(0 3px 6px ' + STARGLOW[n - 1] + ')' : 'none' }}>
-                        <Star />
+                        <Star hollow={!on} />
                       </span>
                     </button>
                   )
