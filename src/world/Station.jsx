@@ -117,8 +117,13 @@ export default function Station({ x, z, skin, resume = 0, farewell = false, onTa
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
             <div style={{ fontSize: 40, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(40,30,70,.4))', animation: 'markerOrbit 2.6s ease-in-out infinite' }}>{skin.marker}</div>
             <div style={{
-              background: `linear-gradient(180deg,${glow},${accent})`, color: '#fff', fontWeight: 700, fontSize: 15,
-              padding: '7px 15px', borderRadius: 18, boxShadow: `0 6px 16px ${accent}72`, textShadow: '0 1px 3px rgba(0,0,0,.25)',
+              /* WCAG AA (Amy 2026-10-05): white text sat on the light glow→accent gradient
+                 (1.7–3.7:1). Now the popup QUEST badge's ink (skin.accentInk, a Datum token
+                 by name) fading only DARKER, so every point of the pill passes: 4.94–7.88:1.
+                 The accent glow stays in the shadow. Type + padding on Datum's scale / 4px. */
+              background: `linear-gradient(180deg,${skin.accentInk},color-mix(in srgb, ${skin.accentInk} 85%, #000))`,
+              color: '#fff', fontWeight: 700, fontSize: 'var(--text-base)',
+              padding: '8px 16px', borderRadius: 20, boxShadow: `0 6px 16px ${accent}72`, textShadow: '0 1px 3px rgba(0,0,0,.25)',
               fontFamily: 'Inter, system-ui, sans-serif',
             }}>
               {resume > 0 ? `${skin.questLabel} · ${resume} done ✨` : `${skin.questLabel}! ✨`}
