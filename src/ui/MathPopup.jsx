@@ -127,8 +127,8 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
             {phase === 'recover' && (
               <div style={{ paddingBottom: 6 }}>
                 <div style={{ textAlign: 'center', marginBottom: 14 }}>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
-                  <div style={{ fontSize: 15, color: T.textTertiary, marginTop: 4 }}>No worries — follow the steps, then give it another go.</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
+                  <div style={{ fontSize: 'var(--text-base)', color: T.textSecondary, marginTop: 4 }}>No worries — follow the steps, then give it another go.</div>
                 </div>
                 <WorkedExample problem={problem} onBack={backToAsk} />
               </div>
@@ -165,8 +165,8 @@ function CorrectState({ skin, pay, onNext }) {
         <Gem size={72} style={{ animation: 'gemSpin .5s ease-out both', filter: 'drop-shadow(0 6px 14px rgba(46,197,197,.4))' }} />
       </div>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 26, fontWeight: 700, color: T.textPrimary }}>Nice work!</div>
-        <div style={{ fontSize: 16, color: T.textTertiary, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+        <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>Nice work!</div>
+        <div style={{ fontSize: 'var(--text-base)', color: T.textSecondary, marginTop: 4, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
           {skin.win} <span>+{pay}</span> <Gem size={18} />
         </div>
       </div>
