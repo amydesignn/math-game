@@ -1,9 +1,9 @@
 # Contrast audit — MathPopup
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/MathPopup.jsx` · **Run:** 2026-10-04 19:53 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/MathPopup.jsx` · **Run:** 2026-10-05 12:49 UTC  
 **Variants:** 2-digit × 1-digit, Long multiplication, 2-digit addition, Long division · **Phases:** ask → correct → recover → walkthrough
 
-> **353 unique checks · 344 pass · 0 fail · 1 exempt (disabled) · 0 need review**
+> **354 unique checks · 345 pass · 0 fail · 1 exempt (disabled) · 0 need review**
 
 **Rules applied**
 
@@ -22,55 +22,55 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
-| Your pet wants a snack! Solve it to fill the bowl. | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | ask |
-| 25 | `#262626` on `#FFFFFF` | 46px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| × | `#6E6E6E` on `#FFFFFF` | 40px (large) | 5.09:1 | 3.00:1 | ✅ | ask, recover |
-| 3 | `#262626` on `#FFFFFF` | 46px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
-| 1 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 2 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 4 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
-| 5 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 6 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
-| 7 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 8 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 9 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 0 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| Check | `#FFFFFF` on `#2D6DF6` | 16px bold | 4.53:1 | 4.50:1 | ✅ | ask |
-| Type your answer, then tap Check | `#6E6E6E` on `#FFFFFF` | 12.5px | 5.09:1 | 4.50:1 | ✅ | ask |
-| SNACK TIME | `#00786F` on `#F3FBFA` ᵖ | 13px bold | 5.10:1 | 4.50:1 | ✅ | ask, correct, recover |
+| Your pet wants a snack! Solve it to fill the bowl. | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | ask |
+| 14 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| × | `#737373` on `#FFFFFF` | 40px (large) | 4.74:1 | 3.00:1 | ✅ | ask, recover |
+| 6 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 1 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 2 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
+| 3 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 4 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 5 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
+| 7 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
+| 8 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 9 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 0 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| Check | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | ask |
+| Type your answer, then tap Check | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | ask |
+| SNACK TIME | `#00786F` on `#F2FBFA` ᵖ | 12px bold | 5.10:1 | 4.50:1 | ✅ | ask, correct, recover |
 | Nice work! | `#262626` on `#FFFFFF` | 26px bold (large) | 15.13:1 | 3.00:1 | ✅ | correct |
-| Yum! Your pet is happy. +1 | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | correct |
-| +1 | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | correct |
-| Keep going ✨ | `#FFFFFF` on `#2D6DF6` | 17px bold | 4.53:1 | 4.50:1 | ✅ | correct |
+| Yum! Your pet is happy. +1 | `#737373` on `#FFFFFF` | 16px | 4.74:1 | 4.50:1 | ✅ | correct |
+| +1 | `#737373` on `#FFFFFF` | 16px | 4.74:1 | 4.50:1 | ✅ | correct |
+| Keep going ✨ | `#FFFFFF` on `#6169E0` | 17px bold | 4.55:1 | 4.50:1 | ✅ | correct |
 | Let's look at one together 💡 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | recover |
-| No worries — follow the steps, then give it another go. | `#6E6E6E` on `#FFFFFF` | 15px | 5.09:1 | 4.50:1 | ✅ | recover |
-| Your problem: | `#6E6E6E` on `#FFFFFF` | 14px | 5.09:1 | 4.50:1 | ✅ | recover |
-| 45 × 2 | `#262626` on `#FFFFFF` | 14px bold | 15.13:1 | 4.50:1 | ✅ | recover |
-| · here's one just like it | `#6E6E6E` on `#FFFFFF` | 14px | 5.09:1 | 4.50:1 | ✅ | recover |
-| Line up the ones, with the × underneath. | `#262626` on `#EFF4FF` | 17px | 13.73:1 | 4.50:1 | ✅ | recover |
-| Show next step ▸ | `#FFFFFF` on `#2D6DF6` | 17px bold | 4.53:1 | 4.50:1 | ✅ | recover |
-| I've got it | `#2D6DF6` on `#FFFFFF` | 17px bold | 4.53:1 | 4.50:1 | ✅ | recover |
+| No worries — follow the steps, then give it another go. | `#737373` on `#FFFFFF` | 15px | 4.74:1 | 4.50:1 | ✅ | recover |
+| Your problem: | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | recover |
+| 19 × 3 | `#262626` on `#FFFFFF` | 14px bold | 15.13:1 | 4.50:1 | ✅ | recover |
+| · here's one just like it | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | recover |
+| Line up the ones, with the × underneath. | `#262626` on `#F1F1FD` | 17px | 13.50:1 | 4.50:1 | ✅ | recover |
+| Show next step ▸ | `#FFFFFF` on `#6169E0` | 17px bold | 4.55:1 | 4.50:1 | ✅ | recover |
+| I've got it | `#4B54DD` on `#FFFFFF` | 17px bold | 5.81:1 | 4.50:1 | ✅ | recover |
 
 ### Interactive elements — every state
 
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
-| Close | ✅ 4.51:1 | ✅ 4.51:1 | ✅ 4.51:1 | ✅ 4.51:1 | ✅ 4.13:1 · 80% of edge | ask |
-| 1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 2 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 3 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 4 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 5 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 6 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 7 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 8 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 9 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| delete | ✅ 5.10:1 | ✅ 5.10:1 | ✅ 5.10:1 | ✅ 5.10:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 0 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| check | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 5.21:1 · 63% of edge | ask |
-| Keep going ✨ | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 5.39:1 · 56% of edge | correct |
-| Show next step ▸ | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 5.33:1 · 56% of edge | recover |
-| I've got it | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 5.33:1 · 91% of edge | recover |
+| Close | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 3.95:1 · 72% of edge | ask |
+| 1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 2 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 3 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 4 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 5 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 6 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 7 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 8 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 9 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| delete | ✅ 4.74:1 | ✅ 4.74:1 | ✅ 4.74:1 | ✅ 4.74:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 0 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| check | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.99:1 · 63% of edge | ask |
+| Keep going ✨ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.18:1 · 56% of edge | correct |
+| Show next step ▸ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.18:1 · 56% of edge | recover |
+| I've got it | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.18:1 · 90% of edge | recover |
 
 ## Long multiplication
 
@@ -78,57 +78,57 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
-| Your pet wants a snack! Solve it to fill the bowl. | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | ask |
-| 32 | `#262626` on `#FFFFFF` | 46px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| × | `#6E6E6E` on `#FFFFFF` | 40px (large) | 5.09:1 | 3.00:1 | ✅ | ask, recover |
-| 30 | `#262626` on `#FFFFFF` | 46px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 1 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| Your pet wants a snack! Solve it to fill the bowl. | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | ask |
+| 20 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| × | `#737373` on `#FFFFFF` | 40px (large) | 4.74:1 | 3.00:1 | ✅ | ask, recover |
+| 21 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 1 | `#262626` on `#F0FBFA` ᵖ | 28px bold (large) | 14.33:1 | 3.00:1 | ✅ | ask, recover |
 | 2 | `#262626` on `#F0FBFA` ᵖ | 28px bold (large) | 14.33:1 | 3.00:1 | ✅ | ask, recover |
-| 3 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
-| 4 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
-| 5 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 6 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 7 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 8 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 9 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 0 | `#262626` on `#F0FBFA` ᵖ | 28px bold (large) | 14.33:1 | 3.00:1 | ✅ | ask, recover |
-| Check | `#FFFFFF` on `#2D6DF6` | 16px bold | 4.53:1 | 4.50:1 | ✅ | ask |
-| Type your answer, then tap Check | `#6E6E6E` on `#FFFFFF` | 12.5px | 5.09:1 | 4.50:1 | ✅ | ask |
-| SNACK TIME | `#00786F` on `#F3FBFA` ᵖ | 13px bold | 5.10:1 | 4.50:1 | ✅ | ask, correct, recover |
+| 3 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
+| 4 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
+| 5 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 6 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 7 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 8 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 9 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 0 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| Check | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | ask |
+| Type your answer, then tap Check | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | ask |
+| SNACK TIME | `#00786F` on `#F2FBFA` ᵖ | 12px bold | 5.10:1 | 4.50:1 | ✅ | ask, correct, recover |
 | Nice work! | `#262626` on `#FFFFFF` | 26px bold (large) | 15.13:1 | 3.00:1 | ✅ | correct |
-| Yum! Your pet is happy. +1 | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | correct |
-| +1 | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | correct |
-| Keep going ✨ | `#FFFFFF` on `#2D6DF6` | 17px bold | 4.53:1 | 4.50:1 | ✅ | correct |
+| Yum! Your pet is happy. +1 | `#737373` on `#FFFFFF` | 16px | 4.74:1 | 4.50:1 | ✅ | correct |
+| +1 | `#737373` on `#FFFFFF` | 16px | 4.74:1 | 4.50:1 | ✅ | correct |
+| Keep going ✨ | `#FFFFFF` on `#6169E0` | 17px bold | 4.55:1 | 4.50:1 | ✅ | correct |
 | Let's look at one together 💡 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | recover |
-| No worries — follow the steps, then give it another go. | `#6E6E6E` on `#FFFFFF` | 15px | 5.09:1 | 4.50:1 | ✅ | recover |
-| Your problem: | `#6E6E6E` on `#FFFFFF` | 14px | 5.09:1 | 4.50:1 | ✅ | recover |
-| 30 × 32 | `#262626` on `#FFFFFF` | 14px bold | 15.13:1 | 4.50:1 | ✅ | recover |
-| · here's one just like it | `#6E6E6E` on `#FFFFFF` | 14px | 5.09:1 | 4.50:1 | ✅ | recover |
+| No worries — follow the steps, then give it another go. | `#737373` on `#FFFFFF` | 15px | 4.74:1 | 4.50:1 | ✅ | recover |
+| Your problem: | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | recover |
+| 33 × 32 | `#262626` on `#FFFFFF` | 14px bold | 15.13:1 | 4.50:1 | ✅ | recover |
+| · here's one just like it | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | recover |
 | WHOLE | `#FFFFFF` on `#00786F` | 10.5px bold | 5.36:1 | 4.50:1 | ✅ | recover |
-| 20 stays WHOLE — it's the whole team, we never split it apar | `#262626` on `#EFF4FF` | 17px | 13.73:1 | 4.50:1 | ✅ | recover |
-| Show next step ▸ | `#FFFFFF` on `#2D6DF6` | 17px bold | 4.53:1 | 4.50:1 | ✅ | recover |
-| I've got it | `#2D6DF6` on `#FFFFFF` | 17px bold | 4.53:1 | 4.50:1 | ✅ | recover |
+| 12 stays WHOLE — it's the whole team, we never split it apar | `#262626` on `#F1F1FD` | 17px | 13.50:1 | 4.50:1 | ✅ | recover |
+| Show next step ▸ | `#FFFFFF` on `#6169E0` | 17px bold | 4.55:1 | 4.50:1 | ✅ | recover |
+| I've got it | `#4B54DD` on `#FFFFFF` | 17px bold | 5.81:1 | 4.50:1 | ✅ | recover |
 
 ### Interactive elements — every state
 
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
-| Close | ✅ 4.51:1 | ✅ 4.51:1 | ✅ 4.51:1 | ✅ 4.51:1 | ✅ 4.13:1 · 80% of edge | ask |
-| 1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 2 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 3 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 4 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 5 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 6 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 7 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 8 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 9 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| delete | ✅ 5.10:1 | ✅ 5.10:1 | ✅ 5.10:1 | ✅ 5.10:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 0 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| check | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 5.21:1 · 63% of edge | ask |
-| Keep going ✨ | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 5.39:1 · 56% of edge | correct |
-| Show next step ▸ | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 5.33:1 · 57% of edge | recover |
-| I've got it | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 5.41:1 · 91% of edge | recover |
+| Close | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 3.95:1 · 72% of edge | ask |
+| 1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 2 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 3 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 4 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 5 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 6 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 7 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 8 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 9 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| delete | ✅ 4.74:1 | ✅ 4.74:1 | ✅ 4.74:1 | ✅ 4.74:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 0 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| check | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.99:1 · 63% of edge | ask |
+| Keep going ✨ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.18:1 · 56% of edge | correct |
+| Show next step ▸ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.18:1 · 57% of edge | recover |
+| I've got it | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.18:1 · 90% of edge | recover |
 
 ## 2-digit addition
 
@@ -136,33 +136,34 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
-| Your pet wants a snack! Solve it to fill the bowl. | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | ask |
-| 46 | `#262626` on `#FFFFFF` | 46px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 1 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
-| 2 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 3 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 4 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 5 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 6 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
-| 7 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 8 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 9 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
-| 0 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| Check | `#FFFFFF` on `#2D6DF6` | 16px bold | 4.53:1 | 4.50:1 | ✅ | ask |
-| Type your answer, then tap Check | `#6E6E6E` on `#FFFFFF` | 12.5px | 5.09:1 | 4.50:1 | ✅ | ask |
-| SNACK TIME | `#00786F` on `#F1FBFA` ᵖ | 13px bold | 5.09:1 | 4.50:1 | ✅ | ask, correct, recover |
+| Your pet wants a snack! Solve it to fill the bowl. | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | ask |
+| 17 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 22 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 1 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
+| 2 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 3 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 4 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
+| 5 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 6 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 7 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
+| 8 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 9 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 0 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| Check | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | ask |
+| Type your answer, then tap Check | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | ask |
+| SNACK TIME | `#00786F` on `#F2FBFA` ᵖ | 12px bold | 5.10:1 | 4.50:1 | ✅ | ask, correct, recover |
 | Nice work! | `#262626` on `#FFFFFF` | 26px bold (large) | 15.13:1 | 3.00:1 | ✅ | correct |
-| Yum! Your pet is happy. +1 | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | correct |
-| +1 | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | correct |
-| Keep going ✨ | `#FFFFFF` on `#2D6DF6` | 17px bold | 4.53:1 | 4.50:1 | ✅ | correct |
+| Yum! Your pet is happy. +1 | `#737373` on `#FFFFFF` | 16px | 4.74:1 | 4.50:1 | ✅ | correct |
+| +1 | `#737373` on `#FFFFFF` | 16px | 4.74:1 | 4.50:1 | ✅ | correct |
+| Keep going ✨ | `#FFFFFF` on `#6169E0` | 17px bold | 4.55:1 | 4.50:1 | ✅ | correct |
 | Let's look at one together 💡 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | recover |
-| No worries — follow the steps, then give it another go. | `#6E6E6E` on `#FFFFFF` | 15px | 5.09:1 | 4.50:1 | ✅ | recover |
-| Your problem: | `#6E6E6E` on `#FFFFFF` | 14px | 5.09:1 | 4.50:1 | ✅ | recover |
-| 55 + 47 | `#262626` on `#FFFFFF` | 14px bold | 15.13:1 | 4.50:1 | ✅ | recover |
-| · here's one just like it | `#6E6E6E` on `#FFFFFF` | 14px | 5.09:1 | 4.50:1 | ✅ | recover |
-| Stack them so the ones line up under the ones. | `#262626` on `#EFF4FF` | 17px | 13.73:1 | 4.50:1 | ✅ | recover |
-| Show next step ▸ | `#FFFFFF` on `#2D6DF6` | 17px bold | 4.53:1 | 4.50:1 | ✅ | recover |
-| I've got it | `#2D6DF6` on `#FFFFFF` | 17px bold | 4.53:1 | 4.50:1 | ✅ | recover |
+| No worries — follow the steps, then give it another go. | `#737373` on `#FFFFFF` | 15px | 4.74:1 | 4.50:1 | ✅ | recover |
+| Your problem: | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | recover |
+| 39 + 26 | `#262626` on `#FFFFFF` | 14px bold | 15.13:1 | 4.50:1 | ✅ | recover |
+| · here's one just like it | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | recover |
+| Stack them so the ones line up under the ones. | `#262626` on `#F1F1FD` | 17px | 13.50:1 | 4.50:1 | ✅ | recover |
+| Show next step ▸ | `#FFFFFF` on `#6169E0` | 17px bold | 4.55:1 | 4.50:1 | ✅ | recover |
+| I've got it | `#4B54DD` on `#FFFFFF` | 17px bold | 5.81:1 | 4.50:1 | ✅ | recover |
 
 ## Long division
 
@@ -170,55 +171,55 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
-| Your pet wants a snack! Solve it to fill the bowl. | `#6E6E6E` on `#FFFFFF` | 16px | 5.09:1 | 4.50:1 | ✅ | ask |
-| 56 | `#262626` on `#FFFFFF` | 42px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| ÷ | `#6E6E6E` on `#FFFFFF` | 32px (large) | 5.09:1 | 3.00:1 | ✅ | ask |
+| Your pet wants a snack! Solve it to fill the bowl. | `#737373` on `#FFFFFF` | 16px | 4.74:1 | 4.50:1 | ✅ | ask |
+| 64 | `#262626` on `#FFFFFF` | 42px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| ÷ | `#737373` on `#FFFFFF` | 32px (large) | 4.74:1 | 3.00:1 | ✅ | ask |
 | 4 | `#262626` on `#FFFFFF` | 42px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| EACH SHARE | `#2D6DF6` on `#FFFFFF` | 10px bold | 4.53:1 | 4.50:1 | ✅ | ask |
-| LEFT OVER | `#6E6E6E` on `#FFFFFF` | 10px bold | 5.09:1 | 4.50:1 | ✅ | ask |
-| 1 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 2 | `#262626` on `#FAFAFA` | 22px bold (large) | 14.49:1 | 3.00:1 | ✅ | ask, walkthrough |
-| 3 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 5 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 6 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 7 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 8 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 9 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 0 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| Tap her share first — then the leftover. | `#6E6E6E` on `#FFFFFF` | 12.5px | 5.09:1 | 4.50:1 | ✅ | ask |
+| EACH SHARE | `#4B54DD` on `#FFFFFF` | 10px bold | 5.81:1 | 4.50:1 | ✅ | ask |
+| LEFT OVER | `#737373` on `#FFFFFF` | 10px bold | 4.74:1 | 4.50:1 | ✅ | ask |
+| 1 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 2 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 3 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 5 | `#262626` on `#FAFAFA` | 22px bold (large) | 14.49:1 | 3.00:1 | ✅ | ask, walkthrough |
+| 6 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 7 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 8 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 9 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 0 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| Tap her share first — then the leftover. | `#737373` on `#FFFFFF` | 12.5px | 4.74:1 | 4.50:1 | ✅ | ask |
 | Show me how 🔎 | `#6E5BC0` on `#FFFFFF` | 13.5px bold | 5.35:1 | 4.50:1 | ✅ | ask |
-| SNACK TIME | `#00786F` on `#F3FBFA` ᵖ | 13px bold | 5.10:1 | 4.50:1 | ✅ | ask |
+| SNACK TIME | `#00786F` on `#F3FBFA` ᵖ | 12px bold | 5.10:1 | 4.50:1 | ✅ | ask |
 | Let's share the candy 🍬 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | walkthrough |
-| 12 | `#262626` on `#FAFAFA` | 40px bold (large) | 14.49:1 | 3.00:1 | ✅ | walkthrough |
+| 20 | `#262626` on `#FAFAFA` | 40px bold (large) | 14.49:1 | 3.00:1 | ✅ | walkthrough |
 | DIVIDEND | `#C6005C` on `#FDF2F8` | 10px bold | 5.40:1 | 4.50:1 | ✅ | walkthrough |
-| You have 12 candies to share. | `#262626` on `#FAFAFA` | 16.5px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
+| You have 20 candies to share. | `#262626` on `#FAFAFA` | 16.5px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
 | DIVISOR | `#000000` on `#FAFAFA` | 10px bold | 20.11:1 | 4.50:1 | ✅ | walkthrough |
-| You share them with 2 friends. | `#262626` on `#FAFAFA` | 16.5px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
+| You share them with 5 friends. | `#262626` on `#FAFAFA` | 16.5px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
 | QUOTIENT | `#8A6D00` on `#FEF9C2` | 10px bold | 4.57:1 | 4.50:1 | ✅ | walkthrough |
 | How many does each friend get? | `#262626` on `#FAFAFA` | 16.5px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
-| Let's discover it! ▸ | `#FFFFFF` on `#2D6DF6` | 16px bold | 4.53:1 | 4.50:1 | ✅ | walkthrough |
+| Let's discover it! ▸ | `#FFFFFF` on `#6169E0` | 16px bold | 4.55:1 | 4.50:1 | ✅ | walkthrough |
 
 ### Interactive elements — every state
 
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
-| Close | ✅ 4.51:1 | ✅ 4.51:1 | ✅ 4.51:1 | ✅ 4.51:1 | ✅ 4.13:1 · 80% of edge | ask, walkthrough |
-| quotient | — | — | — | — | ✅ 6.05:1 · 89% of edge | ask |
-| remainder | — | — | — | — | ✅ 7.66:1 · 88% of edge | ask |
-| 1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 2 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 3 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 4 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 5 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 6 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 7 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 8 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 9 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
-| delete | ✅ 5.10:1 | ✅ 5.10:1 | ✅ 5.10:1 | ✅ 5.10:1 | ✅ 5.43:1 · 92% of edge | ask |
-| 0 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.43:1 · 92% of edge | ask |
+| Close | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 3.95:1 · 72% of edge | ask, walkthrough |
+| quotient | — | — | — | — | ✅ 6.04:1 · 89% of edge | ask |
+| remainder | — | — | — | — | ✅ 7.65:1 · 88% of edge | ask |
+| 1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 2 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 3 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 4 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 5 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 6 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 7 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 8 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 9 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
+| delete | ✅ 4.74:1 | ✅ 4.74:1 | ✅ 4.74:1 | ✅ 4.74:1 | ✅ 5.16:1 · 92% of edge | ask |
+| 0 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 5.16:1 · 92% of edge | ask |
 | check | ⚪ disabled 1.81:1 — exempt (WCAG 1.4.3) | | | | | ask |
-| Show me how 🔎 | ✅ 5.35:1 | ✅ 5.35:1 | ✅ 5.35:1 | ✅ 5.35:1 | ✅ 7.66:1 · 98% of edge | ask |
-| Let's discover it! ▸ | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 4.53:1 | ✅ 5.13:1 · 56% of edge | walkthrough |
+| Show me how 🔎 | ✅ 5.35:1 | ✅ 5.35:1 | ✅ 5.35:1 | ✅ 5.35:1 | ✅ 7.65:1 · 95% of edge | ask |
+| Let's discover it! ▸ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.93:1 · 56% of edge | walkthrough |
 
 ---
 

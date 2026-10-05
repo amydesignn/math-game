@@ -16,12 +16,12 @@ import { OPSYM, buildStages, buildStagesMulti } from '../math'
 export const T = {
   // Brand Iris — actions + focus: 600 face · 700 deep (shadow + text) · 100 soft · 50 tint.
   // Replaced the off-brand blue #2D6DF6 (Amy 2026-10-04).
-  irisFace: '#6169E0', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
-  iris: '#4B54DD', irisDeep: '#3D43BE', irisSoft: '#E4E5FA', irisTint: '#F1F1FD',
+  irisFace: 'var(--brand-iris-500)', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
+  iris: 'var(--brand-iris-600)', irisDeep: 'var(--brand-iris-700)', irisSoft: 'var(--brand-iris-100)', irisTint: 'var(--brand-iris-50)', // Datum names (was raw hex, same values)
   teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
   textPrimary: 'var(--color-text-primary)', textSecondary: 'var(--color-text-secondary)', textTertiary: 'var(--color-text-tertiary)', // Datum text tiers by name
-  line: '#E6E6E6', surface: '#FFFFFF',
-  lilac: '#8570D2', lilacDeep: '#473B7C', // Lilac 600 / 900
+  line: 'var(--color-border-default)', surface: 'var(--color-background-base)', // was #E6E6E6 (one off neutral-200) / #FFFFFF
+  lilac: 'var(--brand-lilac-600)', lilacDeep: 'var(--brand-lilac-900)', // Lilac 600 / 900
   violet: '#7F22FE', amber: '#FE9A00', amberDeep: '#D97706',
   radius: 26, radiusSm: 16,
 }
@@ -44,7 +44,7 @@ export const MODAL = {
   width: 'min(520px, calc(100vw - 40px))',
   // 40, not Oscar's token 36: Amy's call — a friendlier tap target on Ivy's iPad
   // (his comp rendered 40 while MODAL said 36; 40 is what the screenshots show).
-  close: 40, closeBg: '#ECEAF1', closeFg: '#6E6685',
+  close: 40, closeBg: 'var(--color-background-brand-subtle)', closeFg: 'var(--color-icon-secondary)', // was #ECEAF1 / #6E6685 (off-palette) → lilac-100 + neutral-600, like the Door gear
 }
 
 /* ---- LEVEL IDENTITY — the one violet -----------------------------------
@@ -145,7 +145,7 @@ export function Sparkles({ colors = ['#fff', T.tealLt, T.irisSoft], n = 14 }) {
         <svg key={i} viewBox="0 0 24 24" width={s.sz} height={s.sz}
           style={{ position: 'absolute', left: s.left, top: s.top, transform: 'translate(-50%,-50%)',
             animation: `sparkTwinkle .8s ${s.delay}ms ease-out both`, filter: 'drop-shadow(0 0 4px rgba(255,255,255,.9))' }}>
-          <path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12z" fill={s.c} />
+          <path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12z" style={{ fill: s.c }} /* style, not the attribute: var() only resolves in CSS */ />
         </svg>
       ))}
     </div>
@@ -156,7 +156,7 @@ export function Sparkles({ colors = ['#fff', T.tealLt, T.irisSoft], n = 14 }) {
 export function BigButton({ children, onClick, tone = 'primary', style }) {
   const [down, setDown] = useState(false)
   const tones = {
-    primary: { bg: T.irisFace, fg: '#fff', sh: T.irisDeep },
+    primary: { bg: T.irisFace, fg: 'var(--color-text-on-brand)', sh: T.irisDeep },
     ghost: { bg: '#fff', fg: T.iris, sh: '#C9CBF5' },
     amber: { bg: T.amber, fg: '#fff', sh: T.amberDeep },
   }
@@ -178,13 +178,14 @@ export function EquationRow({ a, op, b, entry }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, padding: '6px 0 2px',
       fontVariantNumeric: 'tabular-nums' }}>
-      <span style={{ fontSize: 46, fontWeight: 700, color: T.textPrimary }}>{a}</span>
-      <span style={{ fontSize: 40, fontWeight: 600, color: T.textTertiary }}>{OPSYM[op]}</span>
-      <span style={{ fontSize: 46, fontWeight: 700, color: T.textPrimary }}>{b}</span>
-      <span style={{ fontSize: 40, fontWeight: 600, color: T.textTertiary }}>=</span>
+      {/* game display sizes on Datum's full scale: numbers 46→48 (5xl), operators 40 (--text-40) */}
+      <span style={{ fontSize: 'var(--text-5xl)', fontWeight: 700, color: T.textPrimary }}>{a}</span>
+      <span style={{ fontSize: 'var(--text-40)', fontWeight: 600, color: T.textTertiary }}>{OPSYM[op]}</span>
+      <span style={{ fontSize: 'var(--text-5xl)', fontWeight: 700, color: T.textPrimary }}>{b}</span>
+      <span style={{ fontSize: 'var(--text-40)', fontWeight: 600, color: T.textTertiary }}>=</span>
       <span style={{ minWidth: 96, height: 66, borderRadius: 14, border: `2.5px solid ${entry ? T.iris : T.irisSoft}`,
-        background: entry ? T.irisTint : '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 40, fontWeight: 700, color: T.iris, transition: 'all .15s' }}>{entry || ''}</span>
+        background: entry ? T.irisTint : 'var(--color-background-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 'var(--text-40)', fontWeight: 700, color: 'var(--color-text-brand)', transition: 'all .15s' }}>{entry || ''}</span>
     </div>
   )
 }
@@ -373,15 +374,16 @@ export function Keypad({ onKey, okDisabled = false }) {
     </div>
   )
 }
+const KEY_BG = 'var(--color-background-interactive-default)', KEY_EDGE = 'var(--neutral-300)' // edge was #d9d9d9 (off-palette)
 function KeypadKey({ k, isOk, isDel, onKey, disabled = false }) {
   const [down, setDown] = useState(false)
-  const base = { height: 58, borderRadius: 14, border: 'none', fontWeight: 700, fontSize: 22, cursor: disabled ? 'default' : 'pointer',
+  const base = { height: 58, borderRadius: 14, border: 'none', fontWeight: 700, fontSize: 'var(--text-2xl)', // 22→24 (Datum 2xl) cursor: disabled ? 'default' : 'pointer',
     fontVariantNumeric: 'tabular-nums', transition: 'transform .06s, box-shadow .06s' }
   let sty
   if (isOk && disabled) sty = { ...base, background: '#EDEBF2', color: '#b5aec4', boxShadow: '0 4px 0 #dcd8e4', fontSize: 16 } // Oscar's disabled Check
-  else if (isOk) sty = { ...base, background: T.irisFace, color: '#fff', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 16 }
-  else if (isDel) sty = { ...base, background: '#fff', color: T.textTertiary, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
-  else sty = { ...base, background: '#fff', color: T.textPrimary, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
+  else if (isOk) sty = { ...base, background: T.irisFace, color: 'var(--color-text-on-brand)', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 'var(--text-base)', fontWeight: 500 } // Datum button: 16 / 500
+  else if (isDel) sty = { ...base, background: KEY_BG, color: 'var(--color-icon-tertiary)', boxShadow: down ? `0 1px 0 ${KEY_EDGE}` : `0 4px 0 ${KEY_EDGE}` }
+  else sty = { ...base, background: KEY_BG, color: T.textPrimary, boxShadow: down ? `0 1px 0 ${KEY_EDGE}` : `0 4px 0 ${KEY_EDGE}` }
   return (
     <button onPointerDown={() => !disabled && setDown(true)} onPointerUp={() => setDown(false)} onPointerLeave={() => setDown(false)}
       onClick={() => !disabled && onKey(k)} disabled={disabled}
