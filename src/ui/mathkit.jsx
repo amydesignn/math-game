@@ -560,7 +560,7 @@ export function WorkedExample({ problem, onBack }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
       <div style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center',
-        color: T.textSecondary, fontSize: 'var(--text-sm)', fontWeight: 500 }}>
+        color: T.textPrimary, fontSize: 'var(--text-base)', fontWeight: 400 }}> {/* main content: 16 primary (Amy 2026-10-05) */}
         <span>Your problem:</span>
         <span style={{ color: T.textPrimary, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {problem.a} {OPSYM[problem.op]} {problem.b}
