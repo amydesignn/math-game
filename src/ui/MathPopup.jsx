@@ -104,7 +104,7 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
             background: `linear-gradient(180deg,${skin.accent}14,#fff)`, borderBottom: `1px solid ${T.line}` }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
-            <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
+            <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
             <div style={{ flex: 1 }} />
             {phase === 'ask' && <ModalClose onClick={() => onClose(false)} />}
           </div>
@@ -142,10 +142,12 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
 function AskState({ skin, problem, entry, onKey }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.textTertiary }}>{skin.ask}</div>
+      {/* instruction = content 16/400 primary · hint = supporting 14/400 secondary (Amy 2026-10-05) */}
+      <div style={{ textAlign: 'center', fontSize: 'var(--text-base)', fontWeight: 400, color: T.textPrimary }}>{skin.ask}</div>
       <EquationRow a={problem.a} op={problem.op} b={problem.b} entry={entry} />
       <Keypad onKey={onKey} />
-      <div style={{ textAlign: 'center', fontSize: 12.5, color: T.textTertiary, fontWeight: 500, marginTop: 2 }}>
+      {/* 16 gap + 8 = 24 above the hint (the keys' 4px edge shadow eats into it visually) */}
+      <div style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 400, marginTop: 8 }}>
         Type your answer, then tap Check
       </div>
     </div>

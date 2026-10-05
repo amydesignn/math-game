@@ -140,7 +140,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
           background: `linear-gradient(180deg,${skin.accent}14,#fff)`, borderBottom: `1px solid ${T.line}` }}>
           <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
-          <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
+          <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
           <span style={{ fontWeight: 700, fontSize: 11.5, letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff',
             background: skin.accentInk, borderRadius: 9, padding: '4px 9px' }}>Quest</span>
           <div style={{ flex: 1 }} />
@@ -176,12 +176,13 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                   onWalkthrough={() => setPhase('recover')} />
               ) : (
                 <>
-                  <div style={{ textAlign: 'center', fontSize: 15, fontWeight: 500, color: T.textTertiary }}>
+                  {/* same roles as MathPopup's ask: instruction 16/400 primary · hint 14/400 secondary (Amy 2026-10-05) */}
+                  <div style={{ textAlign: 'center', fontSize: 'var(--text-base)', fontWeight: 400, color: T.textPrimary }}>
                     {skin.stepNoun[0].toUpperCase() + skin.stepNoun.slice(1)} {step + 1} of {total} — {skin.askShort}
                   </div>
                   <EquationRow a={problem.a} op={problem.op} b={problem.b} entry={entry} />
                   <Keypad onKey={onKey} />
-                  <div style={{ textAlign: 'center', fontSize: 12.5, color: T.textTertiary, fontWeight: 500 }}>Type your answer, then tap Check</div>
+                  <div style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 400, marginTop: 10 }}>Type your answer, then tap Check</div>
                 </>
               )}
             </div>

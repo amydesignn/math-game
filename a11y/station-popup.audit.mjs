@@ -4,7 +4,7 @@
 // harness in src/main.jsx. Every skin re-tints the banner, Quest badge and slots, so
 // each skin is its own variant; the shared controls (keypad, buttons, close) are
 // checked state-by-state on the first skin and on the division ask.
-const BASE = 'http://localhost:5180/?a11y=station'
+const BASE = (process.env.AUDIT_BASE || 'http://localhost:5180/') + '?a11y=station' // AUDIT_BASE = a worktree's dev server
 const SKINS = [
   ['feedPet', 'Snack time'], ['waterTree', 'Water the tree'], ['bakery', 'Bakery run'],
   ['flowers', 'Flower patch'], ['arcade', 'Arcade night'], ['starParty', 'Star party'],

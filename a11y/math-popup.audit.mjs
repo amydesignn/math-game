@@ -2,7 +2,7 @@
 //   node ~/projects/nathan-mcp-codebase-01/tooling/contrast-audit/audit.mjs a11y/math-popup.audit.mjs
 // Needs the dev server (:5180) — drives the DEV-only `?a11y=math` harness in src/main.jsx.
 // The game always shows this popup in the Snack time skin, so variants = problem types.
-const BASE = 'http://localhost:5180/?a11y=math'
+const BASE = (process.env.AUDIT_BASE || 'http://localhost:5180/') + '?a11y=math' // AUDIT_BASE = a worktree's dev server
 const answer = async (page, n) => { await page.keyboard.type(String(n)); await page.keyboard.press('Enter') }
 
 export default {
