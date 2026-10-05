@@ -29,7 +29,7 @@ import { fileToAvatar } from '../avatar.js'
 import { MUSIC_TRACKS } from '../config'
 
 // Datum tokens by name (2026-10-04 binding + WCAG AA pass, Amy's calls):
-// text = neutral-800 · secondary = neutral-600 · meta = neutral-500 · links/icons = Lilac 800
+// text = neutral-800 · secondary = neutral-600 (subtitles, section labels) · meta = neutral-500 · links/icons = Lilac 800
 const IRIS = 'var(--brand-iris-600)',
   LILAC800 = 'var(--brand-lilac-800)',
   TEXT = 'var(--neutral-800)',
@@ -113,7 +113,7 @@ const sectionLabel = {
   fontSize: 11,
   fontWeight: 500,
   letterSpacing: '.08em',
-  color: META,
+  color: TEXT2, // secondary text (Amy 2026-10-05)
   textTransform: 'uppercase',
   padding: '0 4px 8px',
 }
@@ -189,7 +189,8 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                       <span style={{ display: 'block', fontSize: 16, fontWeight: 500, color: TEXT }}>Signed in</span>
                       <span style={{ display: 'block', fontSize: 14, fontWeight: 400, color: TEXT2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{auth.email || ''}</span>
                     </span>
-                    <button onClick={() => onSignOut?.()} style={{ border: 'none', background: 'transparent', color: IRIS, fontWeight: 500, fontSize: 14, cursor: 'pointer', padding: 8, borderRadius: 8, whiteSpace: 'nowrap' }}>
+                    {/* Datum Button ghost · md (colours + press live in index.css .luxiSet-ghost) */}
+                    <button onClick={() => onSignOut?.()} className="luxiSet-ghost" style={{ height: 32, padding: '0 10px', border: 'none', borderRadius: 4, fontWeight: 500, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' }}>
                       Sign out
                     </button>
                   </div>
@@ -211,12 +212,11 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                     aria-checked={sound}
                     aria-label="Sound"
                     onClick={() => onToggleSound?.(!sound)}
-                    style={{ width: 48, height: 28, borderRadius: 999, boxSizing: 'border-box', border: '1.5px solid ' + (sound ? IRIS : META), cursor: 'pointer', position: 'relative', padding: 0, transition: 'background .18s, border-color .18s', background: sound ? IRIS : LINE }}
+                    style={{ width: 48, height: 28, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', padding: 0, transition: 'background .18s', background: sound ? IRIS : META }}
                   >
-                    {/* OFF = Checkbox's unchecked rule (Amy 2026-10-04, option B): outline + knob in
-                        neutral-500, both ≥3:1 (WCAG 1.4.11) — OFF is unchecked, not disabled.
-                        ON = filled Iris, the knob grows to full white. Box is 45×25 inside the border. */}
-                    <span style={{ position: 'absolute', top: sound ? 0.5 : 4.5, left: sound ? 20.5 : 4.5, width: sound ? 24 : 16, height: sound ? 24 : 16, borderRadius: '50%', background: sound ? WHITE : META, boxShadow: sound ? '0 2px 5px rgba(0,0,0,.2)' : 'none', transition: 'all .18s' }} />
+                    {/* OFF = unchecked, not disabled, so it holds 3:1 (WCAG 1.4.11) — Amy 2026-10-05,
+                        option A: solid neutral-500 track (4.74 vs the sheet), white knob on it (4.74). */}
+                    <span style={{ position: 'absolute', top: 2, left: 2, width: 24, height: 24, borderRadius: '50%', background: WHITE, boxShadow: '0 2px 5px rgba(0,0,0,.2)', transition: 'transform .18s', transform: 'translateX(' + (sound ? '20px' : '0px') + ')' }} />
                   </button>
                 </div>
                 {/* Music picker (2026-10-04): Island = the default, Soft Focus = the
@@ -277,11 +277,13 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                 </button>
               </div>
 
-              <div style={{ padding: '12px 20px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid ' + LINE }}>
-                <a href={privacyHref} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 500, color: LILAC800 }}>
+              <div style={{ padding: '12px 20px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid ' + LINE }}>
+                {/* Datum Button link — it opens another page (Datum: navigation = link). Its 4px
+                    padding is why the footer's left pad is 16: the text still lines up at 20. */}
+                <a href={privacyHref} target="_blank" rel="noopener noreferrer" className="luxiSet-link" style={{ fontSize: 14, fontWeight: 500, padding: '0 4px', borderRadius: 4 }}>
                   Privacy Policy
                 </a>
-                <span style={{ fontSize: 12, fontWeight: 500, color: META, whiteSpace: 'nowrap' }}>Luxi Math</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: META, whiteSpace: 'nowrap' }}>Luxi Math</span>
               </div>
             </div>
         </div>

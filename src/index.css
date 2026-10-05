@@ -324,6 +324,19 @@ canvas { touch-action: none; display: block; }
 .luxiFb-notnow { transition: background .15s; }
 .luxiFb-notnow:hover { background: var(--brand-lilac-50); }
 
+/* Settings sheet buttons = Datum Button variants (button.tsx), values by token name.
+   ghost (Sign out): Iris 600 text · hover Lilac 100 · pressed Iris 200 + Iris 800 text · press scale .97.
+   link (Privacy Policy): underlined Iris 600 · hover Iris 700 on Lilac 100 · pressed Iris 800 on Lilac 200 ·
+   colour only, never scales (text under the finger shouldn't shrink). Hover/press in CSS — inline beats :hover. */
+.luxiSet-ghost { background: transparent; color: var(--brand-iris-600); transition: scale .1s cubic-bezier(.23,1,.32,1), color .15s, background-color .15s; }
+.luxiSet-ghost:hover { background: var(--brand-lilac-100); }
+.luxiSet-ghost:active { background: var(--brand-iris-200); color: var(--brand-iris-800); scale: .97; }
+.luxiSet-link { color: var(--brand-iris-600); text-decoration: underline; text-underline-offset: 4px; transition: color .15s, background-color .15s; }
+.luxiSet-link:hover { color: var(--brand-iris-700); background: var(--brand-lilac-100); }
+.luxiSet-link:active { color: var(--brand-iris-800); background: var(--brand-lilac-200); }
+.luxiSet-link:focus-visible { outline: 1px solid var(--brand-iris-800); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .luxiSet-ghost:active { scale: none; } }
+
 /* House focus ring (contrast audit, 2026-10-04 — Amy's interaction-states rule):
    1px in Iris 700, 2px gap so it reads on Iris buttons too (WCAG 1.4.11).
    Scoped to the shared modal shell; the app-wide pass comes with later audits. */

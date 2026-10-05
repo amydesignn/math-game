@@ -1,6 +1,6 @@
 # Contrast audit — SettingsSheet
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-05 00:33 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-05 04:38 UTC  
 **Variants:** Guest · sound on, Guest · sound off, Signed in · **Phases:** open
 
 > **160 unique checks · 157 pass · 0 fail · 0 exempt (disabled) · 0 need review**
@@ -25,16 +25,16 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Settings | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | open |
 | Save your progress | `#262626` on `#F6F2FF` | 16px | 13.73:1 | 4.50:1 | ✅ | open |
 | Sign up or sign in | `#525252` on `#F6F2FF` | 14px | 7.09:1 | 4.50:1 | ✅ | open |
-| PREFERENCES | `#737373` on `#FFFFFF` | 11px | 4.74:1 | 4.50:1 | ✅ | open |
+| PREFERENCES | `#525252` on `#FFFFFF` | 11px | 7.81:1 | 4.50:1 | ✅ | open |
 | Sound | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Music | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Island | `#FFFFFF` on `#4B54DD` | 14px | 5.81:1 | 4.50:1 | ✅ | open |
 | Soft Focus | `#5B4B9E` on `#EDE7FC` | 14px | 5.92:1 | 4.50:1 | ✅ | open |
-| HELP | `#737373` on `#FFFFFF` | 11px | 4.74:1 | 4.50:1 | ✅ | open |
+| HELP | `#525252` on `#FFFFFF` | 11px | 7.81:1 | 4.50:1 | ✅ | open |
 | How to Play | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Send Feedback | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
-| Privacy Policy | `#5B4B9E` on `#FFFFFF` | 14px | 7.13:1 | 4.50:1 | ✅ | open |
-| Luxi Math | `#737373` on `#FFFFFF` | 12px | 4.74:1 | 4.50:1 | ✅ | open |
+| Privacy Policy | `#4B54DD` on `#FFFFFF` | 14px | 5.81:1 | 4.50:1 | ✅ | open |
+| Luxi Math | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | open |
 
 ### Interactive elements — every state
 
@@ -47,7 +47,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Soft Focus | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 6.35:1 · 89% of edge | open |
 | How to Play | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
 | Send Feedback | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
-| Privacy Policy | ✅ 7.13:1 | ✅ 7.13:1 | ✅ 7.13:1 | ✅ 7.13:1 | ✅ 5.98:1 · 100% of edge | open |
+| Privacy Policy | ✅ 5.81:1 | ✅ 6.35:1 | ✅ 6.60:1 | ✅ 5.81:1 | ✅ 9.55:1 · 98% of edge | open |
 
 ## Guest · sound off
 
@@ -58,16 +58,16 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Settings | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | open |
 | Save your progress | `#262626` on `#F6F2FF` | 16px | 13.73:1 | 4.50:1 | ✅ | open |
 | Sign up or sign in | `#525252` on `#F6F2FF` | 14px | 7.09:1 | 4.50:1 | ✅ | open |
-| PREFERENCES | `#737373` on `#FFFFFF` | 11px | 4.74:1 | 4.50:1 | ✅ | open |
+| PREFERENCES | `#525252` on `#FFFFFF` | 11px | 7.81:1 | 4.50:1 | ✅ | open |
 | Sound | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Music | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Island | `#FFFFFF` on `#4B54DD` | 14px | 5.81:1 | 4.50:1 | ✅ | open |
 | Soft Focus | `#5B4B9E` on `#EDE7FC` | 14px | 5.92:1 | 4.50:1 | ✅ | open |
-| HELP | `#737373` on `#FFFFFF` | 11px | 4.74:1 | 4.50:1 | ✅ | open |
+| HELP | `#525252` on `#FFFFFF` | 11px | 7.81:1 | 4.50:1 | ✅ | open |
 | How to Play | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Send Feedback | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
-| Privacy Policy | `#5B4B9E` on `#FFFFFF` | 14px | 7.13:1 | 4.50:1 | ✅ | open |
-| Luxi Math | `#737373` on `#FFFFFF` | 12px | 4.74:1 | 4.50:1 | ✅ | open |
+| Privacy Policy | `#4B54DD` on `#FFFFFF` | 14px | 5.81:1 | 4.50:1 | ✅ | open |
+| Luxi Math | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | open |
 
 ### Interactive elements — every state
 
@@ -80,7 +80,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Soft Focus | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 6.35:1 · 89% of edge | open |
 | How to Play | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
 | Send Feedback | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
-| Privacy Policy | ✅ 7.13:1 | ✅ 7.13:1 | ✅ 7.13:1 | ✅ 7.13:1 | ✅ 5.98:1 · 100% of edge | open |
+| Privacy Policy | ✅ 5.81:1 | ✅ 6.35:1 | ✅ 6.60:1 | ✅ 5.81:1 | ✅ 9.55:1 · 98% of edge | open |
 
 ## Signed in
 
@@ -92,16 +92,16 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Signed in | `#262626` on `#F6F2FF` | 16px | 13.73:1 | 4.50:1 | ✅ | open |
 | ivy@email.com | `#525252` on `#F6F2FF` | 14px | 7.09:1 | 4.50:1 | ✅ | open |
 | Sign out | `#4B54DD` on `#F6F2FF` | 14px | 5.27:1 | 4.50:1 | ✅ | open |
-| PREFERENCES | `#737373` on `#FFFFFF` | 11px | 4.74:1 | 4.50:1 | ✅ | open |
+| PREFERENCES | `#525252` on `#FFFFFF` | 11px | 7.81:1 | 4.50:1 | ✅ | open |
 | Sound | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Music | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Island | `#FFFFFF` on `#4B54DD` | 14px | 5.81:1 | 4.50:1 | ✅ | open |
 | Soft Focus | `#5B4B9E` on `#EDE7FC` | 14px | 5.92:1 | 4.50:1 | ✅ | open |
-| HELP | `#737373` on `#FFFFFF` | 11px | 4.74:1 | 4.50:1 | ✅ | open |
+| HELP | `#525252` on `#FFFFFF` | 11px | 7.81:1 | 4.50:1 | ✅ | open |
 | How to Play | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Send Feedback | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
-| Privacy Policy | `#5B4B9E` on `#FFFFFF` | 14px | 7.13:1 | 4.50:1 | ✅ | open |
-| Luxi Math | `#737373` on `#FFFFFF` | 12px | 4.74:1 | 4.50:1 | ✅ | open |
+| Privacy Policy | `#4B54DD` on `#FFFFFF` | 14px | 5.81:1 | 4.50:1 | ✅ | open |
+| Luxi Math | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | open |
 | I | `#FFFFFF` on `#6856B6` ᵖ | 16px bold | 5.84:1 | 4.50:1 | ✅ | open |
 
 ### Interactive elements — every state
@@ -109,13 +109,13 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
 | Close | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 3.94:1 | ✅ 4.33:1 · 75% of edge | open |
-| Sign out | ✅ 5.27:1 | ✅ 5.27:1 | ✅ 5.27:1 | ✅ 5.27:1 | ✅ 6.95:1 · 98% of edge | open |
+| Sign out | ✅ 5.27:1 | ✅ 4.82:1 | ✅ 6.06:1 | ✅ 5.27:1 | ✅ 6.95:1 · 98% of edge | open |
 | Sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
 | Island | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.61:1 · 85% of edge | open |
 | Soft Focus | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 6.35:1 · 89% of edge | open |
 | How to Play | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
 | Send Feedback | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
-| Privacy Policy | ✅ 7.13:1 | ✅ 7.13:1 | ✅ 7.13:1 | ✅ 7.13:1 | ✅ 5.98:1 · 100% of edge | open |
+| Privacy Policy | ✅ 5.81:1 | ✅ 6.35:1 | ✅ 6.60:1 | ✅ 5.81:1 | ✅ 9.55:1 · 98% of edge | open |
 
 ---
 
