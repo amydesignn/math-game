@@ -49,6 +49,20 @@
   --color-border-interactive-default: #737373; /* neutral-500 */
   --color-border-interactive-hover: #525252; /* neutral-600 */
   --color-border-interactive-focus: #4B54DD; /* brand-iris-600 */
+  --color-background-interactive-disabled: #F5F5F5; /* neutral-100 */
+  --color-border-disabled: #E5E5E5; /* neutral-200 */
+  --color-text-secondary: #525252; /* neutral-600 */
+
+  /* Datum TYPE tokens in use — size + line-height ride together (globals.css
+     overrides Tailwind's line-heights to 1.5 up to xl). Weights 400/500/700 only. */
+  --text-xs: 0.75rem;   --text-xs--line-height: 1.5;   /* 12px */
+  --text-sm: 0.875rem;  --text-sm--line-height: 1.5;   /* 14px */
+  --text-base: 1rem;    --text-base--line-height: 1.5; /* 16px */
+  --text-xl: 1.25rem;   --text-xl--line-height: 1.5;   /* 20px */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --tracking-widest: 0.1em;
 
   /* house-only (not Datum) */
   --lilac-50: #f6f4fd;
