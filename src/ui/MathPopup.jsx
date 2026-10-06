@@ -117,7 +117,7 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
              padding (no 22px wrapper). Multiplication/addition keep the compact
              inline recovery below. It teaches a matched `similar` problem (Track
              2's generator will supply one) then she retries hers via onDone. */
-          <DivisionWalkthrough problem={problem.similar || problem} onDone={backToAsk} />
+          <DivisionWalkthrough problem={problem.similar || problem} onDone={backToAsk} closeGutter />
         ) : (
           <div style={{ padding: '22px 26px 4px' }}>
             {phase === 'ask' && (problem.op === '÷'
