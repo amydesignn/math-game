@@ -83,6 +83,7 @@
   --color-border-default: #E5E5E5; /* neutral-200 */
   --color-icon-secondary: #525252; /* neutral-600 */
   --color-icon-tertiary: #737373; /* neutral-500 */
+  --color-icon-success: #00A63E; /* green-600 — Datum */
 
   /* Datum COMPONENT tokens in use — Button ghost (Settings Sign out) + link (Privacy
      Policy), copied verbatim from datum-tokens.css (styling-v0.20). */
