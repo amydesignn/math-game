@@ -196,9 +196,13 @@ canvas { touch-action: none; display: block; }
   align-items: start;
 }
 .doorLeft {
-  position: sticky;
-  top: 84px;
   align-self: start;
+}
+/* Sticky only when the whole column fits under the 84px header: with What's new
+   added it is ~716px tall, so on a 768px laptop a sticky column would hide the
+   quest strip. Shorter windows just scroll it with the page. */
+@media (min-height: 820px) {
+  .doorLeft { position: sticky; top: 84px; }
 }
 .doorWorlds {
   display: grid;
@@ -219,6 +223,14 @@ canvas { touch-action: none; display: block; }
   .doorGrid { grid-template-columns: minmax(0, 1fr); }
   .doorLeft { position: static; top: auto; }
 }
+/* What's new carousel (Door.jsx WhatsNew) */
+.doorNew-track::-webkit-scrollbar { display: none; }
+.doorNew-slide:hover img { transform: scale(1.03); }
+.doorNew-slide img { transition: transform .3s ease; }
+@media (prefers-reduced-motion: reduce) { .doorNew-slide:hover img { transform: none; } }
+.doorNew-slide:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: -2px; border-radius: 24px; } /* inset: the card clips overflow */
+.doorNew-arrow:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+.doorNew-arrow:hover { background: #FFFFFF !important; }
 @keyframes doorPop {
   0% { transform: scale(0.96) translateY(8px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }

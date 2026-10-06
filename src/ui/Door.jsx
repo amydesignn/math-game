@@ -20,6 +20,7 @@
  *   · profile     → the settings-lives-here-later affordance (soft avatar chip).
  */
 
+import { useRef, useState } from 'react'
 import { levelState, fmtPoints } from '../levels'
 import HeroStage from './HeroStage'
 import { GemIcon, ProfileChip } from './hudkit'
@@ -68,6 +69,20 @@ const WORLDS = BASE_WORLDS.map((w) => {
   return c ? { ...w, ...c, art: c.art ? ART + c.art : w.art } : w
 })
 const MEADOW = { id: 'meadow', name: 'The Meadow', blurb: 'Play together', tint: '#b48fe0' }
+
+/* ── What's new — THE place the Door announces game news (Amy 2026-10-06):
+   new maps, seasonal events, updates. Newest first; one entry = one slide.
+   `world` makes the slide a door into that world AND puts the same tag on its
+   world card below, so the carousel and the grid can never disagree.
+   Two tags only: 'Just in' = the freshest / seasonal drop (solid), 'New' = new
+   this season (soft). Remove an entry to retire its slide + card tag. */
+const UPDATES = [
+  { world: 'arcade', tag: 'Just in', title: 'Halloween in Spooky Arcade', line: 'Pumpkins, ghosts & glowing lights' },
+  { world: 'town', tag: 'New', title: 'Sunny Town', line: 'A brand-new map to explore' },
+  { world: 'market', tag: 'New', title: 'Merry Market', line: 'A brand-new map to explore' },
+  { world: 'clearing', tag: 'New', title: 'Forest Clearing', line: 'A brand-new map to explore' },
+]
+const WORLD_TAG = Object.fromEntries(UPDATES.filter((u) => u.world).map((u) => [u.world, u.tag]))
 
 /* ── icons (crafted, not emoji) ── */
 /* GemIcon + ProfileChip now live in hudkit.jsx (shared with the in-world HUD). */
@@ -196,6 +211,73 @@ function QuestCard({ quest }) {
   )
 }
 
+/* ── tag — 'Just in' solid Iris 500 (white 600 = 4.56:1), 'New' Lilac 100 + Iris 700 (7.4:1) ── */
+function Tag({ children, style }) {
+  const hot = children === 'Just in'
+  return <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 600, lineHeight: 1.5, padding: '0 8px', borderRadius: 999, background: hot ? V.btn : V.soft, color: hot ? '#FFFFFF' : 'var(--brand-iris-700)', ...style }}>{children}</span>
+}
+
+/* ── what's new — a full-bleed manual carousel (Amy 2026-10-06): the image fills
+   the card, "What's new" + the tag ride on it as pills, one arrow each side, no
+   pagination. No auto-rotate: it would need a pause control (WCAG 2.2.2) and a
+   moving card fights the quest strip for a kid's attention. Type = 14 + 12 only. ── */
+const newS = {
+  card: { position: 'relative', background: T.surface, borderRadius: 24, boxShadow: '0 2px 14px rgba(74,54,110,.07)', overflow: 'hidden', marginTop: 16, animation: 'doorPop .4s .03s ease-out both' },
+  track: { display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory', scrollbarWidth: 'none' },
+  slide: { flex: '0 0 100%', scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', border: 'none', background: T.surface, padding: 0, textAlign: 'left', cursor: 'pointer', font: 'inherit', minWidth: 0 },
+  media: { position: 'relative', display: 'block', width: '100%', height: 148, overflow: 'hidden' },
+  img: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' },
+  pill: { position: 'absolute', top: 12 }, // 'What's new' top-left · the tag top-right (Amy) — same corner as the world cards' tag
+  label: { display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 600, lineHeight: 1.5, padding: '0 8px', borderRadius: 999, background: 'rgba(255,255,255,.94)', color: T.textPrimary, boxShadow: '0 2px 8px rgba(74,54,110,.14)' },
+  text: { display: 'flex', flexDirection: 'column', gap: 2, padding: '12px 16px 16px' },
+  sTitle: { fontSize: BODY, fontWeight: 600, color: T.textPrimary, lineHeight: 1.4 },
+  sLine: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, lineHeight: 1.4 },
+  // arrows sit on the image's vertical centre (148 / 2 − 16), outside the track so they don't scroll
+  arrow: { position: 'absolute', top: 58, zIndex: 2, width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,.94)', color: 'var(--brand-iris-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0, boxShadow: '0 2px 8px rgba(74,54,110,.18)' },
+}
+function Chevron({ left }) {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={left ? 'm15 18-6-6 6-6' : 'm9 18 6-6-6-6'} /></svg>
+}
+function WhatsNew({ map, onPlay, onResume }) {
+  const track = useRef(null)
+  const [i, setI] = useState(0)
+  const n = UPDATES.length
+  if (!n) return null
+  const go = (k) => {
+    const t = track.current; if (!t) return
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    t.scrollTo({ left: ((k + n) % n) * t.clientWidth, behavior: reduce ? 'auto' : 'smooth' })
+  }
+  const onScroll = () => { const t = track.current; if (t) setI(Math.round(t.scrollLeft / t.clientWidth)) }
+  return (
+    <section style={newS.card} aria-roledescription="carousel" aria-label="What's new">
+      <div ref={track} className="doorNew-track" style={newS.track} onScroll={onScroll}>
+        {UPDATES.map((u, k) => {
+          const w = WORLDS.find((x) => x.id === u.world)
+          const open = () => (u.world === map ? onResume?.() : onPlay?.(u.world))
+          return (
+            <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`What's new, ${k + 1} of ${n}: ${u.tag}, ${u.title}. ${u.line}`} tabIndex={k === i ? 0 : -1}>
+              <span style={{ ...newS.media, ...(w ? worldThumb(w.tint) : null), position: 'relative' }}>
+                {w?.art && <img src={w.art} alt="" style={newS.img} loading="lazy" />}
+                <span style={{ ...newS.pill, left: 12, ...newS.label }}>What’s new</span>
+                <Tag style={{ ...newS.pill, right: 12, boxShadow: '0 2px 8px rgba(74,54,110,.14)' }}>{u.tag}</Tag>
+              </span>
+              <span style={newS.text}>
+                <span style={newS.sTitle}>{u.title}</span>
+                <span style={newS.sLine}>{u.line}</span>
+              </span>
+            </button>
+          )
+        })}
+      </div>
+      {n > 1 && <>
+        <button className="doorNew-arrow" style={{ ...newS.arrow, left: 8 }} onClick={() => go(i - 1)} aria-label="Previous"><Chevron left /></button>
+        <button className="doorNew-arrow" style={{ ...newS.arrow, right: 8 }} onClick={() => go(i + 1)} aria-label="Next"><Chevron /></button>
+      </>}
+    </section>
+  )
+}
+
 /* ── world card ── */
 const cardS = {
   card: { position: 'relative', background: T.surface, borderRadius: 22, boxShadow: '0 2px 14px rgba(74,54,110,.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column', animation: 'doorPop .4s ease-out both' },
@@ -218,6 +300,7 @@ function WorldCard({ world, current, locked, together, onPlay, onResume }) {
   return (
     <div style={cardS.card}>
       <div style={cardS.thumb}>
+        {WORLD_TAG[world.id] && !locked && <Tag style={{ position: 'absolute', right: 10, top: 10, zIndex: 2, boxShadow: '0 2px 8px rgba(74,54,110,.14)' }}>{WORLD_TAG[world.id]}</Tag>}
         {current && !locked && <span style={cardS.chip}><span style={{ width: 7, height: 7, borderRadius: '50%', background: V.main }}></span>Last played</span>}
         <div style={worldThumb(world.tint)}>
           {world.art && <img src={world.art} alt="" style={cardS.thumbImg} loading="lazy" />}
@@ -285,6 +368,7 @@ export default function Door({ mode, name, points, gems, map, quest, meadowOpen 
           <div className="doorLeft">
             <div style={dS.greet}>{greet}</div>
             <Hero mode={mode} points={points} gems={gems} />
+            <WhatsNew map={mode !== 'new' ? map : null} onPlay={onPlay} onResume={onResume} />
             <QuestCard quest={quest} />
           </div>
           {/* id + scroll-margin: the footer's "Worlds" link (#worlds) lands here,
