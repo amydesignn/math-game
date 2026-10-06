@@ -8,7 +8,7 @@
  * import (math.js already imports the store — the other direction would loop).
  */
 
-import { MAPS } from './maps'
+import { MAPS, blockers } from './maps'
 import { WORLD, STATION, REFRESH } from './config'
 import { generateStation } from './math'
 import { STATION_SKIN_IDS } from './ui/skins'
@@ -33,12 +33,13 @@ const shuffle = (arr) => {
  *  gates (a quest luring her into a gate would teleport her), and the scenery. */
 function pickSpot(map) {
   const B = WORLD.bounds - 3
+  const blk = blockers(map)
   for (let guard = 0; guard < 300; guard++) {
     const x = (Math.random() * 2 - 1) * B
     const z = (Math.random() * 2 - 1) * B
     if (Math.hypot(x, z) < 5) continue // not on top of the centre spawn
     if (map.gates.some((g) => Math.hypot(x - g.position[0], z - g.position[2]) < 4.5)) continue
-    if (map.decor.some((d) => Math.hypot(x - d.position[0], z - d.position[2]) < 2)) continue
+    if (blk.some(([bx, bz, r]) => Math.hypot(x - bx, z - bz) < 2 + r)) continue
     return [round(x), round(z)]
   }
   return [6, -6] // fallback — a corner of the playable field

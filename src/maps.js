@@ -8,6 +8,7 @@
 
 import { useGLTF } from '@react-three/drei'
 import { modelUrl } from './config'
+import { currentSeason } from './season'
 
 // Building-kit pieces are authored on a 2-unit grid, 2.4 tall — at full size a
 // wall towers ~3× over the mini characters. 0.8 keeps houses cozy (~2.5×).
@@ -31,19 +32,13 @@ const m = (name, x, z, rotation = 0, scale = MS) => ({
 const a = (name, x, z, rotation = 0, scale = MS) => ({
   pack: 'arcade', name, position: [x, 0, z], rotation, scale,
 })
+// a procedural Halloween prop (world/Spooky.jsx) — `fx` instead of a GLB name
+const sp = (fx, x, z, rotation = 0, scale = 1, extra = {}) => ({
+  fx, position: [x, 0, z], rotation, scale, ...extra,
+})
 
-/** A one-cell house: four walls + flat roof. `door` picks the doorway side. */
-function house(cx, cz, { door = 'e', windows = 'square' } = {}) {
-  const win = `wall-window-${windows}`
-  const pick = (side, fallback) => (door === side ? 'wall-doorway-round' : fallback)
-  return [
-    b(pick('w', win), cx - CELL, cz, 0),
-    b(pick('e', win), cx + CELL, cz, Math.PI),
-    b(pick('n', 'wall'), cx, cz - CELL, Math.PI / 2),
-    b(pick('s', 'wall'), cx, cz + CELL, -Math.PI / 2),
-    { pack: 'building', name: 'roof-flat-square', position: [cx, 2.4 * BS, cz], rotation: 0, scale: BS },
-  ]
-}
+// (house() — the one-cell building-kit house — retired with the old Sunny
+// Town 2026-10-06; it's in git history if a map wants houses again.)
 
 /** An open pavilion: four columns holding a flat roof. `k` scales it up. */
 function pavilion(cx, cz, k = 1) {
@@ -65,10 +60,11 @@ const jitter = (i, k = 0) => {
 
 /** A forest edge: two loose rows of trees just inside the map boundary, with
  *  openings where gates sit. `gaps` = gate positions [x, z] to keep clear. */
-function treeLine({ gaps = [], step = 2.3 } = {}) {
+function treeLine({ gaps = [], step = 2.3, inner = true } = {}) {
   const out = []
   let i = 0
-  for (const [inset, kind] of [[16.6, 'tree-high'], [14.6, 'tree']]) {
+  const rows = inner ? [[16.6, 'tree-high'], [14.6, 'tree']] : [[16.6, 'tree-high']]
+  for (const [inset, kind] of rows) {
     const span = inset
     for (let t = -span; t <= span; t += step) {
       for (const [x, z] of [[t, -inset], [t, inset], [-inset, t], [inset, t]]) {
@@ -113,6 +109,121 @@ function flowerBed(cx, cz, k = 1) {
     f('plant', cx - 0.1 * k, cz + 0.45 * k, 1.3, 1 * k),
   ]
 }
+
+// ── Map 5 — a games arcade on violet ground ──
+const ARCADE = {
+  id: 'arcade',
+  name: 'Star Arcade',
+  ground: '#ddcef6',
+  outside: '#b4a3d8',
+  sky: '#efe8fb',
+  gateColor: '#8f6fe8',
+  decor: [
+    // a row of arcade cabinets, screens facing the spawn
+    a('arcade-machine', -2.9, -5.5, Math.PI),
+    a('arcade-machine', -2.2, -5.5, Math.PI),
+    a('arcade-machine', -1.5, -5.5, Math.PI),
+    a('arcade-machine', -0.8, -5.5, Math.PI),
+    // the big machines get their own spots
+    a('dance-machine', 3.5, -4.5, Math.PI + 0.4),
+    a('claw-machine', -6, -3.5, 0.9),
+    a('air-hockey', 2.5, 0.5, 0.3),
+    a('pinball', -5, 1.5, Math.PI / 2),
+    a('pinball', -5, 2.6, Math.PI / 2),
+    a('basketball-game', 6, 2.5, -Math.PI / 2),
+    // prize corner
+    a('prize-wheel', 1.2, 6.5, Math.PI),
+    a('prizes', 2.8, 6.8, Math.PI),
+    a('ticket-machine', -0.6, 6.8, Math.PI),
+    // snacks + pillars
+    a('vending-machine', -7, 6, Math.PI / 2),
+    a('column', -9.5, -1), a('column', 9.5, -1),
+  ],
+  gates: [
+    { to: 'market', position: [-16, 0, -2] },
+    { to: 'clearing', position: [16, 0, 2] },
+  ],
+}
+
+// ── 🎃 Halloween: the Star Arcade turns spooky (season.js: Oct 1 → Nov 2) ──
+// Amy's ask (2026-10-06): floating fire + cute ghosts. Everything is ADDED on
+// top of the arcade (the machines stay — it's the arcade's Halloween party, not
+// a different map), dusk lighting, and the gate glow stays violet: the colour is
+// the signpost and must not change with the season. Props are procedural
+// (world/Spooky.jsx — no Kenney Halloween pack is staged).
+const ARCADE_HALLOWEEN = {
+  name: 'Spooky Arcade',
+  ground: '#b3a2e0',
+  outside: '#6e5a9e',
+  sky: '#2f2452',
+  light: { hemi: ['#d8c8ff', '#4b3a78', 0.85], dir: ['#ffd6a8', 0.75] },
+  card: { name: 'Spooky Arcade', blurb: 'Pumpkins, ghosts & glowing lights', art: 'arcade-halloween.jpg' },
+  decor: [
+    // the bubbling cauldron, straight ahead of spawn — the first thing she sees
+    sp('cauldron', 0, -2.8),
+    sp('pumpkin', -1.9, -1.4, 0.3, 0.8), sp('pumpkin', 2, -2.2, -0.4, 0.7, { carved: false }),
+
+    // fire-basket torches light the way gate → gate
+    sp('torch', -13, -4.2), sp('torch', -13, 0.2),
+    sp('torch', 13, -0.2), sp('torch', 13, 4.2),
+    sp('torch', -9, -4.6), sp('torch', 9, 4.6),
+
+    // jack-o'-lanterns among the machines
+    sp('pumpkin', -3.8, -6.3, 0.2, 0.9), sp('pumpkin', 0.2, -6.4, -0.2, 0.75),
+    sp('pumpkin', 4.4, 7.3, -0.3, 0.9), sp('pumpkin', -1.9, 7.5, 0.4, 0.8, { carved: false }),
+
+    // the pumpkin patch (south-east)
+    f('patch-dirt', 11, 9, 0.3, 1.8), f('patch-dirt', 12.6, 10.6, 1.4, 1.5),
+    sp('pumpkin', 10, 8.4, 0.2, 1.1), sp('pumpkin', 11.6, 8.1, -0.5, 0.9, { carved: false }),
+    sp('pumpkin', 13, 9, -0.3, 1.3), sp('pumpkin', 10.6, 10, 0.8, 0.8, { carved: false }),
+    sp('pumpkin', 12.2, 10.8, 0, 1), sp('pumpkin', 13.8, 11.6, 0.5, 0.7, { carved: false }),
+    sp('pumpkin', 9.6, 11.4, -0.2, 0.9),
+    f('plant', 11, 9.4, 0.4), f('plant', 12.8, 8.2, 2.2, 0.9),
+
+    // the boo-yard (north-west): friendly little headstones + candles
+    sp('grave', -13, -11, 0.2), sp('grave', -11.2, -11.5, 0, 1, { variant: 1 }),
+    sp('grave', -9.4, -11, -0.2), sp('grave', -12.2, -8.4, 0.1, 0.9, { variant: 1 }),
+    sp('grave', -10, -8.2, -0.1, 0.85),
+    sp('candle', -12.1, -10.1), sp('candle', -10.3, -10, 0, 1, { height: 0.5 }),
+    sp('candle', -8.6, -9.4, 0, 1, { height: 0.25 }),
+    sp('pumpkin', -13.9, -8.2, 0.6, 1),
+
+    // north-east: a pumpkin pile with candles
+    sp('pumpkin', 10.5, -9.4, 0.1, 1.4), sp('pumpkin', 12, -8.6, -0.5, 0.9),
+    sp('pumpkin', 11.2, -10.8, 0.3, 0.8, { carved: false }),
+    sp('candle', 9.4, -8.4), sp('candle', 9.8, -7.9, 0, 1, { height: 0.5 }), sp('candle', 12.7, -9.9, 0, 1, { height: 0.25 }),
+
+    // south-west, by the vending machine
+    sp('pumpkin', -12, 9, 0.4, 1.2), sp('pumpkin', -10.4, 10.3, -0.2, 0.9, { carved: false }),
+    sp('torch', -9.5, 8.6),
+  ],
+  // things that MOVE — float above head height, never block a tap
+  ambient: [
+    { kind: 'ghost', center: [-11.2, -9.8], radius: 2.2, speed: 0.35, phase: 0 },
+    { kind: 'ghost', center: [0, -2.8], radius: 3.8, speed: 0.22, phase: 2, height: 1.6 },
+    { kind: 'ghost', center: [1.2, 6.8], radius: 2.6, speed: 0.3, phase: 4 },
+    { kind: 'ghost', center: [11.5, 9.5], radius: 2.4, speed: 0.28, phase: 1, scale: 0.8 },
+    { kind: 'ghost', center: [0, 0], radius: 10, speed: 0.07, phase: 3, height: 2, scale: 1.2 },
+    { kind: 'wisp', center: [-6, -8], color: 'violet', phase: 0 },
+    { kind: 'wisp', center: [6, -9], color: 'orange', phase: 1.5, height: 1.9 },
+    { kind: 'wisp', center: [-11, -2], color: 'mint', phase: 3 },
+    { kind: 'wisp', center: [10, -3], color: 'violet', phase: 4.5, height: 2.1 },
+    { kind: 'wisp', center: [-6, 10], color: 'orange', phase: 2 },
+    { kind: 'wisp', center: [6, 11], color: 'mint', phase: 5, height: 1.4 },
+    { kind: 'wisp', center: [-3, 3], color: 'violet', phase: 1, radius: 1.6, height: 2.2 },
+    { kind: 'wisp', center: [12, 6], color: 'orange', phase: 3.7 },
+    { kind: 'wisp', center: [-13, 5], color: 'violet', phase: 2.6, height: 1.8 },
+    { kind: 'wisp', center: [3, -12], color: 'mint', phase: 0.8 },
+  ],
+}
+
+/** The arcade as it should look today: Halloween dressing layered on top in
+ *  season (decor APPENDED, never replaced), the plain arcade otherwise. */
+function withSeason(base, season = currentSeason()) {
+  if (season !== 'halloween') return base
+  return { ...base, ...ARCADE_HALLOWEEN, decor: [...base.decor, ...ARCADE_HALLOWEEN.decor] }
+}
+export { withSeason as _arcadeWithSeason, ARCADE as _arcadeBase }
 
 export const MAPS = {
   // ── Map 1 — the forest clearing: a campsite in a glade ──
@@ -178,7 +289,13 @@ export const MAPS = {
     ],
   },
 
-  // ── Map 2 — a little town on warm orange ground ──
+  // ── Map 2 — Sunny Town: an open plot for HER to build, and neighbours ──
+  // Rebuilt 2026-10-06 (Amy + Ivy): the pre-made houses are gone — the town is
+  // a ring of shade trees around a wide open square, deliberately almost empty,
+  // because this is the map where kids BUILD (shop → place). Ivy's ask: "why is
+  // there no friendly face?" → four neighbours live here (world/Neighbour.jsx),
+  // each with a cube pet, strolling near home and saying hello when she comes
+  // by. Homes sit out in the four quarters so the middle stays hers to fill.
   town: {
     id: 'town',
     name: 'Sunny Town',
@@ -187,26 +304,22 @@ export const MAPS = {
     sky: '#fdeedd',
     gateColor: '#f0a03c',
     decor: [
-      ...house(-7, -6, { door: 'e' }),
-      ...house(7, -7, { door: 'w', windows: 'round' }),
-      ...house(-8, 6, { door: 'n', windows: 'round' }),
-      ...house(8, 6.5, { door: 'w' }),
-      ...pavilion(0, -9),
-      b('stairs-open-short', 3.2, -9, -Math.PI / 2),
-      // market corner
-      b('barricade-window-a', 3, 3.2, 0.3),
-      b('barricade-doorway-a', -3.2, 3.6, -0.5),
-      // fence run along the south path
-      b('border', -1.6, 10, Math.PI / 2),
-      b('border', 0, 10, Math.PI / 2),
-      b('border', 1.6, 10, Math.PI / 2),
-      // lamppost-ish columns marking the square
-      b('column-thin', 11.5, -1.5),
-      b('column-thin', -11.5, -1.5),
-      // ground interest borrowed from the forest pack
-      f('patch-dirt', 0, 4.5, 0.8),
-      f('stones', -5.5, 0.5, 0.4),
-      f('plant', 10.5, 1.5, 1.7),
+      ...treeLine({ gaps: [[-16, 2], [16, -3]], step: 2.6, inner: false }),
+      // a few shade trees in the corners — the square itself stays open
+      f('tree', -12.6, -12, 0.4, 1.2), f('tree-high', -11, -13.2, 1.9, 1.1),
+      f('tree', 12.4, -12.4, 2.6, 1.15),
+      f('tree', -12.8, 12.2, 1.2, 1.1),
+      f('tree-high', 12.2, 12.6, 0.2, 1.15), f('tree', 10.8, 13.4, 2.2),
+    ],
+    neighbours: [
+      { character: 'character-female-b', pet: 'animal-bunny', home: [-7, -7],
+        lines: ["Hi! I'm Mia 👋", 'This town needs a bakery!', 'Ooh, is that your pet?', 'Come back soon!'] },
+      { character: 'character-male-c', pet: 'animal-dog', home: [8, -6.5],
+        lines: ["Hey neighbour! I'm Leo", 'Could you build a park here?', 'Nice to see you again!', 'Gems make great houses 💎'] },
+      { character: 'character-female-d', pet: 'animal-chick', home: [-8, 7.5],
+        lines: ["Hello! I'm Sam 🌳", 'I love these big trees', 'What will you build today?', 'Your pet is so cute!'] },
+      { character: 'character-male-e', pet: 'animal-panda', home: [7.5, 7.5],
+        lines: ['Welcome to Sunny Town! ☀️', "I'm Max — I live here!", 'Maths makes gems ✨', 'Build something next to me!'] },
     ],
     gates: [
       { to: 'clearing', position: [-16, 0, 2] },
@@ -292,40 +405,7 @@ export const MAPS = {
     ],
   },
 
-  // ── Map 5 — a games arcade on violet ground ──
-  arcade: {
-    id: 'arcade',
-    name: 'Star Arcade',
-    ground: '#ddcef6',
-    outside: '#b4a3d8',
-    sky: '#efe8fb',
-    gateColor: '#8f6fe8',
-    decor: [
-      // a row of arcade cabinets, screens facing the spawn
-      a('arcade-machine', -2.9, -5.5, Math.PI),
-      a('arcade-machine', -2.2, -5.5, Math.PI),
-      a('arcade-machine', -1.5, -5.5, Math.PI),
-      a('arcade-machine', -0.8, -5.5, Math.PI),
-      // the big machines get their own spots
-      a('dance-machine', 3.5, -4.5, Math.PI + 0.4),
-      a('claw-machine', -6, -3.5, 0.9),
-      a('air-hockey', 2.5, 0.5, 0.3),
-      a('pinball', -5, 1.5, Math.PI / 2),
-      a('pinball', -5, 2.6, Math.PI / 2),
-      a('basketball-game', 6, 2.5, -Math.PI / 2),
-      // prize corner
-      a('prize-wheel', 1.2, 6.5, Math.PI),
-      a('prizes', 2.8, 6.8, Math.PI),
-      a('ticket-machine', -0.6, 6.8, Math.PI),
-      // snacks + pillars
-      a('vending-machine', -7, 6, Math.PI / 2),
-      a('column', -9.5, -1), a('column', 9.5, -1),
-    ],
-    gates: [
-      { to: 'market', position: [-16, 0, -2] },
-      { to: 'clearing', position: [16, 0, 2] },
-    ],
-  },
+  arcade: withSeason(ARCADE),
 
   // ── The Meadow — the Together Space (Phase B, docs/together-space.md) ──
   // OUTSIDE the ring on purpose: no gates lead here and none lead away — you
@@ -364,6 +444,15 @@ export const MAPS = {
   },
 }
 
+/** Every fixed spot on a map that sparkles/stations must keep clear of:
+ *  scenery + neighbours' homes (they stroll ~2 around home). [x, z, radius]. */
+export function blockers(map) {
+  return [
+    ...map.decor.map((d) => [d.position[0], d.position[2], 0]),
+    ...(map.neighbours || []).map((n) => [n.home[0], n.home[1], 1.5]),
+  ]
+}
+
 /** Where to stand after arriving in `map` from `fromId`: just inside the
  *  reciprocal gate, pulled toward the centre so the gate doesn't re-trigger. */
 export function arrivalPoint(map, fromId) {
@@ -397,7 +486,11 @@ export function resumePoint(map, pos) {
  *  and lazily for the rest so travel never pops in raw). */
 export function preloadMap(map) {
   const seen = new Set()
-  for (const d of map.decor) seen.add(modelUrl(d.pack, d.name))
+  for (const d of map.decor) if (!d.fx) seen.add(modelUrl(d.pack, d.name))
+  for (const n of map.neighbours || []) {
+    seen.add(modelUrl('characters', n.character))
+    if (n.pet) seen.add(modelUrl('pets', n.pet))
+  }
   seen.add(modelUrl('building', 'column'))
   for (const url of seen) useGLTF.preload(url)
 }
