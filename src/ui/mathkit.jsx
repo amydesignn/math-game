@@ -63,30 +63,26 @@ export const MODAL = {
  * supporting). main 400 · soft 100 · softLine 200 · deep 800 · ink 700 ·
  * grad 300→400→500 · onFill = Iris 950 (every value on a brand ramp). */
 export const LVL = {
-  main: '#B29BEA', // Lilac 400 — FILL identity only (2.39:1 on white: never text)
-  ink: '#6E5BC0', // Lilac 700 — coloured accent TEXT (5.36:1 on white)
-  soft: '#EDE7FC',
-  deep: '#5B4B9E', // Lilac 800 — text weight, 7.1:1 on white (5.9 on soft)
-  softLine: '#DDD1F7',
-  grad: 'linear-gradient(135deg,#C6B4F0 0%,#B29BEA 58%,#9B84E0 100%)',
-  glow: '155,132,224', // rgb triplet for the soft shadows/halos around level art
+  /* Level identity = IRIS since 2026-10-06 (Amy: the record book read off-brand
+   * in Lilac while the game leans Iris). It now wears the Luxi primary button:
+   * Iris 500 face + white numeral (4.56) — the same pair every Luxi primary
+   * button uses — and Iris 700 (Datum text-brand) for level text. Lilac stays
+   * where it belongs: decoration (the header wash, confetti, stage pips).
+   * One declaration, read by the HUD bar, the congratulations card AND the
+   * record book — never copy it per file (that's how they drifted before). */
+  main: 'var(--brand-iris-500)', // the fill identity
+  ink: 'var(--color-text-brand)', // Iris 700 — coloured accent TEXT (7.7 on white)
+  soft: 'var(--brand-iris-100)', // light Iris surface (topic icons, the bar's track)
+  deep: 'var(--color-text-brand)', // Iris 700 — counts, labels, the total
+  softLine: 'var(--brand-iris-100)',
+  grad: 'var(--brand-iris-500)', // flat, like the button face (was a Lilac gradient)
+  glow: '97,105,224', // Iris 500 as an rgb triplet for the soft shadows/halos
 
-  /* The level NUMERAL wherever it sits on `grad` — medallion, reached ladder
-   * nodes, the congratulations badge. Brand Iris 950 (Amy 2026-10-04: no
-   * off-palette colours; was #2F0D68, which sat on no brand ramp).
-   *
-   * It is not white, and that is a hard constraint rather than a preference:
-   * white cannot meet 4.5:1 on a pastel violet at all (violet-300 = 1.86,
-   * violet-400 = 2.85, and even violet-500 only reaches 4.40). Pastel field or
-   * white text — you cannot have both. Amy's call (2026-07-26) was to keep the
-   * pastel and deepen the numeral. On the Lilac gradient Iris 950 gives 4.93
-   * on the deepest corner (Lilac 500), 6.38 mid, 8.14 on the lightest. The
-   * medallion (46px) and progress circle (34px) are LARGE text (3:1 bar), but
-   * the progress-ladder nodes are 16px bold = NORMAL text (4.5:1) — that's why
-   * it's 950: Iris 900 (3.65) and 800 (3.08) would fail the nodes.
-   *
-   * If anyone ever "restores" white here, the card silently drops below AA. */
-  onFill: '#1D2050', // Brand Iris 950
+  /* The level NUMERAL on `grad` — medallion, reached ladder nodes, the
+   * congratulations badge. WHITE on Iris 500 = 4.56, so even the 16px ladder
+   * nodes (normal text, 4.5 bar) pass. (On the old pastel Lilac white could
+   * never pass, which is why this used to be Iris 950.) */
+  onFill: 'var(--color-text-on-brand)',
 }
 
 /** The close ✕. One implementation so the tap target can never drift again. */

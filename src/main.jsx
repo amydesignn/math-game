@@ -14,6 +14,7 @@ import StationPopup from './ui/StationPopup.jsx'
 import MathPopup from './ui/MathPopup.jsx'
 import ProgressPopup from './ui/ProgressPopup.jsx'
 import Shop from './ui/Shop.jsx'
+import LevelBar, { LevelUpPopup } from './ui/LevelBar.jsx'
 import { SKINS } from './ui/skins.js'
 import { TOPICS, solve } from './math.js'
 import './index.css'
@@ -552,9 +553,19 @@ function ShopAudit() {
     </div>
   )
 }
+/* `/?a11y=level[&card]` — the HUD level pill; `card` shows the congratulations card instead. */
+function LevelAudit() {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
+      {!AUDIT_Q.has('card') && <div style={{ position: 'absolute', top: 16, right: 16 }}><LevelBar points={78} gems={12} onLevelUp={() => {}} onOpen={() => {}} /></div>}
+      {AUDIT_Q.has('card') && <LevelUpPopup level={2} message="You climbed a whole level — every problem counted!" onClose={() => {}} />}
+    </div>
+  )
+}
 const MATH_AUDIT =
   import.meta.env.DEV && new URLSearchParams(window.location.search).get('a11y') === 'math'
 const PROGRESS_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'progress'
+const LEVEL_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'level'
 const SHOP_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'shop'
 const STATION_AUDIT =
   import.meta.env.DEV && new URLSearchParams(window.location.search).get('a11y') === 'station'
@@ -562,7 +573,7 @@ const STATION_AUDIT =
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      {PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
+      {LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
     </Oops>
     {/* Cookieless, privacy-friendly traffic counting (no personal data, no
       * consent banner needed) — the whole point of moving to a real domain. */}

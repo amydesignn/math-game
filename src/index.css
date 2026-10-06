@@ -444,3 +444,7 @@ canvas { touch-action: none; display: block; }
    1px in Iris 700, 2px gap so it reads on Iris buttons too (WCAG 1.4.11).
    Scoped to the shared modal shell; the app-wide pass comes with later audits. */
 [role="dialog"] button:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+/* HUD level pill — keyboard focus. It sits outside any dialog, so it never got
+   the house ring and fell back to a faint browser default (1.24:1). Same 1px
+   Iris 700 ring, 2px out, as every other Luxi control. */
+.lvlbar-pill:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }

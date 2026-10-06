@@ -32,12 +32,9 @@ import { TOPIC_META, stageCounts, startedTopics } from '../topicMeta'
  *    math and station popups.
  */
 
-/* Level identity = VIOLET (teal = gems · amber = station bonus), softened to
- * PASTEL for this card so it sits inside the app's pastel skin — and since
- * 2026-07-26 (Amy) the BAR and the congratulations card wear the same pastel,
- * so LVL is imported from mathkit rather than declared here. One identity, one
- * declaration: a local copy is exactly how the bar and this card drifted into
- * two different purples. */
+/* Level identity = IRIS (the Luxi primary button pair; Amy 2026-10-06) —
+ * LVL is imported from mathkit, shared with the HUD bar and the congratulations
+ * card. One identity, one declaration: a local copy is how they drifted before. */
 
 /* One ascending pastel-violet ramp so the SYSTEM reads at a glance:
  * light → deep = easier → harder. Distinct from the ⭐ badge track (5-C). */
@@ -56,8 +53,7 @@ const S = {
   head: { position: 'relative', padding: '30px 24px 22px', textAlign: 'center', flex: 'none',
     background: 'linear-gradient(180deg,#E9E2FA 0%,#F8F5FE 100%)', borderBottom: '1px solid #E7DEF4', overflow: 'hidden' },
   lvlLabel: { position: 'relative', fontSize: 14, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: LVL.deep, marginBottom: 16, zIndex: 2 },
-  // numeral = LVL.onFill (Iris 950), not white — white cannot reach 4.5:1 on
-  // a pastel violet at any step of the ramp. See the note in mathkit.
+  // numeral = LVL.onFill (white on Iris 500, 4.56) — see the note in mathkit.
   circle: { position: 'relative', width: 80, height: 80, margin: '0 auto 16px', borderRadius: '50%', background: LVL.grad, color: LVL.onFill, fontWeight: 700, fontSize: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 10px 22px rgba(${LVL.glow},.42), inset 0 -4px 0 rgba(0,0,0,.10)`, zIndex: 2 },
   totalLine: { position: 'relative', fontSize: 17, fontWeight: 400, color: T.textSecondary, zIndex: 2 },
   totalStrong: { color: LVL.deep, fontWeight: 700 },
@@ -167,7 +163,7 @@ export function ClimbLadder({ points }) {
           const done = L < st.level
           const current = L === st.level
           const face = (done || current)
-            // reached: numeral in LVL.onFill, since white can't make 4.5:1 on pastel
+            // reached: the button pair — white numeral on Iris 500
             ? { background: LVL.grad, color: LVL.onFill, boxShadow: current ? `0 6px 14px rgba(${LVL.glow},.46)` : `0 3px 9px rgba(${LVL.glow},.30)` }
             // upcoming: stays light ON PURPOSE. An inactive indicator is WCAG
             // 1.4.3 exempt (Amy confirmed), and darkening it would make a level

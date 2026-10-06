@@ -1,6 +1,6 @@
 # Contrast audit — ProgressPopup
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/ProgressPopup.jsx` · **Run:** 2026-10-06 21:26 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/ProgressPopup.jsx` · **Run:** 2026-10-06 21:59 UTC  
 **Variants:** Record (Level 2, three subjects), Empty (new player) · **Phases:** default
 
 > **44 unique checks · 37 pass · 0 fail · 5 exempt (disabled) · 0 need review**
@@ -22,26 +22,26 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
+| 2 | `#FFFFFF` on `#6169E0` | 34px bold (large) | 4.55:1 | 3.00:1 | ✅ | default |
+| 1 | `#FFFFFF` on `#6169E0` | 16px bold | 4.55:1 | 4.50:1 | ✅ | default |
 | 22 points to Level 3 → | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | default |
 | WHAT YOU'VE SOLVED | `#525252` on `#FFFFFF` | 12px bold | 7.81:1 | 4.50:1 | ✅ | default |
-| × | `#5B4B9E` on `#EDE7FC` | 20px bold (large) | 5.92:1 | 3.00:1 | ✅ | default |
+| × | `#3D43BE` on `#E4E5FA` | 20px bold (large) | 6.15:1 | 3.00:1 | ✅ | default |
 | Multiplication | `#262626` on `#FFFFFF` | 19px bold (large) | 15.13:1 | 3.00:1 | ✅ | default |
 | Warm-up problems solved | `#525252` on `#FFFFFF` | 15px | 7.81:1 | 4.50:1 | ✅ | default |
-| 11 | `#5B4B9E` on `#FFFFFF` | 20px bold (large) | 7.13:1 | 3.00:1 | ✅ | default |
+| 11 | `#3D43BE` on `#FFFFFF` | 20px bold (large) | 7.65:1 | 3.00:1 | ✅ | default |
 | Challenge problems solved | `#525252` on `#FFFFFF` | 15px | 7.81:1 | 4.50:1 | ✅ | default |
-| 5 | `#5B4B9E` on `#FFFFFF` | 20px bold (large) | 7.13:1 | 3.00:1 | ✅ | default |
+| 5 | `#3D43BE` on `#FFFFFF` | 20px bold (large) | 7.65:1 | 3.00:1 | ✅ | default |
 | Expert problems solved | `#525252` on `#FFFFFF` | 15px | 7.81:1 | 4.50:1 | ✅ | default |
-| ÷ | `#5B4B9E` on `#EDE7FC` | 20px bold (large) | 5.92:1 | 3.00:1 | ✅ | default |
+| ÷ | `#3D43BE` on `#E4E5FA` | 20px bold (large) | 6.15:1 | 3.00:1 | ✅ | default |
 | Division | `#262626` on `#FFFFFF` | 19px bold (large) | 15.13:1 | 3.00:1 | ✅ | default |
 | Problems solved | `#525252` on `#FFFFFF` | 15px | 7.81:1 | 4.50:1 | ✅ | default |
-| 3 | `#5B4B9E` on `#FFFFFF` | 20px bold (large) | 7.13:1 | 3.00:1 | ✅ | default |
+| 3 | `#3D43BE` on `#FFFFFF` | 20px bold (large) | 7.65:1 | 3.00:1 | ✅ | default |
 | Addition | `#262626` on `#FFFFFF` | 19px bold (large) | 15.13:1 | 3.00:1 | ✅ | default |
-| 8 | `#5B4B9E` on `#FFFFFF` | 20px bold (large) | 7.13:1 | 3.00:1 | ✅ | default |
-| LEVEL | `#5B4B9E` on `#EBE5FA` ᵖ | 14px bold | 5.81:1 | 4.50:1 | ✅ | default |
-| 2 | `#1D2050` on `#AF98E9` ᵖ | 34px bold (large) | 6.18:1 | 3.00:1 | ✅ | default |
-| 78 total points earned! | `#525252` on `#F1EDFD` ᵖ | 17px | 6.80:1 | 4.50:1 | ✅ | default |
-| 78 | `#5B4B9E` on `#F5F1FD` ᵖ | 17px bold | 6.41:1 | 4.50:1 | ✅ | default |
-| 1 | `#1D2050` on `#B19AEA` ᵖ | 16px bold | 6.31:1 | 4.50:1 | ✅ | default |
+| 8 | `#3D43BE` on `#FFFFFF` | 20px bold (large) | 7.65:1 | 3.00:1 | ✅ | default |
+| LEVEL | `#3D43BE` on `#EBE5FA` ᵖ | 14px bold | 6.24:1 | 4.50:1 | ✅ | default |
+| 78 total points earned! | `#525252` on `#EFECFC` ᵖ | 17px | 6.73:1 | 4.50:1 | ✅ | default |
+| 78 | `#3D43BE` on `#F5F1FD` ᵖ | 17px bold | 6.88:1 | 4.50:1 | ✅ | default |
 | 3 | `#A79FB4` on `#EFEDF2` ᵖ | 16px bold | 2.19:1 | — | ⚪ exempt Part of a disabled control — exempt (WCAG 1.4.3, inactive UI component). | default |
 | 4 | `#A79FB4` on `#EFEDF2` ᵖ | 16px bold | 2.19:1 | — | ⚪ exempt Part of a disabled control — exempt (WCAG 1.4.3, inactive UI component). | default |
 
@@ -57,13 +57,13 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
+| 1 | `#FFFFFF` on `#6169E0` | 34px bold (large) | 4.55:1 | 3.00:1 | ✅ | default |
 | 50 points to Level 2 → | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | default |
 | WHAT YOU'VE SOLVED | `#525252` on `#FFFFFF` | 12px bold | 7.81:1 | 4.50:1 | ✅ | default |
 | Start playing to fill this in. | `#525252` on `#FFFFFF` | 15px | 7.81:1 | 4.50:1 | ✅ | default |
-| LEVEL | `#5B4B9E` on `#EBE5FA` ᵖ | 14px bold | 5.81:1 | 4.50:1 | ✅ | default |
-| 1 | `#1D2050` on `#B099E9` ᵖ | 34px bold (large) | 6.24:1 | 3.00:1 | ✅ | default |
-| 0 total points earned! | `#525252` on `#F1EDFC` ᵖ | 17px | 6.79:1 | 4.50:1 | ✅ | default |
-| 0 | `#5B4B9E` on `#F5F1FD` ᵖ | 17px bold | 6.41:1 | 4.50:1 | ✅ | default |
+| LEVEL | `#3D43BE` on `#EBE5FA` ᵖ | 14px bold | 6.24:1 | 4.50:1 | ✅ | default |
+| 0 total points earned! | `#525252` on `#EEECFD` ᵖ | 17px | 6.72:1 | 4.50:1 | ✅ | default |
+| 0 | `#3D43BE` on `#F5F1FD` ᵖ | 17px bold | 6.88:1 | 4.50:1 | ✅ | default |
 | 2 | `#A79FB4` on `#EFEDF2` ᵖ | 16px bold | 2.19:1 | — | ⚪ exempt Part of a disabled control — exempt (WCAG 1.4.3, inactive UI component). | default |
 | 3 | `#A79FB4` on `#EFEDF2` ᵖ | 16px bold | 2.19:1 | — | ⚪ exempt Part of a disabled control — exempt (WCAG 1.4.3, inactive UI component). | default |
 | 4 | `#A79FB4` on `#EFEDF2` ᵖ | 16px bold | 2.19:1 | — | ⚪ exempt Part of a disabled control — exempt (WCAG 1.4.3, inactive UI component). | default |
