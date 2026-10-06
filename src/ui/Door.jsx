@@ -22,6 +22,7 @@
 
 import { useRef, useState } from 'react'
 import { levelState, fmtPoints } from '../levels'
+import { LVL } from './mathkit'
 import HeroStage from './HeroStage'
 import { GemIcon, ProfileChip } from './hudkit'
 import Footer from './Footer'
@@ -41,7 +42,7 @@ const T = {
   amber: '#FE9A00', amberSoft: '#FFF7EA', amberLine: '#FBE3B6', amberInk: '#8A5300',
   pink: '#F6339A', pinkDark: '#C6005C',
 }
-/* Brand Lilac (400/100/200/800, grad 300→500) — levels + supporting; primary actions wear Brand Iris (btn) */
+/* Brand Lilac — decoration on the Door (rocket, stage, chip dot); the LEVEL bar reads mathkit LVL (Iris). Primary actions wear Brand Iris (btn) */
 const V = {
   main: '#B29BEA', soft: '#EDE7FC', softLine: '#DDD1F7', deep: '#5B4B9E',
   btn: '#6169E0', btnDark: '#3D43BE', // Brand Iris 500 face / 700 shadow — actions (4.56:1 white bold; was #7C6CE8 at 4.06, failed AA)
@@ -147,8 +148,10 @@ const heroS = {
   lvlNum: { fontSize: 20, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em' },
   pts: { fontSize: BODY, fontWeight: 400, color: T.textSecondary },
   gems: { display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: BODY, fontWeight: 700, color: T.textPrimary },
-  track: { position: 'relative', height: 12, borderRadius: 999, background: V.soft, overflow: 'hidden', marginTop: 10, border: '1px solid ' + V.softLine },
-  fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: V.grad },
+  // the level bar reads the SHARED level identity (mathkit LVL, Iris since 2026-10-06) — the
+  // Door's own Lilac copy is what left it lilac when the HUD pill went Iris
+  track: { position: 'relative', height: 12, borderRadius: 999, background: LVL.soft, overflow: 'hidden', marginTop: 10, border: '1px solid ' + LVL.softLine },
+  fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: LVL.grad },
   toNextRow: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginTop: 8 },
   toNext: { fontSize: BODY, fontWeight: 400, color: T.textSecondary },
   newLine: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, marginTop: 18, lineHeight: 1.5 },
@@ -283,10 +286,10 @@ const cardS = {
   card: { position: 'relative', background: T.surface, borderRadius: 22, boxShadow: '0 2px 14px rgba(74,54,110,.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column', animation: 'doorPop .4s ease-out both' },
   thumb: { position: 'relative', width: '100%', height: 128 },
   thumbImg: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' },
-  chip: { position: 'absolute', left: 10, top: 10, zIndex: 2, display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(255,255,255,.94)', color: V.deep, fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 999, boxShadow: '0 2px 8px rgba(74,54,110,.14)' },
+  chip: { position: 'absolute', left: 10, top: 10, zIndex: 2, display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(255,255,255,.94)', color: 'var(--color-text-brand)', fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 999, boxShadow: '0 2px 8px rgba(74,54,110,.14)' },
   soonScrim: { position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(160deg, rgba(238,233,251,.94), rgba(228,220,247,.96))', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 9 },
   soonBadge: { width: 56, height: 56, borderRadius: '50%', background: 'rgba(255,255,255,.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 18px rgba(124,108,232,.22)' },
-  soonWord: { fontSize: 13, fontWeight: 700, color: V.deep, letterSpacing: '.01em' },
+  soonWord: { fontSize: 13, fontWeight: 700, color: 'var(--color-text-brand)', letterSpacing: '.01em' },
   body: { padding: '13px 15px 4px' },
   name: { fontSize: 18, fontWeight: 600, color: T.textPrimary, letterSpacing: '-.01em' },
   blurb: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, marginTop: 2 },
