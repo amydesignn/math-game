@@ -20,6 +20,7 @@
  *   · profile     → the settings-lives-here-later affordance (soft avatar chip).
  */
 
+import { useRef, useState } from 'react'
 import { levelState, fmtPoints } from '../levels'
 import HeroStage from './HeroStage'
 import { GemIcon, ProfileChip } from './hudkit'
@@ -68,6 +69,20 @@ const WORLDS = BASE_WORLDS.map((w) => {
   return c ? { ...w, ...c, art: c.art ? ART + c.art : w.art } : w
 })
 const MEADOW = { id: 'meadow', name: 'The Meadow', blurb: 'Play together', tint: '#b48fe0' }
+
+/* ── What's new — THE place the Door announces game news (Amy 2026-10-06):
+   new maps, seasonal events, updates. Newest first; one entry = one slide.
+   `world` makes the slide a door into that world AND puts the same tag on its
+   world card below, so the carousel and the grid can never disagree.
+   Two tags only: 'Just in' = the freshest / seasonal drop (solid), 'New' = new
+   this season (soft). Remove an entry to retire its slide + card tag. */
+const UPDATES = [
+  { world: 'arcade', tag: 'Just in', title: 'Halloween in Spooky Arcade', line: 'Pumpkins, ghosts & glowing lights' },
+  { world: 'town', tag: 'New', title: 'Sunny Town', line: 'A brand-new map to explore' },
+  { world: 'market', tag: 'New', title: 'Merry Market', line: 'A brand-new map to explore' },
+  { world: 'clearing', tag: 'New', title: 'Forest Clearing', line: 'A brand-new map to explore' },
+]
+const WORLD_TAG = Object.fromEntries(UPDATES.filter((u) => u.world).map((u) => [u.world, u.tag]))
 
 /* ── icons (crafted, not emoji) ── */
 /* GemIcon + ProfileChip now live in hudkit.jsx (shared with the in-world HUD). */
@@ -196,6 +211,85 @@ function QuestCard({ quest }) {
   )
 }
 
+/* ── tag — 'Just in' solid Iris 500 (white 600 = 4.56:1), 'New' Lilac 100 + Iris 700 (7.4:1) ── */
+function Tag({ children, style }) {
+  const hot = children === 'Just in'
+  return <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 600, lineHeight: 1.5, padding: '0 8px', borderRadius: 999, background: hot ? V.btn : V.soft, color: hot ? '#FFFFFF' : 'var(--brand-iris-700)', ...style }}>{children}</span>
+}
+
+/* ── what's new — a manual carousel (swipe, or the arrows). No auto-rotate: it
+   would need a pause control (WCAG 2.2.2) and a moving card fights the quest
+   strip for a kid's attention. Type = 14 + 12 only, like the rest of the column. ── */
+const newS = {
+  card: { background: T.surface, borderRadius: 24, boxShadow: '0 2px 14px rgba(74,54,110,.07)', padding: 16, marginTop: 16, animation: 'doorPop .4s .03s ease-out both' },
+  head: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 12 },
+  title: { fontSize: BODY, fontWeight: 600, color: T.textPrimary },
+  nav: { display: 'flex', alignItems: 'center', gap: 4 },
+  count: { fontSize: 12, fontWeight: 400, color: T.textSecondary, marginRight: 4, fontVariantNumeric: 'tabular-nums' },
+  arrow: { width: 32, height: 32, borderRadius: '50%', border: 'none', background: V.soft, color: 'var(--brand-iris-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 },
+  track: { display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory', scrollbarWidth: 'none', gap: 12, borderRadius: 16 },
+  slide: { flex: '0 0 100%', scrollSnapAlign: 'start', display: 'flex', alignItems: 'center', gap: 12, border: 'none', background: 'var(--lilac-50)', borderRadius: 16, padding: 8, textAlign: 'left', cursor: 'pointer', font: 'inherit', minWidth: 0 },
+  thumb: { position: 'relative', flex: 'none', width: 104, height: 78, borderRadius: 12, overflow: 'hidden' },
+  img: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' },
+  text: { minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 },
+  sTitle: { fontSize: BODY, fontWeight: 600, color: T.textPrimary, lineHeight: 1.35 },
+  sLine: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, lineHeight: 1.4 },
+  dots: { display: 'flex', justifyContent: 'center', gap: 6, marginTop: 12 },
+}
+function Chevron({ left }) {
+  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={left ? 'm15 18-6-6 6-6' : 'm9 18 6-6-6-6'} /></svg>
+}
+function WhatsNew({ map, onPlay, onResume }) {
+  const track = useRef(null)
+  const [i, setI] = useState(0)
+  const n = UPDATES.length
+  if (!n) return null
+  const go = (k) => {
+    const t = track.current; if (!t) return
+    const next = (k + n) % n
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    t.scrollTo({ left: next * (t.clientWidth + 12), behavior: reduce ? 'auto' : 'smooth' })
+  }
+  const onScroll = () => { const t = track.current; if (t) setI(Math.round(t.scrollLeft / (t.clientWidth + 12))) }
+  return (
+    <section style={newS.card} aria-roledescription="carousel" aria-label="What's new">
+      <div style={newS.head}>
+        <span style={newS.title}>What’s new</span>
+        {n > 1 && (
+          <div style={newS.nav}>
+            <span style={newS.count} aria-live="polite">{i + 1} / {n}</span>
+            <button className="doorNew-arrow" style={newS.arrow} onClick={() => go(i - 1)} aria-label="Previous"><Chevron left /></button>
+            <button className="doorNew-arrow" style={newS.arrow} onClick={() => go(i + 1)} aria-label="Next"><Chevron /></button>
+          </div>
+        )}
+      </div>
+      <div ref={track} className="doorNew-track" style={newS.track} onScroll={onScroll}>
+        {UPDATES.map((u, k) => {
+          const w = WORLDS.find((x) => x.id === u.world)
+          const open = () => (u.world === map ? onResume?.() : onPlay?.(u.world))
+          return (
+            <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`${k + 1} of ${n}: ${u.tag}, ${u.title}`} tabIndex={k === i ? 0 : -1}>
+              <span style={{ ...newS.thumb, ...(w ? worldThumb(w.tint) : null), position: 'relative' }}>
+                {w?.art && <img src={w.art} alt="" style={newS.img} loading="lazy" />}
+              </span>
+              <span style={newS.text}>
+                <Tag>{u.tag}</Tag>
+                <span style={newS.sTitle}>{u.title}</span>
+                <span style={newS.sLine}>{u.line}</span>
+              </span>
+            </button>
+          )
+        })}
+      </div>
+      {n > 1 && (
+        <div style={newS.dots} aria-hidden="true">
+          {UPDATES.map((_, k) => <span key={k} style={{ height: 6, width: k === i ? 18 : 6, borderRadius: 99, background: k === i ? V.btn : V.softLine, transition: 'width .2s ease, background .2s ease' }} />)}
+        </div>
+      )}
+    </section>
+  )
+}
+
 /* ── world card ── */
 const cardS = {
   card: { position: 'relative', background: T.surface, borderRadius: 22, boxShadow: '0 2px 14px rgba(74,54,110,.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column', animation: 'doorPop .4s ease-out both' },
@@ -218,6 +312,7 @@ function WorldCard({ world, current, locked, together, onPlay, onResume }) {
   return (
     <div style={cardS.card}>
       <div style={cardS.thumb}>
+        {WORLD_TAG[world.id] && !locked && <Tag style={{ position: 'absolute', right: 10, top: 10, zIndex: 2, boxShadow: '0 2px 8px rgba(74,54,110,.14)' }}>{WORLD_TAG[world.id]}</Tag>}
         {current && !locked && <span style={cardS.chip}><span style={{ width: 7, height: 7, borderRadius: '50%', background: V.main }}></span>Last played</span>}
         <div style={worldThumb(world.tint)}>
           {world.art && <img src={world.art} alt="" style={cardS.thumbImg} loading="lazy" />}
@@ -285,6 +380,7 @@ export default function Door({ mode, name, points, gems, map, quest, meadowOpen 
           <div className="doorLeft">
             <div style={dS.greet}>{greet}</div>
             <Hero mode={mode} points={points} gems={gems} />
+            <WhatsNew map={mode !== 'new' ? map : null} onPlay={onPlay} onResume={onResume} />
             <QuestCard quest={quest} />
           </div>
           {/* id + scroll-margin: the footer's "Worlds" link (#worlds) lands here,
