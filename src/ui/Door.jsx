@@ -227,7 +227,7 @@ const newS = {
   slide: { flex: '0 0 100%', scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', border: 'none', background: T.surface, padding: 0, textAlign: 'left', cursor: 'pointer', font: 'inherit', minWidth: 0 },
   media: { position: 'relative', display: 'block', width: '100%', height: 148, overflow: 'hidden' },
   img: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' },
-  pills: { position: 'absolute', left: 12, top: 12, display: 'flex', gap: 6 },
+  pill: { position: 'absolute', top: 12 }, // 'What's new' top-left · the tag top-right (Amy) — same corner as the world cards' tag
   label: { display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 600, lineHeight: 1.5, padding: '0 8px', borderRadius: 999, background: 'rgba(255,255,255,.94)', color: T.textPrimary, boxShadow: '0 2px 8px rgba(74,54,110,.14)' },
   text: { display: 'flex', flexDirection: 'column', gap: 2, padding: '12px 16px 16px' },
   sTitle: { fontSize: BODY, fontWeight: 600, color: T.textPrimary, lineHeight: 1.4 },
@@ -259,10 +259,8 @@ function WhatsNew({ map, onPlay, onResume }) {
             <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`What's new, ${k + 1} of ${n}: ${u.tag}, ${u.title}. ${u.line}`} tabIndex={k === i ? 0 : -1}>
               <span style={{ ...newS.media, ...(w ? worldThumb(w.tint) : null), position: 'relative' }}>
                 {w?.art && <img src={w.art} alt="" style={newS.img} loading="lazy" />}
-                <span style={newS.pills}>
-                  <span style={newS.label}>What’s new</span>
-                  <Tag style={{ boxShadow: '0 2px 8px rgba(74,54,110,.14)' }}>{u.tag}</Tag>
-                </span>
+                <span style={{ ...newS.pill, left: 12, ...newS.label }}>What’s new</span>
+                <Tag style={{ ...newS.pill, right: 12, boxShadow: '0 2px 8px rgba(74,54,110,.14)' }}>{u.tag}</Tag>
               </span>
               <span style={newS.text}>
                 <span style={newS.sTitle}>{u.title}</span>
