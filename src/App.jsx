@@ -892,7 +892,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
           the word, the clearest "leave" affordance for a child. The speaker
           lives here (was in the right stat row) — utility, out of the stats
           zone; it folds into a single gear menu here in a later pass (Amy). */}
-      <div style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', left: 16, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-start' }}>
+      <div className="hud-left" style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', left: 16, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-start' }}>
         {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
           <ExitButton onTap={goToDoor} />
         )}
@@ -909,8 +909,10 @@ export default function App({ cloud = false, justSignedIn = false }) {
           the minimap (Amy 2026-08-30: gear moved here from the left rail; the level
           bar shortened a touch to make room). Profile stays off the world (lives on
           the Door). On phones the pill compacts to "Level · 💎". The minimap keeps
-          its corner and the map name stands right below it. */}
-      <div style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16 + 104 + 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          its corner and the map name stands right below it. On phones (≤600px)
+          this group owns the top row, left edge to minimap, and the pill fills
+          it — pill · gear; Exit + 🛍️ drop below (Amy 2026-10-05, see index.css). */}
+      <div className="hud-stats" style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16 + 104 + 12, display: 'flex', alignItems: 'center', gap: 8 }}>
         <LevelBar points={points} gems={gems} gemRef={hudGemRef} onLevelUp={onLevelUp} onOpen={() => setProgressOpen(true)} />
         {!placing && !shopOpen && selectedId == null && !meadow && (
           <button
@@ -1099,12 +1101,27 @@ function BackArrow({ size = 18 }) {
   )
 }
 
+/** Door + arrow — the phone Exit glyph (Amy 2026-10-05): a door frame with an
+ *  arrow stepping out of it, left, toward the Door screen. currentColor. */
+function DoorExitIcon({ size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M14 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+      <path d="M9 7l-5 5 5 5" />
+      <path d="M4 12h12" />
+    </svg>
+  )
+}
+
 /** ‹ Exit — leave the world, back to the Choose-your-world Door. Top-left, the
- *  universal "back" corner. Leaving is non-destructive (map + spot saved). */
+ *  universal "back" corner. Leaving is non-destructive (map + spot saved).
+ *  On phones it folds to a 44px icon button (door + arrow) so the stat pill
+ *  gets the row — the swap is CSS (.hud-exit in index.css). */
 function ExitButton({ onTap }) {
   return (
     <button
       aria-label="Exit to the Door"
+      className="hud-exit"
       onPointerDown={(e) => e.stopPropagation()}
       onClick={onTap}
       style={{
@@ -1123,7 +1140,8 @@ function ExitButton({ onTap }) {
         cursor: 'pointer',
       }}
     >
-      <BackArrow /> Exit
+      <span className="hud-exit-wide"><BackArrow /> Exit</span>
+      <span className="hud-exit-icon"><DoorExitIcon /></span>
     </button>
   )
 }
@@ -1133,6 +1151,7 @@ function RoundHudButton({ aria, emoji, onTap }) {
   return (
     <button
       aria-label={aria}
+      className="hud-round"
       onPointerDown={(e) => e.stopPropagation()}
       onClick={onTap}
       style={{

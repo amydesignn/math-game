@@ -237,6 +237,25 @@ canvas { touch-action: none; display: block; }
   .lvlbar-pill { padding: 0 13px !important; gap: 8px !important; }
 }
 
+/* ── Phone HUD: top row = stat pill (fills) · gear ──
+   (Amy 2026-10-05) The labelled Exit pill and the stat pill collided on
+   phones. Below 600px the stat group owns the top row from the left edge to
+   the minimap, and the pill fills it so the level and gem digits have room.
+   The left rail (Exit as a 48px door+arrow icon, then 🛍️) drops below it. */
+.hud-exit-wide { display: inline-flex; align-items: center; gap: 6px; }
+.hud-exit-icon { display: none; }
+@media (max-width: 600px) {
+  /* both rail buttons 48px (Amy: a bigger target for kids; Datum has no
+     40/48 icon-button size yet — Notion Datum Backlog). Pill + gear stay 44. */
+  .hud-exit { width: 48px; height: 48px !important; padding: 0 !important; justify-content: center; }
+  .hud-left .hud-round { width: 48px !important; height: 48px !important; }
+  .hud-exit-wide { display: none; }
+  .hud-exit-icon { display: inline-flex; }
+  .hud-left { top: calc(max(16px, env(safe-area-inset-top)) + 44px + 12px) !important; }
+  .hud-stats { left: 16px; right: calc(16px + 104px + 8px) !important; gap: 8px !important; }
+  .hud-stats .lvlbar-pill { flex: 1 1 auto; min-width: 0; justify-content: space-between; padding: 0 12px !important; }
+}
+
 /* gem counter pop — replays via key={count} remount on each collect */
 @keyframes gempop {
   0% { transform: scale(1); }
