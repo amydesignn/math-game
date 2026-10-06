@@ -194,6 +194,12 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
   // Follow camera + tap-marker animation (must live under the Canvas).
   const { camera } = useThree()
   const camTarget = useRef(new THREE.Vector3())
+  // dev-only bird's-eye for layout review: window.__overview(30) → top-down over
+  // the map centre; window.__overview(0) → back to the follow camera
+  const overview = useRef(0)
+  useEffect(() => {
+    if (import.meta.env.DEV) window.__overview = (h = 30, tilt = 0.5, cx = 0, cz = 0) => (overview.current = h ? [h, tilt, cx, cz] : 0)
+  }, [])
 
   // On entering a map, snap the camera straight to the spawn point — the fade
   // overlay hides the cut; without this it would swoosh across the new map.
@@ -206,6 +212,12 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
   }, [])
 
   useFrame((_, dt) => {
+    if (import.meta.env.DEV && overview.current) {
+      const [h, tilt, cx = 0, cz = 0] = overview.current
+      camera.position.set(cx, h, cz + h * tilt)
+      camera.lookAt(cx, 0, cz)
+      return
+    }
     // camera trails the character; pinch zoom scales the offset
     const desired = charPosRef.current
     const zoom = zoomRef.current

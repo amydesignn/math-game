@@ -55,8 +55,59 @@ function pavilion(cx, cz) {
   ]
 }
 
+// Stable pseudo-random in [0,1) — scenery must land in the same spot every
+// load (and for every player), so jitter comes from the index, not Math.random.
+const jitter = (i, k = 0) => {
+  const v = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453
+  return v - Math.floor(v)
+}
+
+/** A forest edge: two loose rows of trees just inside the map boundary, with
+ *  openings where gates sit. `gaps` = gate positions [x, z] to keep clear. */
+function treeLine({ gaps = [], step = 2.3 } = {}) {
+  const out = []
+  let i = 0
+  for (const [inset, kind] of [[16.6, 'tree-high'], [14.6, 'tree']]) {
+    const span = inset
+    for (let t = -span; t <= span; t += step) {
+      for (const [x, z] of [[t, -inset], [t, inset], [-inset, t], [inset, t]]) {
+        i++
+        const jx = x + (jitter(i, 1) - 0.5) * 1.2
+        const jz = z + (jitter(i, 2) - 0.5) * 1.2
+        if (gaps.some(([gx, gz]) => Math.hypot(jx - gx, jz - gz) < 4.2)) continue
+        if (kind === 'tree' && jitter(i, 3) < 0.35) continue // inner row is patchy
+        out.push(f(jitter(i, 4) < 0.3 ? 'tree' : kind, jx, jz, jitter(i, 5) * Math.PI * 2, 0.9 + jitter(i, 6) * 0.45))
+      }
+    }
+  }
+  return out
+}
+
+/** A footpath through `points` ([x, z] waypoints): small patch-dirt
+ *  stepping stones with gaps between, so it guides without walling off. */
+function trail(points, { step = 1.15, width = 0.62 } = {}) {
+  const out = []
+  let i = 0
+  for (let p = 0; p < points.length - 1; p++) {
+    const [ax, az] = points[p]
+    const [bx, bz] = points[p + 1]
+    const n = Math.max(1, Math.round(Math.hypot(bx - ax, bz - az) / step))
+    for (let s = 0; s < n; s++) {
+      const u = s / n
+      i++
+      out.push(f('patch-dirt', ax + (bx - ax) * u, az + (bz - az) * u, Math.floor(jitter(i, 7) * 4) * (Math.PI / 2), width))
+    }
+  }
+  return out
+}
+
 export const MAPS = {
-  // ── Map 1 — the original forest clearing ──
+  // ── Map 1 — the forest clearing: a campsite in a glade ──
+  // Laid out as a place, not a scatter (Ivy's feedback): a tree line frames the
+  // edge, a dirt trail runs gate → camp → gate, and four spots sit off it —
+  // the campsite straight ahead of spawn, the lookout, the archery range and
+  // the rocky knoll. The open meadow between them is where sparkles and
+  // stations land (both keep ~2 units clear of decor).
   clearing: {
     id: 'clearing',
     name: 'Forest Clearing',
@@ -65,18 +116,48 @@ export const MAPS = {
     sky: '#eae6f7',
     gateColor: '#5fbf63', // what gates leading HERE glow like
     decor: [
-      f('tree-high', -6, -5, 0.4),
-      f('tree', 7, -4.5, -0.8),
-      f('tree-high', 10, 3, 1.2),
-      f('tree', -9, 4, 2.1),
-      f('tree', 4, 9, 0.3),
-      f('rocks-high', 5.5, 5.5, 0.6),
-      f('rocks-low', -5, 7, -0.4),
-      f('stones', -3.5, 5.5, 0),
-      f('plant', 3, -5.5, 0),
-      f('plant', -4.5, -3.5, 1),
-      f('flag', 8.5, -8, 0),
-      f('tent', -9, -8, 0.5),
+      ...treeLine({ gaps: [[-16, 2], [16, 2]] }),
+      ...trail([[-15, 2], [-10, 2.6], [-5, 1.6], [0, 1.4], [5, 1.8], [10, 2.8], [15, 2]]),
+      ...trail([[0, 1.4], [0.4, -1.4], [0, -4]]), // spur up to the camp
+
+      // campsite — straight ahead of spawn, the first thing she sees
+      f('stones', 0, -6, 0.3, 1.2), // the fire ring
+      f('tent', -2.6, -7.4, 0.7, 1.4),
+      f('tent', 2.6, -7.6, -0.7, 1.4),
+      f('flag', 0.2, -9.2, 0, 1.6),
+      f('fence', -3.8, -9.6, 0.3), f('fence', -2.7, -9.9, 0.1),
+      f('fence', 2.7, -10, -0.1), f('fence', 3.8, -9.7, -0.3),
+      f('plant', -4.5, -6.4, 0.4), f('plant', 4.6, -6.7, 2.1),
+
+      // lookout — a little tower on the trail's north side, east
+      f('building-structure', 9, -7, 0, 1.6),
+      { pack: 'forest', name: 'building-roof', position: [9, 1.6, -7], rotation: 0, scale: 1.6 },
+      f('ladder', 9, -6.1, 0, 1.6),
+      f('patch-grass', 7.6, -5.6, 0.8), f('plant', 10.4, -5.8, 1.4),
+
+      // archery range — south-west: targets in a row, an archer practising
+      f('target', -12, 9.6, 0, 1.8), f('target', -9.5, 9.8, 0, 1.8), f('target', -7, 9.6, 0, 1.8),
+      f('fence', -12.9, 11, 0, 1.3), f('fence', -11.5, 11, 0, 1.3), f('fence', -10.1, 11, 0, 1.3),
+      f('fence', -8.7, 11, 0, 1.3), f('fence', -7.3, 11, 0, 1.3), f('fence', -5.9, 11, 0, 1.3),
+      f('character-archer', -9.2, 6.6, Math.PI, 1.4),
+      f('plant', -13.2, 7.4, 0.6), f('plant', -5.6, 8.2, 2.3),
+
+      // rocky knoll — south-east, a lump of rock with a flag on top
+      f('rocks-high', 10, 9.2, 0.4, 1.6),
+      f('rocks-low', 8.6, 8.4, 1.2, 1.1),
+      f('stones', 7.8, 10, 0.9), f('stones', 11.8, 8, 2.2, 0.8),
+      { pack: 'forest', name: 'flag', position: [10, 0.8, 9.2], rotation: 0.6, scale: 1.4 },
+      f('patch-grass', 11.6, 10.4, 1.3),
+
+      // a small grove north-west — balances the lookout across the camp
+      f('tree-high', -9.4, -7.2, 0.3, 1.2), f('tree', -10.8, -5.6, 1.7, 1.1),
+      f('tree', -8, -5.4, 2.9), f('patch-grass', -9.2, -4.6, 0.4), f('plant', -7.6, -6.6, 1.2),
+
+      // meadow flowers along the trail, in little clumps
+      f('plant', -6, 3.6, 0.2), f('plant', -5.4, 4.1, 1.9, 0.8), f('patch-grass', -6.4, 4.4, 1),
+      f('plant', 5.6, -0.4, 2.6), f('plant', 6.3, -0.1, 0.5, 0.9),
+      f('plant', 3.2, 5.6, 1.1), f('patch-grass', 2.6, 6, 0.3),
+      f('patch-grass', -4, -3.8, 2.2), f('plant', -3.5, -4.3, 0.9),
     ],
     gates: [
       { to: 'town', position: [16, 0, 2] },
