@@ -241,11 +241,14 @@ canvas { touch-action: none; display: block; }
    (Amy 2026-10-05) The labelled Exit pill and the stat pill collided on
    phones. Below 600px the stat group owns the top row from the left edge to
    the minimap, and the pill fills it so the level and gem digits have room.
-   The left rail (Exit as a 44px door+arrow icon, then 🛍️) drops below it. */
+   The left rail (Exit as a 48px door+arrow icon, then 🛍️) drops below it. */
 .hud-exit-wide { display: inline-flex; align-items: center; gap: 6px; }
 .hud-exit-icon { display: none; }
 @media (max-width: 600px) {
-  .hud-exit { width: 44px; padding: 0 !important; justify-content: center; }
+  /* both rail buttons 48px (Amy: a bigger target for kids; Datum has no
+     40/48 icon-button size yet — Notion Datum Backlog). Pill + gear stay 44. */
+  .hud-exit { width: 48px; height: 48px !important; padding: 0 !important; justify-content: center; }
+  .hud-left .hud-round { width: 48px !important; height: 48px !important; }
   .hud-exit-wide { display: none; }
   .hud-exit-icon { display: inline-flex; }
   .hud-left { top: calc(max(16px, env(safe-area-inset-top)) + 44px + 12px) !important; }

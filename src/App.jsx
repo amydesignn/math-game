@@ -1151,6 +1151,7 @@ function RoundHudButton({ aria, emoji, onTap }) {
   return (
     <button
       aria-label={aria}
+      className="hud-round"
       onPointerDown={(e) => e.stopPropagation()}
       onClick={onTap}
       style={{
