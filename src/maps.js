@@ -45,13 +45,14 @@ function house(cx, cz, { door = 'e', windows = 'square' } = {}) {
   ]
 }
 
-/** An open pavilion: four columns holding a flat roof. */
-function pavilion(cx, cz) {
-  const c = CELL * 0.95
+/** An open pavilion: four columns holding a flat roof. `k` scales it up. */
+function pavilion(cx, cz, k = 1) {
+  const c = CELL * 0.95 * k
+  const s = BS * k
   return [
-    b('column', cx - c, cz - c), b('column', cx + c, cz - c),
-    b('column', cx - c, cz + c), b('column', cx + c, cz + c),
-    { pack: 'building', name: 'roof-flat-square', position: [cx, 2.4 * BS, cz], rotation: 0, scale: BS },
+    b('column', cx - c, cz - c, 0, s), b('column', cx + c, cz - c, 0, s),
+    b('column', cx - c, cz + c, 0, s), b('column', cx + c, cz + c, 0, s),
+    { pack: 'building', name: 'roof-flat-square', position: [cx, 2.4 * s, cz], rotation: 0, scale: s },
   ]
 }
 
@@ -99,6 +100,18 @@ function trail(points, { step = 1.15, width = 0.62 } = {}) {
     }
   }
   return out
+}
+
+/** A square flower bed: two L-shaped stone borders closing a frame, three
+ *  plants inside. Five props; `k` scales the whole bed. */
+function flowerBed(cx, cz, k = 1) {
+  return [
+    b('border-corner', cx, cz, 0, BS * k),
+    b('border-corner', cx, cz, Math.PI, BS * k),
+    f('plant', cx - 0.35 * k, cz - 0.3 * k, 0.4, 1.2 * k),
+    f('plant', cx + 0.4 * k, cz + 0.1 * k, 2.1, 1.1 * k),
+    f('plant', cx - 0.1 * k, cz + 0.45 * k, 1.3, 1 * k),
+  ]
 }
 
 export const MAPS = {
@@ -201,7 +214,13 @@ export const MAPS = {
     ],
   },
 
-  // ── Map 3 — a rosy ruin garden on pink ground ──
+  // ── Map 3 — the rosy garden: a formal garden, laid out LIGHT ──
+  // The "fewer assets" twin of the Forest Clearing (to compare with Ivy): same
+  // idea — a place, not a scatter — but ~50 props instead of ~150, and the
+  // pieces are scaled up so fewer of them still fill the lawn. Symmetry
+  // does the structuring work the Clearing's tree line does: a gazebo on the
+  // axis ahead of spawn, a stepping-stone walk gate → centre → gate, four
+  // matching flower beds, a tree at each corner. Lots of open pink lawn.
   garden: {
     id: 'garden',
     name: 'Rosy Garden',
@@ -210,28 +229,22 @@ export const MAPS = {
     sky: '#fbe9f3',
     gateColor: '#ef7fb5',
     decor: [
-      ...pavilion(0, -8),
-      // ruined colonnade wandering the west side
-      b('column', -7, -4, 0.2),
-      b('column', -8.5, -1, -0.3),
-      b('column-thin', -6.5, 2, 0.5),
-      b('column', -8, 5, 0),
-      // flower beds: border edging + plants inside
-      b('border', 5, -3.2, Math.PI / 2),
-      b('border', 5, -0.8, Math.PI / 2),
-      f('plant', 4.4, -2, 0.4, 1.1),
-      f('plant', 5.7, -2.1, 1.9, 0.9),
-      b('border', 9.5, 3.8, Math.PI / 2),
-      b('border', 9.5, 6.2, Math.PI / 2),
-      f('plant', 9, 5, 2.6),
-      f('plant', 10.1, 5.1, 0.9, 1.15),
-      // soft forest touches
-      f('patch-grass', -3, 6, 0.7),
-      f('patch-grass', 3.5, 8.5, 2.2),
-      f('stones', -4.5, -1.5, 1.1),
-      f('rocks-low', 8, -7.5, 0.9),
-      f('plant', -2.5, -4.5, 1.4),
-      f('plant', 1.5, 5.5, 0.2),
+      // the gazebo, straight ahead of spawn, two lamp posts at its door
+      ...pavilion(0, -8.5, 1.5),
+      b('column-thin', -2.4, -5.4), b('column-thin', 2.4, -5.4),
+      f('tree', -3.6, -11, 0.7, 1.4), f('tree', 3.6, -11, 2.4, 1.4),
+
+      // the walk: gate → centre → gate, plus the spur to the gazebo
+      ...trail([[-15, -3], [-8, -1.6], [0, 0], [8, 1.6], [15, 3]], { step: 1.7, width: 0.85 }),
+      ...trail([[0, 0], [0, -5]], { step: 1.7, width: 0.85 }),
+
+      // four matching flower beds, one per quarter
+      ...flowerBed(-7, -5.5, 1.8), ...flowerBed(7, -5.5, 1.8),
+      ...flowerBed(-7, 6.5, 1.8), ...flowerBed(7, 6.5, 1.8),
+
+      // a tree at each corner frames the lawn
+      f('tree-high', -13, -11, 0.4, 1.3), f('tree-high', 13, -11, 2.2, 1.3),
+      f('tree-high', -13, 11, 1.1, 1.3), f('tree-high', 13, 11, 2.9, 1.3),
     ],
     gates: [
       { to: 'town', position: [-16, 0, -3] },
