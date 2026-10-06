@@ -220,6 +220,44 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
+Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
+Garden. Amy's order: **Star Arcade → Halloween, Sunny Town → open plot +
+neighbours, Merry Market LAST (not started).**
+- **Seasons are DATE WINDOWS (`src/season.js`), not switches:** `halloween` =
+  Oct 1 → Nov 2 inclusive, every year, no deploy. `?season=halloween|none`
+  overrides (decoration only, never touches saves). Resolved ONCE at module
+  load in maps.js (`arcade: withSeason(ARCADE)`).
+- **Spooky Arcade** = the arcade's own decor + Halloween ADDED on top (machines
+  stay) + dusk `light`/ground/sky, renamed "Spooky Arcade" on the label and
+  the Door card (`card` → Door's WORLDS overlay; art `worlds/arcade-halloween.jpg`).
+  **The gate glow stays violet** — colour is the signpost (test-guarded).
+- **Procedural props, `src/world/Spooky.jsx`:** kenney.nl is blocked from the
+  cloud container, so no Graveyard Kit — pumpkins (carved/plain), graves,
+  candles, torches, a bubbling cauldron are three.js primitives, flat-shaded to
+  match Kenney. Decor entries carry `fx` instead of a GLB `name` (Scene
+  dispatches; preloadMap skips them). MOVING things live in `map.ambient`:
+  floating spirit flames (`wisp`: orange/violet/mint) + cute ghosts that stop,
+  turn toward the camera and wiggle when she's within 3. Ghost material is
+  OPAQUE + emissive (translucent showed its inner spheres; dusk greyed it).
+  If Amy ever drops in the real Kenney Graveyard Kit, swap `fx` entries for GLBs.
+- **Sunny Town** is now trees only (outer `treeLine` row + corner shade trees,
+  middle open — the kids' build plot) and **4 neighbours**
+  (`map.neighbours`, `src/world/Neighbour.jsx`): Mia/Leo/Sam/Max, each a Kenney
+  mini character + their own cube `<Pet>` following them. They amble ≤2.2
+  around home, and when she's within 3 they stop, face her, `emote-yes` and say
+  a line (bubble = drei Html, 4px-grid, `nbPop` keyframe). Lines cycle per
+  visit; re-arm after she walks >5 away. Copy is public-safe (test-guarded: no
+  family names). A neighbour wearing the PLAYER's character swaps to a spare.
+- **`blockers(map)`** (maps.js) = decor + neighbour homes; sparkles + stations
+  keep clear of both. `house()` retired with the old town (git history).
+- Tests `season-maps.test.js` (+10) → 205 green; oxlint + build clean.
+  Verified in headless Chromium (swiftshader): arcade + boo-yard + overview,
+  town greeting bubble, Door card in/out of season, zero page errors.
+- **Open:** Merry Market redo (Amy: last). Door card photos are quick
+  captures — Amy may reshoot. Neighbours don't avoid her placed assets on
+  their short stroll (harmless overlap, no collision system).
+
 ## Long-mult walkthrough fix ✅ SHIPPED 2026-09-27 — shaped example + every carry + a real ending
 From Amy's Luxi Math video recording + Finn's review (32 × 31, answered 895). Commit `a088dfb`.
 - **"One just like it" wasn't** — 32 × 31 got 40 × 21 (the 0 trivialises the ones pass).

@@ -24,6 +24,7 @@ import { levelState, fmtPoints } from '../levels'
 import HeroStage from './HeroStage'
 import { GemIcon, ProfileChip } from './hudkit'
 import Footer from './Footer'
+import { MAPS } from '../maps'
 
 /* level math is imported from levels.js — the comp inlined a verbatim copy of it;
    in-app we read the real source so the two can never drift. */
@@ -53,13 +54,19 @@ const V = {
    loads and as the honest fallback. Art resolves against BASE_URL (Vercel '/',
    Pages '/math-game/'). */
 const ART = import.meta.env.BASE_URL + 'worlds/'
-const WORLDS = [
+const BASE_WORLDS = [
   { id: 'clearing', name: 'Forest Clearing', blurb: 'Where every journey begins', tint: '#5fbf63', art: ART + 'clearing.jpg' },
   { id: 'town', name: 'Sunny Town', blurb: 'Warm streets, friendly faces', tint: '#f0a03c', art: ART + 'town.jpg' },
   { id: 'garden', name: 'Rosy Garden', blurb: 'Petal paths and quiet corners', tint: '#ef7fb5', art: ART + 'garden.jpg' },
   { id: 'market', name: 'Merry Market', blurb: 'Stalls, treats, and trinkets', tint: '#f2c530', art: ART + 'market.jpg' },
   { id: 'arcade', name: 'Star Arcade', blurb: 'Bright lights, big scores', tint: '#8f6fe8', art: ART + 'arcade.jpg' },
 ]
+// A seasonal map (maps.js `card`) re-dresses its Door card too — name, blurb,
+// and its own capture when one exists — so the hub and the world agree.
+const WORLDS = BASE_WORLDS.map((w) => {
+  const c = MAPS[w.id]?.card
+  return c ? { ...w, ...c, art: c.art ? ART + c.art : w.art } : w
+})
 const MEADOW = { id: 'meadow', name: 'The Meadow', blurb: 'Play together', tint: '#b48fe0' }
 
 /* ── icons (crafted, not emoji) ── */
