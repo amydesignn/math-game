@@ -237,6 +237,21 @@ canvas { touch-action: none; display: block; }
   .lvlbar-pill { padding: 0 13px !important; gap: 8px !important; }
 }
 
+/* ── Phone HUD: one top row — Exit icon · stat pill (fills) · gear ──
+   (Amy 2026-10-05) The labelled Exit pill and the stat pill collided on
+   phones. Below 600px Exit folds to a 44px door+arrow icon, the stat group
+   stretches from it to the minimap, and the pill fills that space so the
+   level and gem digits have room. The 🛍️ stays under Exit in the left rail. */
+.hud-exit-wide { display: inline-flex; align-items: center; gap: 6px; }
+.hud-exit-icon { display: none; }
+@media (max-width: 600px) {
+  .hud-exit { width: 44px; padding: 0 !important; justify-content: center; }
+  .hud-exit-wide { display: none; }
+  .hud-exit-icon { display: inline-flex; }
+  .hud-stats { left: calc(16px + 44px + 8px); right: calc(16px + 104px + 8px) !important; gap: 8px !important; }
+  .hud-stats .lvlbar-pill { flex: 1 1 auto; min-width: 0; justify-content: space-between; padding: 0 12px !important; }
+}
+
 /* gem counter pop — replays via key={count} remount on each collect */
 @keyframes gempop {
   0% { transform: scale(1); }
