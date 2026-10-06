@@ -217,24 +217,23 @@ function Tag({ children, style }) {
   return <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 600, lineHeight: 1.5, padding: '0 8px', borderRadius: 999, background: hot ? V.btn : V.soft, color: hot ? '#FFFFFF' : 'var(--brand-iris-700)', ...style }}>{children}</span>
 }
 
-/* ── what's new — a manual carousel (swipe, or the arrows). No auto-rotate: it
-   would need a pause control (WCAG 2.2.2) and a moving card fights the quest
-   strip for a kid's attention. Type = 14 + 12 only, like the rest of the column. ── */
+/* ── what's new — a full-bleed manual carousel (Amy 2026-10-06): the image fills
+   the card, "What's new" + the tag ride on it as pills, one arrow each side, no
+   pagination. No auto-rotate: it would need a pause control (WCAG 2.2.2) and a
+   moving card fights the quest strip for a kid's attention. Type = 14 + 12 only. ── */
 const newS = {
-  card: { background: T.surface, borderRadius: 24, boxShadow: '0 2px 14px rgba(74,54,110,.07)', padding: 16, marginTop: 16, animation: 'doorPop .4s .03s ease-out both' },
-  head: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 12 },
-  title: { fontSize: BODY, fontWeight: 600, color: T.textPrimary },
-  nav: { display: 'flex', alignItems: 'center', gap: 4 },
-  count: { fontSize: 12, fontWeight: 400, color: T.textSecondary, marginRight: 4, fontVariantNumeric: 'tabular-nums' },
-  arrow: { width: 32, height: 32, borderRadius: '50%', border: 'none', background: V.soft, color: 'var(--brand-iris-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0 },
-  track: { display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory', scrollbarWidth: 'none', gap: 12, borderRadius: 16 },
-  slide: { flex: '0 0 100%', scrollSnapAlign: 'start', display: 'flex', alignItems: 'center', gap: 12, border: 'none', background: 'var(--lilac-50)', borderRadius: 16, padding: 8, textAlign: 'left', cursor: 'pointer', font: 'inherit', minWidth: 0 },
-  thumb: { position: 'relative', flex: 'none', width: 104, height: 78, borderRadius: 12, overflow: 'hidden' },
-  img: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' },
-  text: { minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4 },
-  sTitle: { fontSize: BODY, fontWeight: 600, color: T.textPrimary, lineHeight: 1.35 },
+  card: { position: 'relative', background: T.surface, borderRadius: 24, boxShadow: '0 2px 14px rgba(74,54,110,.07)', overflow: 'hidden', marginTop: 16, animation: 'doorPop .4s .03s ease-out both' },
+  track: { display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory', scrollbarWidth: 'none' },
+  slide: { flex: '0 0 100%', scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', border: 'none', background: T.surface, padding: 0, textAlign: 'left', cursor: 'pointer', font: 'inherit', minWidth: 0 },
+  media: { position: 'relative', display: 'block', width: '100%', height: 148, overflow: 'hidden' },
+  img: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' },
+  pills: { position: 'absolute', left: 12, top: 12, display: 'flex', gap: 6 },
+  label: { display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 600, lineHeight: 1.5, padding: '0 8px', borderRadius: 999, background: 'rgba(255,255,255,.94)', color: T.textPrimary, boxShadow: '0 2px 8px rgba(74,54,110,.14)' },
+  text: { display: 'flex', flexDirection: 'column', gap: 2, padding: '12px 16px 16px' },
+  sTitle: { fontSize: BODY, fontWeight: 600, color: T.textPrimary, lineHeight: 1.4 },
   sLine: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, lineHeight: 1.4 },
-  dots: { display: 'flex', justifyContent: 'center', gap: 6, marginTop: 12 },
+  // arrows sit on the image's vertical centre (148 / 2 − 16), outside the track so they don't scroll
+  arrow: { position: 'absolute', top: 58, zIndex: 2, width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,.94)', color: 'var(--brand-iris-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0, boxShadow: '0 2px 8px rgba(74,54,110,.18)' },
 }
 function Chevron({ left }) {
   return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={left ? 'm15 18-6-6 6-6' : 'm9 18 6-6-6-6'} /></svg>
@@ -246,34 +245,26 @@ function WhatsNew({ map, onPlay, onResume }) {
   if (!n) return null
   const go = (k) => {
     const t = track.current; if (!t) return
-    const next = (k + n) % n
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    t.scrollTo({ left: next * (t.clientWidth + 12), behavior: reduce ? 'auto' : 'smooth' })
+    t.scrollTo({ left: ((k + n) % n) * t.clientWidth, behavior: reduce ? 'auto' : 'smooth' })
   }
-  const onScroll = () => { const t = track.current; if (t) setI(Math.round(t.scrollLeft / (t.clientWidth + 12))) }
+  const onScroll = () => { const t = track.current; if (t) setI(Math.round(t.scrollLeft / t.clientWidth)) }
   return (
     <section style={newS.card} aria-roledescription="carousel" aria-label="What's new">
-      <div style={newS.head}>
-        <span style={newS.title}>What’s new</span>
-        {n > 1 && (
-          <div style={newS.nav}>
-            <span style={newS.count} aria-live="polite">{i + 1} / {n}</span>
-            <button className="doorNew-arrow" style={newS.arrow} onClick={() => go(i - 1)} aria-label="Previous"><Chevron left /></button>
-            <button className="doorNew-arrow" style={newS.arrow} onClick={() => go(i + 1)} aria-label="Next"><Chevron /></button>
-          </div>
-        )}
-      </div>
       <div ref={track} className="doorNew-track" style={newS.track} onScroll={onScroll}>
         {UPDATES.map((u, k) => {
           const w = WORLDS.find((x) => x.id === u.world)
           const open = () => (u.world === map ? onResume?.() : onPlay?.(u.world))
           return (
-            <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`${k + 1} of ${n}: ${u.tag}, ${u.title}`} tabIndex={k === i ? 0 : -1}>
-              <span style={{ ...newS.thumb, ...(w ? worldThumb(w.tint) : null), position: 'relative' }}>
+            <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`What's new, ${k + 1} of ${n}: ${u.tag}, ${u.title}. ${u.line}`} tabIndex={k === i ? 0 : -1}>
+              <span style={{ ...newS.media, ...(w ? worldThumb(w.tint) : null), position: 'relative' }}>
                 {w?.art && <img src={w.art} alt="" style={newS.img} loading="lazy" />}
+                <span style={newS.pills}>
+                  <span style={newS.label}>What’s new</span>
+                  <Tag style={{ boxShadow: '0 2px 8px rgba(74,54,110,.14)' }}>{u.tag}</Tag>
+                </span>
               </span>
               <span style={newS.text}>
-                <Tag>{u.tag}</Tag>
                 <span style={newS.sTitle}>{u.title}</span>
                 <span style={newS.sLine}>{u.line}</span>
               </span>
@@ -281,11 +272,10 @@ function WhatsNew({ map, onPlay, onResume }) {
           )
         })}
       </div>
-      {n > 1 && (
-        <div style={newS.dots} aria-hidden="true">
-          {UPDATES.map((_, k) => <span key={k} style={{ height: 6, width: k === i ? 18 : 6, borderRadius: 99, background: k === i ? V.btn : V.softLine, transition: 'width .2s ease, background .2s ease' }} />)}
-        </div>
-      )}
+      {n > 1 && <>
+        <button className="doorNew-arrow" style={{ ...newS.arrow, left: 8 }} onClick={() => go(i - 1)} aria-label="Previous"><Chevron left /></button>
+        <button className="doorNew-arrow" style={{ ...newS.arrow, right: 8 }} onClick={() => go(i + 1)} aria-label="Next"><Chevron /></button>
+      </>}
     </section>
   )
 }
