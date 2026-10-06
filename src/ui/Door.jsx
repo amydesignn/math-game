@@ -94,9 +94,9 @@ function Rocket({ size = 22, color = V.main }) {
     </svg>
   )
 }
-function Saved({ size = 15 }) {
+function Saved({ size = 16 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ stroke: T.textSecondary }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ stroke: 'var(--color-icon-success)' }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 21a9 9 0 1 0-9-9" />
       <path d="m8.5 12 2.5 2.5 5-5" />
     </svg>
@@ -137,7 +137,7 @@ const heroS = {
   toNextRow: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginTop: 8 },
   toNext: { fontSize: BODY, fontWeight: 400, color: T.textSecondary },
   newLine: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, marginTop: 18, lineHeight: 1.5 },
-  saved: { display: 'flex', alignItems: 'center', gap: 7, marginTop: 14, fontSize: 12.5, fontWeight: 400, color: T.textSecondary },
+  saved: { display: 'flex', alignItems: 'center', gap: 7, marginTop: 14, fontSize: BODY, fontWeight: 400, color: T.textSecondary }, // 12.5 → 14 supporting (Amy: Door = 14 + 12 only); check = Datum icon-success
 }
 function Hero({ mode, points, gems }) {
   const stats = mode !== 'new'
@@ -173,9 +173,9 @@ const questS = {
   card: { display: 'flex', alignItems: 'center', gap: 13, background: T.amberSoft, border: '1.5px solid ' + T.amberLine, borderRadius: 18, padding: '12px 15px', marginTop: 16, animation: 'doorPop .4s .05s ease-out both' },
   badge: { width: 40, height: 40, flex: 'none', borderRadius: 12, background: '#FFEFCF', display: 'flex', alignItems: 'center', justifyContent: 'center' },
   mid: { minWidth: 0, flex: 1 },
-  labelRow: { display: 'flex', alignItems: 'center', gap: 7 },
-  label: { fontSize: 11.5, fontWeight: 600, color: T.amberInk, letterSpacing: '.02em' },
-  refresh: { fontSize: 10.5, fontWeight: 600, color: T.amberInk }, // was #B4832E 3.17 ✗ — amberInk = the label beside it, 5.95 on amberSoft
+  labelRow: { display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 7, rowGap: 2, whiteSpace: 'nowrap' }, // eyebrow line can outrun the column; phone column ~196 → 'refreshes' drops to its own line whole, never mid-phrase
+  label: { fontSize: 12, fontWeight: 600, color: T.amberInk, letterSpacing: '.02em' }, // 11.5 → 12, Title Case (Amy: Door = 14 + 12 only, no caps)
+  refresh: { fontSize: 12, fontWeight: 600, color: T.amberInk, letterSpacing: '.02em' }, // 10.5 → 12, same eyebrow as the label (was #B4832E 3.17 ✗ → amberInk 5.95 on amberSoft)
   text: { fontSize: BODY, fontWeight: 400, color: '#6E4E15', marginTop: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   reward: { flex: 'none', display: 'inline-flex', alignItems: 'center', gap: 3, fontWeight: 700, color: T.amberInk, fontSize: BODY, background: '#FFEFCF', padding: '5px 10px 5px 9px', borderRadius: 999 },
 }
@@ -186,8 +186,8 @@ function QuestCard({ quest }) {
       <span style={questS.badge}><Trophy size={24} /></span>
       <div style={questS.mid}>
         <div style={questS.labelRow}>
-          <span style={questS.label}>Today’s quest</span>
-          <span style={questS.refresh}>· refreshes in {quest.hrs}h</span>
+          <span style={questS.label}>Today’s Quest</span>
+          <span style={questS.refresh}>· Refreshes in {quest.hrs}h</span>
         </div>
         <div style={questS.text}>Visit {quest.worldName} to earn gems</div>
       </div>
