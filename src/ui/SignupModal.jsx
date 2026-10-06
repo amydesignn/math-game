@@ -341,35 +341,36 @@ export default function SignupModal({
                 }}
               />
 
-              <button
-                onClick={submit}
-                disabled={btnDisabled}
-                aria-busy={sending || undefined}
-                className="luxiSu-primary"
-                style={{ ...S.primary, ...(btnDisabled ? S.primaryDisabled : null), ...(sending ? { cursor: 'default' } : null) }}
-              >
-                {sending && (
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: '50%',
-                      border: '2px solid color-mix(in srgb, var(--color-text-on-brand) 45%, transparent)',
-                      borderTopColor: 'var(--color-text-on-brand)',
-                      animation: 'suSpin .7s linear infinite',
-                    }}
-                  />
-                )}
-                <span>{sending ? 'Sending…' : 'Send the link'}</span>
-              </button>
-
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 4 }}>
-                <PrivacyLine href={privacyHref} />
-                <button onClick={dismiss} className="luxiSu-notnow" style={S.notNow}>
+              {/* the action pair (Send + Not now) sits together, the privacy note below: same order as the guest popup (Amy) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <button
+                  onClick={submit}
+                  disabled={btnDisabled}
+                  aria-busy={sending || undefined}
+                  className="luxiSu-primary"
+                  style={{ ...S.primary, ...(btnDisabled ? S.primaryDisabled : null), ...(sending ? { cursor: 'default' } : null) }}
+                >
+                  {sending && (
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: '50%',
+                        border: '2px solid color-mix(in srgb, var(--color-text-on-brand) 45%, transparent)',
+                        borderTopColor: 'var(--color-text-on-brand)',
+                        animation: 'suSpin .7s linear infinite',
+                      }}
+                    />
+                  )}
+                  <span>{sending ? 'Sending…' : 'Send the link'}</span>
+                </button>
+                <button onClick={dismiss} className="luxiSu-notnow" style={{ ...S.notNow, width: '100%', height: 44 }}>
                   Not now
                 </button>
               </div>
+
+              <PrivacyLine href={privacyHref} />
             </div>
           )}
 
