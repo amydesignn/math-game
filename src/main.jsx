@@ -321,13 +321,17 @@ const DEV_DEMO =
  * 1.2s stub. DEV-guarded → dead-code-eliminated from prod.
  */
 function SignupDemo() {
-  const [entry, setEntry] = React.useState('form')
-  const [fail, setFail] = React.useState(false)
-  const [toast, setToast] = React.useState(false)
+  // URL seeds (&entry=guest · &fail · &toast) let a11y/signup-modal.audit.mjs open each state directly
+  const q = new URLSearchParams(window.location.search)
+  const [entry, setEntry] = React.useState(q.get('entry') || 'form')
+  const [fail, setFail] = React.useState(q.has('fail'))
+  const [toast, setToast] = React.useState(q.has('toast'))
   const [open, setOpen] = React.useState(true)
   const [k, setK] = React.useState(0) // remount to reset the modal's internal phase
   const onSend = () =>
-    new Promise((res, rej) => setTimeout(() => (fail ? rej(new Error('demo')) : res(true)), 1200))
+    q.has('hang') // &hang holds the Sending… state open for the audit
+      ? new Promise(() => {})
+      : new Promise((res, rej) => setTimeout(() => (fail ? rej(new Error('demo')) : res(true)), 1200))
   const reopen = (e) => {
     setEntry(e)
     setOpen(true)
@@ -344,6 +348,7 @@ function SignupDemo() {
       }}
     >
       <div
+        data-demo
         style={{
           position: 'fixed',
           top: 12,
@@ -374,10 +379,11 @@ function SignupDemo() {
           Success toast
         </button>
       </div>
-      {open && (
-        <SignupModal key={k} entry={entry} onSend={onSend} onClose={() => setOpen(false)} />
-      )}
-      {toast && <SavedToast onDone={() => setToast(false)} />}
+      {/* audit root: the shipped surfaces only, not the DEMO bar */}
+      <div data-audit-root style={{ display: 'contents' }}>
+        {open && <SignupModal key={k} entry={entry} onSend={onSend} onClose={() => setOpen(false)} />}
+        {toast && <SavedToast onDone={() => setToast(false)} duration={q.has('toast') ? 1e9 : undefined} />}
+      </div>
     </div>
   )
 }

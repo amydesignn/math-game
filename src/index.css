@@ -96,6 +96,12 @@
   --color-component-button-link-text-pressed: #333A98; /* brand-iris-800 */
   --color-component-button-link-background-pressed: #DDD1F7; /* brand-lilac-200 */
   --color-component-button-link-focus-ring: #333A98; /* brand-iris-800 */
+  /* status (Datum datum-tokens.css, verbatim) — SignupModal error note + saved toast */
+  --color-status-warning-background: #FFFBEB; /* amber-50 */
+  --color-status-warning-border: #FEE685; /* amber-200 */
+  --color-status-warning-text: #973C00; /* amber-800 */
+  --color-status-success-background: #F0FDF4; /* green-50 */
+  --color-status-success-text: #016630; /* green-800 */
 
   /* Datum TYPE tokens in use — size + line-height ride together (globals.css
      overrides Tailwind's line-heights to 1.5 up to xl). Weights 400/500/700 only. */
@@ -363,6 +369,29 @@ canvas { touch-action: none; display: block; }
 .luxiFb-ta:focus { border-color: var(--color-border-interactive-focus); } /* after :hover so focus wins */
 .luxiFb-press { transition: transform .07s, box-shadow .07s, background .15s; }
 .luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
+
+/* ── Save Your Progress (SignupModal.jsx) → Datum, 2026-10-05 ──
+   Same recipe as .luxiFb-: interactive states here because an inline style beats
+   :hover. Primary = the Luxi 3D button (4px press, shadow to 0). Input = Datum's
+   interactive border trio (neutral-500 rest 4.74:1 · 600 hover · iris-600 focus).
+   Not now = quiet secondary text (Feedback's "Not now"); links = Datum link tokens. */
+.luxiSu-close { background: var(--brand-lilac-100); transition: background .15s; }
+.luxiSu-close:hover { background: var(--brand-lilac-200); }
+.luxiSu-primary { transition: transform .07s, box-shadow .07s, filter .15s; }
+.luxiSu-primary:hover:not(:disabled):not([aria-busy]) { filter: brightness(1.04); }
+.luxiSu-primary:active:not(:disabled):not([aria-busy]) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
+.luxiSu-input { border: 1.5px solid var(--color-border-interactive-default); background: var(--color-background-interactive-default); outline: none; transition: border-color .15s; }
+.luxiSu-input:hover { border-color: var(--color-border-interactive-hover); }
+.luxiSu-input:focus { border-color: var(--color-border-interactive-focus); outline: 1px solid var(--brand-iris-700); outline-offset: 2px; } /* after :hover so focus wins. The border shift alone (neutral-500 → iris-600) is 1.23:1, too faint to be a focus indicator, so it also gets the house 1px Iris 700 ring, 2px out (7.65:1). */
+.luxiSu-input::placeholder { color: var(--color-text-placeholder); }
+.luxiSu-input:disabled { background: var(--color-background-interactive-disabled); }
+.luxiSu-notnow { transition: background .15s, color .15s; }
+.luxiSu-notnow:hover { background: var(--brand-lilac-100); color: var(--color-text-primary); }
+.luxiSu-link { color: var(--color-component-button-link-text-default); text-decoration: underline; text-underline-offset: 4px; border-radius: 4px; transition: color .15s, background-color .15s; }
+.luxiSu-link:hover:not(:disabled) { color: var(--color-component-button-link-text-hover); background: var(--color-component-button-link-background-hover); }
+.luxiSu-link:active:not(:disabled) { color: var(--color-component-button-link-text-pressed); background: var(--color-component-button-link-background-pressed); }
+.luxiSu-link:focus-visible { outline: 1px solid var(--color-component-button-link-focus-ring); outline-offset: 2px; }
+.luxiSu-link:disabled { color: var(--color-text-secondary); text-decoration: none; } /* the countdown ("Resend in 30s") is information the parent reads, so it stays legible (7.81:1) rather than disabled grey (2.6:1, exempt but reads as a fail) */
 .luxiFb-notnow { transition: background .15s; }
 .luxiFb-notnow:hover { background: var(--brand-lilac-50); }
 
