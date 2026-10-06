@@ -910,8 +910,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
           bar shortened a touch to make room). Profile stays off the world (lives on
           the Door). On phones the pill compacts to "Level · 💎". The minimap keeps
           its corner and the map name stands right below it. On phones (≤600px)
-          this group stretches from the Exit icon to the minimap and the pill
-          fills it — one row: Exit · pill · gear (Amy 2026-10-05, see index.css). */}
+          this group owns the top row, left edge to minimap, and the pill fills
+          it — pill · gear; Exit + 🛍️ drop below (Amy 2026-10-05, see index.css). */}
       <div className="hud-stats" style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16 + 104 + 12, display: 'flex', alignItems: 'center', gap: 8 }}>
         <LevelBar points={points} gems={gems} gemRef={hudGemRef} onLevelUp={onLevelUp} onOpen={() => setProgressOpen(true)} />
         {!placing && !shopOpen && selectedId == null && !meadow && (
