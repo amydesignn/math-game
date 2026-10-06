@@ -11,7 +11,8 @@ import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
 import Buddy from './Buddy'
 import Neighbour from './Neighbour'
-import { SpookyProp, Ambient } from './Spooky'
+import { Ambient } from './Spooky'
+import { FxProp } from './fx'
 import { WORLD, GEMS, STATION, CHARACTERS, assetScale } from '../config'
 import { MAPS, blockers } from '../maps'
 import { stationFor } from '../stations'
@@ -317,7 +318,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
         <meshBasicMaterial color="#4b54dd" transparent opacity={0} />
       </mesh>
 
-      {map.decor.map((d, i) => (d.fx ? <SpookyProp key={i} {...d} /> : <Prop key={i} {...d} />))}
+      {map.decor.map((d, i) => (d.fx ? <FxProp key={i} {...d} /> : <Prop key={i} {...d} />))}
       {map.ambient && <Ambient items={map.ambient} charPosRef={charPosRef} />}
 
       {/* the people who live here — never wearing the player's own character */}

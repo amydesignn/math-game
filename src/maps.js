@@ -110,6 +110,13 @@ function flowerBed(cx, cz, k = 1) {
   ]
 }
 
+/** A market stall: a striped canopy over its goods, front facing +z (the
+ *  follow-cam's side). `goods` are placed props; the keeper is a neighbour
+ *  listed with the map. */
+function stall(cx, cz, color, goods) {
+  return [sp('awning', cx, cz, 0, 1, { color }), ...goods]
+}
+
 // ── Map 5 — a games arcade on violet ground ──
 const ARCADE = {
   id: 'arcade',
@@ -365,7 +372,16 @@ export const MAPS = {
     ],
   },
 
-  // ── Map 4 — an open-air market on sunny yellow ground ──
+  // ── Map 4 — Merry Market: market day in the square (rebuilt 2026-10-06) ──
+  // Amy: "redo the market — will there be people wandering too?" A busy town
+  // square (Ivy loves the DENSE Clearing): the fountain straight ahead of
+  // spawn, a row of striped stalls behind it (fruit, bakery, limes, toys) and
+  // two across the square (ice cream, checkout), bunting over both rows, trees
+  // round the edge. Shopkeepers stand at their counters (`stroll: 0` +
+  // `facing`); shoppers walk stall to stall (`route`) and browse. EVERY stall
+  // faces +z, the follow-cam's side (a back-facing stall hid its goods and its
+  // keeper under the canopy), and keepers stand BESIDE the counter, not under
+  // the roof, so the camera sees their faces. Canopies/fountain/bunting/crates are procedural (Market.jsx).
   market: {
     id: 'market',
     name: 'Merry Market',
@@ -374,30 +390,74 @@ export const MAPS = {
     sky: '#fdf6e3',
     gateColor: '#f2c530',
     decor: [
-      // front stalls — fruit + bread facing the spawn
-      m('display-fruit', -2.4, -5, Math.PI),
-      m('display-fruit', -1.2, -5, Math.PI),
-      m('display-bread', 1.2, -5, Math.PI),
-      m('display-bread', 2.4, -5, Math.PI),
-      // a continuous aisle of shelves behind the stalls (0.8 = touching)
-      m('shelf-boxes', -2.4, -8), m('shelf-bags', -1.6, -8),
-      m('shelf-boxes', -0.8, -8), m('shelf-end', 0, -8),
-      // frozen corner
-      m('freezer', 6.5, -3, -Math.PI / 2),
-      m('freezers-standing', 6.5, -5, -Math.PI / 2),
-      // checkout
-      m('cash-register', -5.5, -2, 0.5),
-      m('bottle-return', -7, -4.5, Math.PI / 2),
-      // strays — carts and a basket someone left around the square
-      m('shopping-cart', 4.5, 1.5, 2.4),
-      m('shopping-cart', -4, 4, -0.7),
-      m('shopping-basket', 1, 3, 0),
-      // entrance framing + a bit of green
-      m('fence', -1.2, 7), m('fence-door-rotate', 0, 7), m('fence', 1.2, 7),
-      m('column', -8, 6), m('column', 8, 6),
-      f('plant', 10, -8, 0.8),
-      f('patch-grass', -8, 8.5, 1.9),
-      f('plant', -10.5, 0, 2.4),
+      ...treeLine({ gaps: [[-16, 3], [16, -2]], step: 2.4, inner: false }),
+
+      // the fountain, straight ahead of spawn, planters at its shoulders
+      sp('fountain', 0, -4.4),
+      sp('planter', -3.4, -2.6), sp('planter', 3.4, -2.6, 0, 1, { flowers: '#ffb62e' }),
+
+      // ── north row: four stalls facing the square ──
+      ...stall(-9, -9.6, 'coral', [m('display-fruit', -9.45, -9.3, Math.PI), m('display-fruit', -8.55, -9.3, Math.PI)]),
+      sp('crate', -10.8, -8.6, 0.2), sp('crate', -10.6, -9.6, -0.1, 1, { fruit: 'oranges' }),
+      ...stall(-4.5, -9.6, 'sun', [m('display-bread', -4.95, -9.3, Math.PI), m('display-bread', -4.05, -9.3, Math.PI)]),
+      ...stall(4.5, -9.6, 'mint', [m('display-fruit', 4.05, -9.3, Math.PI), m('display-fruit', 4.95, -9.3, Math.PI)]),
+      sp('crate', 2.9, -9.4, -0.2, 1, { fruit: 'limes' }), sp('crate', 3, -10.4, 0.1, 1, { fruit: 'plums' }),
+      ...stall(9, -9.6, 'lilac', [m('shelf-boxes', 8.6, -9.5, 0), m('shelf-bags', 9.4, -9.5, 0)]),
+      // the space behind the stalls: stock + a couple of trees
+      { pack: 'dungeon', name: 'barrel', position: [-7, 0, -11.6], rotation: 0, scale: 0.8 },
+      { pack: 'dungeon', name: 'barrel', position: [-6.3, 0, -11.9], rotation: 1, scale: 0.8 },
+      { pack: 'dungeon', name: 'chest', position: [7, 0, -11.7], rotation: 0.2, scale: 0.8 },
+      f('tree', 0, -11.8, 0.4, 1.2),
+      sp('planter', -1.6, -10.6, 0, 0.9), sp('planter', 1.6, -10.6, 0, 0.9, { flowers: '#a98be8' }),
+
+      // bunting over the north row's frontage (poles clear of the walkway)
+      sp('bunting', -5.5, -7.3, 0, 1, { span: 9 }), sp('bunting', 5.5, -7.3, 0, 1, { span: 9 }),
+
+      // ── south row: ice cream + the checkout (customers queue on the south side) ──
+      ...stall(-6, 8.6, 'sky', [m('freezer', -6.45, 8.9, Math.PI), m('freezer', -5.55, 8.9, Math.PI)]),
+      ...stall(6, 8.6, 'pink', [m('cash-register', 6, 8.9, Math.PI), m('shopping-basket', 6.6, 9.1, 0.3)]),
+      m('shopping-cart', 11.2, 4.4, 0.6), m('shopping-cart', 11.8, 5.2, 0.5),
+      m('bottle-return', 10.4, 9.6, -Math.PI / 2),
+      sp('bunting', 0, 11.6, 0, 1, { span: 16 }),
+      sp('planter', 0, 9.6, 0, 1, { flowers: '#ff7a6b' }),
+
+      // west: a cart someone left by the trail + a fruit crate pile
+      m('shopping-cart', -11.6, -2.8, 2.2),
+      sp('crate', -12.4, 7.6, 0.3, 1, { fruit: 'oranges' }), sp('crate', -11.7, 8.3, -0.2),
+      // east: the quiet corner by the arcade gate
+      sp('planter', 12.4, 1.4, 0, 1, { flowers: '#4cc9a4' }),
+      f('plant', 11.4, -5.6, 0.8), f('patch-grass', -8, 2.8, 1.9),
+    ],
+    neighbours: [
+      // shopkeepers — beside their counters, facing the square (+z)
+      { character: 'character-male-a', home: [-7.55, -9.05], stroll: 0, facing: 0,
+        lines: ['Fresh apples! 🍎', 'Three apples for one smile!', 'Pick a shiny one!'] },
+      { character: 'character-female-c', home: [-3.05, -9.05], stroll: 0, facing: 0,
+        lines: ['Warm bread, just baked! 🥖', 'Smell that? Cinnamon buns!', 'Come back for cookies 🍪'] },
+      { character: 'character-male-d', home: [5.95, -9.05], stroll: 0, facing: 0,
+        lines: ['Limes and plums! 🍋', 'Fruit makes you fast!', 'Have a lovely day!'] },
+      { character: 'character-female-e', home: [10.45, -9.05], stroll: 0, facing: 0,
+        lines: ['Toys and treasures! 🧸', 'Everything here is one-of-a-kind', 'Look around, take your time!'] },
+      { character: 'character-male-f', home: [-7.45, 9.15], stroll: 0, facing: 0,
+        lines: ['Ice cream! 🍦 Which flavour?', 'Strawberry is my favourite!', 'Brrr, the freezer is cold!'] },
+      { character: 'character-female-f', home: [4.55, 9.15], stroll: 0, facing: 0,
+        lines: ['Ring ring! Checkout is open 🛒', 'Did you find everything?', 'Thank you for shopping!'] },
+      // shoppers — stall to stall, browsing as they go. A stop WITH a yaw is a
+      // stall (face it, browse); without one it's a corner they walk round.
+      // Routes go around the fountain, planters, crates, carts, stalls and
+      // keepers (season-maps.test.js walks every segment).
+      { character: 'character-female-a', pet: 'animal-dog',
+        route: [[-4.5, -8.1, Math.PI], [-9, -8.1, Math.PI], [-3.4, 8.6], [-6, 10.2, Math.PI], [-3.4, 8.6], [-4.5, 1.2]],
+        lines: ['Hi there! 👋', 'Have you tried the bread? 😋', 'My dog loves market day!'] },
+      { character: 'character-male-b',
+        route: [[4.5, -8.1, Math.PI], [9, -8.1, Math.PI], [8.6, 8.6], [6, 10.2, Math.PI], [8.6, 8.6], [4.6, 1.6]],
+        lines: ["Hello! I'm looking for limes", 'This fountain is my favourite spot', 'So much to see today!'] },
+      { character: 'character-female-b', pet: 'animal-chick',
+        route: [[9, -8.1, Math.PI], [-9, -8.1, Math.PI], [-3.4, 8.6], [-6, 10.2, Math.PI], [-3.4, 8.6], [2.6, 3.6]],
+        lines: ['Ice cream first, then shopping!', 'Have a sparkly day ✨', 'Hi, neighbour!'] },
+      { character: 'character-male-c', pet: 'animal-pig',
+        route: [[-4.5, -8.1, Math.PI], [-5.4, -1], [-2.6, 2.4], [2.6, 2.4, 0], [5.4, -1], [4.5, -8.1, Math.PI]],
+        lines: ['Good morning! ☀️', 'The baker gave me a free roll!', 'What are you buying today?'] },
     ],
     gates: [
       { to: 'garden', position: [-16, 0, 3] },
@@ -449,7 +509,8 @@ export const MAPS = {
 export function blockers(map) {
   return [
     ...map.decor.map((d) => [d.position[0], d.position[2], 0]),
-    ...(map.neighbours || []).map((n) => [n.home[0], n.home[1], 1.5]),
+    // a keeper/stroller's home, or a shopper's first stop
+    ...(map.neighbours || []).map((n) => { const [x, z] = n.home || n.route[0]; return [x, z, 1.5] }),
   ]
 }
 

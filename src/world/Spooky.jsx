@@ -13,7 +13,7 @@ import { WORLD } from '../config'
  * scary — Ivy is the audience: ghosts have big eyes and blush, pumpkins smile.
  *
  * Two kinds of thing live here:
- *  · <SpookyProp fx=…/> — STATIC decor (pumpkin, grave, candle, torch, cauldron).
+ *  · SPOOKY_FX kinds (placed by fx.jsx's <FxProp>) — STATIC decor (pumpkin, grave, candle, torch, cauldron).
  *    They sit in map.decor like any Prop, so sparkles/stations/minimap already
  *    keep clear of them (decor entries carry `fx` instead of a GLB `name`).
  *  · <Ambient items/> — things that MOVE (floating flames, drifting ghosts).
@@ -232,18 +232,8 @@ function Cauldron() {
   )
 }
 
-const STATIC = { pumpkin: Pumpkin, grave: Grave, candle: Candle, torch: Torch, cauldron: Cauldron }
-
-/** A static Halloween prop placed from map.decor (`fx` picks the kind). */
-export function SpookyProp({ fx, position, rotation = 0, scale = 1, ...rest }) {
-  const Kind = STATIC[fx]
-  if (!Kind) return null
-  return (
-    <group position={position} rotation={[0, rotation, 0]} scale={scale}>
-      <Kind {...rest} />
-    </group>
-  )
-}
+// the static Halloween kinds, placed via world/fx.jsx's <FxProp>
+export const SPOOKY_FX = { pumpkin: Pumpkin, grave: Grave, candle: Candle, torch: Torch, cauldron: Cauldron }
 
 // ─────────────────────────── moving things ───────────────────────────
 

@@ -19,6 +19,14 @@ import Pet from './Pet'
  * neighbour's list, so coming back gets something new; the greeting re-arms
  * only once she's walked away (LEAVE_R), so standing next to them isn't spammy.
  *
+ * Three ways to spend the day (Merry Market, 2026-10-06):
+ *  · strollers (default) — amble randomly ≤`stroll` around home;
+ *  · keepers (`stroll: 0` + `facing`) — stay at their counter, facing the
+ *    customers, and turn back to it after chatting;
+ *  · shoppers (`route`) — walk stall to stall ([x, z, faceYaw?] waypoints, in
+ *    order, looping); a stop with a yaw is a stall (face it, browse with
+ *    `interact-right`), one without is a corner they just walk round.
+ *
  * Copy is PUBLIC-SAFE (guests play this): no player names, no family names.
  * Neighbours never touch the store — they're scenery with a heartbeat.
  */
@@ -28,14 +36,18 @@ const LEAVE_R = 5
 const SPEED = 1.3 // an amble — slower than her 3.2 walk
 const BUBBLE_MS = 3600
 
-export default function Neighbour({ character, pet, home, lines, stroll = 2.2, charPosRef }) {
+export default function Neighbour({ character, pet, home: homeProp, lines, stroll = 2.2, facing, route, charPosRef }) {
+  const home = homeProp || route[0]
   const group = useRef()
   const { scene, animations } = useGLTF(modelUrl('characters', character))
   const model = useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { actions } = useAnimations(animations, model)
   const current = useRef(null)
   const posRef = useRef(new THREE.Vector3(home[0], 0, home[1]))
-  const startYaw = useMemo(() => Math.random() * Math.PI * 2, []) // stable across bubble re-renders
+  const startYaw = useMemo(() => facing ?? Math.random() * Math.PI * 2, [facing]) // stable across bubble re-renders
+  const faceYaw = useRef(facing) // where to look while idle (a keeper's counter, a stall she's browsing)
+  const routeIx = useRef(0)
+  const browseUntil = useRef(0)
 
   const target = useRef(null) // stroll destination, or null while idling
   const restUntil = useRef(performance.now() + 1500 + Math.random() * 4000)
@@ -101,13 +113,31 @@ export default function Neighbour({ character, pet, home, lines, stroll = 2.2, c
         g.rotation.y = dampAngle(g.rotation.y, Math.atan2(dx, dz), 8, dt)
         play('walk')
       } else {
+        if (route && target.current[2] == null) {
+          // a corner on the way — keep walking
+          faceYaw.current = undefined
+          restUntil.current = now + 150
+        } else if (route) {
+          // arrived at a stall: face it and browse a moment
+          faceYaw.current = target.current[2]
+          browseUntil.current = now + 1400
+          restUntil.current = now + 2500 + Math.random() * 3000
+        } else {
+          faceYaw.current = facing
+          restUntil.current = now + 3500 + Math.random() * 6000
+        }
         target.current = null
-        restUntil.current = now + 3500 + Math.random() * 6000
         play('idle')
       }
     } else {
-      play(now < cheerUntil.current ? 'emote-yes' : 'idle')
-      if (now > restUntil.current) {
+      play(now < cheerUntil.current ? 'emote-yes' : now < browseUntil.current ? 'interact-right' : 'idle')
+      if (faceYaw.current != null) g.rotation.y = dampAngle(g.rotation.y, faceYaw.current, 4, dt)
+      if (now <= restUntil.current) {
+        // resting
+      } else if (route) {
+        routeIx.current = (routeIx.current + 1) % route.length
+        target.current = route[routeIx.current]
+      } else if (stroll > 0) {
         // amble somewhere near home (clamped inside the map, never wandering off)
         const a = Math.random() * Math.PI * 2
         const r = stroll * (0.4 + Math.random() * 0.6)
