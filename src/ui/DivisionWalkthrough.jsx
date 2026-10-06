@@ -36,31 +36,43 @@ import { buildDivisionStages } from '../math'
    Table = slate, quotient = the yellow Answer Box), meaningful only here. */
 const P = {
   textPrimary: 'var(--color-text-primary)', textTertiary: 'var(--color-text-tertiary)', // Datum text tiers by name
-  berry: '#E60076', berryInk: '#C6005C', // berryInk = pink-700, the AA text shade teal: '#009689', tealTint: '#F0FDFA',
+  berry: '#E60076', berryInk: 'var(--pink-700)', /* berryInk = the AA text shade */
+  teal: 'var(--teal-600)', tealInk: 'var(--teal-700)', tealTint: 'var(--teal-50)', /* teal = ring · tealInk = text (5.36) */
   slate: '#62748E', slate400: '#90A1B9', slateTint: 'rgba(98,116,142,.10)',
   answerFill: '#FEF9C2', answerLine: '#F0B100', answerLineSolid: '#D08700',
   goldB: '#C2410C',
 }
 const MOVES = [
-  { key: 'DIVIDE', label: 'Divide', color: '#2D6DF6', tint: '#DCE9FF' },
-  { key: 'MULTIPLY', label: 'Multiply', color: '#F54900', tint: '#FFE7D6' },
-  { key: 'SUBTRACT', label: 'Subtract', color: '#E7000B', tint: '#FFDEDE' },
-  { key: 'BRINGDOWN', label: 'Bring down', color: '#008236', tint: '#D6F5E1' },
+  { key: 'DIVIDE', label: 'Divide', color: 'var(--blue-700)', tint: '#DCE9FF' },
+  { key: 'MULTIPLY', label: 'Multiply', color: 'var(--orange-700)', tint: '#FFE7D6' },
+  { key: 'SUBTRACT', label: 'Subtract', color: 'var(--red-700)', tint: '#FFDEDE' },
+  { key: 'BRINGDOWN', label: 'Bring down', color: 'var(--green-700)', tint: '#D6F5E1' },
 ]
+/* Diagram labels (Amy 2026-10-05): the math TERM leads (12/700 caps, the part's colour),
+   the friendly explanation sits under it as secondary text (12/400). */
+const term = (color) => ({ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '.05em' })
+const explain = { display: 'block', fontSize: 'var(--text-xs)', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.3 }
 const CANDY = '/worked/candies.png'
 const FRIEND = '/worked/friend.png'
 
 /* diagram geometry (Oscar's exact values) */
-const CELL = 44, FS = 26, ROWH = 50, TOPPAD = 52, GUTTER = 72, LABELPAD = 124, BOTPAD = 26
+/* Label ↔ math spacing (Amy 2026-10-05): every annotation sits LABELGAP from its math —
+   QUOTIENT above the Answer Box, the divisor column left of the bracket, DIVIDEND right of
+   the box. COLW = the divisor column (widest label, centred); the bracket is drawn 7px
+   inside GUTTER, so GUTTER = COLW + LABELGAP + 7 (measured: 16px rendered). */
+const LABELGAP = 16, COLW = 68
+const CELL = 44, FS = 26, ROWH = 50, TOPPAD = 52, GUTTER = COLW + LABELGAP + 7, BOTPAD = 26
+const LABELW = 128 // the dividend label column: fits "all the candy to share" on one line at 12px
+const RW = 37 // "R3" beside the Answer Box: 8px gap + glyphs (measured: DIVIDEND lands 16px past it)
 
 /* Oscar's skeuomorphic pressable button (his `style-active` → a pressed state).
    Distinct from mathkit's BigButton — this is the division comp's own look. */
 function PressBtn({ children, onClick, variant = 'primary' }) {
   const [down, setDown] = useState(false)
   const V = {
-    primary: { bg: '#6169E0', color: '#fff', border: 'none', shadow: '#3D43BE', pad: '13px 24px', fs: 16 },
-    secondary: { bg: '#fff', color: '#6E5BC0', border: '2px solid #DDD1F7', shadow: '#DDD1F7', pad: '12px 20px', fs: 15.5 },
-    back: { bg: '#fff', color: '#525252', border: '2px solid #E5E5E5', shadow: '#E5E5E5', pad: '12px 20px', fs: 15.5 },
+    primary: { bg: 'var(--brand-iris-600)', color: '#fff', border: 'none', shadow: 'var(--brand-iris-700)', pad: '13px 24px', fs: 'var(--text-base)' },
+    secondary: { bg: '#fff', color: 'var(--brand-iris-700)', border: '2px solid var(--brand-lilac-200)', shadow: 'var(--brand-lilac-200)', pad: '12px 20px', fs: 'var(--text-base)' },
+    back: { bg: '#fff', color: 'var(--color-text-secondary)', border: '2px solid #E5E5E5', shadow: '#E5E5E5', pad: '12px 20px', fs: 'var(--text-base)' },
   }[variant]
   return (
     <button
@@ -70,7 +82,7 @@ function PressBtn({ children, onClick, variant = 'primary' }) {
       onPointerLeave={() => setDown(false)}
       style={{
         display: 'inline-flex', alignItems: 'center', gap: 6, border: V.border, background: V.bg,
-        color: V.color, fontWeight: 800, fontSize: V.fs, borderRadius: 14, padding: V.pad, cursor: 'pointer',
+        color: V.color, fontWeight: 500, fontSize: V.fs, borderRadius: 14, padding: V.pad, cursor: 'pointer',
         boxShadow: down ? `0 1px 0 ${V.shadow}` : `0 4px 0 ${V.shadow}`,
         transform: down ? 'translateY(3px)' : 'none', transition: 'transform .07s, box-shadow .07s',
       }}>
@@ -84,11 +96,10 @@ function PressBtn({ children, onClick, variant = 'primary' }) {
    fitScale to fit a narrow modal (never up). Everything is his notation. */
 function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   const { n, steps, remainder, digits, b } = built
-  const remGap = remainder > 0 ? 44 : 0
   const textPrimary = P.textPrimary, textTertiary = P.textTertiary
   const xL = (c) => GUTTER + c * CELL
   const yT = (r) => TOPPAD + r * ROWH
-  const totemL = Math.round((GUTTER - 46) / 2)
+  const totemL = Math.round((COLW - 46) / 2)
   const els = []
 
   // Sharing Table spotlight (neutral slate) — slides + pulses between columns
@@ -102,7 +113,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
         transition: 'left .45s cubic-bezier(.3,.8,.3,1),top .45s cubic-bezier(.3,.8,.3,1),width .45s',
       }}>
         <span style={{
-          position: 'absolute', top: -11, left: 11, fontSize: 9, fontWeight: 800, letterSpacing: '.05em',
+          position: 'absolute', bottom: -13, left: 11, fontSize: 'var(--text-xs)' /* bottom edge: on top it hid under the Answer Box in round 1 */, lineHeight: 1.2, fontWeight: 700, letterSpacing: '.05em',
           textTransform: 'uppercase', color: '#fff', background: P.slate, borderRadius: 7, padding: '2px 7px', whiteSpace: 'nowrap',
         }}>Sharing Table</span>
       </div>,
@@ -119,16 +130,16 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     }} />,
   )
   els.push(
-    <div key="ql" style={{ position: 'absolute', left: xL(0) - 7, top: yT(0) - 46, width: n * CELL + 14, textAlign: 'center', zIndex: 2 }}>
-      <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 0, color: textTertiary, whiteSpace: 'nowrap' }}>Each friend&apos;s share</span>
-      {showTerms && <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, color: textTertiary, opacity: 0.75, textTransform: 'uppercase', letterSpacing: '.05em' }}>Quotient</span>}
+    <div key="ql" style={{ position: 'absolute', left: xL(0) - 7, top: yT(0) - 48, /* text ends LABELGAP above the Answer Box */ width: n * CELL + 14, textAlign: 'center', zIndex: 2 }}>
+      {showTerms && <span style={term('var(--amber-700)')}>Quotient</span>}
+      <span style={{ ...explain, whiteSpace: 'nowrap' }}>Each friend&apos;s share</span>
     </div>,
   )
   if (!snap.qShown.some(Boolean)) {
     els.push(
       <div key="qmark" style={{
         position: 'absolute', left: xL(0) - 7, top: yT(0) + 1, width: n * CELL + 14, height: ROWH - 4,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: FS, fontWeight: 800, color: '#C89A2B', zIndex: 2,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: FS, fontWeight: 800, color: 'var(--amber-700)', zIndex: 2,
       }}>?</div>,
     )
   }
@@ -139,13 +150,13 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     <div key="dv" style={{
       position: 'absolute', left: totemL, top: yT(1) + (ROWH - 46) / 2, width: 46, height: 46, borderRadius: '50%',
       border: `2.5px solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 24, fontWeight: 800, color: textPrimary, zIndex: 2,
+      fontSize: 24, fontWeight: 800, color: P.tealInk, zIndex: 2, /* divisor = dark teal */
     }}>{String(b)}</div>,
   )
   els.push(
-    <div key="dvl" style={{ position: 'absolute', left: -4, top: yT(1) + 48, width: GUTTER + 8, textAlign: 'center', zIndex: 2 }}>
-      <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 0, color: P.teal }}>The friends</span>
-      {showTerms && <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, color: P.teal, opacity: 0.85, textTransform: 'uppercase', letterSpacing: '.05em' }}>Divisor</span>}
+    <div key="dvl" style={{ position: 'absolute', left: 0, top: yT(1) + 60, /* 12px under the divisor circle */ width: COLW, textAlign: 'center', zIndex: 2 }}>
+      {showTerms && <span style={term(P.tealInk)}>Divisor</span>}
+      <span style={explain}>The friends</span>
     </div>,
   )
 
@@ -159,12 +170,13 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
 
   // The Candy Bag totem (dividend): bag image + berry label
   els.push(
-    <div key="cbag" style={{ position: 'absolute', left: xL(n - 1) + CELL + 16 + remGap, top: yT(0) - 10, width: LABELPAD - 26, display: 'flex', flexDirection: 'column', gap: 5, zIndex: 2 }}>
+    <div key="cbag" style={{
+      /* LABELGAP right of the Answer Box; on the final step it slides aside for "R3" */
+      position: 'absolute', left: xL(0) + n * CELL + 7 + LABELGAP + (snap.final && remainder > 0 ? RW : 0), transition: 'left .4s ease', top: yT(0) - 10, width: LABELW, display: 'flex', flexDirection: 'column', gap: 5, zIndex: 2 }}>
       <img src={CANDY} alt="candy bag" style={{ width: 54, height: 54, objectFit: 'contain', alignSelf: 'flex-start', filter: 'drop-shadow(0 3px 6px rgba(90,60,120,.18))' }} />
       <div>
-        <span style={{ fontSize: 11.5, fontWeight: 800, color: P.berry }}>The Candy Bag</span>
-        <span style={{ display: 'block', fontSize: 10.5, fontWeight: 500, color: textTertiary, marginTop: 1, lineHeight: 1.3 }}>all the candy to share</span>
-        {showTerms && <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, color: P.berry, opacity: 0.9, marginTop: 2, letterSpacing: '.05em', textTransform: 'uppercase' }}>Dividend</span>}
+        {showTerms && <span style={term(P.berryInk)}>Dividend</span>}
+        <span style={{ ...explain, whiteSpace: 'nowrap' }}>all the candy to share</span>{/* one line, like the other two (Amy: the picture already says "candy bag") */}
       </div>
     </div>,
   )
@@ -176,14 +188,14 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     els.push(
       <div key={'q' + c} style={{
         position: 'absolute', left: xL(c), top: yT(0), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
+        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--amber-700)', zIndex: 3, /* quotient = dark orange */
         animation: hot ? (sneaky ? 'dvShimmer .6s ease-out both' : 'dvQuoUp .5s cubic-bezier(.2,.8,.3,1.2) both') : 'none',
       }}>{String(built.q[c])}</div>,
     )
     if (sneaky && hot) {
       els.push(
         <span key={'qz' + c} style={{
-          position: 'absolute', left: xL(c) - 10, top: yT(0) - 14, fontSize: 8.5, fontWeight: 800, letterSpacing: '.02em',
+          position: 'absolute', left: xL(0) + n * CELL + 15, top: yT(0) + ROWH / 2 - 11, fontSize: 'var(--text-xs)' /* beside the Answer Box: at 12px it covered QUOTIENT */, lineHeight: 1.2, fontWeight: 700, letterSpacing: '.02em',
           color: '#fff', background: P.goldB, borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap', zIndex: 4,
           animation: 'dvFadeSlide .5s .15s both', boxShadow: '0 2px 5px rgba(0,0,0,.12)',
         }}>keeps the line!</span>,
@@ -195,8 +207,8 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     els.push(
       <div key={'d' + c} style={{
         position: 'absolute', left: xL(c), top: yT(1), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
-        opacity: snap.dim[c] ? 0.24 : 1, transition: 'opacity .4s',
+        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: snap.dim[c] ? P.textTertiary : P.berryInk, zIndex: 3, /* dividend = pink; waiting digits stay tertiary */ /* faded = tertiary (4.74), Amy 2026-10-05 */
+        transition: 'color .4s',
       }}>{String(digits[c])}</div>,
     )
   }
@@ -233,7 +245,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
       placeNum(s.sub, col, subRow, snap.hot.sub === si ? 'dvCellPop .34s ease-out both' : null, 's' + si)
       if (isRem && remainder > 0) {
         els.push(
-          <span key="rt" style={{ position: 'absolute', left: xL(col) - 8, top: yT(subRow) + ROWH + 2, width: CELL + 16, textAlign: 'center', fontSize: 8.5, fontWeight: 800, letterSpacing: '.03em', textTransform: 'uppercase', color: P.goldB }}>leftover</span>,
+          <span key="rt" style={{ position: 'absolute', left: xL(col) - 8, top: yT(subRow) + ROWH + 2, width: CELL + 16, textAlign: 'center', fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.03em', textTransform: 'uppercase', color: P.goldB }}>leftover</span>,
         )
       }
     }
@@ -294,7 +306,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
   const built = useMemo(() => buildDivisionStages(a, b), [a, b])
   const stages = built.stages
   const n = built.n
-  const W = GUTTER + n * CELL + (built.remainder > 0 ? 44 : 0) + LABELPAD
+  const W = GUTTER + n * CELL + 7 + LABELGAP + (built.remainder > 0 ? RW : 0) + LABELW // room for the dividend label incl. its final slide past "R3"
   const Hh = TOPPAD + (2 + 2 * built.steps.length) * ROWH + BOTPAD
 
   const [phase, setPhase] = useState('intro') // 'intro' | 'work'
@@ -354,7 +366,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
   const idx = Math.max(0, Math.min(i, stages.length - 1))
   const snap = stages[idx]
   const isLast = idx >= stages.length - 1
-  const roundLabel = snap.final ? 'All shared! 🎉' : snap.round == null ? "Let's begin" : 'Round ' + (snap.round + 1) + ' of ' + built.steps.length
+  const roundLabel = snap.final ? null /* Amy 2026-10-05: no "All shared!" pill — less noise */ : snap.round == null ? "Let's begin" : 'Round ' + (snap.round + 1) + ' of ' + built.steps.length
   // keep intro and work the same height so switching phases doesn't jump (Oscar)
   const stageMinH = 250 + Math.max(300, 8 + Hh * (fitScale || 1))
 
@@ -384,20 +396,20 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
     transition: 'opacity .55s ease, transform .55s cubic-bezier(.2,.8,.3,1.2)',
   })
   const totemCol = { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 116, flexShrink: 0 }
-  const copyStyle = { fontSize: 16.5, fontWeight: 600, color: P.textPrimary, lineHeight: 1.45, textWrap: 'pretty' }
-  const badge = (color, bg) => ({ fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color, background: bg, borderRadius: 999, padding: '3px 10px' })
+  const copyStyle = { fontSize: 'var(--text-base)', fontWeight: 400, color: P.textPrimary, lineHeight: 1.45, textWrap: 'pretty' }
+  const badge = (color, bg) => ({ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.05em', color, background: bg, borderRadius: 999, padding: '3px 10px' })
 
   return (
     // renders as content inside a white card parent (the house <Modal>); the
     // `20px 24px 24px` padding matches Oscar's modal inner padding
     <div ref={stageHostRef} style={{ display: 'flex', flexDirection: 'column', minHeight: Math.round(stageMinH), padding: '20px 24px 24px', fontFamily: "'Inter',system-ui,sans-serif" }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: P.textPrimary, letterSpacing: '-.01em' }}>Let&apos;s share the candy 🍬</div>
-        {phase === 'work' && (
+        <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: P.textPrimary, letterSpacing: '-.01em' }}>Let&apos;s share the candy 🍬</div>
+        {phase === 'work' && roundLabel && (
           // marginRight reserves the parent modal's floating ✕ gutter (ModalClose
           // 40px at right:14) so the round pill clears the close button by a
           // governed ~12px gap (golden 4px rule; 44 = 4×11, Amy 2026-08-31).
-          <span style={{ fontSize: 12.5, fontWeight: 700, color: '#404040', background: '#F5F5F5', borderRadius: 999, padding: '6px 13px', whiteSpace: 'nowrap', marginRight: 44 }}>{roundLabel}</span>
+          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)', background: '#F5F5F5', borderRadius: 999, padding: '6px 13px', whiteSpace: 'nowrap', marginRight: 44 }}>{roundLabel}</span>
         )}
       </div>
 
@@ -413,7 +425,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
             <div style={cardStyle(1)}>
               <div style={{ ...totemCol, gap: 5 }}>
                 <img src={CANDY} alt="candy bag" style={{ width: 40, height: 40, objectFit: 'contain', filter: 'drop-shadow(0 3px 6px rgba(90,60,120,.20))' }} />
-                <div style={{ fontSize: 40, fontWeight: 800, color: P.textPrimary, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{a}</div>
+                <div style={{ fontSize: 40, fontWeight: 800, color: P.berryInk, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{a}</div>
                 {showMathTerms && <span style={badge(P.berryInk, '#FDF2F8')}>DIVIDEND</span>}
               </div>
               <div style={copyStyle}>You have {a} candies to share.</div>
@@ -424,16 +436,16 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,26px)', gap: 4, justifyContent: 'center' }}>
                   {[0, 1, 2, 3].map((k) => <img key={k} src={FRIEND} alt="friend" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />)}
                 </div>
-                <div style={{ width: 44, height: 44, borderRadius: '50%', border: `2.5px solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800, color: P.textPrimary }}>{b}</div>
-                {showMathTerms && <span style={badge(P.teal, P.tealTint)}>DIVISOR</span>}
+                <div style={{ width: 44, height: 44, borderRadius: '50%', border: `2.5px solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800, color: P.tealInk }}>{b}</div>
+                {showMathTerms && <span style={badge(P.tealInk, P.tealTint)}>DIVISOR</span>}
               </div>
               <div style={copyStyle}>You share them with {b} friends.</div>
             </div>
             {/* Card 3 — Quotient / QUOTIENT */}
             <div style={cardStyle(3)}>
               <div style={{ ...totemCol, gap: 5 }}>
-                <div style={{ width: 62, height: 50, border: '2.5px dashed #F0B100', background: '#FEF9C2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: 800, color: '#C89A2B' }}>?</div>
-                {showMathTerms && <span style={badge('#8A6D00', '#FEF9C2')}>QUOTIENT</span>}
+                <div style={{ width: 62, height: 50, border: '2.5px dashed #F0B100', background: '#FEF9C2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: 800, color: 'var(--amber-700)' }}>?</div>
+                {showMathTerms && <span style={badge('var(--amber-700)', '#FEF9C2')}>QUOTIENT</span>}
               </div>
               <div style={copyStyle}>How many does each friend get?</div>
             </div>
@@ -457,7 +469,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
               return (
                 <div key={m.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ width: 11, height: 11, borderRadius: '50%', flexShrink: 0, background: on ? m.color : '#fff', border: on ? `2px solid ${m.color}` : '2px solid #D4D4D4', boxShadow: on ? `0 0 0 3px ${m.tint}` : 'none', transition: 'all .25s' }} />
-                  <span style={{ fontSize: 12.5, fontWeight: on ? 800 : 600, color: on ? m.color : '#A1A1A1', whiteSpace: 'nowrap', transition: 'color .25s' }}>{m.label}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', fontWeight: on ? 700 : 500, color: on ? m.color : P.textTertiary, whiteSpace: 'nowrap', transition: 'color .25s' }}>{m.label}</span>
                 </div>
               )
             })}
