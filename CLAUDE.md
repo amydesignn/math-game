@@ -258,6 +258,30 @@ neighbours, Merry Market LAST (not started).**
   captures — Amy may reshoot. Neighbours don't avoid her placed assets on
   their short stroll (harmless overlap, no collision system).
 
+## Merry Market — market day in the square 🍎 (2026-10-06, branch `feat/merry-market-day`)
+The last of Amy's three map redos. Dense (Ivy's taste), alive (people).
+- **Layout (`maps.js` `market`):** fountain straight ahead of spawn, four striped
+  stalls north (apples · bakery · limes/plums · toys) and two south (ice cream ·
+  checkout), bunting over both rows, crates/planters/carts, an outer tree line.
+  The west half of the square stays open for her to build. `stall()` helper =
+  canopy + goods.
+- **EVERY stall faces +z (the follow-cam's side)** and **keepers stand BESIDE the
+  counter, not under it** — the first pass had back-facing south stalls and
+  keepers hidden under canopies (camera looks down; roofs hide whatever's under).
+- **People = `Neighbour` with two new modes:** keepers (`stroll: 0` + `facing` —
+  stay put, turn back to the counter after chatting) and shoppers (`route` of
+  `[x, z, yaw?]` stops, looping; a stop WITH a yaw = browse a stall with
+  `interact-right`, without = a corner to walk round). 6 keepers + 4 shoppers
+  (3 with pets). `blockers()` uses `home || route[0]`.
+- **Procedural kinds in `src/world/Market.jsx`** (awning, fountain w/ droplets +
+  ripple, bunting that sways, fruit crates, planters). All `fx` decor now goes
+  through ONE dispatcher, `src/world/fx.jsx` (`FX` = SPOOKY_FX + MARKET_FX).
+- **Route-collision test** walks every shopper segment against the fountain,
+  stalls, keepers, planters, crates, carts — it caught a real walk-through-the-
+  fountain (the pig 🐷) and a walk-through-a-crate. Re-run it after moving ANY
+  market prop. `season-maps.test.js` → 211 green; oxlint + build clean.
+- New Door card `public/worlds/market.jpg`.
+
 ## Long-mult walkthrough fix ✅ SHIPPED 2026-09-27 — shaped example + every carry + a real ending
 From Amy's Luxi Math video recording + Finn's review (32 × 31, answered 895). Commit `a088dfb`.
 - **"One just like it" wasn't** — 32 × 31 got 40 × 21 (the 0 trivialises the ones pass).
