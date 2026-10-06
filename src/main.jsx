@@ -403,7 +403,10 @@ function SettingsDemo() {
   const [signedIn, setSignedIn] = React.useState(q.has('account'))
   const [sound, setSound] = React.useState(!q.has('soundoff'))
   const [view, setView] = React.useState(q.get('open') || 'none') // none | settings | profile
-  const [avatar, setAvatar] = React.useState(null) // exercises the real on-device photo path
+  // &avatar seeds a photo so the audit reaches "Remove photo" (a11y/profile-popover.audit.mjs)
+  const [avatar, setAvatar] = React.useState(
+    q.has('avatar') ? 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2 2"><rect width="2" height="2" fill="#B29BEA"/></svg>') : null,
+  ) // exercises the real on-device photo path
   const auth = { signedIn, email: 'ivy@email.com', initial: 'I' }
   const isDoor = surface === 'door'
   const chip = (on) => ({

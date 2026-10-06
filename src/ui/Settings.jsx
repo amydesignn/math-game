@@ -336,20 +336,27 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
   return (
     <>
       <div style={scrimStyle} onClick={close} />
-      <div style={{ position: 'fixed', top: 72, right: 60, width: 288, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
-        <div style={{ background: '#fff', borderRadius: 20, border: '1px solid ' + LINE, boxShadow: '0 24px 60px rgba(50,38,80,.30)', overflow: 'hidden', animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both' }}>
+      {/* Hidden native picker — accept=image/* offers Photo Library / Take Photo / Choose File on
+          iPad. The result never leaves avatar.js. Sits outside the dialog: it's never drawn, so the
+          contrast audit shouldn't measure it. */}
+      <input ref={fileRef} type="file" accept="image/*" onChange={onFile} style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
+      {/* On Datum 2026-10-05 (Amy): a real dialog (house focus ring), colours by Datum name, type on the roles —
+          title 16/700 · button 16/500 · link 14/500 · caption 14 supporting. Was: caption #9a92ac 12px (2.9:1),
+          Remove photo #8A7FB8 13px (3.6:1). Audit: a11y/profile-popover.audit.mjs. */}
+      <div role="dialog" aria-label="Profile" style={{ position: 'fixed', top: 72, right: 60, width: 288, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
+        <div style={{ background: 'var(--color-background-base)', borderRadius: 20, border: '1px solid ' + LINE, boxShadow: '0 24px 60px rgba(50,38,80,.30)', overflow: 'hidden', animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 12px' }}>
-            <span style={{ fontSize: 16, fontWeight: 800, color: '#262626' }}>Profile</span>
+            <span style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>Profile</span>
             <button aria-label="Close" onClick={close} style={closeBtn}>
               ✕
             </button>
           </div>
           <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            <div style={{ width: 96, height: 96, borderRadius: '50%', background: '#EDE7FC', boxShadow: '0 0 0 3px #fff, 0 0 0 5px #DDD1F7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, overflow: 'hidden' }}>
+            <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'var(--brand-lilac-100)', boxShadow: '0 0 0 3px var(--color-background-base), 0 0 0 5px var(--brand-lilac-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, overflow: 'hidden' }}>
               {avatar ? (
                 <img src={avatar} alt="Your avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               ) : auth.signedIn ? (
-                <span style={{ width: '100%', height: '100%', background: 'linear-gradient(160deg, var(--brand-lilac-700), var(--brand-lilac-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 800, fontSize: 38 }}>
+                <span style={{ width: '100%', height: '100%', background: 'linear-gradient(160deg, var(--brand-lilac-700), var(--brand-lilac-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-on-brand)', fontWeight: 'var(--font-weight-bold)', fontSize: 38 }}>
                   {auth.initial || '★'}
                 </span>
               ) : (
@@ -357,14 +364,13 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
               )}
             </div>
 
-            {/* Hidden native picker — accept=image/* offers Photo Library / Take
-                Photo / Choose File on iPad. The result never leaves avatar.js. */}
-            <input ref={fileRef} type="file" accept="image/*" onChange={onFile} style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
-
+            {/* Datum Button secondary (lilac-100 fill, Iris 800 label 9.55:1) — was lilac-50 + Lilac 800 label (Lilac = decoration only, Amy's colour rule) */}
             <button
               onClick={pick}
               disabled={busy}
-              style={{ width: '100%', height: 44, borderRadius: 12, border: '1.5px solid #DDD1F7', background: 'var(--brand-lilac-50)', color: LILAC800, fontWeight: 700, fontSize: 15, cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              aria-busy={busy || undefined}
+              className="luxiPf-secondary"
+              style={{ width: '100%', height: 44, borderRadius: 12, border: 'none', fontFamily: 'inherit', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-base)', cursor: busy ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
             >
               <UploadIcon />
               {busy ? 'Adding…' : avatar ? 'Change photo' : 'Upload a photo'}
@@ -373,13 +379,14 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
             {avatar && !busy && (
               <button
                 onClick={() => onRemoveAvatar?.()}
-                style={{ border: 'none', background: 'transparent', color: '#8A7FB8', fontWeight: 700, fontSize: 13, cursor: 'pointer', padding: 4, marginTop: -8 }}
+                className="luxiSet-link" // Datum Button link, 14/500 (was #8A7FB8 13/700, 3.6:1)
+                style={{ border: 'none', background: 'transparent', fontFamily: 'inherit', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-sm)', cursor: 'pointer', padding: '4px 8px', borderRadius: 4, marginTop: -8 }}
               >
                 Remove photo
               </button>
             )}
 
-            <span style={{ fontSize: 12, fontWeight: 500, color: err ? '#B4531F' : '#9a92ac', textAlign: 'center', lineHeight: 1.5, textWrap: 'pretty' }}>
+            <span role={err ? 'alert' : undefined} style={{ fontSize: 'var(--text-sm)', fontWeight: err ? 'var(--font-weight-medium)' : 'var(--font-weight-normal)', color: err ? 'var(--color-status-warning-text)' : 'var(--color-text-secondary)', textAlign: 'center', lineHeight: 1.5, textWrap: 'pretty' }}>
               {caption}
             </span>
           </div>
