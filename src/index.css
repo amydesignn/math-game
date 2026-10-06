@@ -96,6 +96,11 @@
   --color-component-button-link-text-pressed: #333A98; /* brand-iris-800 */
   --color-component-button-link-background-pressed: #DDD1F7; /* brand-lilac-200 */
   --color-component-button-link-focus-ring: #333A98; /* brand-iris-800 */
+  --color-component-button-secondary-background-default: #EDE7FC; /* brand-lilac-100 */
+  --color-component-button-secondary-background-hover: #DDD1F7; /* brand-lilac-200 */
+  --color-component-button-secondary-background-pressed: #C6B4F0; /* brand-lilac-300 */
+  --color-component-button-secondary-text-default: #333A98; /* brand-iris-800 */
+  --color-component-button-secondary-focus-ring: #333A98; /* brand-iris-800 */
   /* status (Datum datum-tokens.css, verbatim) — SignupModal error note + saved toast */
   --color-status-warning-background: #FFFBEB; /* amber-50 */
   --color-status-warning-border: #FEE685; /* amber-200 */
@@ -406,6 +411,12 @@ canvas { touch-action: none; display: block; }
 .luxiSet-link:hover { color: var(--color-component-button-link-text-hover); background: var(--color-component-button-link-background-hover); }
 .luxiSet-link:active { color: var(--color-component-button-link-text-pressed); background: var(--color-component-button-link-background-pressed); }
 .luxiSet-link:focus-visible { outline: 1px solid var(--color-component-button-link-focus-ring); outline-offset: 2px; }
+/* Profile popover photo button = Datum Button secondary (component tokens copied below in :root) */
+.luxiPf-secondary { background: var(--color-component-button-secondary-background-default); color: var(--color-component-button-secondary-text-default); transition: scale .1s cubic-bezier(.23,1,.32,1), background-color .15s; }
+.luxiPf-secondary:hover:not(:disabled) { background: var(--color-component-button-secondary-background-hover); }
+.luxiPf-secondary:active:not(:disabled) { background: var(--color-component-button-secondary-background-pressed); scale: .97; }
+.luxiPf-secondary:focus-visible { outline: 1px solid var(--color-component-button-secondary-focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .luxiPf-secondary:active { scale: none; } }
 @media (prefers-reduced-motion: reduce) { .luxiSet-ghost:active { scale: none; } }
 
 /* House focus ring (contrast audit, 2026-10-04 — Amy's interaction-states rule):
