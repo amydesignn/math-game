@@ -2,7 +2,7 @@
   "component": "DivisionWalkthrough",
   "file": "src/ui/DivisionWalkthrough.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-06T02:18:46.844Z",
+  "ranAt": "2026-10-06T02:46:29.905Z",
   "variants": [
     "815 ÷ 4 (sneaky zero)",
     "85 ÷ 4"

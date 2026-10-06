@@ -29,6 +29,7 @@ import { buildDivisionStages } from '../math'
  *   showMathTerms  boolean   — show DIVIDEND/DIVISOR/QUOTIENT under friendly labels
  *   autoAdvanceMs  number    — Play-mode dwell per step (800–4000)
  *   onDone()                 — fired on "I got it!" (recovery: → try again)
+ *   closeGutter    boolean   — parent floats a ✕ top-right (sparkle popup): pill clears it
  */
 
 /* Oscar's division palette — kept local, not folded into mathkit's `T`: these
@@ -301,7 +302,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   )
 }
 
-export default function DivisionWalkthrough({ problem, showMathTerms = true, autoAdvanceMs = 2200, onDone }) {
+export default function DivisionWalkthrough({ problem, showMathTerms = true, autoAdvanceMs = 2200, onDone, closeGutter = false }) {
   const { a, b } = problem
   const built = useMemo(() => buildDivisionStages(a, b), [a, b])
   const stages = built.stages
@@ -406,10 +407,10 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: P.textPrimary, letterSpacing: '-.01em' }}>Let&apos;s share the candy 🍬</div>
         {phase === 'work' && roundLabel && (
-          // marginRight reserves the parent modal's floating ✕ gutter (ModalClose
-          // 40px at right:14) so the round pill clears the close button by a
-          // governed ~12px gap (golden 4px rule; 44 = 4×11, Amy 2026-08-31).
-          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)', background: '#F5F5F5', borderRadius: 999, padding: '6px 13px', whiteSpace: 'nowrap', marginRight: 44 }}>{roundLabel}</span>
+          // closeGutter: only the sparkle popup floats its ✕ (40px at right:14) in this
+          // corner, so only there does the pill reserve 44px (Amy 2026-08-31). Everywhere
+          // else it aligns with the bubble's right edge (Amy 2026-10-05).
+          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)', background: '#F5F5F5', borderRadius: 999, padding: '6px 13px', whiteSpace: 'nowrap', marginRight: closeGutter ? 44 : 0 }}>{roundLabel}</span>
         )}
       </div>
 

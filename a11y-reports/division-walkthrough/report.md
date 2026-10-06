@@ -1,6 +1,6 @@
 # Contrast audit — DivisionWalkthrough
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/DivisionWalkthrough.jsx` · **Run:** 2026-10-06 02:18 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/DivisionWalkthrough.jsx` · **Run:** 2026-10-06 02:46 UTC  
 **Variants:** 815 ÷ 4 (sneaky zero), 85 ÷ 4 · **Phases:** intro → step-0 → step-1 → step-2 → step-3 → step-4 → step-5 → step-6 → step-7 → step-8 → step-9 → step-10 → step-11 → step-12 → step-13 → step-14 → step-15
 
 > **134 unique checks · 134 pass · 0 fail · 0 exempt (disabled) · 0 need review**
