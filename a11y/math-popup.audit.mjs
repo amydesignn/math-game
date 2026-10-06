@@ -13,9 +13,11 @@ export default {
   decorative: ['[aria-hidden="true"]'],
   viewport: { width: 1280, height: 900 },
   variants: [
-    { id: 'mult-2x1', name: '2-digit × 1-digit', url: `${BASE}&topic=mult-2x1` },
-    { id: 'long-mult', name: 'Long multiplication', url: `${BASE}&topic=long-mult` },
-    { id: 'add-2x2', name: '2-digit addition', url: `${BASE}&topic=add-2x2`, interactions: false },
+    // `sim` pins the worked example to a worst case (carries, longest walk), so
+    // every later step is audited, not just step 1. `steps` = its stage count.
+    { id: 'mult-2x1', name: '2-digit × 1-digit', url: `${BASE}&topic=mult-2x1&sim=47x6`, steps: 4 },
+    { id: 'long-mult', name: 'Long multiplication', url: `${BASE}&topic=long-mult&sim=95x85`, steps: 8 },
+    { id: 'add-2x2', name: '2-digit addition', url: `${BASE}&topic=add-2x2&sim=58x57`, steps: 4, interactions: false },
     { id: 'long-div', name: 'Long division', url: `${BASE}&topic=long-div`, division: true },
   ],
   states: [
@@ -34,6 +36,15 @@ export default {
         await page.waitForTimeout(600)
       },
     },
+    // the worked example's later steps — recover lands on step 1; walk forward
+    ...[2, 3, 4, 5, 6, 7, 8].map((n) => ({
+      name: `step-${n}`, skip: (v) => v.division || n > v.steps,
+      run: async (page, { answers }) => {
+        await answer(page, answers[0] + 1)
+        const next = page.getByRole('button', { name: /Show next step/ })
+        for (let k = 1; k < n; k++) { await next.click(); await page.waitForTimeout(350) }
+      },
+    })),
     {
       // division recovers into Oscar's candy walkthrough — open it from the ask
       name: 'walkthrough', skip: (v) => !v.division,

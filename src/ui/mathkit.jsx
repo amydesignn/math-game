@@ -23,6 +23,7 @@ export const T = {
   line: 'var(--color-border-default)', surface: 'var(--color-background-base)', // was #E6E6E6 (one off neutral-200) / #FFFFFF
   lilac: 'var(--brand-lilac-600)', lilacDeep: 'var(--brand-lilac-900)', // Lilac 600 / 900
   violet: '#7F22FE', amber: '#FE9A00', amberDeep: '#D97706',
+  amberInk: 'var(--amber-700)', // amber as TEXT (carries, the written zero): amber-500 is 2.1 on white → Datum amber-700, 5.0
   radius: 26, radiusSm: 16,
 }
 
@@ -214,7 +215,7 @@ export function ColumnMath({ snap, big = false }) {
               <div style={{ width: cell * 0.7 }}></div>
               {r.cells.map((c, i) => (
                 <div key={i} style={{ width: cell, textAlign: 'center', fontSize: big ? 18 : 15, fontWeight: 700,
-                  color: T.amber, animation: c ? 'cellPop .3s ease-out both' : 'none' }}>{c}</div>
+                  color: T.amberInk, animation: c ? 'cellPop .3s ease-out both' : 'none' }}>{c}</div>
               ))}
             </div>
           )
@@ -254,11 +255,11 @@ export function MultiColumnMath({ snap }) {
       <div key={which} style={{ width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: cell - 8, height: cell - 8, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-          color: active ? T.irisDeep : T.textPrimary, opacity: dim ? 0.28 : 1,
+          color: active ? T.irisDeep : dim ? T.textTertiary : T.textPrimary, /* dim = Datum tertiary (4.7), not opacity .28 (1.7) */
           border: active ? `2.5px dashed ${T.iris}` : '2.5px dashed transparent',
           background: active ? T.irisTint : 'transparent',
           animation: active ? 'spotIn .35s ease-out both' : 'none',
-          transition: 'opacity .25s' }}>{d}</div>
+          transition: 'color .25s' }}>{d}</div>
       </div>
     )
   }
@@ -281,8 +282,8 @@ export function MultiColumnMath({ snap }) {
             <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
               {snap.carry[i] !== '' && (
                 <div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 17, fontWeight: 700, color: '#B45309', background: '#FEF9C3', border: `2px solid ${T.amber}`,
-                  animation: snap.carryHot ? 'spotIn .35s ease-out both' : 'none', opacity: snap.carryHot ? 1 : 0.75 }}>{snap.carry[i]}</div>
+                  fontSize: 17, fontWeight: 700, color: T.amberInk, background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  animation: snap.carryHot ? 'spotIn .35s ease-out both' : 'none' /* no .75 fade on a used carry — it took the digit under AA */ }}>{snap.carry[i]}</div>
               )}
             </div>
           ))}
@@ -323,7 +324,7 @@ export function MultiColumnMath({ snap }) {
             <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
               {snap.addCarry[i] !== '' && (
                 <div style={{ width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 700, color: '#B45309', background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  fontSize: 14, fontWeight: 700, color: T.amberInk, background: '#FEF9C3', border: `2px solid ${T.amber}`,
                   animation: snap.hiRow === 'sum' ? 'spotIn .35s ease-out both' : 'none' }}>{snap.addCarry[i]}</div>
               )}
             </div>
@@ -341,10 +342,10 @@ export function MultiColumnMath({ snap }) {
           return (
             <div key={i} style={{ position: 'relative' }}>
               {numCell(snap.row2[i], { hot: (snap.hiRow === 'row2' && snap.row2[i] !== '') || (isZero && snap.zeroHot),
-                color: isZero ? T.amber : T.iris, key: i })}
+                color: isZero ? T.amberInk : T.iris, key: i })}
               {isZero && snap.zeroHot && (
                 <span style={{ position: 'absolute', left: '50%', bottom: -16, transform: 'translateX(-50%)',
-                  fontSize: 10.5, fontWeight: 700, color: T.amber, whiteSpace: 'nowrap' }}>write it!</span>
+                  fontSize: 12, fontWeight: 700, color: T.amberInk, whiteSpace: 'nowrap' }}>write it!</span>
               )}
             </div>
           )

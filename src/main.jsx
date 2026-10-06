@@ -501,13 +501,19 @@ function StationAudit() {
 }
 /*
  * Dev-only audit harness for the sparkle popup: `/?a11y=math&topic=mult-2x1`
- * (topics: mult-2x1 · long-mult · add-2x2 · long-div). The real <MathPopup> in the
+ * (topics: mult-2x1 · long-mult · add-2x2 · long-div; optional `&sim=95x85`). The real <MathPopup> in the
  * Snack time skin it always wears in the game; answer on `window.__audit`.
  */
 function MathAudit() {
   const t = new URLSearchParams(window.location.search).get('topic')
   const topic = TOPICS[t] ? t : 'mult-2x1'
-  const [problem] = React.useState(() => TOPICS[topic].generate(1))
+  // `&sim=95x85` pins the worked example's similar problem, so the audit sees
+  // a fixed, worst-case walkthrough (carries, the longest step count).
+  const sim = new URLSearchParams(window.location.search).get('sim')?.split('x').map(Number)
+  const [problem] = React.useState(() => {
+    const p = TOPICS[topic].generate(1)
+    return sim?.length === 2 ? { ...p, similar: { a: sim[0], b: sim[1] } } : p
+  })
   window.__audit = {
     answers: [problem.op === '÷' ? { q: Math.floor(problem.a / problem.b), r: problem.a % problem.b } : solve(problem.op, problem.a, problem.b)],
   }
