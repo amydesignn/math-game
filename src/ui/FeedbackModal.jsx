@@ -29,7 +29,7 @@
 import { useRef, useState } from 'react'
 
 // Datum tokens by name (Amy's map: Iris = text + anything WCAG; Lilac = supporting detail)
-const IRIS = 'var(--brand-iris-600)',
+const IRIS = 'var(--brand-iris-500)', // Luxi 3D button face (was iris-600 — the one primary off the Iris 500 spec; aligned 2026-10-05, Amy)
   IRISD = 'var(--brand-iris-700)'
 const EMPTY = 'var(--color-border-interactive-default)' // neutral-500, 4.74:1 — an unselected star is a
 // RESTING control: a hollow outline in the same token as the textarea border (Amy, 2026-10-04).
