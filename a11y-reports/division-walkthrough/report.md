@@ -1,6 +1,6 @@
 # Contrast audit — DivisionWalkthrough
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/DivisionWalkthrough.jsx` · **Run:** 2026-10-06 02:46 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/DivisionWalkthrough.jsx` · **Run:** 2026-10-06 03:09 UTC  
 **Variants:** 815 ÷ 4 (sneaky zero), 85 ÷ 4 · **Phases:** intro → step-0 → step-1 → step-2 → step-3 → step-4 → step-5 → step-6 → step-7 → step-8 → step-9 → step-10 → step-11 → step-12 → step-13 → step-14 → step-15
 
 > **134 unique checks · 134 pass · 0 fail · 0 exempt (disabled) · 0 need review**
@@ -31,7 +31,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | You share them with 4 friends. | `#262626` on `#FAFAFA` | 16px | 14.49:1 | 4.50:1 | ✅ | intro |
 | QUOTIENT | `#BB4D00` on `#FEF9C2` | 12px bold | 4.68:1 | 4.50:1 | ✅ | intro, step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | How many does each friend get? | `#262626` on `#FAFAFA` | 16px | 14.49:1 | 4.50:1 | ✅ | intro |
-| Let's discover it! ▸ | `#FFFFFF` on `#4B54DD` | 16px | 5.81:1 | 4.50:1 | ✅ | intro |
+| Let's discover it! ▸ | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | intro |
 | Let's begin | `#525252` on `#F5F5F5` | 14px | 7.16:1 | 4.50:1 | ✅ | step-0, step-1 |
 | We have 815 candies to share equally among 4 friends. Let's  | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | step-0 |
 | Divide | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | step-0, step-1, step-3, step-4, step-5, step-7, step-8, step-9, step-11, step-12, step-13, step-14, step-15 |
@@ -43,7 +43,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | all the candy to share | `#525252` on `#FFFFFF` | 12px | 7.81:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | ▶ Play | `#3D43BE` on `#FFFFFF` | 16px | 7.65:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12 |
 | ◂ Back | `#525252` on `#FFFFFF` | 16px | 7.81:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
-| Next step ▸ | `#FFFFFF` on `#4B54DD` | 16px | 5.81:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12 |
+| Next step ▸ | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12 |
 | 8 | `#C6005C` on `#EFF1F3` ᵖ | 26px bold (large) | 5.22:1 | 3.00:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | 1 | `#C6005C` on `#FFFFFF` ᵖ | 26px bold (large) | 5.91:1 | 3.00:1 | ✅ | step-0, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | 5 | `#C6005C` on `#FFFFFF` ᵖ | 26px bold (large) | 5.91:1 | 3.00:1 | ✅ | step-0, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
@@ -83,16 +83,16 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Done! Each of the 4 friends gets 203 candies, with 3 left ov | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | step-13, step-14, step-15 |
 | R3 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | step-13, step-14, step-15 |
 | ↺ Watch again | `#3D43BE` on `#FFFFFF` | 16px | 7.65:1 | 4.50:1 | ✅ | step-13, step-14, step-15 |
-| I got it! 🎉 | `#FFFFFF` on `#4B54DD` | 16px | 5.81:1 | 4.50:1 | ✅ | step-13, step-14, step-15 |
+| I got it! 🎉 | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | step-13, step-14, step-15 |
 
 ### Interactive elements — every state
 
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
-| Let's discover it! ▸ | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 4.99:1 · 57% of edge | intro |
+| Let's discover it! ▸ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.99:1 · 57% of edge | intro |
 | ▶ Play | ✅ 7.65:1 | ✅ 7.65:1 | ✅ 7.65:1 | ✅ 7.65:1 | ✅ 5.30:1 · 92% of edge | step-0 |
 | ◂ Back | ✅ 7.81:1 | ✅ 7.81:1 | ✅ 7.81:1 | ✅ 7.81:1 | ✅ 6.07:1 · 91% of edge | step-0 |
-| Next step ▸ | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 4.99:1 · 59% of edge | step-0 |
+| Next step ▸ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.99:1 · 59% of edge | step-0 |
 
 ## 85 ÷ 4
 
@@ -109,7 +109,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | You share them with 4 friends. | `#262626` on `#FAFAFA` | 16px | 14.49:1 | 4.50:1 | ✅ | intro |
 | QUOTIENT | `#BB4D00` on `#FEF9C2` | 12px bold | 4.68:1 | 4.50:1 | ✅ | intro, step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | How many does each friend get? | `#262626` on `#FAFAFA` | 16px | 14.49:1 | 4.50:1 | ✅ | intro |
-| Let's discover it! ▸ | `#FFFFFF` on `#4B54DD` | 16px | 5.81:1 | 4.50:1 | ✅ | intro |
+| Let's discover it! ▸ | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | intro |
 | Let's begin | `#525252` on `#F5F5F5` | 14px | 7.16:1 | 4.50:1 | ✅ | step-0, step-1 |
 | We have 85 candies to share equally among 4 friends. Let's f | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | step-0 |
 | Divide | `#737373` on `#FFFFFF` | 14px | 4.74:1 | 4.50:1 | ✅ | step-0, step-1, step-3, step-4, step-5, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
@@ -121,7 +121,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | all the candy to share | `#525252` on `#FFFFFF` | 12px | 7.81:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | ▶ Play | `#3D43BE` on `#FFFFFF` | 16px | 7.65:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
 | ◂ Back | `#525252` on `#FFFFFF` | 16px | 7.81:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
-| Next step ▸ | `#FFFFFF` on `#4B54DD` | 16px | 5.81:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
+| Next step ▸ | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
 | 8 | `#C6005C` on `#EFF1F3` ᵖ | 26px bold (large) | 5.22:1 | 3.00:1 | ✅ | step-0, step-1, step-2, step-3, step-4, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | 5 | `#C6005C` on `#FFFFFF` ᵖ | 26px bold (large) | 5.91:1 | 3.00:1 | ✅ | step-0, step-5, step-6, step-7, step-8, step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | We only look at a little at a time. This glowing box is the  | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | step-1 |
@@ -151,7 +151,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Done! Each of the 4 friends gets 21 candies, with 1 left ove | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | R1 | `#262626` on `#FFFFFF` | 22px bold (large) | 15.13:1 | 3.00:1 | ✅ | step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 | ↺ Watch again | `#3D43BE` on `#FFFFFF` | 16px | 7.65:1 | 4.50:1 | ✅ | step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
-| I got it! 🎉 | `#FFFFFF` on `#4B54DD` | 16px | 5.81:1 | 4.50:1 | ✅ | step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
+| I got it! 🎉 | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | step-9, step-10, step-11, step-12, step-13, step-14, step-15 |
 
 ---
 

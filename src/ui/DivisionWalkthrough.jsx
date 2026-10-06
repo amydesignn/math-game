@@ -71,7 +71,7 @@ const RW = 37 // "R3" beside the Answer Box: 8px gap + glyphs (measured: DIVIDEN
 function PressBtn({ children, onClick, variant = 'primary' }) {
   const [down, setDown] = useState(false)
   const V = {
-    primary: { bg: 'var(--brand-iris-600)', color: '#fff', border: 'none', shadow: 'var(--brand-iris-700)', pad: '13px 24px', fs: 'var(--text-base)' },
+    primary: { bg: 'var(--brand-iris-500)' /* Luxi 3D button face (Iris 500 / 700 shadow), like every Luxi primary */, color: '#fff', border: 'none', shadow: 'var(--brand-iris-700)', pad: '13px 24px', fs: 'var(--text-base)' },
     secondary: { bg: '#fff', color: 'var(--brand-iris-700)', border: '2px solid var(--brand-lilac-200)', shadow: 'var(--brand-lilac-200)', pad: '12px 20px', fs: 'var(--text-base)' },
     back: { bg: '#fff', color: 'var(--color-text-secondary)', border: '2px solid #E5E5E5', shadow: '#E5E5E5', pad: '12px 20px', fs: 'var(--text-base)' },
   }[variant]
