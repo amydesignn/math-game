@@ -99,9 +99,14 @@ function trail(points, { step = 1.15, width = 0.62 } = {}) {
 }
 
 /** A square flower bed: two L-shaped stone borders closing a frame, three
- *  plants inside. Five props; `k` scales the whole bed. */
-function flowerBed(cx, cz, k = 1) {
+ *  plants inside, and (with `roses`) two rose bushes in that colour.
+ *  `k` scales the whole bed. */
+function flowerBed(cx, cz, k = 1, roses) {
   return [
+    ...(roses ? [
+      sp('rosebush', cx + 0.4 * k, cz - 0.4 * k, 0.3, 0.9 * k, { color: roses }),
+      sp('rosebush', cx - 0.45 * k, cz + 0.35 * k, 1.9, 0.8 * k, { color: roses }),
+    ] : []),
     b('border-corner', cx, cz, 0, BS * k),
     b('border-corner', cx, cz, Math.PI, BS * k),
     f('plant', cx - 0.35 * k, cz - 0.3 * k, 0.4, 1.2 * k),
@@ -239,6 +244,9 @@ export const MAPS = {
   // the campsite straight ahead of spawn, the lookout, the archery range and
   // the rocky knoll. The open meadow between them is where sparkles and
   // stations land (both keep ~2 units clear of decor).
+  // People (2026-10-06, Ivy: "people there too"): two campers on logs at a
+  // crackling fire, a real archer at the range, a hiker + dog on the trail, a
+  // forager filling a basket in the grove, someone at the lookout.
   clearing: {
     id: 'clearing',
     name: 'Forest Clearing',
@@ -252,7 +260,9 @@ export const MAPS = {
       ...trail([[0, 1.4], [0.4, -1.4], [0, -4]]), // spur up to the camp
 
       // campsite — straight ahead of spawn, the first thing she sees
-      f('stones', 0, -6, 0.3, 1.2), // the fire ring
+      sp('campfire', 0, -6, 0, 1.3), // crackling, in its own ring of stones
+      sp('logseat', -1.55, -6, Math.PI / 2), sp('logseat', 1.55, -6, Math.PI / 2),
+      sp('woodpile', -4.4, -8.4, 0.3), sp('woodpile', 4.6, -8.6, -0.2, 0.8),
       f('tent', -2.6, -7.4, 0.7, 1.4),
       f('tent', 2.6, -7.6, -0.7, 1.4),
       f('flag', 0.2, -9.2, 0, 1.6),
@@ -270,7 +280,9 @@ export const MAPS = {
       f('target', -12, 9.6, 0, 1.8), f('target', -9.5, 9.8, 0, 1.8), f('target', -7, 9.6, 0, 1.8),
       f('fence', -12.9, 11, 0, 1.3), f('fence', -11.5, 11, 0, 1.3), f('fence', -10.1, 11, 0, 1.3),
       f('fence', -8.7, 11, 0, 1.3), f('fence', -7.3, 11, 0, 1.3), f('fence', -5.9, 11, 0, 1.3),
-      f('character-archer', -9.2, 6.6, Math.PI, 1.4),
+      { pack: 'forest', name: 'weapon-arrow', position: [-9.5, 0.75, 9.55], rotation: Math.PI / 2, scale: 1.2 },
+      { pack: 'forest', name: 'weapon-arrow', position: [-12.1, 0.62, 9.45], rotation: Math.PI / 2, scale: 1.2 },
+      f('weapon-bow', -13, 7, 0.4, 1.1), // a spare bow by the range
       f('plant', -13.2, 7.4, 0.6), f('plant', -5.6, 8.2, 2.3),
 
       // rocky knoll — south-east, a lump of rock with a flag on top
@@ -289,6 +301,27 @@ export const MAPS = {
       f('plant', 5.6, -0.4, 2.6), f('plant', 6.3, -0.1, 0.5, 0.9),
       f('plant', 3.2, 5.6, 1.1), f('patch-grass', 2.6, 6, 0.3),
       f('patch-grass', -4, -3.8, 2.2), f('plant', -3.5, -4.3, 0.9),
+    ],
+    neighbours: [
+      // campers on the logs, warming their hands at the fire
+      { character: 'character-female-b', home: [-1.55, -6], stroll: 0, facing: Math.PI / 2, pose: 'sit', seat: 0.27,
+        lines: ['Want a marshmallow? 🔥', 'Shh… listen to the owls 🦉', 'We sleep in the tents tonight!'] },
+      { character: 'character-male-b', home: [1.55, -6], stroll: 0, facing: -Math.PI / 2, pose: 'sit', seat: 0.27,
+        lines: ['The fire is so cosy', 'I can see the first star! ⭐', 'Have you been to the lookout?'] },
+      // the archer, bow up, facing the targets
+      { character: 'character-male-d', home: [-9.4, 6.6], stroll: 0, facing: 0, pose: 'holding-both-shoot', carry: 'bow',
+        lines: ['Bullseye! 🎯 …almost', 'Practice makes perfect!', 'Stand behind me, please!'] },
+      // someone at the foot of the lookout
+      { character: 'character-male-f', home: [10.4, -5.4], stroll: 0, facing: 0,
+        lines: ['I climbed up there this morning!', 'You can see the whole forest 🌲', 'Mind the ladder!'] },
+      // a hiker + dog on the trail, stopping at the fire on the way
+      { character: 'character-female-d', pet: 'animal-dog',
+        route: [[-10, 3.4, undefined, { wait: 2000 }], [-5, 2.4], [-0.9, 2.2], [-0.6, -3.7, Math.PI, { wait: 4000 }], [0.9, 2.2], [5, 2.6], [10, 3.6, undefined, { wait: 2000 }], [5, 2.6], [0.9, 2.2], [-0.9, 2.2], [-5, 2.4]],
+        lines: ['The trail goes all the way round!', 'My dog found a stick 🐕', 'Hello, fellow explorer!'] },
+      // a forager with a basket, picking in the grove and dropping off at camp
+      { character: 'character-female-f', pet: 'animal-bunny', carry: 'basket',
+        route: [[-6.6, -3.6], [-6.8, -6.2, -2, { do: 'pick-up', ms: 2600, wait: 3000 }], [-6.6, -3.6], [-9.2, -3.6, Math.PI, { do: 'pick-up', ms: 2600, wait: 3000 }], [-6.6, -3.6], [-5, -7.2, 2.7, { wait: 2500 }]],
+        lines: ['Found a mushroom! 🍄', 'Berries for the campfire', 'The forest has so many treasures'] },
     ],
     gates: [
       { to: 'town', position: [16, 0, 2] },
@@ -334,13 +367,16 @@ export const MAPS = {
     ],
   },
 
-  // ── Map 3 — the rosy garden: a formal garden, laid out LIGHT ──
-  // The "fewer assets" twin of the Forest Clearing (to compare with Ivy): same
-  // idea — a place, not a scatter — but ~50 props instead of ~150, and the
-  // pieces are scaled up so fewer of them still fill the lawn. Symmetry
-  // does the structuring work the Clearing's tree line does: a gazebo on the
-  // axis ahead of spawn, a stepping-stone walk gate → centre → gate, four
-  // matching flower beds, a tree at each corner. Lots of open pink lawn.
+  // ── Map 3 — the rosy garden: a working garden, dense + alive ──
+  // First laid out LIGHT (~50 props, the twin of the dense Clearing); Ivy
+  // picked dense, and asked for people (2026-10-06). Amy: "a shed, and people
+  // getting in and out of it to take tools — working on their garden." So:
+  // the gazebo on the axis ahead of spawn (with a tea party in it), the
+  // stepping-stone walk gate → centre → gate under two rose arches, four
+  // flower beds, a shed + veg patch in the north-east corner, a lily pond in
+  // the south-west, hedges and a tree line round the edge. Gardeners walk
+  // shed → beds → shed (in through the door, out with a tool, back to put it
+  // away); routes are checked against every solid prop in season-maps.test.js.
   garden: {
     id: 'garden',
     name: 'Rosy Garden',
@@ -349,22 +385,127 @@ export const MAPS = {
     sky: '#fbe9f3',
     gateColor: '#ef7fb5',
     decor: [
-      // the gazebo, straight ahead of spawn, two lamp posts at its door
+      ...treeLine({ gaps: [[-16, -3], [16, 3]], step: 2.5, inner: false }),
+
+      // the gazebo, straight ahead of spawn: a tea table + two stools inside,
+      // two lamp posts at its door
       ...pavilion(0, -8.5, 1.5),
+      sp('teatable', 0, -8.5), sp('stool', -0.75, -8.5), sp('stool', 0.75, -8.5),
       b('column-thin', -2.4, -5.4), b('column-thin', 2.4, -5.4),
       f('tree', -3.6, -11, 0.7, 1.4), f('tree', 3.6, -11, 2.4, 1.4),
+      sp('planter', -1.9, -6.2, 0, 0.9), sp('planter', 1.9, -6.2, 0, 0.9, { flowers: '#a98be8' }),
 
-      // the walk: gate → centre → gate, plus the spur to the gazebo
+      // the walk: gate → centre → gate, plus the spur to the gazebo, two rose
+      // arches over it and a bench either side of the spur
       ...trail([[-15, -3], [-8, -1.6], [0, 0], [8, 1.6], [15, 3]], { step: 1.7, width: 0.85 }),
       ...trail([[0, 0], [0, -5]], { step: 1.7, width: 0.85 }),
+      sp('rosearch', -10.5, -2.1, Math.PI / 2 - 0.2), sp('rosearch', 10.5, 2.1, Math.PI / 2 - 0.2), // posts across the walk
+      sp('bench', -1.6, -2.8, Math.PI / 2), sp('bench', 1.6, -2.8, -Math.PI / 2),
 
-      // four matching flower beds, one per quarter
-      ...flowerBed(-7, -5.5, 1.8), ...flowerBed(7, -5.5, 1.8),
-      ...flowerBed(-7, 6.5, 1.8), ...flowerBed(7, 6.5, 1.8),
+      // four flower beds, one per quarter, flowers in clumps around them
+      ...flowerBed(-7, -5.5, 1.8, '#ff8fc0'), ...flowerBed(7, -5.5, 1.8, '#ff7a6b'),
+      ...flowerBed(-7, 6.5, 1.8, '#ffb62e'), ...flowerBed(7, 6.5, 1.8, '#a98be8'),
+      // rose bushes along the walk and round the gazebo
+      ...[[-13.2, -5.6], [-12.4, 0.4], [-5, -2.5], [-3.2, 1.8], [3.4, -1.9], [5.8, 3.4], [12.6, 0.2], [13.2, 5.4],
+        [-3.4, -6.6], [3.4, -6.8], [-2.6, -11.6], [2.6, -11.8], [-12.6, 3.6], [12.4, -3.8]]
+        .map(([x, z], i) => sp('rosebush', x, z, i * 0.9, 0.85 + (i % 3) * 0.12, { color: ['#ff8fc0', '#ff7a6b', '#fff8ec', '#a98be8'][i % 4] })),
+      // tree clumps at the middle of each side, so no edge is bare
+      f('tree', -14, -8.6, 0.6, 1.2), f('tree-high', -13.4, 7.6, 2.4, 1.1),
+      f('tree', 0.4, 15, 1.4, 1.2), f('tree-high', -6.6, 15.2, 0.3, 1.1), f('tree', 8.4, 14.8, 2, 1.15),
+      f('tree-high', 14.2, -6.8, 1.1, 1.15), f('tree', 14.4, 8.4, 0.8, 1.1),
+      f('plant', -4.6, -7.4, 0.3, 0.9), f('patch-grass', -9.4, -7.6, 1.2),
+      f('plant', 4.4, 8.6, 2.1, 0.9), f('patch-grass', 9.6, 4.4, 0.4),
+      f('plant', -4.4, 4.6, 1.6, 0.8), f('plant', 4.6, -3.4, 0.7, 0.8),
+
+      // the shed corner (north-east): shed door to the square, tools, a
+      // wheelbarrow, sacks, and a veg patch out front the gardeners water
+      sp('shed', 10.5, -10.6),
+      sp('toolrack', 12.4, -9.7, -Math.PI / 2),
+      sp('wheelbarrow', 8.2, -11.4, 0.4),
+      sp('sack', 12.6, -11.7, 0.3), sp('sack', 12.2, -12.3, 1.2, 1, { color: '#c9b083' }),
+      ...[5.6, 6.5, 7.4].flatMap((x, i) => [
+        f('patch-dirt', x, -8.9, 0, 0.9), f('patch-dirt', x, -9.9, Math.PI / 2, 0.9),
+        f('plant', x, -8.9, i * 1.7, 1.05), sp('rosebush', x, -9.9, i, 0.55, { color: ['#ff7a6b', '#ffb62e', '#ff7a6b'][i] }), // lettuces + tomatoes
+      ]),
+
+      // the lily pond (south-west) with a bench looking over it
+      sp('pond', -10.6, 11.2, 0, 1, { r: 1.5 }),
+      sp('bench', -10.6, 8.7),
+      f('plant', -12.6, 9.4, 0.5), f('patch-grass', -8.2, 12.6, 1.4), f('plant', -8.6, 9.6, 2.2, 0.8),
+
+      // hedges: behind the gazebo, and a flowering hedge along the south edge
+      sp('hedge', -6, -13, 0, 1, { len: 4 }), sp('hedge', 6, -13.4, 0, 1, { len: 3 }),
+      sp('hedge', -1.6, 12.8, 0, 1, { len: 4.4, flowers: '#ff8fc0' }),
+      sp('hedge', 4.6, 12.8, 0, 1, { len: 4, flowers: '#fff8ec' }),
+      sp('planter', 10.8, 9.6, 0, 1, { flowers: '#ff7a6b' }), sp('planter', 12.4, 6.2, 0, 1),
 
       // a tree at each corner frames the lawn
-      f('tree-high', -13, -11, 0.4, 1.3), f('tree-high', 13, -11, 2.2, 1.3),
-      f('tree-high', -13, 11, 1.1, 1.3), f('tree-high', 13, 11, 2.9, 1.3),
+      f('tree-high', -13, -11, 0.4, 1.3), f('tree-high', 13, -13.6, 2.2, 1.3),
+      f('tree-high', -13.6, 13.4, 1.1, 1.3), f('tree-high', 13, 11, 2.9, 1.3),
+    ],
+    neighbours: [
+      // the tea party in the gazebo — sitting on their stools, chatting
+      { character: 'character-female-e', home: [-0.75, -8.5], stroll: 0, facing: Math.PI / 2, pose: 'sit', seat: 0.28,
+        lines: ['Lovely day for tea! ☕', 'Would you like a cup?', 'The roses smell so sweet today 🌹'] },
+      { character: 'character-male-e', home: [0.75, -8.5], stroll: 0, facing: -Math.PI / 2, pose: 'sit', seat: 0.28,
+        lines: ['Hello! Cookie? 🍪', 'We have tea here every afternoon', 'The gardeners work SO hard'] },
+      // the bench by the pond
+      { character: 'character-male-c', home: [-10.6, 8.75], stroll: 0, facing: 0, pose: 'sit', seat: 0.26,
+        lines: ['Shh… the frogs are singing 🐸', 'I like watching the lily pads', 'Look, a dragonfly!'] },
+      // gardener #1 — fetches the watering can, waters the veg patch and the
+      // two north beds, puts the can back
+      { character: 'character-female-c',
+        route: [
+          [10.5, -8.9],
+          [10.5, -10.3, Math.PI, { inside: true, wait: 2600, take: 'can' }],
+          [10.5, -8.9],
+          [6.5, -8.1, Math.PI, { do: 'holding-right', ms: 3200, wait: 3600 }],
+          [4.2, -4.4],
+          [7, -3.6, Math.PI, { do: 'holding-right', ms: 3200, wait: 3600 }],
+          [-7, -3.6, Math.PI, { do: 'holding-right', ms: 3200, wait: 3600 }],
+          [4.2, -4.4],
+          [4.2, -7.6],
+          [9.4, -8.2],
+          [10.5, -8.9],
+          [10.5, -10.3, Math.PI, { inside: true, wait: 3000, take: null }],
+        ],
+        lines: ['Watering time! 💧', 'Thirsty flowers grow the best', 'Want to help me garden?'] },
+      // gardener #2 — takes the spade to weed the south beds, swaps it for a
+      // basket, picks flowers and carries them up to the tea party
+      { character: 'character-male-a',
+        route: [
+          [10.5, -8.9],
+          [10.5, -10.3, Math.PI, { inside: true, wait: 2400, take: 'spade' }],
+          [10.5, -8.9],
+          [9.6, -0.4],
+          [9.4, 8.2],
+          [7, 8.4, Math.PI, { do: 'pick-up', ms: 3600, wait: 4000 }],
+          [-7, 8.4, Math.PI, { do: 'pick-up', ms: 3600, wait: 4000 }],
+          [-4.4, 8.6],
+          [-4.4, 2.6],
+          [9.6, -0.4],
+          [10.5, -8.9],
+          [10.5, -10.3, Math.PI, { inside: true, wait: 2400, take: 'basket' }],
+          [10.5, -8.9],
+          [9.6, -0.4],
+          [9.6, 4.6, 0, { do: 'pick-up', ms: 2400, wait: 2800 }],
+          [4.2, -4.4],
+          [1, -4.4],
+          [0, -5.6],
+          [0, -7, Math.PI, { wait: 3200 }], // flowers for the tea table
+          [0, -5.6],
+          [1, -4.4],
+          [4.2, -4.4],
+          [4.2, -7.6],
+          [9.4, -8.2],
+          [10.5, -8.9],
+          [10.5, -10.3, Math.PI, { inside: true, wait: 2400, take: null }],
+        ],
+        lines: ['Pulling weeds is my job! 🌱', 'These flowers are for the tea party', 'A garden needs lots of love'] },
+      // a dog walker on the stepping-stone walk
+      { character: 'character-female-a', pet: 'animal-dog',
+        route: [[-10.4, -2.1, undefined, { wait: 2500 }], [-3.6, -0.7], [3.6, 0.7], [10.4, 2.1, undefined, { wait: 2500 }], [3.6, 0.7], [-3.6, -0.7]],
+        lines: ['Hi! 👋 We walk here every day', 'Smell the roses! 🌸', 'My dog loves the arches'] },
     ],
     gates: [
       { to: 'town', position: [-16, 0, -3] },
