@@ -170,7 +170,7 @@ const popStyles = {
   // the inset lip softened with the palette (was -5px/.14 under the saturated
   // violet — too heavy a shadow for a pastel badge, it read as a dark rim)
   badge: { position: 'absolute', inset: 0, borderRadius: '50%', background: LVL.grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 10px 26px rgba(${LVL.glow},.42), inset 0 -4px 0 rgba(0,0,0,.10)`, animation: 'badgeBounce .55s cubic-bezier(.22,1.4,.36,1) .1s both' },
-  // numeral = LVL.onFill (Iris 950), not white — see the note in mathkit.
+  // numeral = LVL.onFill (white on Iris 500) — see the note in mathkit.
   // The drop shadow goes with it: it existed to lift white off the saturated
   // violet, and under a deep numeral it just muddies the pastel.
   badgeNum: { position: 'relative', overflow: 'hidden', height: 56, width: '100%', textAlign: 'center', color: LVL.onFill, fontWeight: 800, fontSize: 46, lineHeight: '56px' },

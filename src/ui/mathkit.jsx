@@ -23,6 +23,7 @@ export const T = {
   line: 'var(--color-border-default)', surface: 'var(--color-background-base)', // was #E6E6E6 (one off neutral-200) / #FFFFFF
   lilac: 'var(--brand-lilac-600)', lilacDeep: 'var(--brand-lilac-900)', // Lilac 600 / 900
   violet: '#7F22FE', amber: '#FE9A00', amberDeep: '#D97706',
+  amberInk: 'var(--amber-700)', // amber as TEXT (carries, the written zero): amber-500 is 2.1 on white → Datum amber-700, 5.0
   radius: 26, radiusSm: 16,
 }
 
@@ -63,30 +64,26 @@ export const MODAL = {
  * supporting). main 400 · soft 100 · softLine 200 · deep 800 · ink 700 ·
  * grad 300→400→500 · onFill = Iris 950 (every value on a brand ramp). */
 export const LVL = {
-  main: '#B29BEA', // Lilac 400 — FILL identity only (2.39:1 on white: never text)
-  ink: '#6E5BC0', // Lilac 700 — coloured accent TEXT (5.36:1 on white)
-  soft: '#EDE7FC',
-  deep: '#5B4B9E', // Lilac 800 — text weight, 7.1:1 on white (5.9 on soft)
-  softLine: '#DDD1F7',
-  grad: 'linear-gradient(135deg,#C6B4F0 0%,#B29BEA 58%,#9B84E0 100%)',
-  glow: '155,132,224', // rgb triplet for the soft shadows/halos around level art
+  /* Level identity = IRIS since 2026-10-06 (Amy: the record book read off-brand
+   * in Lilac while the game leans Iris). It now wears the Luxi primary button:
+   * Iris 500 face + white numeral (4.56) — the same pair every Luxi primary
+   * button uses — and Iris 700 (Datum text-brand) for level text. Lilac stays
+   * where it belongs: decoration (the header wash, confetti, stage pips).
+   * One declaration, read by the HUD bar, the congratulations card AND the
+   * record book — never copy it per file (that's how they drifted before). */
+  main: 'var(--brand-iris-500)', // the fill identity
+  ink: 'var(--color-text-brand)', // Iris 700 — coloured accent TEXT (7.7 on white)
+  soft: 'var(--brand-iris-100)', // light Iris surface (topic icons, the bar's track)
+  deep: 'var(--color-text-brand)', // Iris 700 — counts, labels, the total
+  softLine: 'var(--brand-iris-100)',
+  grad: 'var(--brand-iris-500)', // flat, like the button face (was a Lilac gradient)
+  glow: '97,105,224', // Iris 500 as an rgb triplet for the soft shadows/halos
 
-  /* The level NUMERAL wherever it sits on `grad` — medallion, reached ladder
-   * nodes, the congratulations badge. Brand Iris 950 (Amy 2026-10-04: no
-   * off-palette colours; was #2F0D68, which sat on no brand ramp).
-   *
-   * It is not white, and that is a hard constraint rather than a preference:
-   * white cannot meet 4.5:1 on a pastel violet at all (violet-300 = 1.86,
-   * violet-400 = 2.85, and even violet-500 only reaches 4.40). Pastel field or
-   * white text — you cannot have both. Amy's call (2026-07-26) was to keep the
-   * pastel and deepen the numeral. On the Lilac gradient Iris 950 gives 4.93
-   * on the deepest corner (Lilac 500), 6.38 mid, 8.14 on the lightest. The
-   * medallion (46px) and progress circle (34px) are LARGE text (3:1 bar), but
-   * the progress-ladder nodes are 16px bold = NORMAL text (4.5:1) — that's why
-   * it's 950: Iris 900 (3.65) and 800 (3.08) would fail the nodes.
-   *
-   * If anyone ever "restores" white here, the card silently drops below AA. */
-  onFill: '#1D2050', // Brand Iris 950
+  /* The level NUMERAL on `grad` — medallion, reached ladder nodes, the
+   * congratulations badge. WHITE on Iris 500 = 4.56, so even the 16px ladder
+   * nodes (normal text, 4.5 bar) pass. (On the old pastel Lilac white could
+   * never pass, which is why this used to be Iris 950.) */
+  onFill: 'var(--color-text-on-brand)',
 }
 
 /** The close ✕. One implementation so the tap target can never drift again. */
@@ -214,7 +211,7 @@ export function ColumnMath({ snap, big = false }) {
               <div style={{ width: cell * 0.7 }}></div>
               {r.cells.map((c, i) => (
                 <div key={i} style={{ width: cell, textAlign: 'center', fontSize: big ? 18 : 15, fontWeight: 700,
-                  color: T.amber, animation: c ? 'cellPop .3s ease-out both' : 'none' }}>{c}</div>
+                  color: T.amberInk, animation: c ? 'cellPop .3s ease-out both' : 'none' }}>{c}</div>
               ))}
             </div>
           )
@@ -254,11 +251,11 @@ export function MultiColumnMath({ snap }) {
       <div key={which} style={{ width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: cell - 8, height: cell - 8, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-          color: active ? T.irisDeep : T.textPrimary, opacity: dim ? 0.28 : 1,
+          color: active ? T.irisDeep : dim ? T.textTertiary : T.textPrimary, /* dim = Datum tertiary (4.7), not opacity .28 (1.7) */
           border: active ? `2.5px dashed ${T.iris}` : '2.5px dashed transparent',
           background: active ? T.irisTint : 'transparent',
           animation: active ? 'spotIn .35s ease-out both' : 'none',
-          transition: 'opacity .25s' }}>{d}</div>
+          transition: 'color .25s' }}>{d}</div>
       </div>
     )
   }
@@ -281,8 +278,8 @@ export function MultiColumnMath({ snap }) {
             <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
               {snap.carry[i] !== '' && (
                 <div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 17, fontWeight: 700, color: '#B45309', background: '#FEF9C3', border: `2px solid ${T.amber}`,
-                  animation: snap.carryHot ? 'spotIn .35s ease-out both' : 'none', opacity: snap.carryHot ? 1 : 0.75 }}>{snap.carry[i]}</div>
+                  fontSize: 17, fontWeight: 700, color: T.amberInk, background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  animation: snap.carryHot ? 'spotIn .35s ease-out both' : 'none' /* no .75 fade on a used carry — it took the digit under AA */ }}>{snap.carry[i]}</div>
               )}
             </div>
           ))}
@@ -323,7 +320,7 @@ export function MultiColumnMath({ snap }) {
             <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
               {snap.addCarry[i] !== '' && (
                 <div style={{ width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 700, color: '#B45309', background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  fontSize: 14, fontWeight: 700, color: T.amberInk, background: '#FEF9C3', border: `2px solid ${T.amber}`,
                   animation: snap.hiRow === 'sum' ? 'spotIn .35s ease-out both' : 'none' }}>{snap.addCarry[i]}</div>
               )}
             </div>
@@ -341,10 +338,10 @@ export function MultiColumnMath({ snap }) {
           return (
             <div key={i} style={{ position: 'relative' }}>
               {numCell(snap.row2[i], { hot: (snap.hiRow === 'row2' && snap.row2[i] !== '') || (isZero && snap.zeroHot),
-                color: isZero ? T.amber : T.iris, key: i })}
+                color: isZero ? T.amberInk : T.iris, key: i })}
               {isZero && snap.zeroHot && (
                 <span style={{ position: 'absolute', left: '50%', bottom: -16, transform: 'translateX(-50%)',
-                  fontSize: 10.5, fontWeight: 700, color: T.amber, whiteSpace: 'nowrap' }}>write it!</span>
+                  fontSize: 12, fontWeight: 700, color: T.amberInk, whiteSpace: 'nowrap' }}>write it!</span>
               )}
             </div>
           )

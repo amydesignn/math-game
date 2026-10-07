@@ -12,6 +12,9 @@ import { SettingsSheet, ProfilePopover } from './ui/Settings.jsx'
 import { GemIcon } from './ui/hudkit.jsx'
 import StationPopup from './ui/StationPopup.jsx'
 import MathPopup from './ui/MathPopup.jsx'
+import ProgressPopup from './ui/ProgressPopup.jsx'
+import Shop from './ui/Shop.jsx'
+import LevelBar, { LevelUpPopup } from './ui/LevelBar.jsx'
 import { SKINS } from './ui/skins.js'
 import { TOPICS, solve } from './math.js'
 import './index.css'
@@ -501,13 +504,19 @@ function StationAudit() {
 }
 /*
  * Dev-only audit harness for the sparkle popup: `/?a11y=math&topic=mult-2x1`
- * (topics: mult-2x1 · long-mult · add-2x2 · long-div). The real <MathPopup> in the
+ * (topics: mult-2x1 · long-mult · add-2x2 · long-div; optional `&sim=95x85`). The real <MathPopup> in the
  * Snack time skin it always wears in the game; answer on `window.__audit`.
  */
 function MathAudit() {
   const t = new URLSearchParams(window.location.search).get('topic')
   const topic = TOPICS[t] ? t : 'mult-2x1'
-  const [problem] = React.useState(() => TOPICS[topic].generate(1))
+  // `&sim=95x85` pins the worked example's similar problem, so the audit sees
+  // a fixed, worst-case walkthrough (carries, the longest step count).
+  const sim = new URLSearchParams(window.location.search).get('sim')?.split('x').map(Number)
+  const [problem] = React.useState(() => {
+    const p = TOPICS[topic].generate(1)
+    return sim?.length === 2 ? { ...p, similar: { a: sim[0], b: sim[1] } } : p
+  })
   window.__audit = {
     answers: [problem.op === '÷' ? { q: Math.floor(problem.a / problem.b), r: problem.a % problem.b } : solve(problem.op, problem.a, problem.b)],
   }
@@ -517,15 +526,60 @@ function MathAudit() {
     </div>
   )
 }
+/*
+ * Dev-only audit harnesses for the record book + the Gem Shop:
+ *   `/?a11y=progress[&empty]`  — Ivy-shaped record (78 points, 3 subjects) or the empty state
+ *   `/?a11y=shop&gems=4[&owned][&sparkle]` — gems decide what's affordable;
+ *     `owned` adds "Your things", `sparkle` an active trail.
+ */
+const AUDIT_Q = new URLSearchParams(window.location.search)
+function ProgressAudit() {
+  const tp = AUDIT_Q.has('empty') ? {} : {
+    'long-mult': { byLevel: { 1: { correct: 4 }, 2: { correct: 5 }, 3: { correct: 11 } } },
+    'mult-2x1': { byLevel: { 1: { correct: 7 } } },
+    'long-div': { byLevel: { 1: { correct: 3 } } },
+    'add-2x2': { byLevel: { 1: { correct: 8 } } },
+  }
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
+      <ProgressPopup totalPoints={AUDIT_Q.has('empty') ? 0 : 78} topicProgress={tp} onClose={() => {}} />
+    </div>
+  )
+}
+function ShopAudit() {
+  const owned = AUDIT_Q.has('owned') ? [
+    { id: 'o1', asset: 'tree', pack: 'forest', size: 1 },
+    { id: 'o2', asset: 'tent', pack: 'forest', size: 2 },
+  ] : []
+  return (
+    <div data-audit-root style={{ position: 'fixed', inset: 0, background: 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
+      <Shop gems={Number(AUDIT_Q.get('gems') ?? 4)} owned={owned}
+        activeSparkle={AUDIT_Q.has('sparkle') ? { colorId: 'pink' } : null}
+        onBuy={() => {}} onBuySparkle={() => {}} onPlaceOwned={() => {}} onClose={() => {}} />
+    </div>
+  )
+}
+/* `/?a11y=level[&card]` — the HUD level pill; `card` shows the congratulations card instead. */
+function LevelAudit() {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
+      {!AUDIT_Q.has('card') && <div style={{ position: 'absolute', top: 16, right: 16 }}><LevelBar points={78} gems={12} onLevelUp={() => {}} onOpen={() => {}} /></div>}
+      {AUDIT_Q.has('card') && <LevelUpPopup level={2} message="You climbed a whole level — every problem counted!" onClose={() => {}} />}
+    </div>
+  )
+}
 const MATH_AUDIT =
   import.meta.env.DEV && new URLSearchParams(window.location.search).get('a11y') === 'math'
+const PROGRESS_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'progress'
+const LEVEL_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'level'
+const SHOP_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'shop'
 const STATION_AUDIT =
   import.meta.env.DEV && new URLSearchParams(window.location.search).get('a11y') === 'station'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      {STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
+      {LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
     </Oops>
     {/* Cookieless, privacy-friendly traffic counting (no personal data, no
       * consent banner needed) — the whole point of moving to a real domain. */}

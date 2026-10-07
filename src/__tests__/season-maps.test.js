@@ -15,8 +15,12 @@ import { MAPS, _arcadeWithSeason, _arcadeBase, blockers } from '../maps'
 import { WORLD, CHARACTERS, PETS } from '../config'
 
 const d = (m, day) => new Date(2026, m - 1, day, 12)
-// mirrors world/fx.jsx's FX registry (Spooky + Market kinds)
-const FX = new Set(['pumpkin', 'grave', 'candle', 'torch', 'cauldron', 'awning', 'fountain', 'bunting', 'crate', 'planter'])
+// mirrors world/fx.jsx's FX registry (Spooky + Market + Outdoor kinds)
+const FX = new Set([
+  'pumpkin', 'grave', 'candle', 'torch', 'cauldron', 'awning', 'fountain', 'bunting', 'crate', 'planter',
+  'rosebush', 'shed', 'hedge', 'bench', 'pond', 'rosearch', 'teatable', 'wheelbarrow', 'toolrack', 'sack', 'stool',
+  'campfire', 'logseat', 'woodpile',
+])
 
 describe('season window', () => {
   it('is Halloween from Oct 1 through Nov 2, inclusive', () => {
@@ -179,3 +183,121 @@ describe('Merry Market', () => {
     expect(text).not.toMatch(/\b(Ivy|Amy|Finn|Oscar|Nathan|Mum)\b/)
   })
 })
+
+// ── Rosy Garden + Forest Clearing people (2026-10-06) ──
+// Ivy picked DENSE and asked for people; Amy asked for gardeners going in and
+// out of a shed for tools. These guard the same things the Market's do, plus
+// the new jobs: every route stop is reachable without walking through a solid
+// prop, the shed is the only thing anyone walks into, and every tool that
+// comes out of the shed goes back in.
+const segDist = ([ax, az], [bx, bz], [px, pz]) => {
+  const dx = bx - ax, dz = bz - az
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (pz - az) * dz) / (dx * dx + dz * dz || 1)))
+  return Math.hypot(ax + dx * t - px, az + dz * t - pz)
+}
+// how much room each solid thing needs (radius); plants, grass, dirt, the
+// trail and arrows are walk-through
+const R = {
+  tree: 0.6, 'tree-high': 0.6, column: 0.35, 'column-thin': 0.25, 'border-corner': 1.5,
+  stones: 0.75, tent: 1.2, flag: 0.3, fence: 0.45, 'building-structure': 1.3, ladder: 0.3, target: 0.6,
+  'rocks-high': 1.3, 'rocks-low': 0.9, 'weapon-bow': 0.3,
+  shed: 1.35, bench: 0.7, teatable: 0.45, stool: 0.25, planter: 0.55, wheelbarrow: 0.55, toolrack: 0.5,
+  sack: 0.3, rosebush: 0.4, campfire: 0.5, logseat: 0.65, woodpile: 0.45,
+}
+function solids(m) {
+  const out = []
+  for (const d of m.decor) {
+    const [x, , z] = d.position
+    const kind = d.fx || d.name
+    if (kind === 'hedge') {
+      const len = d.len || 2
+      for (let u = -len / 2; u <= len / 2 + 1e-6; u += 0.5) out.push([kind, x + Math.cos(d.rotation || 0) * u, z - Math.sin(d.rotation || 0) * u, 0.45])
+    } else if (kind === 'rosearch') {
+      // only its two posts are solid — the walk goes through it
+      for (const s of [-0.9, 0.9]) out.push(['arch post', x + Math.cos(d.rotation) * s, z - Math.sin(d.rotation) * s, 0.2])
+    } else if (kind === 'pond') {
+      out.push([kind, x, z, (d.r || 1.6) + 0.4])
+    } else if (R[kind] != null && d.position[1] === 0) {
+      out.push([kind, x, z, R[kind] * Math.max(1, (d.scale || 1) * 0.8)])
+    }
+  }
+  for (const n of m.neighbours) if (n.stroll === 0) out.push(['keeper', n.home[0], n.home[1], 0.55])
+  return out
+}
+
+for (const id of ['garden', 'clearing']) {
+  describe(`${id === 'garden' ? 'Rosy Garden' : 'Forest Clearing'} — people`, () => {
+    const m = MAPS[id]
+    const walkers = m.neighbours.filter((n) => n.route)
+
+    it('is dense — Ivy picked dense', () => {
+      expect(m.decor.length).toBeGreaterThan(100)
+    })
+
+    it('has people at work and people on the move', () => {
+      expect(m.neighbours.filter((n) => n.stroll === 0).length).toBeGreaterThanOrEqual(2)
+      expect(walkers.length).toBeGreaterThanOrEqual(2)
+      for (const n of m.neighbours) {
+        expect(CHARACTERS).toContain(n.character)
+        if (n.pet) expect(PETS).toContain(n.pet)
+        expect(n.lines.length).toBeGreaterThanOrEqual(2)
+        if (n.stroll === 0) expect(typeof n.facing).toBe('number')
+      }
+      expect(new Set(m.neighbours.map((n) => n.character)).size).toBe(m.neighbours.length) // no twins
+    })
+
+    it('keeps everyone in bounds, out of the gates and off the spawn', () => {
+      for (const n of m.neighbours) {
+        for (const [x, z] of n.route || [n.home]) {
+          expect(Math.abs(x)).toBeLessThan(WORLD.bounds - 1)
+          expect(Math.abs(z)).toBeLessThan(WORLD.bounds - 1)
+          for (const g of m.gates) expect(Math.hypot(x - g.position[0], z - g.position[2])).toBeGreaterThan(4)
+        }
+        if (n.home) expect(Math.hypot(n.home[0], n.home[1])).toBeGreaterThan(2.4)
+      }
+    })
+
+    it('never walks anyone through a solid prop or a keeper (only INTO the shed, by its door)', () => {
+      const solid = solids(m)
+      for (const n of walkers) {
+        n.route.forEach((a, i) => {
+          const b = n.route[(i + 1) % n.route.length]
+          const intoShed = a[3]?.inside || b[3]?.inside
+          for (const [kind, x, z, r] of solid) {
+            if (intoShed && kind === 'shed') continue
+            expect(segDist(a, b, [x, z]), `${n.character} walks through ${kind} at ${x.toFixed(1)},${z.toFixed(1)} (${a} → ${b})`).toBeGreaterThan(r)
+          }
+        })
+      }
+    })
+
+    it('goes into the shed only straight through its door', () => {
+      const sheds = m.decor.filter((d) => d.fx === 'shed')
+      for (const n of walkers) {
+        n.route.forEach((stop, i) => {
+          if (!stop[3]?.inside) return
+          const shed = sheds.find((s) => Math.hypot(stop[0] - s.position[0], stop[1] - s.position[2]) < 1)
+          expect(shed, `${n.character} goes inside where there is no shed`).toBeTruthy()
+          // the legs in and out run along the door's axis (+z), so nobody walks through a wall
+          for (const other of [n.route[(i - 1 + n.route.length) % n.route.length], n.route[(i + 1) % n.route.length]]) {
+            expect(Math.abs(other[0] - shed.position[0])).toBeLessThan(0.3)
+            expect(other[1]).toBeGreaterThan(shed.position[2] + 0.8)
+          }
+        })
+      }
+    })
+
+    it('puts every tool back — a walker ends each loop holding what they started with', () => {
+      for (const n of walkers) {
+        let hand = n.carry ?? null
+        for (const stop of n.route) if (stop[3] && 'take' in stop[3]) hand = stop[3].take
+        expect(hand, `${n.character} keeps the ${hand}`).toBe(n.carry ?? null)
+      }
+    })
+
+    it('keeps public-safe copy', () => {
+      const text = m.neighbours.flatMap((n) => n.lines).join(' ')
+      expect(text).not.toMatch(/\b(Ivy|Amy|Finn|Oscar|Nathan|Mum)\b/)
+    })
+  })
+}
