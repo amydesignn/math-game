@@ -381,8 +381,8 @@ describe('joinMeadow (transport + roster + sims composed)', () => {
 
 describe('meadow guardrails', () => {
   it('labels: the family mapping + the public-release seam', () => {
-    expect(labelFor('amyngo2k2@gmail.com')).toBe('Mum')
-    expect(labelFor('  AmyNgo2K2@gmail.com ')).toBe('Mum')
+    expect(labelFor('amyngo2k2@gmail.com')).toBe('Amy')
+    expect(labelFor('  AmyNgo2K2@gmail.com ')).toBe('Amy')
     expect(labelFor('ivydesign2026@gmail.com')).toBe('Ivy')
     expect(labelFor('someone@else.com')).toBe('Friend')
     expect(labelFor(null)).toBe('Friend')
