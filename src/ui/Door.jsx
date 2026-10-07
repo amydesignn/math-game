@@ -219,20 +219,20 @@ function QuestCard({ quest }) {
 }
 
 /* ── badge — Datum Badge (styling-v0.21), variant by MEANING: 'new' = fresh content
-   (the Beta amber, 6.84:1) · 'status' = about her ("Last played", 10.37:1). One per
+   (the Beta amber, 6.84:1) · 'status' = about her ("Last played", 10.37:1, live green dot). One per
    corner, two per card at most: status top-left, new top-right. Token names are
    Datum's, copied verbatim into index.css. ── */
 const badgeS = {
   base: { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1, 4px)', height: 20, padding: '0 var(--space-2, 8px)', borderRadius: 9999, borderWidth: 1, borderStyle: 'solid', fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' },
   new: { background: 'var(--color-component-badge-new-background)', borderColor: 'var(--color-component-badge-new-border)', color: 'var(--color-component-badge-new-text)' },
   status: { background: 'var(--color-component-badge-status-background)', borderColor: 'var(--color-component-badge-status-border)', color: 'var(--color-component-badge-status-text)' },
-  // 6px dot: Datum's size-1.5 (a documented 2px step) — decoration, the word carries the meaning
+  // 6px dot: Datum's size-1.5 (a documented 2px step) — green + a slow pulse (.badge-live) = live, "you're here"; the word still carries the meaning
   dot: { width: 6, height: 6, borderRadius: 9999, flex: 'none', background: 'var(--color-component-badge-status-dot)' },
 }
 function Badge({ variant, children, style }) {
   return (
     <span style={{ ...badgeS.base, ...badgeS[variant], ...style }}>
-      {variant === 'status' && <span aria-hidden="true" style={badgeS.dot} />}
+      {variant === 'status' && <span aria-hidden="true" className="badge-live" style={badgeS.dot} />}
       {children}
     </span>
   )

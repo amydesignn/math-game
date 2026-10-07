@@ -114,7 +114,7 @@
   --color-component-badge-new-text: #973C00; /* amber-800 */
   --color-component-badge-status-background: #FFFFFF; /* white */
   --color-component-badge-status-border: #E5E5E5; /* neutral-200 */
-  --color-component-badge-status-dot: #B29BEA; /* brand-lilac-400 */
+  --color-component-badge-status-dot: #00A63E; /* green-600 — live, pulses (Amy 2026-10-07) */
   --color-component-badge-status-text: #404040; /* neutral-700 */
 
   /* Datum TYPE tokens in use — size + line-height ride together (globals.css
@@ -132,6 +132,8 @@
   --font-weight-medium: 500;
   --font-weight-bold: 700;
   --tracking-widest: 0.1em;
+  /* Datum motion — easing copied verbatim (globals.css @theme) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
   /* house-only (not Datum) */
   --lilac-50: #f6f4fd;
@@ -239,6 +241,16 @@ canvas { touch-action: none; display: block; }
 .doorNew-slide:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: -2px; border-radius: 24px; } /* inset: the card clips overflow */
 .doorNew-arrow:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
 .doorNew-arrow:hover { background: #FFFFFF !important; }
+/* Last played — the live dot breathes: a soft ring grows out of it and fades,
+   once every 2s (0.5 Hz, far under WCAG 2.3.1's 3 flashes/s — a pulse, not a flash).
+   Infinite loop = exempt from the duration ladder. Reduced motion: the dot stays, still. */
+.badge-live { animation: badgeLive 2s var(--ease-out) infinite; }
+@keyframes badgeLive {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-component-badge-status-dot) 40%, transparent); }
+  to { box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-component-badge-status-dot) 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .badge-live { animation: none; } }
+
 @keyframes doorPop {
   0% { transform: scale(0.96) translateY(8px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
