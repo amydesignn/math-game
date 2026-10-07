@@ -108,14 +108,14 @@
   --color-status-warning-text: #973C00; /* amber-800 */
   --color-status-success-background: #F0FDF4; /* green-50 */
   --color-status-success-text: #016630; /* green-800 */
-  /* Datum Badge (styling-v0.21, verbatim) — the Door's New + Last played */
+  /* Datum Badge + Status indicator (styling-v0.21, verbatim) — the Door's New + Last played */
   --color-component-badge-new-background: #FFFBEB; /* amber-50 */
   --color-component-badge-new-border: #FEE685; /* amber-200 */
   --color-component-badge-new-text: #973C00; /* amber-800 */
-  --color-component-badge-status-background: #FFFFFF; /* white */
-  --color-component-badge-status-border: #E5E5E5; /* neutral-200 */
-  --color-component-badge-status-dot: #00A63E; /* green-600 — live, pulses (Amy 2026-10-07) */
-  --color-component-badge-status-text: #404040; /* neutral-700 */
+  --color-component-status-indicator-background: #FFFFFF; /* white */
+  --color-component-status-indicator-border: #E5E5E5; /* neutral-200 */
+  --color-component-status-indicator-live-dot: #00A63E; /* green-600 */
+  --color-component-status-indicator-text: #404040; /* neutral-700 */
 
   /* Datum TYPE tokens in use — size + line-height ride together (globals.css
      overrides Tailwind's line-heights to 1.5 up to xl). Weights 400/500/700 only. */
@@ -241,15 +241,16 @@ canvas { touch-action: none; display: block; }
 .doorNew-slide:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: -2px; border-radius: 24px; } /* inset: the card clips overflow */
 .doorNew-arrow:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
 .doorNew-arrow:hover { background: #FFFFFF !important; }
-/* Last played — the live dot breathes: a soft ring grows out of it and fades,
-   once every 2s (0.5 Hz, far under WCAG 2.3.1's 3 flashes/s — a pulse, not a flash).
-   Infinite loop = exempt from the duration ladder. Reduced motion: the dot stays, still. */
-.badge-live { animation: badgeLive 2s var(--ease-out) infinite; }
-@keyframes badgeLive {
-  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-component-badge-status-dot) 40%, transparent); }
-  to { box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-component-badge-status-dot) 0%, transparent); }
+/* Datum motion-pulse (styling-v0.21, datum-motion.css): a live dot breathes — a soft
+   ring grows out and fades every 2s (0.5 Hz, far under WCAG 2.3.1's 3 flashes/s).
+   A loop, outside the duration ladder. The ring takes the dot's colour (currentColor).
+   Reduced motion: the dot stays, still. */
+.motion-pulse { animation: datum-pulse 2s var(--ease-out) infinite; }
+@keyframes datum-pulse {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 40%, transparent); }
+  to { box-shadow: 0 0 0 6px color-mix(in srgb, currentColor 0%, transparent); }
 }
-@media (prefers-reduced-motion: reduce) { .badge-live { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .motion-pulse { animation: none; } }
 
 @keyframes doorPop {
   0% { transform: scale(0.96) translateY(8px); opacity: 0; }

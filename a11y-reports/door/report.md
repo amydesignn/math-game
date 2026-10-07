@@ -1,6 +1,6 @@
 # Contrast audit — Door
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-07 18:33 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-07 18:45 UTC  
 **Variants:** Returning player · **Phases:** idle
 
 > **31 unique checks · 31 pass · 0 fail · 0 exempt (disabled) · 0 need review**
@@ -32,7 +32,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Spooky Arcade for Halloween | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
 | Today’s Quest | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
 | · Refreshes in 3h | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
-| Visit Spooky Arcade to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
+| Visit Sunny Town to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
 | +1 | `#8A5300` on `#FFEFCF` | 14px bold | 5.57:1 | 4.50:1 | ✅ | idle |
 | Forest Clearing | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Where every journey begins | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |

@@ -218,21 +218,26 @@ function QuestCard({ quest }) {
   )
 }
 
-/* ── badge — Datum Badge (styling-v0.21), variant by MEANING: 'new' = fresh content
-   (the Beta amber, 6.84:1) · 'status' = about her ("Last played", 10.37:1, live green dot). One per
-   corner, two per card at most: status top-left, new top-right. Token names are
-   Datum's, copied verbatim into index.css. ── */
+/* ── badge + status indicator — Datum styling-v0.21. Two components, two jobs:
+   Badge 'new' = a fact about the CONTENT (the Beta amber, 6.84:1, top-right).
+   Status indicator = a live state about HER ("Last played", 10.37:1, top-left):
+   a green dot that breathes (motion-pulse). Token names copied verbatim into index.css. ── */
+const pill = { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1, 4px)', height: 20, padding: '0 var(--space-2, 8px)', borderRadius: 9999, borderWidth: 1, borderStyle: 'solid', fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' }
 const badgeS = {
-  base: { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1, 4px)', height: 20, padding: '0 var(--space-2, 8px)', borderRadius: 9999, borderWidth: 1, borderStyle: 'solid', fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' },
   new: { background: 'var(--color-component-badge-new-background)', borderColor: 'var(--color-component-badge-new-border)', color: 'var(--color-component-badge-new-text)' },
-  status: { background: 'var(--color-component-badge-status-background)', borderColor: 'var(--color-component-badge-status-border)', color: 'var(--color-component-badge-status-text)' },
-  // 6px dot: Datum's size-1.5 (a documented 2px step) — green + a slow pulse (.badge-live) = live, "you're here"; the word still carries the meaning
-  dot: { width: 6, height: 6, borderRadius: 9999, flex: 'none', background: 'var(--color-component-badge-status-dot)' },
 }
 function Badge({ variant, children, style }) {
+  return <span style={{ ...pill, ...badgeS[variant], ...style }}>{children}</span>
+}
+const indicatorS = {
+  live: { background: 'var(--color-component-status-indicator-background)', borderColor: 'var(--color-component-status-indicator-border)', color: 'var(--color-component-status-indicator-text)' },
+  // 6px dot: Datum's size-1.5 (a documented 2px step); colour on `color` so the pulse ring matches (bg = currentColor)
+  dot: { width: 6, height: 6, borderRadius: 9999, flex: 'none', color: 'var(--color-component-status-indicator-live-dot)', background: 'currentColor' },
+}
+function StatusIndicator({ children, style }) {
   return (
-    <span style={{ ...badgeS.base, ...badgeS[variant], ...style }}>
-      {variant === 'status' && <span aria-hidden="true" className="badge-live" style={badgeS.dot} />}
+    <span style={{ ...pill, ...indicatorS.live, ...style }}>
+      <span aria-hidden="true" className="motion-pulse" style={indicatorS.dot} />
       {children}
     </span>
   )
@@ -320,7 +325,7 @@ function WorldCard({ world, current, locked, together, onPlay, onResume }) {
     <div style={cardS.card}>
       <div style={cardS.thumb}>
         {WORLD_NEW[world.id] && !locked && <Badge variant="new" style={{ ...corner, right: 'var(--space-3, 12px)' }}>New</Badge>}
-        {current && !locked && <Badge variant="status" style={{ ...corner, left: 'var(--space-3, 12px)' }}>Last played</Badge>}
+        {current && !locked && <StatusIndicator style={{ ...corner, left: 'var(--space-3, 12px)' }}>Last played</StatusIndicator>}
         <div style={worldThumb(world.tint)}>
           {world.art && <img src={world.art} alt="" style={cardS.thumbImg} loading="lazy" />}
         </div>

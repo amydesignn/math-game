@@ -2,7 +2,7 @@
   "component": "Door",
   "file": "src/ui/Door.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-07T18:33:06.771Z",
+  "ranAt": "2026-10-07T18:45:02.028Z",
   "variants": [
     "Returning player"
   ],
@@ -184,7 +184,7 @@
       "variant": "Returning player",
       "phase": "idle",
       "state": "default",
-      "label": "Visit Spooky Arcade to earn gems",
+      "label": "Visit Sunny Town to earn gems",
       "target": ".doorLeft > div:nth-child(4) > div > div:nth-child(2)",
       "fg": "#6E4E15",
       "bg": "#FFF7EA",
