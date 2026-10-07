@@ -321,6 +321,13 @@ the Market". Amy: a garden SHED with people going in and out for tools.
 - Verified headless (playwright-core + system Chrome, swiftshader;
   `__overview(h, tilt, cx, cz)` low angles): sitters on stools/logs/bench,
   gardener out of the shed with the can, campfire, archer's bow.
+- **Door cards retaken** (`public/worlds/{garden,clearing}.jpg`, 900×494): HUD-
+  free canvas grab mid-hello (tea party / campers). Recipe: playwright seeds the
+  save with `addInitScript` BEFORE boot (seeding after a first load races the
+  app's own save → no Resume button), clicks Resume, `__overview(h,tilt,cx,cz)`,
+  hides all DOM except `.nbBubble` + the world canvas (the minimap is a canvas
+  too), `__walk` up to a neighbour, shoots when `.nbBubble` appears,
+  `sips -Z 900 -s formatOptions 82`.
 
 ## Long-mult walkthrough fix ✅ SHIPPED 2026-09-27 — shaped example + every carry + a real ending
 From Amy's Luxi Math video recording + Finn's review (32 × 31, answered 895). Commit `a088dfb`.
