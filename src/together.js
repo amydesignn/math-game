@@ -46,7 +46,7 @@ export const EMOTES = [
 /* The family mapping — the one place an email becomes a name. Public-release
  * seam: any other account simply reads "Friend". */
 const LABELS = {
-  'amyngo2k2@gmail.com': 'Mum',
+  'amyngo2k2@gmail.com': 'Amy',
   'ivydesign2026@gmail.com': 'Ivy',
 }
 export function labelFor(email) {
