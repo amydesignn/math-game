@@ -73,17 +73,21 @@ const MEADOW = { id: 'meadow', name: 'The Meadow', blurb: 'Play together', tint:
 
 /* ── What's new — THE place the Door announces game news (Amy 2026-10-06):
    new maps, seasonal events, updates. Newest first; one entry = one slide.
-   `world` makes the slide a door into that world AND puts the same tag on its
+   `world` makes the slide a door into that world AND puts the same New badge on its
    world card below, so the carousel and the grid can never disagree.
-   Two tags only: 'Just in' = the freshest / seasonal drop (solid), 'New' = new
-   this season (soft). Remove an entry to retire its slide + card tag. */
+   One freshness word only — 'New' ('Just in' retired, Amy 2026-10-07) — and it
+   expires (addedAt, below). Remove an entry to retire its slide. */
 const UPDATES = [
-  { world: 'arcade', tag: 'Just in', title: 'Halloween in Spooky Arcade', line: 'Pumpkins, ghosts & glowing lights' },
-  { world: 'town', tag: 'New', title: 'Sunny Town', line: 'A brand-new map to explore' },
-  { world: 'market', tag: 'New', title: 'Merry Market', line: 'A brand-new map to explore' },
-  { world: 'clearing', tag: 'New', title: 'Forest Clearing', line: 'A brand-new map to explore' },
+  { world: 'arcade', title: 'Spooky Arcade for Halloween', addedAt: '2026-10-06' },
+  { world: 'town', title: 'Sunny Town', addedAt: '2026-10-06' },
+  { world: 'market', title: 'Merry Market', addedAt: '2026-10-06' },
+  { world: 'clearing', title: 'Forest Clearing', addedAt: '2026-10-05' },
 ]
-const WORLD_TAG = Object.fromEntries(UPDATES.filter((u) => u.world).map((u) => [u.world, u.tag]))
+/* New is earned and ends (Datum Badge contract): an entry shows the New badge — on its
+   slide AND its world card — for NEW_FOR_DAYS after addedAt, then drops on its own. */
+const NEW_FOR_DAYS = 14
+const isFresh = (u, now = Date.now()) => now - new Date(u.addedAt + 'T00:00:00').getTime() < NEW_FOR_DAYS * 864e5
+const WORLD_NEW = Object.fromEntries(UPDATES.filter((u) => u.world && isFresh(u)).map((u) => [u.world, true]))
 
 /* ── icons (crafted, not emoji) ── */
 /* GemIcon + ProfileChip now live in hudkit.jsx (shared with the in-world HUD). */
@@ -214,11 +218,26 @@ function QuestCard({ quest }) {
   )
 }
 
-/* ── tag — 'Just in' solid Iris 500 (white 600 = 4.56:1), 'New' Lilac 100 + Iris 700 (7.4:1) ── */
-function Tag({ children, style }) {
-  const hot = children === 'Just in'
-  return <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 600, lineHeight: 1.5, padding: '0 8px', borderRadius: 999, background: hot ? V.btn : V.soft, color: hot ? '#FFFFFF' : 'var(--brand-iris-700)', ...style }}>{children}</span>
+/* ── badge — Datum Badge (styling-v0.21), variant by MEANING: 'new' = fresh content
+   (the Beta amber, 6.84:1) · 'status' = about her ("Last played", 10.37:1). One per
+   corner, two per card at most: status top-left, new top-right. Token names are
+   Datum's, copied verbatim into index.css. ── */
+const badgeS = {
+  base: { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1, 4px)', height: 20, padding: '0 var(--space-2, 8px)', borderRadius: 9999, borderWidth: 1, borderStyle: 'solid', fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' },
+  new: { background: 'var(--color-component-badge-new-background)', borderColor: 'var(--color-component-badge-new-border)', color: 'var(--color-component-badge-new-text)' },
+  status: { background: 'var(--color-component-badge-status-background)', borderColor: 'var(--color-component-badge-status-border)', color: 'var(--color-component-badge-status-text)' },
+  // 6px dot: Datum's size-1.5 (a documented 2px step) — decoration, the word carries the meaning
+  dot: { width: 6, height: 6, borderRadius: 9999, flex: 'none', background: 'var(--color-component-badge-status-dot)' },
 }
+function Badge({ variant, children, style }) {
+  return (
+    <span style={{ ...badgeS.base, ...badgeS[variant], ...style }}>
+      {variant === 'status' && <span aria-hidden="true" style={badgeS.dot} />}
+      {children}
+    </span>
+  )
+}
+const corner = { position: 'absolute', top: 'var(--space-3, 12px)', zIndex: 2 }
 
 /* ── what's new — a full-bleed manual carousel (Amy 2026-10-06): the image fills
    the card, "What's new" + the tag ride on it as pills, one arrow each side, no
@@ -230,11 +249,10 @@ const newS = {
   slide: { flex: '0 0 100%', scrollSnapAlign: 'start', display: 'flex', flexDirection: 'column', border: 'none', background: T.surface, padding: 0, textAlign: 'left', cursor: 'pointer', font: 'inherit', minWidth: 0 },
   media: { position: 'relative', display: 'block', width: '100%', height: 148, overflow: 'hidden' },
   img: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' },
-  pill: { position: 'absolute', top: 12 }, // 'What's new' top-left · the tag top-right (Amy) — same corner as the world cards' tag
-  label: { display: 'inline-flex', alignItems: 'center', fontSize: 12, fontWeight: 600, lineHeight: 1.5, padding: '0 8px', borderRadius: 999, background: 'rgba(255,255,255,.94)', color: T.textPrimary, boxShadow: '0 2px 8px rgba(74,54,110,.14)' },
   text: { display: 'flex', flexDirection: 'column', gap: 2, padding: '12px 16px 16px' },
-  sTitle: { fontSize: BODY, fontWeight: 600, color: T.textPrimary, lineHeight: 1.4 },
-  sLine: { fontSize: BODY, fontWeight: 400, color: T.textSecondary, lineHeight: 1.4 },
+  // two lines only (Amy 2026-10-07): the heading, then the update on ONE line
+  sTitle: { fontSize: 'var(--text-sm)', lineHeight: 'var(--text-sm--line-height)', fontWeight: 'var(--font-weight-medium)', color: T.textPrimary },
+  sLine: { fontSize: 'var(--text-sm)', lineHeight: 'var(--text-sm--line-height)', fontWeight: 'var(--font-weight-normal)', color: T.textSecondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   // arrows sit on the image's vertical centre (148 / 2 − 16), outside the track so they don't scroll
   arrow: { position: 'absolute', top: 58, zIndex: 2, width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,.94)', color: 'var(--brand-iris-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0, boxShadow: '0 2px 8px rgba(74,54,110,.18)' },
 }
@@ -259,15 +277,14 @@ function WhatsNew({ map, onPlay, onResume }) {
           const w = WORLDS.find((x) => x.id === u.world)
           const open = () => (u.world === map ? onResume?.() : onPlay?.(u.world))
           return (
-            <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`What's new, ${k + 1} of ${n}: ${u.tag}, ${u.title}. ${u.line}`} tabIndex={k === i ? 0 : -1}>
+            <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`What's new, ${k + 1} of ${n}: ${isFresh(u) ? 'New, ' : ''}${u.title}`} tabIndex={k === i ? 0 : -1}>
               <span style={{ ...newS.media, ...(w ? worldThumb(w.tint) : null), position: 'relative' }}>
                 {w?.art && <img src={w.art} alt="" style={newS.img} loading="lazy" />}
-                <span style={{ ...newS.pill, left: 12, ...newS.label }}>What’s new</span>
-                <Tag style={{ ...newS.pill, right: 12, boxShadow: '0 2px 8px rgba(74,54,110,.14)' }}>{u.tag}</Tag>
+                {isFresh(u) && <Badge variant="new" style={{ ...corner, right: 'var(--space-3, 12px)' }}>New</Badge>}
               </span>
               <span style={newS.text}>
-                <span style={newS.sTitle}>{u.title}</span>
-                <span style={newS.sLine}>{u.line}</span>
+                <span style={newS.sTitle}>What’s new</span>
+                <span style={newS.sLine}>{u.title}</span>
               </span>
             </button>
           )
@@ -286,7 +303,6 @@ const cardS = {
   card: { position: 'relative', background: T.surface, borderRadius: 22, boxShadow: '0 2px 14px rgba(74,54,110,.07)', overflow: 'hidden', display: 'flex', flexDirection: 'column', animation: 'doorPop .4s ease-out both' },
   thumb: { position: 'relative', width: '100%', height: 128 },
   thumbImg: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 60%' },
-  chip: { position: 'absolute', left: 10, top: 10, zIndex: 2, display: 'inline-flex', alignItems: 'center', gap: 5, background: 'rgba(255,255,255,.94)', color: 'var(--color-text-brand)', fontSize: 11, fontWeight: 600, padding: '5px 10px', borderRadius: 999, boxShadow: '0 2px 8px rgba(74,54,110,.14)' },
   soonScrim: { position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(160deg, rgba(238,233,251,.94), rgba(228,220,247,.96))', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 9 },
   soonBadge: { width: 56, height: 56, borderRadius: '50%', background: 'rgba(255,255,255,.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 6px 18px rgba(124,108,232,.22)' },
   soonWord: { fontSize: 13, fontWeight: 700, color: 'var(--color-text-brand)', letterSpacing: '.01em' },
@@ -303,8 +319,8 @@ function WorldCard({ world, current, locked, together, onPlay, onResume }) {
   return (
     <div style={cardS.card}>
       <div style={cardS.thumb}>
-        {WORLD_TAG[world.id] && !locked && <Tag style={{ position: 'absolute', right: 10, top: 10, zIndex: 2, boxShadow: '0 2px 8px rgba(74,54,110,.14)' }}>{WORLD_TAG[world.id]}</Tag>}
-        {current && !locked && <span style={cardS.chip}><span style={{ width: 7, height: 7, borderRadius: '50%', background: V.main }}></span>Last played</span>}
+        {WORLD_NEW[world.id] && !locked && <Badge variant="new" style={{ ...corner, right: 'var(--space-3, 12px)' }}>New</Badge>}
+        {current && !locked && <Badge variant="status" style={{ ...corner, left: 'var(--space-3, 12px)' }}>Last played</Badge>}
         <div style={worldThumb(world.tint)}>
           {world.art && <img src={world.art} alt="" style={cardS.thumbImg} loading="lazy" />}
         </div>

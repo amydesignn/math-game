@@ -108,6 +108,14 @@
   --color-status-warning-text: #973C00; /* amber-800 */
   --color-status-success-background: #F0FDF4; /* green-50 */
   --color-status-success-text: #016630; /* green-800 */
+  /* Datum Badge (styling-v0.21, verbatim) — the Door's New + Last played */
+  --color-component-badge-new-background: #FFFBEB; /* amber-50 */
+  --color-component-badge-new-border: #FEE685; /* amber-200 */
+  --color-component-badge-new-text: #973C00; /* amber-800 */
+  --color-component-badge-status-background: #FFFFFF; /* white */
+  --color-component-badge-status-border: #E5E5E5; /* neutral-200 */
+  --color-component-badge-status-dot: #B29BEA; /* brand-lilac-400 */
+  --color-component-badge-status-text: #404040; /* neutral-700 */
 
   /* Datum TYPE tokens in use — size + line-height ride together (globals.css
      overrides Tailwind's line-heights to 1.5 up to xl). Weights 400/500/700 only. */
