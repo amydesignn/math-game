@@ -17,6 +17,7 @@ import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
 import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
+import * as metrics from './metrics'
 import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
@@ -90,6 +91,11 @@ export default function App({ cloud = false, justSignedIn = false }) {
     player: cloud ? 'account' : 'guest',
     appVersion: typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev',
   })
+  // Play metrics (metrics.js): coarse, anonymous session counts — never an id.
+  useEffect(() => {
+    metrics.startMetrics({ player: cloud ? 'account' : 'guest', appVersion: typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev' })
+  }, [cloud])
+
   const onFeedbackSubmit = (payload) => {
     const row = buildFeedbackRow(payload, feedbackCtx())
     if (!row) return Promise.resolve() // no rating — the button was disabled anyway
@@ -208,6 +214,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   }
 
   function onStationResult(problem, correct) {
+    metrics.answered(correct)
     recordAnswer(problem.type, problem.level, correct, TOPICS[problem.type].topLevel)
     if (correct) maybeLevelUp(problem.type)
   }
@@ -219,6 +226,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
     setFocusMode(false)
     if (!mid) return
     if (completed) {
+      metrics.questDone()
       completeStation(mid) // done for the day — won't reappear
       setFarewellMap(mid) // the world plays the sparkle-white dissolve at its spot
       clearTimeout(farewellTimer.current)
@@ -645,6 +653,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
       setPos(at[0], at[1]) // …and where Resume will drop her
       markPlayed()
       setPlayed(true)
+      metrics.enteredWorld(toId)
       setView('world')
       setToast(MAPS[toId].name)
       clearTimeout(toastTimer.current)
@@ -675,6 +684,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
     if (travelling.current) return
     travelling.current = true
     if (mapId !== 'meadow') setPos(charPosRef.current.x, charPosRef.current.z)
+    metrics.leftWorld()
     setFading(true)
     setTimeout(() => {
       setView('door')
@@ -711,6 +721,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
       setSpawn(at)
       setMapId(toId)
       setMap(toId) // persist — she resumes in the map she left
+      metrics.travelled(toId)
       setPos(at[0], at[1]) // and where Resume drops her if she closes here
       setToast(MAPS[toId].name)
       clearTimeout(toastTimer.current)
@@ -981,6 +992,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
           onAward={onMathAward}
           onPetReact={onPetReact}
           onResult={(correct) => {
+            metrics.answered(correct)
             const p = math.problem
             // Guard an unregistered topic — a division problem before Track 2
             // adds 'long-div' to TOPICS — so a wrong ÷ answer still recovers.

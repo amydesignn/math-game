@@ -282,6 +282,28 @@ The last of Amy's three map redos. Dense (Ivy's taste), alive (people).
   market prop. `season-maps.test.js` → 211 green; oxlint + build clean.
 - New Door card `public/worlds/market.jpg`.
 
+## Play metrics — anonymous session counts (2026-10-07, branch `feat/play-metrics`)
+Amy wants to watch engagement + session time before marketing; Vercel page views
+can't say (one-page app = "it loaded"). **`src/metrics.js`** tallies ONE session
+on the device and sends coarse rows to **`public.play_events`** (Supabase,
+migration `play_events_anonymous_metrics`): `session_start` (`came_back` bucket:
+new | same-day | 1 | 2-7 | 8+), `world_enter` (world), `session_end` (minutes in
+a world capped 240, problems, solved, maps, quests). `player` = guest|account
+WORD so family accounts can be filtered out.
+- **ZERO PII by schema** — no uid/name/email/device id; nothing links sessions.
+  The last-played DAY stays in localStorage (`luxi.lastPlayDay`), only the
+  bucket is sent. Check constraints bound every value. **RLS INSERT-only** for
+  anon + authenticated, no read policy (verified as anon: insert ok, read = 0).
+  `public/privacy.html` now describes it ("Anonymous play counts").
+- Transport = the feedback.js pattern (raw PostgREST `fetch(keepalive)`, no
+  supabase-js). Off in dev unless `?metrics`. Column is `came_back`, NOT
+  `returning` (reserved word in Postgres — the first migration failed on it).
+- Hooks in App: boot `startMetrics`, `enterWorld`→`enteredWorld`, `goToDoor`→
+  `leftWorld`, `travel`→`travelled`, both onResult paths→`answered`, quest
+  complete→`questDone`. Hide/show starts a fresh tally (resumes world time).
+- Tests `metrics.test.js` (+5) incl. a **field whitelist** — adding any field
+  fails there first. Read the numbers via the Supabase MCP (`play_events`).
+
 ## People in the Rosy Garden + Forest Clearing 🌹🏕️ (2026-10-06, branch `feat/world-people`)
 Ivy's verdict on the dense/light A/B: **dense**, and "people there too, like
 the Market". Amy: a garden SHED with people going in and out for tools.
