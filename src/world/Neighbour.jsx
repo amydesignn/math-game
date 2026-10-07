@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, createPortal } from '@react-three/fiber'
 import { useGLTF, useAnimations, Html } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
 import * as THREE from 'three'
 import { modelUrl, WORLD } from '../config'
 import BlobShadow from './BlobShadow'
 import Pet from './Pet'
+import { CARRY } from './Outdoor'
 
 /*
  * Neighbour — a friendly face who lives in a map (Sunny Town first; Ivy asked
@@ -27,6 +28,21 @@ import Pet from './Pet'
  *    order, looping); a stop with a yaw is a stall (face it, browse with
  *    `interact-right`), one without is a corner they just walk round.
  *
+ * Garden + camp jobs (Rosy Garden / Forest Clearing, 2026-10-06 — Amy: "people
+ * getting in and out of the shed to take tools, working on their garden"):
+ *  · a route stop can carry a 4th element, `{ do, ms, wait, inside, take }`:
+ *    `do` = the animation while working there (default `interact-right`) for
+ *    `ms`; `wait` = how long the stop lasts; `inside` = they're in a building
+ *    (hidden, no greeting) for the stop; `take` = what they hold in their right
+ *    hand AFTER the stop (a CARRY kind from Outdoor.jsx, or null to put it
+ *    back) — so a shed stop with `inside` + `take: 'can'` reads as "went in,
+ *    came out with the watering can".
+ *  · `pose` (e.g. 'sit', 'holding-both-shoot') = a keeper's resting animation;
+ *    `seat` lifts a sitter onto a log / bench; `carry` = what they hold from
+ *    the start (the archer's bow).
+ *  · if she says hello mid-walk, a route walker finishes that leg after —
+ *    they never skip a stop, so a tool always goes back to the shed.
+ *
  * Copy is PUBLIC-SAFE (guests play this): no player names, no family names.
  * Neighbours never touch the store — they're scenery with a heartbeat.
  */
@@ -36,7 +52,7 @@ const LEAVE_R = 5
 const SPEED = 1.3 // an amble — slower than her 3.2 walk
 const BUBBLE_MS = 3600
 
-export default function Neighbour({ character, pet, home: homeProp, lines, stroll = 2.2, facing, route, charPosRef }) {
+export default function Neighbour({ character, pet, home: homeProp, lines, stroll = 2.2, facing, route, pose, seat = 0, carry: carryProp = null, charPosRef }) {
   const home = homeProp || route[0]
   const group = useRef()
   const { scene, animations } = useGLTF(modelUrl('characters', character))
@@ -48,6 +64,11 @@ export default function Neighbour({ character, pet, home: homeProp, lines, strol
   const faceYaw = useRef(facing) // where to look while idle (a keeper's counter, a stall she's browsing)
   const routeIx = useRef(0)
   const browseUntil = useRef(0)
+  const stop = useRef(null) // the route stop's options while they're at it
+  const hidden = useRef(false) // inside a building
+  const [carry, setCarry] = useState(carryProp)
+  const hand = useMemo(() => model.getObjectByName('arm-right'), [model])
+  const Tool = carry && CARRY[carry]
 
   const target = useRef(null) // stroll destination, or null while idling
   const restUntil = useRef(performance.now() + 1500 + Math.random() * 4000)
@@ -89,19 +110,22 @@ export default function Neighbour({ character, pet, home: homeProp, lines, strol
     const now = performance.now()
     const p = charPosRef?.current
     const dist = p ? Math.hypot(p.x - g.position.x, p.z - g.position.z) : Infinity
+    // resting look: a keeper's pose, else holding their tool, else plain idle
+    const rest = pose || (carry ? 'holding-right' : 'idle')
 
     if (dist > LEAVE_R) greeted.current = false
 
-    if (dist < GREET_R) {
-      // she's here: stop, look at her, say hello once per visit
-      target.current = null
-      restUntil.current = now + 2500
+    if (dist < GREET_R && !hidden.current) {
+      // she's here: stop, look at her, say hello once per visit. A route
+      // walker keeps its target and finishes that leg once she moves on.
+      if (!route) target.current = null
+      restUntil.current = Math.max(restUntil.current, now + 2500)
       g.rotation.y = dampAngle(g.rotation.y, Math.atan2(p.x - g.position.x, p.z - g.position.z), 6, dt)
       if (!greeted.current) {
         greeted.current = true
         greet()
       }
-      play(now < cheerUntil.current ? 'emote-yes' : 'idle')
+      play(now < cheerUntil.current ? 'emote-yes' : rest)
     } else if (target.current) {
       const dx = target.current[0] - g.position.x
       const dz = target.current[1] - g.position.z
@@ -113,28 +137,45 @@ export default function Neighbour({ character, pet, home: homeProp, lines, strol
         g.rotation.y = dampAngle(g.rotation.y, Math.atan2(dx, dz), 8, dt)
         play('walk')
       } else {
-        if (route && target.current[2] == null) {
+        const [, , yaw, opts] = target.current
+        if (route && yaw == null && !opts) {
           // a corner on the way — keep walking
           faceYaw.current = undefined
           restUntil.current = now + 150
         } else if (route) {
-          // arrived at a stall: face it and browse a moment
-          faceYaw.current = target.current[2]
-          browseUntil.current = now + 1400
-          restUntil.current = now + 2500 + Math.random() * 3000
+          // arrived at a stop: face it and work / browse a moment
+          stop.current = opts || {}
+          faceYaw.current = yaw ?? undefined
+          browseUntil.current = now + (opts?.ms ?? 1400)
+          restUntil.current = now + (opts?.wait ?? 2500 + Math.random() * 3000)
+          if (opts?.inside) {
+            hidden.current = true
+            g.visible = false
+          }
         } else {
           faceYaw.current = facing
           restUntil.current = now + 3500 + Math.random() * 6000
         }
         target.current = null
-        play('idle')
+        play(rest)
       }
     } else {
-      play(now < cheerUntil.current ? 'emote-yes' : now < browseUntil.current ? 'interact-right' : 'idle')
+      const doing = stop.current?.do || 'interact-right'
+      play(now < cheerUntil.current ? 'emote-yes' : now < browseUntil.current ? doing : rest)
       if (faceYaw.current != null) g.rotation.y = dampAngle(g.rotation.y, faceYaw.current, 4, dt)
       if (now <= restUntil.current) {
-        // resting
+        // resting / working
       } else if (route) {
+        const s = stop.current
+        if (s) {
+          // leaving the stop: step back out of the shed, swap what's in hand
+          if (s.inside) {
+            hidden.current = false
+            g.visible = true
+          }
+          if ('take' in s) setCarry(s.take)
+          stop.current = null
+        }
         routeIx.current = (routeIx.current + 1) % route.length
         target.current = route[routeIx.current]
       } else if (stroll > 0) {
@@ -151,10 +192,13 @@ export default function Neighbour({ character, pet, home: homeProp, lines, strol
 
   return (
     <>
-      <group ref={group} position={[home[0], 0, home[1]]} rotation={[0, startYaw, 0]}>
+      <group ref={group} position={[home[0], seat, home[1]]} rotation={[0, startYaw, 0]}>
         <BlobShadow radius={0.55} />
         <group scale={WORLD.characterScale}>
           <primitive object={model} />
+          {/* tools are drawn hand-sized, then scaled up so they read from the follow-cam;
+              a `body` tool (the bow) is held in front of the chest instead */}
+          {Tool && (Tool.body ? <Tool /> : hand && createPortal(<group scale={1.7}><Tool /></group>, hand))}
         </group>
         {say && (
           <Html center position={[0, 2.1, 0]} style={{ pointerEvents: 'none', userSelect: 'none' }} zIndexRange={[0, 0]}>

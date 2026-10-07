@@ -282,6 +282,53 @@ The last of Amy's three map redos. Dense (Ivy's taste), alive (people).
   market prop. `season-maps.test.js` → 211 green; oxlint + build clean.
 - New Door card `public/worlds/market.jpg`.
 
+## People in the Rosy Garden + Forest Clearing 🌹🏕️ (2026-10-06, branch `feat/world-people`)
+Ivy's verdict on the dense/light A/B: **dense**, and "people there too, like
+the Market". Amy: a garden SHED with people going in and out for tools.
+- **Rosy Garden → dense + working:** shed corner NE (shed door +z, tool rack,
+  wheelbarrow, sacks, a veg patch), lily pond + bench SW, hedges, two rose
+  arches over the walk, rose bushes in every bed and along the walk, a tea
+  party in the gazebo (table + stools), outer tree line. 6 people: 2 tea
+  drinkers + a pond-bench sitter (`pose: 'sit'`), gardener #1 (shed → can →
+  veg patch + north beds → can back), gardener #2 (shed → spade → weeds south
+  beds → swaps for a basket → flowers to the tea table → basket back), a dog
+  walker on the walk.
+- **Forest Clearing:** a real campfire (flickering cones in its OWN stone ring —
+  Kenney `stones` is a rock PILE; the old "fire ring" buried the fire) with
+  two campers sitting on logs, woodpiles, the static `character-archer` model
+  replaced by a live archer (bow pose), a lookout keeper, a hiker + dog on the
+  trail (stops at the fire), a forager with a basket in the grove.
+- **Procedural kinds, `src/world/Outdoor.jsx`** (`OUTDOOR_FX` in fx.jsx):
+  shed, hedge, bench, pond, rosearch, rosebush, teatable, stool, wheelbarrow,
+  toolrack, sack, campfire, logseat, woodpile. `CARRY` = things held: can,
+  rake, spade, basket, bow.
+- **Neighbour.jsx grew jobs:** a route stop's 4th element `{ do, ms, wait,
+  inside, take }` (`inside` hides them in a building; `take` swaps what's in
+  the right hand AFTER the stop — tools parent to the `arm-right` bone via
+  `createPortal`, scaled 1.7 to read from the follow-cam; `Tool.body` = mount
+  on the character instead — the bow, which lay hidden along the arm in the
+  shooting pose). Keepers take `pose` + `seat` (sit height: stool 0.28, log
+  0.27, bench 0.26 — `sit` puts the hips at y=0). A route walker greeted
+  mid-leg now FINISHES the leg (they used to skip a stop → a tool could
+  never go back). **No pets on sitters** — the pet walks onto the owner and
+  covers them on the bench.
+- **Tests (season-maps.test.js):** per map — dense (>100 decor), every walker
+  segment clears every solid (radius table `R`; hedges sampled, arches = posts
+  only, shed exempt only on legs into an `inside` stop), shed entered only
+  straight through its door, every tool taken comes back, no twins, public-safe
+  copy. It caught 5 walk-throughs while laying out. **Re-run after moving ANY
+  garden/clearing prop.**
+- Verified headless (playwright-core + system Chrome, swiftshader;
+  `__overview(h, tilt, cx, cz)` low angles): sitters on stools/logs/bench,
+  gardener out of the shed with the can, campfire, archer's bow.
+- **Door cards retaken** (`public/worlds/{garden,clearing}.jpg`, 900×494): HUD-
+  free canvas grab mid-hello (tea party / campers). Recipe: playwright seeds the
+  save with `addInitScript` BEFORE boot (seeding after a first load races the
+  app's own save → no Resume button), clicks Resume, `__overview(h,tilt,cx,cz)`,
+  hides all DOM except `.nbBubble` + the world canvas (the minimap is a canvas
+  too), `__walk` up to a neighbour, shoots when `.nbBubble` appears,
+  `sips -Z 900 -s formatOptions 82`.
+
 ## Long-mult walkthrough fix ✅ SHIPPED 2026-09-27 — shaped example + every carry + a real ending
 From Amy's Luxi Math video recording + Finn's review (32 × 31, answered 895). Commit `a088dfb`.
 - **"One just like it" wasn't** — 32 × 31 got 40 × 21 (the 0 trivialises the ones pass).
