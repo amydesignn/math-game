@@ -1,9 +1,9 @@
 # Contrast audit — Door
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-06 22:15 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-07 18:45 UTC  
 **Variants:** Returning player · **Phases:** idle
 
-> **28 unique checks · 27 pass · 0 fail · 0 exempt (disabled) · 0 need review**
+> **31 unique checks · 31 pass · 0 fail · 0 exempt (disabled) · 0 need review**
 
 **Rules applied**
 
@@ -26,14 +26,18 @@ None — every check passes WCAG 2.2 AA. 🎉
 | 71 | `#262626` on `#FFFFFF` | 14px bold | 15.13:1 | 4.50:1 | ✅ | idle |
 | 29 points to Level 3 | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
 | 71 points | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
-| Saved on this device | `#525252` on `#FFFFFF` | 12.5px | 7.81:1 | 4.50:1 | ✅ | idle |
-| Today’s quest | `#8A5300` on `#FFF7EA` | 11.5px | 5.95:1 | 4.50:1 | ✅ | idle |
-| · refreshes in 2h | `#8A5300` on `#FFF7EA` | 10.5px | 5.95:1 | 4.50:1 | ✅ | idle |
-| Visit Merry Market to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
+| Saved on this device | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| New | `#973C00` on `#FFFBEB` | 12px | 6.83:1 | 4.50:1 | ✅ | idle |
+| What’s new | `#262626` on `#FFFFFF` | 14px | 15.13:1 | 4.50:1 | ✅ | idle |
+| Spooky Arcade for Halloween | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| Today’s Quest | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
+| · Refreshes in 3h | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
+| Visit Sunny Town to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
 | +1 | `#8A5300` on `#FFEFCF` | 14px bold | 5.57:1 | 4.50:1 | ✅ | idle |
 | Forest Clearing | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Where every journey begins | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
 | Play | `#FFFFFF` on `#6169E0` | 15px bold | 4.55:1 | 4.50:1 | ✅ | idle |
+| Last played | `#404040` on `#FFFFFF` | 12px | 10.36:1 | 4.50:1 | ✅ | idle |
 | Sunny Town | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Warm streets, friendly faces | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
 | Resume | `#FFFFFF` on `#6169E0` | 15px bold | 4.55:1 | 4.50:1 | ✅ | idle |
