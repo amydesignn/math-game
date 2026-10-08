@@ -39,7 +39,7 @@ describe('return bucket', () => {
 describe('session summary', () => {
   it('adds live world time, rounds to minutes and caps a forgotten tab', async () => {
     const { summarize } = await import('../metrics')
-    const t = { worldMs: 5 * 60000, worldSince: 1000, problems: 4, solved: 3, maps: new Set(['market', 'town']), quests: 1, played: true }
+    const t = { worldMs: 5 * 60000, worldSince: 1000, problems: 4, solved: 3, maps: new Set(['market', 'town']), quests: 1 }
     expect(summarize(t, 1000 + 2 * 60000)).toEqual({ minutes: 7, problems: 4, solved: 3, maps: 2, quests: 1 })
     expect(summarize({ ...t, worldMs: 10 * 3600000 }, 1000).minutes).toBe(240)
   })
@@ -59,21 +59,58 @@ describe('a whole session', () => {
     m.questDone()
     fire('pagehide')
 
-    expect(sent.map((r) => r.event)).toEqual(['session_start', 'world_enter', 'session_end'])
     expect(sent[0].came_back).toBe('new')
-    expect(sent[2]).toMatchObject({ problems: 2, solved: 1, maps: 2, quests: 1, player: 'guest', app_version: 'abc1234' })
+    // questDone checkpoints (problems 2, solved 1, quests 1); session_end carries the rest + maps
+    expect(sent.map((r) => r.event)).toEqual(['session_start', 'world_enter', 'progress', 'session_end'])
+    expect(sent[2]).toMatchObject({ problems: 2, solved: 1, quests: 1, player: 'guest', app_version: 'abc1234' })
+    expect(sent[3]).toMatchObject({ problems: 0, solved: 0, quests: 0, maps: 2 })
     for (const row of sent) for (const k of Object.keys(row)) expect(ALLOWED.has(k), `unexpected field ${k}`).toBe(true)
   })
 
-  it('a Door-only visit sends no session_end, and a second visit the same day reads same-day', async () => {
+  it('a Door-only visit still ends (maps 0), and a second visit the same day reads same-day', async () => {
     const { sent, fire } = stubBrowser()
     const m = await import('../metrics')
     m.startMetrics({})
     fire('pagehide')
-    expect(sent.map((r) => r.event)).toEqual(['session_start'])
+    expect(sent.map((r) => r.event)).toEqual(['session_start', 'session_end'])
+    expect(sent[1]).toMatchObject({ minutes: 0, problems: 0, maps: 0 })
     document.visibilityState = 'visible'
     fire('visibilitychange') // back to the foreground → a fresh tally
     expect(sent.at(-1)).toMatchObject({ event: 'session_start', came_back: 'same-day' })
+  })
+
+  it('checkpoints every 5 problems, so a session killed before it ends keeps its learning data', async () => {
+    const { sent } = stubBrowser()
+    const m = await import('../metrics')
+    m.startMetrics({})
+    m.enteredWorld('market')
+    for (let i = 0; i < 12; i++) m.answered(i % 3 !== 0) // 12 tried, 8 solved
+    // the tab is killed here — no hide, no pagehide
+    const progress = sent.filter((r) => r.event === 'progress')
+    expect(progress.length).toBe(2) // at 5 and 10
+    expect(progress.reduce((n, r) => n + r.problems, 0)).toBe(10)
+    expect(progress.reduce((n, r) => n + r.solved, 0)).toBe(6)
+  })
+
+  it('rows are deltas — SUM over progress + session_end = the session total, nothing counted twice', async () => {
+    vi.useFakeTimers({ now: 0 })
+    const { sent, fire } = stubBrowser()
+    const m = await import('../metrics')
+    m.startMetrics({})
+    m.enteredWorld('market')
+    for (let i = 0; i < 7; i++) m.answered(true)
+    vi.advanceTimersByTime(3 * 60000)
+    m.questDone()
+    vi.advanceTimersByTime(4 * 60000)
+    m.leftWorld() // back to the Door → checkpoint
+    m.leftWorld() // a second call sends nothing new
+    fire('pagehide')
+    vi.useRealTimers()
+    const rows = sent.filter((r) => r.event === 'progress' || r.event === 'session_end')
+    const sum = (k) => rows.reduce((n, r) => n + r[k], 0)
+    expect({ minutes: sum('minutes'), problems: sum('problems'), solved: sum('solved'), quests: sum('quests') }).toEqual({ minutes: 7, problems: 7, solved: 7, quests: 1 })
+    expect(sent.filter((r) => r.event === 'session_end')).toHaveLength(1)
+    for (const row of sent) for (const k of Object.keys(row)) expect(ALLOWED.has(k), `unexpected field ${k}`).toBe(true)
   })
 
   it('stays silent in dev without ?metrics', async () => {

@@ -301,7 +301,17 @@ WORD so family accounts can be filtered out.
 - Hooks in App: boot `startMetrics`, `enterWorld`→`enteredWorld`, `goToDoor`→
   `leftWorld`, `travel`→`travelled`, both onResult paths→`answered`, quest
   complete→`questDone`. Hide/show starts a fresh tally (resumes world time).
-- Tests `metrics.test.js` (+5) incl. a **field whitelist** — adding any field
+- **2026-10-08 — `progress` checkpoints (Finn).** Finn read 14 starts / 4 ends
+  as lost ends; the data said every world session HAD its end — the 10 orphans
+  were Door-only visits, which sent no end by design. Now: every start gets a
+  `session_end` (Door-only = maps 0), so **starts − ends = genuinely lost**;
+  and `progress` rows checkpoint every 5 problems, after a quest, and on the
+  way back to the Door. **minutes/problems/solved/quests are DELTAS** since the
+  session's last row → totals = `SUM` over progress + session_end (no id links
+  rows, so cumulative rows couldn't be de-duplicated). Migration
+  `play_events_progress_event` adds `progress` to the event check. Rows before
+  this change (`app_version` 3d375d0) are cumulative-in-one-end-row — same SUM.
+- Tests `metrics.test.js` (+7) incl. a **field whitelist** — adding any field
   fails there first. Read the numbers via the Supabase MCP (`play_events`).
 
 ## People in the Rosy Garden + Forest Clearing 🌹🏕️ (2026-10-06, branch `feat/world-people`)
