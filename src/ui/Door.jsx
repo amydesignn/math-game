@@ -184,7 +184,7 @@ function Hero({ mode, points, gems }) {
           <div style={heroS.saved}><Saved /> {mode === 'account' ? 'Saved to your account' : 'Saved on this device'}</div>
         </>
       ) : (
-        <div style={heroS.newLine}>Pick a world below and start playing — no setup, jump right in. 🌟</div>
+        <div style={heroS.newLine}>Pick a world and start playing — no setup, jump right in. 🌟</div>
       )}
     </div>
   )
@@ -389,15 +389,22 @@ export default function Door({ mode, name, points, gems, map, quest, meadowOpen 
       <Header onOpenSettings={onOpenSettings} onOpenProfile={onOpenProfile} settingsActive={settingsActive} avatar={avatar} />
       <main className="doorWrap">
         <div className="doorGrid">
+          {/* Mobile order (Finn 2026-10-10): on one column the worlds came after
+              the hero + quest cards, so the first thing a phone player could tap
+              to play sat far below the fold. Under 860px .doorLeft dissolves
+              (display: contents) and .doorGreet / #worlds / .doorLeftBody are
+              re-ordered: greeting → worlds → hero + quest. Desktop unchanged. */}
           <div className="doorLeft">
-            <div style={dS.greet}>{greet}</div>
-            <Hero mode={mode} points={points} gems={gems} />
-            <WhatsNew map={mode !== 'new' ? map : null} onPlay={onPlay} onResume={onResume} />
-            <QuestCard quest={quest} />
+            <div className="doorGreet" style={dS.greet}>{greet}</div>
+            <div className="doorLeftBody">
+              <Hero mode={mode} points={points} gems={gems} />
+              <WhatsNew map={mode !== 'new' ? map : null} onPlay={onPlay} onResume={onResume} />
+              <QuestCard quest={quest} />
+            </div>
           </div>
           {/* id + scroll-margin: the footer's "Worlds" link (#worlds) lands here,
               clear of the sticky .doorHdr (~70px). */}
-          <div id="worlds" style={{ scrollMarginTop: 90 }}>
+          <div id="worlds" className="doorWorldsCol" style={{ scrollMarginTop: 90 }}>
             <div style={dS.colHead}>
               <span style={dS.colTitle}>Choose your world</span>
               <span style={dS.colNote}>{WORLDS.length} worlds{meadowOpen ? ' · Meadow open' : ''}</span>
