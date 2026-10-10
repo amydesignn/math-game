@@ -64,12 +64,23 @@ describe('migrate — a returning player is never re-onboarded', () => {
     expect(store.getState().seenOnboarding).toBe(true)
   })
 
-  it('a new player who reloaded before dismissing keeps false (explicit false is respected)', async () => {
+  it('an explicit false in a save is respected (the store never invents "seen")', async () => {
     storage.setItem(
       KEY,
       JSON.stringify({ map: 'clearing', gems: 0, lifetimeGems: 0, seenOnboarding: false, capRetiredAt: '2026-07-18T00:00:00.000Z' }),
     )
     const store = await import('../store.js')
     expect(store.getState().seenOnboarding).toBe(false)
+  })
+})
+
+describe('seen = shown (Finn 2026-10-10: walkthrough appeared twice)', () => {
+  it('marked at show time, a player who leaves WITHOUT dismissing is not re-onboarded on return', async () => {
+    let store = await import('../store.js')
+    expect(store.getState().seenOnboarding).toBe(false) // brand-new → auto-show
+    store.markOnboardingSeen() // App marks on show — no close ever happens
+    vi.resetModules() // she leaves (back button / closed tab) and comes back
+    store = await import('../store.js')
+    expect(store.getState().seenOnboarding).toBe(true) // → no second auto-show
   })
 })

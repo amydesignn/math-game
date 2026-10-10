@@ -46,20 +46,31 @@ const CORE = [
   { num: 4, title: 'Add some sparkle', body: 'Treat your character to a sparkle trail and other playful extras.', media: '/onboarding/step-4.jpg' },
 ]
 
+// Step 0 — "what is this?" before "how to play" (Finn 2026-10-10: jumping
+// straight into instructions skipped what the game IS). No number badge: it is
+// the welcome, not a how-to step. Understated, a tool not a world (Luxi tone).
+const INTRO = {
+  title: 'What is Luxi Math?',
+  body: 'A math practice game. Answer questions to earn gems, then spend them building a world that’s all yours.',
+  media: null,
+}
+
 /**
- * The 5-step carousel. Owns its own step cursor (like Oscar's comp).
+ * The 6-step carousel: welcome + four how-to steps + "What's next". Owns its own step cursor (like Oscar's comp).
  * onClose = the header back-control (dismiss). onFinish = the final CTA.
  */
 export function OnboardingCard({ onClose, onFinish }) {
   const [step, setStep] = useState(0)
-  const total = CORE.length + 1 // + the "What's next" step
-  const isWhatsNext = step === CORE.length
-  const cur = isWhatsNext ? null : CORE[step]
+  const STEPS = [INTRO, ...CORE]
+  const total = STEPS.length + 1 // + the "What's next" step
+  const isIntro = step === 0
+  const isWhatsNext = step === STEPS.length
+  const cur = isWhatsNext ? null : STEPS[step]
 
-  // Progress dots: one per core step + one for "What's next" (Oscar's rule —
+  // Progress dots: one per step + one for "What's next" (Oscar's rule —
   // current = pill, already-passed = faded lilac, future = light).
   const dots = []
-  for (let i = 0; i < CORE.length; i++) {
+  for (let i = 0; i < STEPS.length; i++) {
     dots.push({ w: i === step ? 24 : 8, bg: i === step ? '#4B54DD' : i < step ? '#C6B4F0' : '#EDE7FC' })
   }
   dots.push({ w: isWhatsNext ? 24 : 8, bg: isWhatsNext ? '#4B54DD' : '#EDE7FC' })
@@ -87,7 +98,7 @@ export function OnboardingCard({ onClose, onFinish }) {
           button covers stepping. */}
       <div style={{ padding: '16px 16px 16px 24px', background: 'linear-gradient(180deg,#E9E2FA,#F8F5FE)', borderBottom: '1px solid #E7E0F3' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <span style={{ fontSize: 20, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>How to Play</span>
+          <span style={{ fontSize: 20, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{isIntro ? 'Welcome' : 'How to Play'}</span>
           <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>
             ✕
           </button>
@@ -107,7 +118,12 @@ export function OnboardingCard({ onClose, onFinish }) {
 
       {/* Step content */}
       <div style={{ padding: '24px 24px 8px', minHeight: 152 }}>
-        {!isWhatsNext ? (
+        {isIntro ? (
+          <div>
+            <div style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{cur.title}</div>
+            <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{cur.body}</p>
+          </div>
+        ) : !isWhatsNext ? (
           <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
             <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#EDE7FC', color: '#5B4B9E', fontSize: 20, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{cur.num}</div>
             <div>

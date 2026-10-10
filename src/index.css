@@ -177,6 +177,13 @@ canvas { touch-action: none; display: block; }
      bounds as designed. */
   .doorGrid { grid-template-columns: minmax(0, 1fr); }
   .doorLeft { position: static; top: auto; }
+  /* Worlds first on phones (Finn 2026-10-10): dissolve the left column so its
+     children join .doorGrid and can be re-ordered around the worlds column.
+     The greeting's inline 24px bottom margin is dropped — the grid gap spaces it. */
+  .doorLeft { display: contents; }
+  .doorGreet { order: 0; margin-bottom: 0 !important; }
+  .doorWorldsCol { order: 1; }
+  .doorLeftBody { order: 2; }
 }
 @keyframes doorPop {
   0% { transform: scale(0.96) translateY(8px); opacity: 0; }

@@ -75,10 +75,14 @@ export default function App({ cloud = false, justSignedIn = false }) {
   // First-run onboarding: auto-shows once for a brand-new player (over the Door),
   // and re-openable any time from the gear's "How to Play". One flag, two entries.
   const [showOnboarding, setShowOnboarding] = useState(!state.seenOnboarding)
-  const closeOnboarding = () => {
-    markOnboardingSeen()
-    setShowOnboarding(false)
-  }
+  // Seen = SHOWN, not dismissed (Finn 2026-10-10: it appeared twice). Marking
+  // only on close meant leaving with it open — back button, closed tab, iOS
+  // reloading a backgrounded tab — never saved the flag, so it auto-showed
+  // again on return. Mark the moment the first-run auto-show mounts.
+  useEffect(() => {
+    if (showOnboarding) markOnboardingSeen()
+  }, [showOnboarding])
+  const closeOnboarding = () => setShowOnboarding(false)
   const [signup, setSignup] = useState(null) // null | 'form' | 'guest'
   // Feedback Flow (Oscar's comp, lifted 2026-09-19) — gear → Send Feedback.
   // Silent context is attached HERE, never asked of the child (COPPA): the
