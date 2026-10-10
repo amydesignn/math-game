@@ -112,6 +112,9 @@
   --color-component-badge-new-background: #FFFBEB; /* amber-50 */
   --color-component-badge-new-border: #FEE685; /* amber-200 */
   --color-component-badge-new-text: #973C00; /* amber-800 */
+  --color-component-badge-brand-background: #EDE7FC; /* brand-lilac-100 */
+  --color-component-badge-brand-border: #DDD1F7; /* brand-lilac-200 */
+  --color-component-badge-brand-text: #3D43BE; /* brand-iris-700 — the Door's Beta tag */
   --color-component-status-indicator-background: #FFFFFF; /* white */
   --color-component-status-indicator-border: #E5E5E5; /* neutral-200 */
   --color-component-status-indicator-live-dot: #00A63E; /* green-600 */

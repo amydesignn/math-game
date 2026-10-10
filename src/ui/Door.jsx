@@ -225,6 +225,10 @@ function QuestCard({ quest }) {
 const pill = { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1, 4px)', height: 20, padding: '0 var(--space-2, 8px)', borderRadius: 9999, borderWidth: 1, borderStyle: 'solid', fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' }
 const badgeS = {
   new: { background: 'var(--color-component-badge-new-background)', borderColor: 'var(--color-component-badge-new-border)', color: 'var(--color-component-badge-new-text)' },
+  // Beta (Amy 2026-10-10: "we always said it is beta"). Brand, not the New amber —
+  // it is a fact about the PRODUCT, sat beside the iris wordmark; amber on the Door
+  // already means "new content".
+  brand: { background: 'var(--color-component-badge-brand-background)', borderColor: 'var(--color-component-badge-brand-border)', color: 'var(--color-component-badge-brand-text)' },
 }
 function Badge({ variant, children, style }) {
   return <span style={{ ...pill, ...badgeS[variant], ...style }}>{children}</span>
@@ -364,7 +368,7 @@ function Header({ onOpenSettings, onOpenProfile, settingsActive, avatar }) {
   return (
     <header className="doorHdr">
       <div className="doorHdrIn">
-        <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Luxi Math</span></div>
+        <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Luxi Math</span><Badge variant="brand">Beta</Badge></div>
         <div style={hS.right}>
           {/* Gear first, profile at the corner (Amy 2026-08-30). */}
           <button style={{ ...hS.gear, background: settingsActive ? '#DDD1F7' : '#EDE7FC' }} onClick={onOpenSettings} aria-label="Settings" title="Settings">⚙️</button>
