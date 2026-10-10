@@ -407,6 +407,28 @@ canvas { touch-action: none; display: block; }
 @keyframes obCardIn { 0% { transform: translateY(12px) scale(.96); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 .luxiOb-scrim { animation: obScrimIn .2s ease-out both; }
 .luxiOb-card { animation: obCardIn .28s cubic-bezier(.2,.9,.3,1.1) both; }
+/* Step 0 logo stage (Amy 2026-10-10). First-run only = the delight budget.
+   CSS keyframes, not JS: the Door's R3F hero is loading underneath, and CSS
+   animation stays smooth off the main thread. transform + opacity only.
+   1. gemIn — the gem rises in just after the card lands (.12s delay), strong
+      ease-out, from scale(.9) never 0.
+   2. gemFloat — then a slow 3.2s bob (on-screen movement → ease-in-out); its
+      shadow narrows as the gem rises so it stays grounded.
+   3. twinkle — three sparkles pulse in turn, staggered in the JSX. */
+@keyframes obGemIn { 0% { transform: translateY(16px) scale(.9); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
+@keyframes obGemFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes obGemShadow { 0%, 100% { transform: scaleX(1); opacity: .5; } 50% { transform: scaleX(.8); opacity: .3; } }
+@keyframes obTwinkle { 0%, 100% { transform: scale(.6) rotate(0deg); opacity: 0; } 40% { transform: scale(1) rotate(20deg); opacity: 1; } 70% { transform: scale(.85) rotate(30deg); opacity: .7; } }
+.luxiOb-gemIn { display: flex; flex-direction: column; align-items: center; gap: 8px; animation: obGemIn .5s var(--ease-out) .12s both; }
+.luxiOb-gemFloat { display: flex; animation: obGemFloat 3.2s ease-in-out .62s infinite; }
+.luxiOb-gemShadow { width: 64px; height: 8px; border-radius: 50%; background: rgba(74,54,110,.28); animation: obGemShadow 3.2s ease-in-out .62s infinite; }
+.luxiOb-twinkle { opacity: 0; animation: obTwinkle 2.4s var(--ease-out) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  /* gentler, not zero: the gem still fades in; no bobbing, sparkles sit still */
+  .luxiOb-gemIn { animation: obScrimIn .3s ease-out .12s both; }
+  .luxiOb-gemFloat, .luxiOb-gemShadow { animation: none; }
+  .luxiOb-twinkle { animation: none; opacity: .8; }
+}
 /* header close / back control */
 .luxiOb-close { width: 40px; height: 40px; border: 0; border-radius: 50%; background: #ECEAF1; color: #6E6685; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none; transition: background .15s ease; }
 .luxiOb-close:hover { background: #E1DEEA; }

@@ -31,6 +31,7 @@
  * and colours are left as Oscar's. Doc: nathan-mcp-codebase-01/docs/governance-layer.md.
  */
 import { useState } from 'react'
+import { GemIcon } from './hudkit'
 
 // Oscar's four core steps + a fifth "What's next" step (verbatim copy).
 //
@@ -108,6 +109,28 @@ export function OnboardingCard({ onClose, onFinish }) {
       {/* Per-step media (Oscar's inline image-slot styling, brought into the
           modal). Renders only when the current step has media, so a step without
           an image simply shows text — the box collapses, no empty placeholder. */}
+      {/* Step 0's stage — the Luxi gem, animated (Amy 2026-10-10: "more exciting
+          than a static screen"). Same 16:9 box as the step images so the card
+          doesn't jump height on Next. Motion lives in index.css (.luxiOb-gem*). */}
+      {isIntro && (
+        <div style={{ padding: '16px 16px 0' }}>
+          <div className="luxiOb-stage" style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', background: 'radial-gradient(120% 100% at 50% 30%, #F6F1FF 0%, #ECE4FB 62%, #E4D9F6 100%)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="luxiOb-gemIn">
+              <div className="luxiOb-gemFloat">
+                <GemIcon size={104} />
+              </div>
+              <span className="luxiOb-gemShadow" />
+            </div>
+            {/* three twinkles around the gem — gem cyan + the card's lilac star (#8570D2); positions are % of the stage */}
+            {[{ l: '30%', t: '24%', s: 20, d: 0, c: '#22D3EE' }, { l: '68%', t: '18%', s: 16, d: 0.6, c: '#8570D2' }, { l: '66%', t: '62%', s: 16, d: 1.2, c: '#22D3EE' }].map((k, i) => (
+              <svg key={i} className="luxiOb-twinkle" width={k.s} height={k.s} viewBox="0 0 24 24" aria-hidden="true" style={{ position: 'absolute', left: k.l, top: k.t, animationDelay: `${0.45 + k.d}s` }}>
+                <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" fill={k.c} />
+              </svg>
+            ))}
+          </div>
+        </div>
+      )}
+
       {cur?.media && (
         <div style={{ padding: '16px 16px 0' }}>
           <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', background: 'linear-gradient(150deg,#EDE7FB,#E3DBF7)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.5)' }}>
