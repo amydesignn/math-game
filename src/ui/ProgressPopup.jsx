@@ -32,12 +32,9 @@ import { TOPIC_META, stageCounts, startedTopics } from '../topicMeta'
  *    math and station popups.
  */
 
-/* Level identity = VIOLET (teal = gems · amber = station bonus), softened to
- * PASTEL for this card so it sits inside the app's pastel skin — and since
- * 2026-07-26 (Amy) the BAR and the congratulations card wear the same pastel,
- * so LVL is imported from mathkit rather than declared here. One identity, one
- * declaration: a local copy is exactly how the bar and this card drifted into
- * two different purples. */
+/* Level identity = IRIS (the Luxi primary button pair; Amy 2026-10-06) —
+ * LVL is imported from mathkit, shared with the HUD bar and the congratulations
+ * card. One identity, one declaration: a local copy is how they drifted before. */
 
 /* One ascending pastel-violet ramp so the SYSTEM reads at a glance:
  * light → deep = easier → harder. Distinct from the ⭐ badge track (5-C). */
@@ -45,8 +42,8 @@ const STAGE_DOT = { 1: '#C6B4F0', 2: '#B29BEA', 3: '#8570D2' }
 
 const REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
-/* Greys are WCAG AA on their backgrounds (Oscar's locked format): #5C5470 body
- * ≈7:1 on white, #6E6685 muted ≈6:1. The one light grey is the upcoming-level
+/* Greys = Datum text-secondary by name (were Oscar's #5C5470 / #6E6685, ≈7 / 6:1;
+ * neutral-600 is 7.8). The one light grey is the upcoming-level
  * ladder node — an inactive indicator, SC 1.4.3 exempt. Keep it light. */
 const S = {
   card: { display: 'flex', flexDirection: 'column', maxHeight: '90vh', overflow: 'hidden' },
@@ -56,10 +53,9 @@ const S = {
   head: { position: 'relative', padding: '30px 24px 22px', textAlign: 'center', flex: 'none',
     background: 'linear-gradient(180deg,#E9E2FA 0%,#F8F5FE 100%)', borderBottom: '1px solid #E7DEF4', overflow: 'hidden' },
   lvlLabel: { position: 'relative', fontSize: 14, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: LVL.deep, marginBottom: 16, zIndex: 2 },
-  // numeral = LVL.onFill (Iris 950), not white — white cannot reach 4.5:1 on
-  // a pastel violet at any step of the ramp. See the note in mathkit.
+  // numeral = LVL.onFill (white on Iris 500, 4.56) — see the note in mathkit.
   circle: { position: 'relative', width: 80, height: 80, margin: '0 auto 16px', borderRadius: '50%', background: LVL.grad, color: LVL.onFill, fontWeight: 700, fontSize: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 10px 22px rgba(${LVL.glow},.42), inset 0 -4px 0 rgba(0,0,0,.10)`, zIndex: 2 },
-  totalLine: { position: 'relative', fontSize: 17, fontWeight: 400, color: '#5C5470', zIndex: 2 },
+  totalLine: { position: 'relative', fontSize: 17, fontWeight: 400, color: T.textSecondary, zIndex: 2 },
   totalStrong: { color: LVL.deep, fontWeight: 700 },
 
   /* CLIMB ZONE — its own white band between two dividers; the tint stays
@@ -69,21 +65,21 @@ const S = {
   ladderLine: { position: 'absolute', left: '6%', right: '6%', top: '50%', height: 4, marginTop: -2, borderRadius: 2, background: '#E7E1F1' },
   ladderFill: { position: 'absolute', left: '6%', top: '50%', height: 4, marginTop: -2, borderRadius: 2, background: LVL.grad, transition: 'width .75s cubic-bezier(.22,1,.36,1)' },
   node: { position: 'relative', width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16 },
-  toNext: { position: 'relative', fontSize: 14, fontWeight: 400, color: '#6E6685', textAlign: 'right', marginTop: 12, paddingRight: 2 },
+  toNext: { position: 'relative', fontSize: 14, fontWeight: 400, color: T.textSecondary, textAlign: 'right', marginTop: 12, paddingRight: 2 },
 
   /* BODY ZONE — the white record. */
   body: { padding: '18px 24px 22px', overflowY: 'auto', flex: '1 1 auto' },
-  sectionLbl: { fontSize: 12, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#6E6685', marginBottom: 12 },
+  sectionLbl: { fontSize: 12, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: T.textSecondary, marginBottom: 12 },
   topicHead: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 },
   topicIcon: { width: 40, height: 40, borderRadius: 12, background: LVL.soft, color: LVL.deep, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, fontWeight: 700, flex: 'none' },
   topicName: { fontWeight: 700, fontSize: 19, color: T.textPrimary },
   stageRow: { display: 'flex', alignItems: 'center', gap: 12, padding: '6px 2px' },
   pips: { display: 'flex', gap: 4, flex: 'none' },
   pip: { width: 8, height: 8, borderRadius: '50%' },
-  stageTxt: { flex: 1, fontSize: 15, color: '#5C5470', fontWeight: 400 },
+  stageTxt: { flex: 1, fontSize: 15, color: T.textSecondary, fontWeight: 400 },
   stageCount: { fontWeight: 700, fontSize: 20, color: LVL.deep, minWidth: 24, textAlign: 'right' },
   divider: { height: 1, background: LVL.softLine, margin: '16px 0' },
-  empty: { textAlign: 'center', color: '#6E6685', fontWeight: 400, fontSize: 15, padding: '8px 0 18px' },
+  empty: { textAlign: 'center', color: T.textSecondary, fontWeight: 400, fontSize: 15, padding: '8px 0 18px' },
 }
 
 /* A number ticks up from 0 on mount. The state DEFAULTS to the true value and
@@ -167,7 +163,7 @@ export function ClimbLadder({ points }) {
           const done = L < st.level
           const current = L === st.level
           const face = (done || current)
-            // reached: numeral in LVL.onFill, since white can't make 4.5:1 on pastel
+            // reached: the button pair — white numeral on Iris 500
             ? { background: LVL.grad, color: LVL.onFill, boxShadow: current ? `0 6px 14px rgba(${LVL.glow},.46)` : `0 3px 9px rgba(${LVL.glow},.30)` }
             // upcoming: stays light ON PURPOSE. An inactive indicator is WCAG
             // 1.4.3 exempt (Amy confirmed), and darkening it would make a level
@@ -176,7 +172,7 @@ export function ClimbLadder({ points }) {
           return (
             <span key={L} style={{ position: 'absolute', top: '50%', left: center(i) + '%',
               transform: `translate(-50%,-50%) scale(${current ? 1.1 : 1})`, zIndex: current ? 2 : 1 }}>
-              <span style={{ ...S.node, ...face, animation: REDUCED ? 'none' : `rungPop .42s cubic-bezier(.22,1.4,.36,1) ${i * 0.06}s both` }}>{L}</span>
+              <span data-disabled={!(done || current) || undefined} style={{ ...S.node, ...face, animation: REDUCED ? 'none' : `rungPop .42s cubic-bezier(.22,1.4,.36,1) ${i * 0.06}s both` }}>{L}</span>
             </span>
           )
         })}

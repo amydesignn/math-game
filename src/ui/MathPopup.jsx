@@ -104,7 +104,7 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
             background: `linear-gradient(180deg,${skin.accent}14,#fff)`, borderBottom: `1px solid ${T.line}` }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
-            <span style={{ fontWeight: 700, fontSize: 13, letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
+            <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
             <div style={{ flex: 1 }} />
             {phase === 'ask' && <ModalClose onClick={() => onClose(false)} />}
           </div>
@@ -117,7 +117,7 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
              padding (no 22px wrapper). Multiplication/addition keep the compact
              inline recovery below. It teaches a matched `similar` problem (Track
              2's generator will supply one) then she retries hers via onDone. */
-          <DivisionWalkthrough problem={problem.similar || problem} onDone={backToAsk} />
+          <DivisionWalkthrough problem={problem.similar || problem} onDone={backToAsk} closeGutter />
         ) : (
           <div style={{ padding: '22px 26px 4px' }}>
             {phase === 'ask' && (problem.op === '÷'
@@ -127,8 +127,9 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
             {phase === 'recover' && (
               <div style={{ paddingBottom: 6 }}>
                 <div style={{ textAlign: 'center', marginBottom: 14 }}>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
-                  <div style={{ fontSize: 15, color: T.textTertiary, marginTop: 4 }}>No worries — follow the steps, then give it another go.</div>
+                  <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
+                  {/* reassurance = supporting line, 14 secondary (Amy 2026-10-05) */}
+                  <div style={{ fontSize: 'var(--text-sm)', color: T.textSecondary, marginTop: 4 }}>No worries — follow the steps, then give it another go.</div>
                 </div>
                 <WorkedExample problem={problem} onBack={backToAsk} />
               </div>
@@ -142,10 +143,12 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
 function AskState({ skin, problem, entry, onKey }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.textTertiary }}>{skin.ask}</div>
+      {/* instruction = content 16/400 primary · hint = supporting 14/400 secondary (Amy 2026-10-05) */}
+      <div style={{ textAlign: 'center', fontSize: 'var(--text-base)', fontWeight: 400, color: T.textPrimary }}>{skin.ask}</div>
       <EquationRow a={problem.a} op={problem.op} b={problem.b} entry={entry} />
       <Keypad onKey={onKey} />
-      <div style={{ textAlign: 'center', fontSize: 12.5, color: T.textTertiary, fontWeight: 500, marginTop: 2 }}>
+      {/* 16 gap + 8 = 24 above the hint (the keys' 4px edge shadow eats into it visually) */}
+      <div style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 400, marginTop: 8 }}>
         Type your answer, then tap Check
       </div>
     </div>
@@ -163,8 +166,8 @@ function CorrectState({ skin, pay, onNext }) {
         <Gem size={72} style={{ animation: 'gemSpin .5s ease-out both', filter: 'drop-shadow(0 6px 14px rgba(46,197,197,.4))' }} />
       </div>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 26, fontWeight: 700, color: T.textPrimary }}>Nice work!</div>
-        <div style={{ fontSize: 16, color: T.textTertiary, marginTop: 3, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
+        <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>Nice work!</div>
+        <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
           {skin.win} <span>+{pay}</span> <Gem size={18} />
         </div>
       </div>

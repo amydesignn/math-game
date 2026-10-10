@@ -127,8 +127,9 @@
         <p><strong>When playing as a guest (no account):</strong></p>
         <ul>
           <li>
-            <strong>Nothing is collected.</strong> Progress is saved only on that
-            device (in the browser) and is never sent to us.
+            <strong>No personal information is collected.</strong> Progress is saved only on that
+            device (in the browser) and is never sent to us. Only the anonymous
+            stats below leave the device.
           </li>
         </ul>
         <p><strong>For everyone:</strong></p>
@@ -137,6 +138,14 @@
             <strong>Anonymous usage stats</strong> — privacy-friendly analytics
             (via Vercel) that count visits without cookies and without identifying
             anyone.
+          </li>
+          <li>
+            <strong>Anonymous play counts</strong> — during a play session and when it
+            ends, the game sends a few totals: minutes played, problems tried and solved,
+            worlds visited, and roughly how long since the last visit on that
+            device (for example “came back after 2–7 days”). There is no name, no
+            account ID, no device ID and nothing that links one session to
+            another.
           </li>
         </ul>
         <p>
@@ -196,7 +205,7 @@
           game for us, and only so they can provide their service:
         </p>
         <ul>
-          <li><strong>Supabase</strong> — stores accounts and saved games.</li>
+          <li><strong>Supabase</strong> — stores accounts, saved games, feedback and the anonymous play counts.</li>
           <li><strong>Vercel</strong> — hosts the game and provides the cookieless analytics above.</li>
           <li><strong>The email service</strong> that sends your one-time sign-in link.</li>
         </ul>

@@ -16,13 +16,14 @@ import { OPSYM, buildStages, buildStagesMulti } from '../math'
 export const T = {
   // Brand Iris — actions + focus: 600 face · 700 deep (shadow + text) · 100 soft · 50 tint.
   // Replaced the off-brand blue #2D6DF6 (Amy 2026-10-04).
-  irisFace: '#6169E0', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
-  iris: '#4B54DD', irisDeep: '#3D43BE', irisSoft: '#E4E5FA', irisTint: '#F1F1FD',
+  irisFace: 'var(--brand-iris-500)', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
+  iris: 'var(--brand-iris-600)', irisDeep: 'var(--brand-iris-700)', irisSoft: 'var(--brand-iris-100)', irisTint: 'var(--brand-iris-50)', // Datum names (was raw hex, same values)
   teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
   textPrimary: 'var(--color-text-primary)', textSecondary: 'var(--color-text-secondary)', textTertiary: 'var(--color-text-tertiary)', // Datum text tiers by name
-  line: '#E6E6E6', surface: '#FFFFFF',
-  lilac: '#8570D2', lilacDeep: '#473B7C', // Lilac 600 / 900
+  line: 'var(--color-border-default)', surface: 'var(--color-background-base)', // was #E6E6E6 (one off neutral-200) / #FFFFFF
+  lilac: 'var(--brand-lilac-600)', lilacDeep: 'var(--brand-lilac-900)', // Lilac 600 / 900
   violet: '#7F22FE', amber: '#FE9A00', amberDeep: '#D97706',
+  amberInk: 'var(--amber-700)', // amber as TEXT (carries, the written zero): amber-500 is 2.1 on white → Datum amber-700, 5.0
   radius: 26, radiusSm: 16,
 }
 
@@ -44,7 +45,7 @@ export const MODAL = {
   width: 'min(520px, calc(100vw - 40px))',
   // 40, not Oscar's token 36: Amy's call — a friendlier tap target on Ivy's iPad
   // (his comp rendered 40 while MODAL said 36; 40 is what the screenshots show).
-  close: 40, closeBg: '#ECEAF1', closeFg: '#6E6685',
+  close: 40, closeBg: 'var(--color-background-brand-subtle)', closeFg: 'var(--color-icon-secondary)', // was #ECEAF1 / #6E6685 (off-palette) → lilac-100 + neutral-600, like the Door gear
 }
 
 /* ---- LEVEL IDENTITY — the one violet -----------------------------------
@@ -63,30 +64,26 @@ export const MODAL = {
  * supporting). main 400 · soft 100 · softLine 200 · deep 800 · ink 700 ·
  * grad 300→400→500 · onFill = Iris 950 (every value on a brand ramp). */
 export const LVL = {
-  main: '#B29BEA', // Lilac 400 — FILL identity only (2.39:1 on white: never text)
-  ink: '#6E5BC0', // Lilac 700 — coloured accent TEXT (5.36:1 on white)
-  soft: '#EDE7FC',
-  deep: '#5B4B9E', // Lilac 800 — text weight, 7.1:1 on white (5.9 on soft)
-  softLine: '#DDD1F7',
-  grad: 'linear-gradient(135deg,#C6B4F0 0%,#B29BEA 58%,#9B84E0 100%)',
-  glow: '155,132,224', // rgb triplet for the soft shadows/halos around level art
+  /* Level identity = IRIS since 2026-10-06 (Amy: the record book read off-brand
+   * in Lilac while the game leans Iris). It now wears the Luxi primary button:
+   * Iris 500 face + white numeral (4.56) — the same pair every Luxi primary
+   * button uses — and Iris 700 (Datum text-brand) for level text. Lilac stays
+   * where it belongs: decoration (the header wash, confetti, stage pips).
+   * One declaration, read by the HUD bar, the congratulations card AND the
+   * record book — never copy it per file (that's how they drifted before). */
+  main: 'var(--brand-iris-500)', // the fill identity
+  ink: 'var(--color-text-brand)', // Iris 700 — coloured accent TEXT (7.7 on white)
+  soft: 'var(--brand-iris-100)', // light Iris surface (topic icons, the bar's track)
+  deep: 'var(--color-text-brand)', // Iris 700 — counts, labels, the total
+  softLine: 'var(--brand-iris-100)',
+  grad: 'var(--brand-iris-500)', // flat, like the button face (was a Lilac gradient)
+  glow: '97,105,224', // Iris 500 as an rgb triplet for the soft shadows/halos
 
-  /* The level NUMERAL wherever it sits on `grad` — medallion, reached ladder
-   * nodes, the congratulations badge. Brand Iris 950 (Amy 2026-10-04: no
-   * off-palette colours; was #2F0D68, which sat on no brand ramp).
-   *
-   * It is not white, and that is a hard constraint rather than a preference:
-   * white cannot meet 4.5:1 on a pastel violet at all (violet-300 = 1.86,
-   * violet-400 = 2.85, and even violet-500 only reaches 4.40). Pastel field or
-   * white text — you cannot have both. Amy's call (2026-07-26) was to keep the
-   * pastel and deepen the numeral. On the Lilac gradient Iris 950 gives 4.93
-   * on the deepest corner (Lilac 500), 6.38 mid, 8.14 on the lightest. The
-   * medallion (46px) and progress circle (34px) are LARGE text (3:1 bar), but
-   * the progress-ladder nodes are 16px bold = NORMAL text (4.5:1) — that's why
-   * it's 950: Iris 900 (3.65) and 800 (3.08) would fail the nodes.
-   *
-   * If anyone ever "restores" white here, the card silently drops below AA. */
-  onFill: '#1D2050', // Brand Iris 950
+  /* The level NUMERAL on `grad` — medallion, reached ladder nodes, the
+   * congratulations badge. WHITE on Iris 500 = 4.56, so even the 16px ladder
+   * nodes (normal text, 4.5 bar) pass. (On the old pastel Lilac white could
+   * never pass, which is why this used to be Iris 950.) */
+  onFill: 'var(--color-text-on-brand)',
 }
 
 /** The close ✕. One implementation so the tap target can never drift again. */
@@ -145,7 +142,7 @@ export function Sparkles({ colors = ['#fff', T.tealLt, T.irisSoft], n = 14 }) {
         <svg key={i} viewBox="0 0 24 24" width={s.sz} height={s.sz}
           style={{ position: 'absolute', left: s.left, top: s.top, transform: 'translate(-50%,-50%)',
             animation: `sparkTwinkle .8s ${s.delay}ms ease-out both`, filter: 'drop-shadow(0 0 4px rgba(255,255,255,.9))' }}>
-          <path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12z" fill={s.c} />
+          <path d="M12 0c1 8 4 11 12 12-8 1-11 4-12 12-1-8-4-11-12-12 8-1 11-4 12-12z" style={{ fill: s.c }} /* style, not the attribute: var() only resolves in CSS */ />
         </svg>
       ))}
     </div>
@@ -156,8 +153,8 @@ export function Sparkles({ colors = ['#fff', T.tealLt, T.irisSoft], n = 14 }) {
 export function BigButton({ children, onClick, tone = 'primary', style }) {
   const [down, setDown] = useState(false)
   const tones = {
-    primary: { bg: T.irisFace, fg: '#fff', sh: T.irisDeep },
-    ghost: { bg: '#fff', fg: T.iris, sh: '#C9CBF5' },
+    primary: { bg: T.irisFace, fg: 'var(--color-text-on-brand)', sh: T.irisDeep },
+    ghost: { bg: 'var(--color-background-base)', fg: T.iris, sh: 'var(--brand-iris-200)' },
     amber: { bg: T.amber, fg: '#fff', sh: T.amberDeep },
   }
   const c = tones[tone]
@@ -165,7 +162,7 @@ export function BigButton({ children, onClick, tone = 'primary', style }) {
     <button onClick={onClick}
       onPointerDown={() => setDown(true)} onPointerUp={() => setDown(false)} onPointerLeave={() => setDown(false)}
       style={{ border: tone === 'ghost' ? `2px solid ${T.irisSoft}` : 'none', background: c.bg, color: c.fg,
-        fontWeight: 700, fontSize: 17, borderRadius: 16, padding: '15px 26px', cursor: 'pointer', minHeight: 54,
+        fontWeight: 500, fontSize: 'var(--text-base)', /* Datum button 16/500 (was 17/700) */ borderRadius: 16, padding: '15px 26px', cursor: 'pointer', minHeight: 54,
         boxShadow: down ? `0 1px 0 ${c.sh}` : `0 4px 0 ${c.sh}`, transform: down ? 'translateY(3px)' : 'none',
         transition: 'transform .07s, box-shadow .07s', ...style }}>
       {children}
@@ -178,13 +175,14 @@ export function EquationRow({ a, op, b, entry }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, padding: '6px 0 2px',
       fontVariantNumeric: 'tabular-nums' }}>
-      <span style={{ fontSize: 46, fontWeight: 700, color: T.textPrimary }}>{a}</span>
-      <span style={{ fontSize: 40, fontWeight: 600, color: T.textTertiary }}>{OPSYM[op]}</span>
-      <span style={{ fontSize: 46, fontWeight: 700, color: T.textPrimary }}>{b}</span>
-      <span style={{ fontSize: 40, fontWeight: 600, color: T.textTertiary }}>=</span>
+      {/* game display sizes on Datum's full scale: numbers 46→48 (5xl), operators 40 (--text-40) */}
+      <span style={{ fontSize: 'var(--text-5xl)', fontWeight: 700, color: T.textPrimary }}>{a}</span>
+      <span style={{ fontSize: 'var(--text-40)', fontWeight: 600, color: T.textTertiary }}>{OPSYM[op]}</span>
+      <span style={{ fontSize: 'var(--text-5xl)', fontWeight: 700, color: T.textPrimary }}>{b}</span>
+      <span style={{ fontSize: 'var(--text-40)', fontWeight: 600, color: T.textTertiary }}>=</span>
       <span style={{ minWidth: 96, height: 66, borderRadius: 14, border: `2.5px solid ${entry ? T.iris : T.irisSoft}`,
-        background: entry ? T.irisTint : '#fafafa', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 40, fontWeight: 700, color: T.iris, transition: 'all .15s' }}>{entry || ''}</span>
+        background: entry ? T.irisTint : 'var(--color-background-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize: 'var(--text-40)', fontWeight: 700, color: 'var(--color-text-brand)', transition: 'all .15s' }}>{entry || ''}</span>
     </div>
   )
 }
@@ -213,7 +211,7 @@ export function ColumnMath({ snap, big = false }) {
               <div style={{ width: cell * 0.7 }}></div>
               {r.cells.map((c, i) => (
                 <div key={i} style={{ width: cell, textAlign: 'center', fontSize: big ? 18 : 15, fontWeight: 700,
-                  color: T.amber, animation: c ? 'cellPop .3s ease-out both' : 'none' }}>{c}</div>
+                  color: T.amberInk, animation: c ? 'cellPop .3s ease-out both' : 'none' }}>{c}</div>
               ))}
             </div>
           )
@@ -253,11 +251,11 @@ export function MultiColumnMath({ snap }) {
       <div key={which} style={{ width: cell, height: cell, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ width: cell - 8, height: cell - 8, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: fs, fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1,
-          color: active ? T.irisDeep : T.textPrimary, opacity: dim ? 0.28 : 1,
+          color: active ? T.irisDeep : dim ? T.textTertiary : T.textPrimary, /* dim = Datum tertiary (4.7), not opacity .28 (1.7) */
           border: active ? `2.5px dashed ${T.iris}` : '2.5px dashed transparent',
           background: active ? T.irisTint : 'transparent',
           animation: active ? 'spotIn .35s ease-out both' : 'none',
-          transition: 'opacity .25s' }}>{d}</div>
+          transition: 'color .25s' }}>{d}</div>
       </div>
     )
   }
@@ -280,8 +278,8 @@ export function MultiColumnMath({ snap }) {
             <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
               {snap.carry[i] !== '' && (
                 <div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 17, fontWeight: 700, color: '#B45309', background: '#FEF9C3', border: `2px solid ${T.amber}`,
-                  animation: snap.carryHot ? 'spotIn .35s ease-out both' : 'none', opacity: snap.carryHot ? 1 : 0.75 }}>{snap.carry[i]}</div>
+                  fontSize: 17, fontWeight: 700, color: T.amberInk, background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  animation: snap.carryHot ? 'spotIn .35s ease-out both' : 'none' /* no .75 fade on a used carry — it took the digit under AA */ }}>{snap.carry[i]}</div>
               )}
             </div>
           ))}
@@ -322,7 +320,7 @@ export function MultiColumnMath({ snap }) {
             <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
               {snap.addCarry[i] !== '' && (
                 <div style={{ width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 700, color: '#B45309', background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  fontSize: 14, fontWeight: 700, color: T.amberInk, background: '#FEF9C3', border: `2px solid ${T.amber}`,
                   animation: snap.hiRow === 'sum' ? 'spotIn .35s ease-out both' : 'none' }}>{snap.addCarry[i]}</div>
               )}
             </div>
@@ -340,10 +338,10 @@ export function MultiColumnMath({ snap }) {
           return (
             <div key={i} style={{ position: 'relative' }}>
               {numCell(snap.row2[i], { hot: (snap.hiRow === 'row2' && snap.row2[i] !== '') || (isZero && snap.zeroHot),
-                color: isZero ? T.amber : T.iris, key: i })}
+                color: isZero ? T.amberInk : T.iris, key: i })}
               {isZero && snap.zeroHot && (
                 <span style={{ position: 'absolute', left: '50%', bottom: -16, transform: 'translateX(-50%)',
-                  fontSize: 10.5, fontWeight: 700, color: T.amber, whiteSpace: 'nowrap' }}>write it!</span>
+                  fontSize: 12, fontWeight: 700, color: T.amberInk, whiteSpace: 'nowrap' }}>write it!</span>
               )}
             </div>
           )
@@ -373,15 +371,16 @@ export function Keypad({ onKey, okDisabled = false }) {
     </div>
   )
 }
+const KEY_BG = 'var(--color-background-interactive-default)', KEY_EDGE = 'var(--neutral-300)' // edge was #d9d9d9 (off-palette)
 function KeypadKey({ k, isOk, isDel, onKey, disabled = false }) {
   const [down, setDown] = useState(false)
-  const base = { height: 58, borderRadius: 14, border: 'none', fontWeight: 700, fontSize: 22, cursor: disabled ? 'default' : 'pointer',
+  const base = { height: 58, borderRadius: 14, border: 'none', fontWeight: 700, fontSize: 'var(--text-2xl)', /* 22→24 (Datum 2xl) */ cursor: disabled ? 'default' : 'pointer',
     fontVariantNumeric: 'tabular-nums', transition: 'transform .06s, box-shadow .06s' }
   let sty
-  if (isOk && disabled) sty = { ...base, background: '#EDEBF2', color: '#b5aec4', boxShadow: '0 4px 0 #dcd8e4', fontSize: 16 } // Oscar's disabled Check
-  else if (isOk) sty = { ...base, background: T.irisFace, color: '#fff', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 16 }
-  else if (isDel) sty = { ...base, background: '#fff', color: T.textTertiary, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
-  else sty = { ...base, background: '#fff', color: T.textPrimary, boxShadow: down ? '0 1px 0 #d9d9d9' : '0 4px 0 #d9d9d9' }
+  if (isOk && disabled) sty = { ...base, background: 'var(--color-background-interactive-disabled)', color: 'var(--color-text-disabled)', boxShadow: '0 4px 0 var(--color-border-disabled)', fontSize: 'var(--text-base)', fontWeight: 500 } // Datum disabled (was Oscar's #EDEBF2/#b5aec4/#dcd8e4)
+  else if (isOk) sty = { ...base, background: T.irisFace, color: 'var(--color-text-on-brand)', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 'var(--text-base)', fontWeight: 500 } // Datum button: 16 / 500
+  else if (isDel) sty = { ...base, background: KEY_BG, color: 'var(--color-icon-tertiary)', boxShadow: down ? `0 1px 0 ${KEY_EDGE}` : `0 4px 0 ${KEY_EDGE}` }
+  else sty = { ...base, background: KEY_BG, color: T.textPrimary, boxShadow: down ? `0 1px 0 ${KEY_EDGE}` : `0 4px 0 ${KEY_EDGE}` }
   return (
     <button onPointerDown={() => !disabled && setDown(true)} onPointerUp={() => setDown(false)} onPointerLeave={() => setDown(false)}
       onClick={() => !disabled && onKey(k)} disabled={disabled}
@@ -473,7 +472,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
 
   const ready = q !== '' && r !== ''
   const hint = q === ''
-    ? 'Tap her share first — then the leftover.'
+    ? 'Tap each share first — then the leftover.' // was "her share" — public copy stays ungendered (2026-08-29 rule)
     : r === ''
       ? 'Now the leftover. Tap R, then type it — R 0 if none is left.'
       : 'Tap Check when you’re ready.'
@@ -482,23 +481,24 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
     height: 64, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, cursor: 'pointer',
     fontSize: 40, fontWeight: 700, color: T.iris, fontVariantNumeric: 'tabular-nums', borderStyle: 'solid', borderWidth: 2.5,
     borderColor: val !== '' || active === f ? T.iris : T.irisSoft,
-    background: val !== '' ? T.irisTint : active === f ? '#fff' : '#fafafa',
-    boxShadow: active === f ? '0 0 0 4px rgba(45,109,246,.18)' : 'none',
+    background: val !== '' ? T.irisTint : active === f ? 'var(--color-background-base)' : 'var(--color-background-subtle)',
+    boxShadow: active === f ? `0 0 0 4px ${T.irisSoft}` : 'none', // was rgba of the retired blue #2D6DF6
     transition: 'border-color .15s, background .15s, box-shadow .15s',
   })
-  const cap = (on) => ({ height: 14, fontSize: 10, fontWeight: 800, letterSpacing: '.05em', color: on ? T.iris : T.textTertiary })
+  const cap = (on) => ({ height: 16, lineHeight: '16px', fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.05em', color: on ? T.iris : T.textTertiary }) // 10/800 -> 12/700 (Datum floor is 11)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ textAlign: 'center', fontSize: 16, fontWeight: 500, color: T.textTertiary }}>{skin.ask}</div>
+      <div style={{ textAlign: 'center', fontSize: 'var(--text-base)', fontWeight: 400, color: T.textPrimary }}>{skin.ask}</div>
 
       {/* a ÷ b = [q] R [r] — two nowrap groups, so a narrow modal drops the answer to its own line */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '10px 12px', fontVariantNumeric: 'tabular-nums' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap' }}>
-          <span style={{ fontSize: 42, fontWeight: 700, color: T.textPrimary }}>{problem.a}</span>
-          <span style={{ fontSize: 32, fontWeight: 600, color: T.textTertiary }}>÷</span>
-          <span style={{ fontSize: 42, fontWeight: 700, color: T.textPrimary }}>{problem.b}</span>
-          <span style={{ fontSize: 32, fontWeight: 600, color: T.textTertiary }}>=</span>
+          {/* 42 -> 40 (--text-40), operators 32 (--text-32) */}
+          <span style={{ fontSize: 'var(--text-40)', fontWeight: 700, color: T.textPrimary }}>{problem.a}</span>
+          <span style={{ fontSize: 'var(--text-32)', fontWeight: 600, color: T.textTertiary }}>÷</span>
+          <span style={{ fontSize: 'var(--text-40)', fontWeight: 700, color: T.textPrimary }}>{problem.b}</span>
+          <span style={{ fontSize: 'var(--text-32)', fontWeight: 600, color: T.textTertiary }}>=</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, whiteSpace: 'nowrap' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
@@ -510,7 +510,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
           {/* R label — a real tap target that lights + pulses once the quotient has a digit */}
           {/* a duplicate pointer target for the remainder box — skipped by keyboard + screen readers */}
           <button onClick={() => setActive('r')} tabIndex={-1} aria-hidden="true"
-            style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 28, fontWeight: 800, lineHeight: 1, borderRadius: 12,
+            style={{ height: 64, padding: '0 8px', border: 'none', background: 'transparent', cursor: 'pointer', fontSize: 'var(--text-32)', fontWeight: 700, lineHeight: 1, borderRadius: 12, // 28/800 -> 32/700
               color: active === 'r' || r !== '' ? T.iris : T.textTertiary, animation: q !== '' && r === '' && active === 'q' ? 'dvTapMe 1.6s ease-in-out infinite' : 'none' }}>R</button>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
             <button onClick={() => setActive('r')} aria-label="remainder" style={{ ...box('r', r), width: 74, animation: shakeR ? 'dvShakeCell .4s ease-in-out both' : 'none' }}>
@@ -524,16 +524,17 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
       {nudge && (
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 14, padding: '11px 14px', animation: 'dvFadeSlide .3s ease-out both' }}>
           <span style={{ fontSize: 16, lineHeight: 1.35 }}>🍬</span>
-          <span style={{ fontSize: 15, fontWeight: 600, color: '#9A3412', lineHeight: 1.4 }}>The share is right! Now look again at what&apos;s <strong style={{ fontWeight: 800 }}>left over</strong>.</span>
+          <span style={{ fontSize: 'var(--text-base)', fontWeight: 400, color: '#9A3412', lineHeight: 1.4 }}>The share is right! Now look again at what&apos;s <strong style={{ fontWeight: 700 }}>left over</strong>.</span>
         </div>
       )}
 
       <Keypad onKey={onKey} okDisabled={!ready} />
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 9, marginTop: 2 }}>
-        <div style={{ textAlign: 'center', fontSize: 12.5, color: T.textTertiary, fontWeight: 500 }}>{hint}</div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginTop: 8 }}>
+        {/* same hint role as the ask screen: 14/400 secondary, 24 above */}
+        <div style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 400 }}>{hint}</div>
         <button onClick={onWalkthrough}
-          style={{ border: 'none', background: 'transparent', color: '#6E5BC0', fontWeight: 700, fontSize: 13.5, cursor: 'pointer', padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
+          style={{ border: 'none', background: 'transparent', color: 'var(--color-component-button-link-text-default)', fontWeight: 500, fontSize: 'var(--text-sm)', cursor: 'pointer', /* was Lilac 700 text — Lilac is decoration only; text = Iris (Datum link) */ padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
       </div>
     </div>
   )
@@ -556,7 +557,7 @@ export function WorkedExample({ problem, onBack }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
       <div style={{ alignSelf: 'stretch', display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center',
-        color: T.textTertiary, fontSize: 14, fontWeight: 600 }}>
+        color: T.textPrimary, fontSize: 'var(--text-base)', fontWeight: 400 }}> {/* main content: 16 primary (Amy 2026-10-05) */}
         <span>Your problem:</span>
         <span style={{ color: T.textPrimary, fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>
           {problem.a} {OPSYM[problem.op]} {problem.b}
@@ -566,12 +567,12 @@ export function WorkedExample({ problem, onBack }) {
       <div key={i} style={{ animation: 'stepIn .3s ease-out both' }}>
         {useV2 ? <MultiColumnMath snap={st.snap} /> : <ColumnMath snap={st.snap} big />}
       </div>
-      <div style={{ minHeight: 58, maxWidth: 400, textAlign: 'center', fontSize: 17, fontWeight: 500, color: T.textPrimary,
+      <div style={{ minHeight: 58, maxWidth: 400, textAlign: 'center', fontSize: 'var(--text-base)', fontWeight: 400, color: T.textPrimary, // content 16/400 (was 17/500)
         lineHeight: 1.5, background: T.irisTint, borderRadius: 14, padding: '12px 18px' }}>{st.caption}</div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         {stages.map((_, k) => (
           <span key={k} style={{ width: k === i ? 22 : 8, height: 8, borderRadius: 5,
-            background: k === i ? T.iris : k < i ? T.irisSoft : '#E6E6E6', transition: 'all .2s' }} />
+            background: k === i ? T.iris : k < i ? T.irisSoft : 'var(--color-border-default)', transition: 'all .2s' }} />
         ))}
       </div>
       <div style={{ display: 'flex', gap: 10, marginTop: 2, flexWrap: 'wrap', justifyContent: 'center' }}>

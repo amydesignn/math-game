@@ -220,6 +220,147 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
+Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
+Garden. Amy's order: **Star Arcade → Halloween, Sunny Town → open plot +
+neighbours, Merry Market LAST (not started).**
+- **Seasons are DATE WINDOWS (`src/season.js`), not switches:** `halloween` =
+  Oct 1 → Nov 2 inclusive, every year, no deploy. `?season=halloween|none`
+  overrides (decoration only, never touches saves). Resolved ONCE at module
+  load in maps.js (`arcade: withSeason(ARCADE)`).
+- **Spooky Arcade** = the arcade's own decor + Halloween ADDED on top (machines
+  stay) + dusk `light`/ground/sky, renamed "Spooky Arcade" on the label and
+  the Door card (`card` → Door's WORLDS overlay; art `worlds/arcade-halloween.jpg`).
+  **The gate glow stays violet** — colour is the signpost (test-guarded).
+- **Procedural props, `src/world/Spooky.jsx`:** kenney.nl is blocked from the
+  cloud container, so no Graveyard Kit — pumpkins (carved/plain), graves,
+  candles, torches, a bubbling cauldron are three.js primitives, flat-shaded to
+  match Kenney. Decor entries carry `fx` instead of a GLB `name` (Scene
+  dispatches; preloadMap skips them). MOVING things live in `map.ambient`:
+  floating spirit flames (`wisp`: orange/violet/mint) + cute ghosts that stop,
+  turn toward the camera and wiggle when she's within 3. Ghost material is
+  OPAQUE + emissive (translucent showed its inner spheres; dusk greyed it).
+  If Amy ever drops in the real Kenney Graveyard Kit, swap `fx` entries for GLBs.
+- **Sunny Town** is now trees only (outer `treeLine` row + corner shade trees,
+  middle open — the kids' build plot) and **4 neighbours**
+  (`map.neighbours`, `src/world/Neighbour.jsx`): Mia/Leo/Sam/Max, each a Kenney
+  mini character + their own cube `<Pet>` following them. They amble ≤2.2
+  around home, and when she's within 3 they stop, face her, `emote-yes` and say
+  a line (bubble = drei Html, 4px-grid, `nbPop` keyframe). Lines cycle per
+  visit; re-arm after she walks >5 away. Copy is public-safe (test-guarded: no
+  family names). A neighbour wearing the PLAYER's character swaps to a spare.
+- **`blockers(map)`** (maps.js) = decor + neighbour homes; sparkles + stations
+  keep clear of both. `house()` retired with the old town (git history).
+- Tests `season-maps.test.js` (+10) → 205 green; oxlint + build clean.
+  Verified in headless Chromium (swiftshader): arcade + boo-yard + overview,
+  town greeting bubble, Door card in/out of season, zero page errors.
+- **Open:** Merry Market redo (Amy: last). Door card photos are quick
+  captures — Amy may reshoot. Neighbours don't avoid her placed assets on
+  their short stroll (harmless overlap, no collision system).
+
+## Merry Market — market day in the square 🍎 (2026-10-06, branch `feat/merry-market-day`)
+The last of Amy's three map redos. Dense (Ivy's taste), alive (people).
+- **Layout (`maps.js` `market`):** fountain straight ahead of spawn, four striped
+  stalls north (apples · bakery · limes/plums · toys) and two south (ice cream ·
+  checkout), bunting over both rows, crates/planters/carts, an outer tree line.
+  The west half of the square stays open for her to build. `stall()` helper =
+  canopy + goods.
+- **EVERY stall faces +z (the follow-cam's side)** and **keepers stand BESIDE the
+  counter, not under it** — the first pass had back-facing south stalls and
+  keepers hidden under canopies (camera looks down; roofs hide whatever's under).
+- **People = `Neighbour` with two new modes:** keepers (`stroll: 0` + `facing` —
+  stay put, turn back to the counter after chatting) and shoppers (`route` of
+  `[x, z, yaw?]` stops, looping; a stop WITH a yaw = browse a stall with
+  `interact-right`, without = a corner to walk round). 6 keepers + 4 shoppers
+  (3 with pets). `blockers()` uses `home || route[0]`.
+- **Procedural kinds in `src/world/Market.jsx`** (awning, fountain w/ droplets +
+  ripple, bunting that sways, fruit crates, planters). All `fx` decor now goes
+  through ONE dispatcher, `src/world/fx.jsx` (`FX` = SPOOKY_FX + MARKET_FX).
+- **Route-collision test** walks every shopper segment against the fountain,
+  stalls, keepers, planters, crates, carts — it caught a real walk-through-the-
+  fountain (the pig 🐷) and a walk-through-a-crate. Re-run it after moving ANY
+  market prop. `season-maps.test.js` → 211 green; oxlint + build clean.
+- New Door card `public/worlds/market.jpg`.
+
+## Play metrics — anonymous session counts (2026-10-07, branch `feat/play-metrics`)
+Amy wants to watch engagement + session time before marketing; Vercel page views
+can't say (one-page app = "it loaded"). **`src/metrics.js`** tallies ONE session
+on the device and sends coarse rows to **`public.play_events`** (Supabase,
+migration `play_events_anonymous_metrics`): `session_start` (`came_back` bucket:
+new | same-day | 1 | 2-7 | 8+), `world_enter` (world), `session_end` (minutes in
+a world capped 240, problems, solved, maps, quests). `player` = guest|account
+WORD so family accounts can be filtered out.
+- **ZERO PII by schema** — no uid/name/email/device id; nothing links sessions.
+  The last-played DAY stays in localStorage (`luxi.lastPlayDay`), only the
+  bucket is sent. Check constraints bound every value. **RLS INSERT-only** for
+  anon + authenticated, no read policy (verified as anon: insert ok, read = 0).
+  `public/privacy.html` now describes it ("Anonymous play counts").
+- Transport = the feedback.js pattern (raw PostgREST `fetch(keepalive)`, no
+  supabase-js). Off in dev unless `?metrics`. Column is `came_back`, NOT
+  `returning` (reserved word in Postgres — the first migration failed on it).
+- Hooks in App: boot `startMetrics`, `enterWorld`→`enteredWorld`, `goToDoor`→
+  `leftWorld`, `travel`→`travelled`, both onResult paths→`answered`, quest
+  complete→`questDone`. Hide/show starts a fresh tally (resumes world time).
+- **2026-10-08 — `progress` checkpoints (Finn).** Finn read 14 starts / 4 ends
+  as lost ends; the data said every world session HAD its end — the 10 orphans
+  were Door-only visits, which sent no end by design. Now: every start gets a
+  `session_end` (Door-only = maps 0), so **starts − ends = genuinely lost**;
+  and `progress` rows checkpoint every 5 problems, after a quest, and on the
+  way back to the Door. **minutes/problems/solved/quests are DELTAS** since the
+  session's last row → totals = `SUM` over progress + session_end (no id links
+  rows, so cumulative rows couldn't be de-duplicated). Migration
+  `play_events_progress_event` adds `progress` to the event check. Rows before
+  this change (`app_version` 3d375d0) are cumulative-in-one-end-row — same SUM.
+- Tests `metrics.test.js` (+7) incl. a **field whitelist** — adding any field
+  fails there first. Read the numbers via the Supabase MCP (`play_events`).
+
+## People in the Rosy Garden + Forest Clearing 🌹🏕️ (2026-10-06, branch `feat/world-people`)
+Ivy's verdict on the dense/light A/B: **dense**, and "people there too, like
+the Market". Amy: a garden SHED with people going in and out for tools.
+- **Rosy Garden → dense + working:** shed corner NE (shed door +z, tool rack,
+  wheelbarrow, sacks, a veg patch), lily pond + bench SW, hedges, two rose
+  arches over the walk, rose bushes in every bed and along the walk, a tea
+  party in the gazebo (table + stools), outer tree line. 6 people: 2 tea
+  drinkers + a pond-bench sitter (`pose: 'sit'`), gardener #1 (shed → can →
+  veg patch + north beds → can back), gardener #2 (shed → spade → weeds south
+  beds → swaps for a basket → flowers to the tea table → basket back), a dog
+  walker on the walk.
+- **Forest Clearing:** a real campfire (flickering cones in its OWN stone ring —
+  Kenney `stones` is a rock PILE; the old "fire ring" buried the fire) with
+  two campers sitting on logs, woodpiles, the static `character-archer` model
+  replaced by a live archer (bow pose), a lookout keeper, a hiker + dog on the
+  trail (stops at the fire), a forager with a basket in the grove.
+- **Procedural kinds, `src/world/Outdoor.jsx`** (`OUTDOOR_FX` in fx.jsx):
+  shed, hedge, bench, pond, rosearch, rosebush, teatable, stool, wheelbarrow,
+  toolrack, sack, campfire, logseat, woodpile. `CARRY` = things held: can,
+  rake, spade, basket, bow.
+- **Neighbour.jsx grew jobs:** a route stop's 4th element `{ do, ms, wait,
+  inside, take }` (`inside` hides them in a building; `take` swaps what's in
+  the right hand AFTER the stop — tools parent to the `arm-right` bone via
+  `createPortal`, scaled 1.7 to read from the follow-cam; `Tool.body` = mount
+  on the character instead — the bow, which lay hidden along the arm in the
+  shooting pose). Keepers take `pose` + `seat` (sit height: stool 0.28, log
+  0.27, bench 0.26 — `sit` puts the hips at y=0). A route walker greeted
+  mid-leg now FINISHES the leg (they used to skip a stop → a tool could
+  never go back). **No pets on sitters** — the pet walks onto the owner and
+  covers them on the bench.
+- **Tests (season-maps.test.js):** per map — dense (>100 decor), every walker
+  segment clears every solid (radius table `R`; hedges sampled, arches = posts
+  only, shed exempt only on legs into an `inside` stop), shed entered only
+  straight through its door, every tool taken comes back, no twins, public-safe
+  copy. It caught 5 walk-throughs while laying out. **Re-run after moving ANY
+  garden/clearing prop.**
+- Verified headless (playwright-core + system Chrome, swiftshader;
+  `__overview(h, tilt, cx, cz)` low angles): sitters on stools/logs/bench,
+  gardener out of the shed with the can, campfire, archer's bow.
+- **Door cards retaken** (`public/worlds/{garden,clearing}.jpg`, 900×494): HUD-
+  free canvas grab mid-hello (tea party / campers). Recipe: playwright seeds the
+  save with `addInitScript` BEFORE boot (seeding after a first load races the
+  app's own save → no Resume button), clicks Resume, `__overview(h,tilt,cx,cz)`,
+  hides all DOM except `.nbBubble` + the world canvas (the minimap is a canvas
+  too), `__walk` up to a neighbour, shoots when `.nbBubble` appears,
+  `sips -Z 900 -s formatOptions 82`.
+
 ## Long-mult walkthrough fix ✅ SHIPPED 2026-09-27 — shaped example + every carry + a real ending
 From Amy's Luxi Math video recording + Finn's review (32 × 31, answered 895). Commit `a088dfb`.
 - **"One just like it" wasn't** — 32 × 31 got 40 × 21 (the 0 trivialises the ones pass).

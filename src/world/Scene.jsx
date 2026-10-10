@@ -10,8 +10,11 @@ import Station from './Station'
 import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
 import Buddy from './Buddy'
-import { WORLD, GEMS, STATION, assetScale } from '../config'
-import { MAPS } from '../maps'
+import Neighbour from './Neighbour'
+import { Ambient } from './Spooky'
+import { FxProp } from './fx'
+import { WORLD, GEMS, STATION, CHARACTERS, assetScale } from '../config'
+import { MAPS, blockers } from '../maps'
 import { stationFor } from '../stations'
 import { SKINS } from '../ui/skins'
 
@@ -28,13 +31,14 @@ function spawnSparkles(map, spawn, placed = []) {
   const count = GEMS.perMap
   const pts = []
   const B = WORLD.bounds - 2.5
+  const blk = blockers(map)
   let guard = 0
   while (pts.length < count && guard++ < 400) {
     const x = (Math.random() * 2 - 1) * B
     const z = (Math.random() * 2 - 1) * B
     if (Math.hypot(x - spawn[0], z - spawn[1]) < 4) continue
     if (map.gates.some((g) => Math.hypot(x - g.position[0], z - g.position[2]) < 4.5)) continue
-    if (map.decor.some((d) => Math.hypot(x - d.position[0], z - d.position[2]) < 1.8)) continue
+    if (blk.some(([bx, bz, r]) => Math.hypot(x - bx, z - bz) < 1.8 + r)) continue
     if (placed.some((w) => Math.hypot(x - w.x, z - w.z) < 1.8)) continue
     if (pts.some((p) => Math.hypot(x - p.x, z - p.z) < 5)) continue
     pts.push({ id: pts.length, x, z, collected: false })
@@ -194,6 +198,12 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
   // Follow camera + tap-marker animation (must live under the Canvas).
   const { camera } = useThree()
   const camTarget = useRef(new THREE.Vector3())
+  // dev-only bird's-eye for layout review: window.__overview(30) → top-down over
+  // the map centre; window.__overview(0) → back to the follow camera
+  const overview = useRef(0)
+  useEffect(() => {
+    if (import.meta.env.DEV) window.__overview = (h = 30, tilt = 0.5, cx = 0, cz = 0) => (overview.current = h ? [h, tilt, cx, cz] : 0)
+  }, [])
 
   // On entering a map, snap the camera straight to the spawn point — the fade
   // overlay hides the cut; without this it would swoosh across the new map.
@@ -206,6 +216,12 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
   }, [])
 
   useFrame((_, dt) => {
+    if (import.meta.env.DEV && overview.current) {
+      const [h, tilt, cx = 0, cz = 0] = overview.current
+      camera.position.set(cx, h, cz + h * tilt)
+      camera.lookAt(cx, 0, cz)
+      return
+    }
     // camera trails the character; pinch zoom scales the offset
     const desired = charPosRef.current
     const zoom = zoomRef.current
@@ -280,8 +296,9 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
 
   return (
     <>
-      <hemisphereLight args={['#fff6e8', '#b9b0d6', 0.9]} />
-      <directionalLight position={[6, 12, 6]} intensity={1.1} />
+      {/* a map may override the light (the Halloween arcade is dusk) */}
+      <hemisphereLight args={map.light?.hemi || ['#fff6e8', '#b9b0d6', 0.9]} />
+      <directionalLight position={[6, 12, 6]} color={map.light?.dir?.[0] || '#ffffff'} intensity={map.light?.dir?.[1] ?? 1.1} />
 
       {/* the land beyond the map — muted, so "outside" reads as outside */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} onPointerDown={handleTap}>
@@ -301,8 +318,14 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
         <meshBasicMaterial color="#4b54dd" transparent opacity={0} />
       </mesh>
 
-      {map.decor.map((d, i) => (
-        <Prop key={i} {...d} />
+      {map.decor.map((d, i) => (d.fx ? <FxProp key={i} {...d} /> : <Prop key={i} {...d} />))}
+      {map.ambient && <Ambient items={map.ambient} charPosRef={charPosRef} />}
+
+      {/* the people who live here — never wearing the player's own character */}
+      {(map.neighbours || []).map((n, i) => (
+        <Suspense key={i} fallback={null}>
+          <Neighbour {...n} character={n.character === characterId ? spareCharacter(map, characterId) : n.character} charPosRef={charPosRef} />
+        </Suspense>
       ))}
 
       {map.gates.map((g) => (
@@ -370,4 +393,11 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
       )}
     </>
   )
+}
+
+/** A character no neighbour (and not the player) is wearing — so a player who
+ *  picked Mia's look never meets her own twin in town. */
+function spareCharacter(map, playerId) {
+  const taken = new Set([playerId, ...(map.neighbours || []).map((n) => n.character)])
+  return CHARACTERS.find((c) => !taken.has(c)) || playerId
 }

@@ -35,6 +35,7 @@
 
   /* Other Datum steps in use — subset, copied verbatim (oklch as Datum writes them) */
   --brand-neutral-00: #FFFFFF;
+  --neutral-300: oklch(87% 0 0);   /* keypad key edge */
   --neutral-500: oklch(55.6% 0 0);
   --neutral-600: oklch(43.9% 0 0);
   --neutral-800: oklch(26.9% 0 0);
@@ -43,6 +44,18 @@
   --orange-600:  oklch(64.6% 0.222 41.116);
   --amber-600:   oklch(66.6% 0.179 58.318);
   --amber-700:   oklch(55.5% 0.163 48.998);
+  /* station accentInk — eyebrow + QUEST badge text (skins.js) */
+  --teal-700:    oklch(51.1% 0.096 186.391);
+  --green-700:   oklch(52.7% 0.154 150.069);
+  --blue-700:    oklch(48.8% 0.243 264.376);
+  --pink-800:    oklch(45.9% 0.187 3.815);
+  --sky-800:     oklch(44.3% 0.11 240.79);
+  /* division walkthrough — move colours (text) + divisor teal */
+  --orange-700:  oklch(55.3% 0.195 38.402);
+  --red-700:     oklch(50.5% 0.213 27.518);
+  --pink-700:    oklch(52.5% 0.223 3.958);
+  --teal-600:    oklch(60% 0.118 184.704);
+  --teal-50:     oklch(98.4% 0.014 180.72);
 
   /* Datum SEMANTIC tokens in use — subset, copied verbatim from
      nathan-mcp-codebase-01 src/styles/datum-tokens.css (styling-v0.18).
@@ -59,6 +72,18 @@
   --color-text-tertiary: #737373; /* neutral-500 */
 
   --color-text-brand: #3D43BE; /* brand-iris-700 — Datum styling-v0.19 (was iris-600) */
+  --color-text-on-brand: #FFFFFF; /* white */
+  --color-text-inverse: #FFFFFF; /* white */
+
+  /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
+  --color-background-base: #FFFFFF; /* white */
+  --color-background-subtle: #FAFAFA; /* neutral-50 */
+  --color-background-brand-subtle: #EDE7FC; /* brand-lilac-100 */
+  --color-background-interactive-default: #FFFFFF; /* white */
+  --color-border-default: #E5E5E5; /* neutral-200 */
+  --color-icon-secondary: #525252; /* neutral-600 */
+  --color-icon-tertiary: #737373; /* neutral-500 */
+  --color-icon-success: #00A63E; /* green-600 — Datum */
 
   /* Datum COMPONENT tokens in use — Button ghost (Settings Sign out) + link (Privacy
      Policy), copied verbatim from datum-tokens.css (styling-v0.20). */
@@ -72,6 +97,25 @@
   --color-component-button-link-text-pressed: #333A98; /* brand-iris-800 */
   --color-component-button-link-background-pressed: #DDD1F7; /* brand-lilac-200 */
   --color-component-button-link-focus-ring: #333A98; /* brand-iris-800 */
+  --color-component-button-secondary-background-default: #EDE7FC; /* brand-lilac-100 */
+  --color-component-button-secondary-background-hover: #DDD1F7; /* brand-lilac-200 */
+  --color-component-button-secondary-background-pressed: #C6B4F0; /* brand-lilac-300 */
+  --color-component-button-secondary-text-default: #333A98; /* brand-iris-800 */
+  --color-component-button-secondary-focus-ring: #333A98; /* brand-iris-800 */
+  /* status (Datum datum-tokens.css, verbatim) — SignupModal error note + saved toast */
+  --color-status-warning-background: #FFFBEB; /* amber-50 */
+  --color-status-warning-border: #FEE685; /* amber-200 */
+  --color-status-warning-text: #973C00; /* amber-800 */
+  --color-status-success-background: #F0FDF4; /* green-50 */
+  --color-status-success-text: #016630; /* green-800 */
+  /* Datum Badge + Status indicator (styling-v0.21, verbatim) — the Door's New + Last played */
+  --color-component-badge-new-background: #FFFBEB; /* amber-50 */
+  --color-component-badge-new-border: #FEE685; /* amber-200 */
+  --color-component-badge-new-text: #973C00; /* amber-800 */
+  --color-component-status-indicator-background: #FFFFFF; /* white */
+  --color-component-status-indicator-border: #E5E5E5; /* neutral-200 */
+  --color-component-status-indicator-live-dot: #00A63E; /* green-600 */
+  --color-component-status-indicator-text: #404040; /* neutral-700 */
 
   /* Datum TYPE tokens in use — size + line-height ride together (globals.css
      overrides Tailwind's line-heights to 1.5 up to xl). Weights 400/500/700 only. */
@@ -79,10 +123,17 @@
   --text-sm: 0.875rem;  --text-sm--line-height: 1.5;   /* 14px */
   --text-base: 1rem;    --text-base--line-height: 1.5; /* 16px */
   --text-xl: 1.25rem;   --text-xl--line-height: 1.5;   /* 20px */
+  /* game display — equation + keypad (Amy 2026-10-05: on Datum's full scale) */
+  --text-2xl: 1.5rem;   --text-2xl--line-height: 1.25; /* 24px */
+  --text-32: 2rem;      --text-32--line-height: 1.25;  /* 32px */
+  --text-40: 2.5rem;    --text-40--line-height: 1.25;  /* 40px */
+  --text-5xl: 3rem;     --text-5xl--line-height: 1.25; /* 48px */
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-bold: 700;
   --tracking-widest: 0.1em;
+  /* Datum motion — easing copied verbatim (globals.css @theme) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
   /* house-only (not Datum) */
   --lilac-50: #f6f4fd;
@@ -155,9 +206,13 @@ canvas { touch-action: none; display: block; }
   align-items: start;
 }
 .doorLeft {
-  position: sticky;
-  top: 84px;
   align-self: start;
+}
+/* Sticky only when the whole column fits under the 84px header: with What's new
+   added it is ~716px tall, so on a 768px laptop a sticky column would hide the
+   quest strip. Shorter windows just scroll it with the page. */
+@media (min-height: 820px) {
+  .doorLeft { position: sticky; top: 84px; }
 }
 .doorWorlds {
   display: grid;
@@ -185,6 +240,25 @@ canvas { touch-action: none; display: block; }
   .doorWorldsCol { order: 1; }
   .doorLeftBody { order: 2; }
 }
+/* What's new carousel (Door.jsx WhatsNew) */
+.doorNew-track::-webkit-scrollbar { display: none; }
+.doorNew-slide:hover img { transform: scale(1.03); }
+.doorNew-slide img { transition: transform .3s ease; }
+@media (prefers-reduced-motion: reduce) { .doorNew-slide:hover img { transform: none; } }
+.doorNew-slide:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: -2px; border-radius: 24px; } /* inset: the card clips overflow */
+.doorNew-arrow:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+.doorNew-arrow:hover { background: #FFFFFF !important; }
+/* Datum motion-pulse (styling-v0.21, datum-motion.css): a live dot breathes — a soft
+   ring grows out and fades every 2s (0.5 Hz, far under WCAG 2.3.1's 3 flashes/s).
+   A loop, outside the duration ladder. The ring takes the dot's colour (currentColor).
+   Reduced motion: the dot stays, still. */
+.motion-pulse { animation: datum-pulse 2s var(--ease-out) infinite; }
+@keyframes datum-pulse {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 40%, transparent); }
+  to { box-shadow: 0 0 0 6px color-mix(in srgb, currentColor 0%, transparent); }
+}
+@media (prefers-reduced-motion: reduce) { .motion-pulse { animation: none; } }
+
 @keyframes doorPop {
   0% { transform: scale(0.96) translateY(8px); opacity: 0; }
   100% { transform: scale(1) translateY(0); opacity: 1; }
@@ -202,6 +276,25 @@ canvas { touch-action: none; display: block; }
 @media (max-width: 600px) {
   .lvlbar-track, .lvlbar-pts, .lvlbar-div { display: none; }
   .lvlbar-pill { padding: 0 13px !important; gap: 8px !important; }
+}
+
+/* ── Phone HUD: top row = stat pill (fills) · gear ──
+   (Amy 2026-10-05) The labelled Exit pill and the stat pill collided on
+   phones. Below 600px the stat group owns the top row from the left edge to
+   the minimap, and the pill fills it so the level and gem digits have room.
+   The left rail (Exit as a 48px door+arrow icon, then 🛍️) drops below it. */
+.hud-exit-wide { display: inline-flex; align-items: center; gap: 6px; }
+.hud-exit-icon { display: none; }
+@media (max-width: 600px) {
+  /* both rail buttons 48px (Amy: a bigger target for kids; Datum has no
+     40/48 icon-button size yet — Notion Datum Backlog). Pill + gear stay 44. */
+  .hud-exit { width: 48px; height: 48px !important; padding: 0 !important; justify-content: center; }
+  .hud-left .hud-round { width: 48px !important; height: 48px !important; }
+  .hud-exit-wide { display: none; }
+  .hud-exit-icon { display: inline-flex; }
+  .hud-left { top: calc(max(16px, env(safe-area-inset-top)) + 44px + 12px) !important; }
+  .hud-stats { left: 16px; right: calc(16px + 104px + 8px) !important; gap: 8px !important; }
+  .hud-stats .lvlbar-pill { flex: 1 1 auto; min-width: 0; justify-content: space-between; padding: 0 12px !important; }
 }
 
 /* gem counter pop — replays via key={count} remount on each collect */
@@ -228,6 +321,8 @@ canvas { touch-action: none; display: block; }
 /* ── Station mini-quest animations (Oscar's Phase 5 comp, lifted) ── */
 @keyframes floaty { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
 @keyframes markerOrbit { 0%, 100% { transform: translateY(0) rotate(-6deg); } 50% { transform: translateY(-11px) rotate(6deg); } }
+/* Neighbour speech bubble (world/Neighbour.jsx) — namespaced nb- so it can never retune another popIn */
+@keyframes nbPop { 0% { opacity: 0; transform: translateY(8px) scale(.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes slotFill { 0% { transform: scale(.4) rotate(-14deg); } 60% { transform: scale(1.25) rotate(6deg); } 100% { transform: scale(1) rotate(0); } }
 @keyframes bonusRing { 0% { transform: scale(.5); opacity: .8; } 100% { transform: scale(2.1); opacity: 0; } }
 
@@ -235,9 +330,9 @@ canvas { touch-action: none; display: block; }
 /* the bar */
 @keyframes shineSweep { 0% { transform: translateX(-140%) skewX(-18deg); } 100% { transform: translateX(340%) skewX(-18deg); } }
 @keyframes nearShimmer { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.28); } }
-/* pastel level identity (2026-07-26) — 167,139,250 is LVL.main; the saturated
-   127,34,254 ring read as a hard purple flash against the softened bar */
-@keyframes surgeGlow { 0% { box-shadow: 0 0 0 0 rgba(167,139,250,0); } 45% { box-shadow: 0 0 0 7px rgba(167,139,250,.30); } 100% { box-shadow: 0 0 0 0 rgba(167,139,250,0); } }
+/* level identity = Iris 500 (97,105,224 = LVL.glow, 2026-10-06; was pastel Lilac).
+   Kept soft at .30 — a full-strength ring read as a hard flash on the bar */
+@keyframes surgeGlow { 0% { box-shadow: 0 0 0 0 rgba(97,105,224,0); } 45% { box-shadow: 0 0 0 7px rgba(97,105,224,.30); } 100% { box-shadow: 0 0 0 0 rgba(97,105,224,0); } }
 @keyframes rollOut { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-115%); opacity: 0; } }
 @keyframes rollIn { 0% { transform: translateY(115%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 @keyframes tickPop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
@@ -341,6 +436,29 @@ canvas { touch-action: none; display: block; }
 .luxiFb-ta:focus { border-color: var(--color-border-interactive-focus); } /* after :hover so focus wins */
 .luxiFb-press { transition: transform .07s, box-shadow .07s, background .15s; }
 .luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
+
+/* ── Save Your Progress (SignupModal.jsx) → Datum, 2026-10-05 ──
+   Same recipe as .luxiFb-: interactive states here because an inline style beats
+   :hover. Primary = the Luxi 3D button (4px press, shadow to 0). Input = Datum's
+   interactive border trio (neutral-500 rest 4.74:1 · 600 hover · iris-600 focus).
+   Not now = quiet secondary text (Feedback's "Not now"); links = Datum link tokens. */
+.luxiSu-close { background: var(--brand-lilac-100); transition: background .15s; }
+.luxiSu-close:hover { background: var(--brand-lilac-200); }
+.luxiSu-primary { transition: transform .07s, box-shadow .07s, filter .15s; }
+.luxiSu-primary:hover:not(:disabled):not([aria-busy]) { filter: brightness(1.04); }
+.luxiSu-primary:active:not(:disabled):not([aria-busy]) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
+.luxiSu-input { border: 1.5px solid var(--color-border-interactive-default); background: var(--color-background-interactive-default); outline: none; transition: border-color .15s; }
+.luxiSu-input:hover { border-color: var(--color-border-interactive-hover); }
+.luxiSu-input:focus { border-color: var(--color-border-interactive-focus); outline: 1px solid var(--brand-iris-700); outline-offset: 2px; } /* after :hover so focus wins. The border shift alone (neutral-500 → iris-600) is 1.23:1, too faint to be a focus indicator, so it also gets the house 1px Iris 700 ring, 2px out (7.65:1). */
+.luxiSu-input::placeholder { color: var(--color-text-placeholder); }
+.luxiSu-input:disabled { background: var(--color-background-interactive-disabled); }
+.luxiSu-notnow { transition: background .15s, color .15s; }
+.luxiSu-notnow:hover { background: var(--brand-lilac-100); color: var(--color-text-primary); }
+.luxiSu-link { color: var(--color-component-button-link-text-default); text-decoration: underline; text-underline-offset: 4px; border-radius: 4px; transition: color .15s, background-color .15s; }
+.luxiSu-link:hover:not(:disabled) { color: var(--color-component-button-link-text-hover); background: var(--color-component-button-link-background-hover); }
+.luxiSu-link:active:not(:disabled) { color: var(--color-component-button-link-text-pressed); background: var(--color-component-button-link-background-pressed); }
+.luxiSu-link:focus-visible { outline: 1px solid var(--color-component-button-link-focus-ring); outline-offset: 2px; }
+.luxiSu-link:disabled { color: var(--color-text-secondary); text-decoration: none; } /* the countdown ("Resend in 30s") is information the parent reads, so it stays legible (7.81:1) rather than disabled grey (2.6:1, exempt but reads as a fail) */
 .luxiFb-notnow { transition: background .15s; }
 .luxiFb-notnow:hover { background: var(--brand-lilac-50); }
 
@@ -355,9 +473,19 @@ canvas { touch-action: none; display: block; }
 .luxiSet-link:hover { color: var(--color-component-button-link-text-hover); background: var(--color-component-button-link-background-hover); }
 .luxiSet-link:active { color: var(--color-component-button-link-text-pressed); background: var(--color-component-button-link-background-pressed); }
 .luxiSet-link:focus-visible { outline: 1px solid var(--color-component-button-link-focus-ring); outline-offset: 2px; }
+/* Profile popover photo button = Datum Button secondary (component tokens copied below in :root) */
+.luxiPf-secondary { background: var(--color-component-button-secondary-background-default); color: var(--color-component-button-secondary-text-default); transition: scale .1s cubic-bezier(.23,1,.32,1), background-color .15s; }
+.luxiPf-secondary:hover:not(:disabled) { background: var(--color-component-button-secondary-background-hover); }
+.luxiPf-secondary:active:not(:disabled) { background: var(--color-component-button-secondary-background-pressed); scale: .97; }
+.luxiPf-secondary:focus-visible { outline: 1px solid var(--color-component-button-secondary-focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .luxiPf-secondary:active { scale: none; } }
 @media (prefers-reduced-motion: reduce) { .luxiSet-ghost:active { scale: none; } }
 
 /* House focus ring (contrast audit, 2026-10-04 — Amy's interaction-states rule):
    1px in Iris 700, 2px gap so it reads on Iris buttons too (WCAG 1.4.11).
    Scoped to the shared modal shell; the app-wide pass comes with later audits. */
 [role="dialog"] button:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+/* HUD level pill — keyboard focus. It sits outside any dialog, so it never got
+   the house ring and fell back to a faint browser default (1.24:1). Same 1px
+   Iris 700 ring, 2px out, as every other Luxi control. */
+.lvlbar-pill:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
