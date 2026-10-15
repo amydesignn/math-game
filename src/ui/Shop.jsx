@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SHOP, SHOP_CATEGORIES, SIZES, SPARKLE, COMPANIONS } from '../config'
+import { SHOP, SHOP_CATEGORIES, SIZES, SPARKLE, COMPANIONS, GEAR } from '../config'
 
 // display fill for each sparkle swatch (metallics + rainbow read as gradients)
 const SWATCH_BG = {
@@ -18,10 +18,11 @@ const SWATCH_BG = {
  * shop and hands the item to App, which enters placement mode. "Your things"
  * lists bought-but-unplaced items (e.g. a cancelled placement) to place later.
  */
-export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], onBuy, onBuySparkle, onBuyPet, onChoosePet, onPlaceOwned, onClose }) {
+export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], gear = {}, ownedGear = [], onBuy, onBuySparkle, onBuyPet, onChoosePet, onBuyGear, onWearGear, onPlaceOwned, onClose }) {
   const [selected, setSelected] = useState(null) // "pack:asset" of the selected tile
   const [magicSel, setMagicSel] = useState(null) // selected sparkle colorId
   const [petSel, setPetSel] = useState(null) // selected companion id (not yet owned)
+  const [gearSel, setGearSel] = useState(null) // selected wardrobe piece (not yet owned)
   const [size, setSize] = useState(1) // ×1/×2/×3 — resets each time the shop opens
 
   const sheet = {
@@ -75,6 +76,69 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
               </div>
             </>
           )}
+
+          {/* Wardrobe — the Sorcerer's hat + staff: buy a colour and she wears it
+              right away; switch (or take one off) any time */}
+          {[['hat', '🧙 Hats', 'No hat'], ['staff', '🪄 Staffs', 'No staff']].map(([slot, label, bare]) => (
+            <div key={slot}>
+              <SectionLabel>{label}</SectionLabel>
+              <div style={{ ...grid, marginBottom: 6 }}>
+                {GEAR.filter((g) => g.slot === slot).map((g) => {
+                  const isHers = g.price === 0 || ownedGear.includes(g.id)
+                  const isOn = gear[slot] === g.id
+                  const affordable = isHers || gems >= g.price
+                  const isSel = gearSel === g.id
+                  return (
+                    <button
+                      key={g.id}
+                      onClick={() => {
+                        if (isOn) return
+                        if (isHers) onWearGear(slot, g.id)
+                        else if (affordable) setGearSel(isSel ? null : g.id)
+                      }}
+                      aria-disabled={(!affordable || isOn) || undefined}
+                      aria-pressed={isOn}
+                      style={{ ...tile(affordable), outline: isSel || isOn ? '3px solid var(--brand-iris-600)' : undefined }}
+                    >
+                      <img
+                        src={import.meta.env.BASE_URL + g.thumb}
+                        alt=""
+                        width={48}
+                        height={48}
+                        style={{ objectFit: 'contain', filter: affordable ? 'none' : 'grayscale(1)', opacity: affordable ? 1 : 0.5 }}
+                      />
+                      <span style={tileName(affordable)}>{g.name}</span>
+                      {isOn ? (
+                        <span style={{ ...tilePrice, color: 'var(--color-text-brand)' }}>Wearing 💜</span>
+                      ) : isHers ? (
+                        <span style={{ ...tilePrice, color: 'var(--color-component-button-link-text-default)' }}>Wear</span>
+                      ) : isSel ? (
+                        <span
+                          onClick={(e) => { e.stopPropagation(); onBuyGear(g.id); setGearSel(null) }}
+                          style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '4px 12px', fontWeight: 800 }}
+                        >
+                          Buy 💎{g.price}
+                        </span>
+                      ) : (
+                        <span style={{ ...tilePrice, color: affordable ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>💎 {g.price}</span>
+                      )}
+                    </button>
+                  )
+                })}
+                <button
+                  onClick={() => gear[slot] !== null && onWearGear(slot, null)}
+                  aria-pressed={gear[slot] === null}
+                  style={{ ...tile(true), outline: gear[slot] === null ? '3px solid var(--brand-iris-600)' : undefined }}
+                >
+                  <span style={{ fontSize: 30, lineHeight: '48px' }}>🚫</span>
+                  <span style={tileName(true)}>{bare}</span>
+                  <span style={{ ...tilePrice, color: gear[slot] === null ? 'var(--color-text-brand)' : 'var(--color-component-button-link-text-default)' }}>
+                    {gear[slot] === null ? 'Wearing 💜' : 'Take off'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          ))}
 
           {/* Companions — buy one and it follows her right away; switch any time */}
           <SectionLabel>💜 Companions</SectionLabel>

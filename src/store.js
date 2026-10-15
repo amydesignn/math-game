@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS } from './config'
+import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR } from './config'
 import { localBackend } from './backend'
 
 const KEY = 'math_world_v1'
@@ -18,7 +18,11 @@ const KEY = 'math_world_v1'
 /** The complete game state. Add fields here as stages land; keep it flat + serialisable. */
 function freshState() {
   return {
-    character: 'character-female-a', // Ivy's avatar (chosen later in a picker)
+    character: PLAYER, // Ivy's avatar — the Sorcerer (2026-10-14)
+    // What she's wearing (slot → GEAR id, or null = bare) and what she owns.
+    // Free pieces (price 0) are always hers; ownedGear lists bought ones.
+    gear: { ...DEFAULT_GEAR },
+    ownedGear: [],
     pet: 'animal-cat', // her companion
     ownedPets: ['animal-cat'], // companions she owns (Gem Shop) — the cat is free
     // Profile photo — a small square JPEG data URL, or null. ON-DEVICE ONLY:
@@ -307,6 +311,20 @@ function migrate(parsed) {
   merged.ownedPets = merged.ownedPets.filter((id) => PET_IDS.includes(id))
   if (!merged.ownedPets.includes(merged.pet)) merged.pet = 'animal-cat'
 
+  // The Sorcerer (2026-10-14) is the player character; older saves had the
+  // Kenney default (there was never a picker). Wardrobe: keep only pieces we
+  // ship, in the right slot, that she owns.
+  merged.character = PLAYER
+  if (!Array.isArray(merged.ownedGear)) merged.ownedGear = []
+  merged.ownedGear = merged.ownedGear.filter((id) => GEAR.some((g) => g.id === id))
+  const gear = { ...DEFAULT_GEAR, ...(merged.gear && typeof merged.gear === 'object' ? merged.gear : {}) }
+  for (const slot of Object.keys(DEFAULT_GEAR)) {
+    const id = gear[slot]
+    const g = GEAR.find((x) => x.id === id)
+    if (id !== null && !(g && g.slot === slot && ownsGear(merged, id))) gear[slot] = DEFAULT_GEAR[slot]
+  }
+  merged.gear = gear
+
   // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
   // While the 15-gem beta cap was live, a correct answer over the cap paid
   // NOTHING — Ivy solved 6 problems, was told she was right, and got zero.
@@ -365,6 +383,38 @@ export function buyPet(id) {
     state.ownedPets.push(id)
   }
   state.pet = id
+  save()
+  return id
+}
+
+function ownsGear(s, id) {
+  const g = GEAR.find((x) => x.id === id)
+  return !!g && (g.price === 0 || s.ownedGear.includes(id))
+}
+
+/** Wear a piece she owns, or take a slot off (id = null). */
+export function setGear(slot, id) {
+  if (!(slot in DEFAULT_GEAR)) return false
+  if (id !== null) {
+    const g = GEAR.find((x) => x.id === id)
+    if (!g || g.slot !== slot || !ownsGear(state, id)) return false
+  }
+  state.gear = { ...state.gear, [slot]: id }
+  save()
+  return true
+}
+
+/** Buy a wardrobe piece → she puts it on right away.
+ *  Returns the id, or null if she can't afford it (or it isn't for sale). */
+export function buyGear(id) {
+  const g = GEAR.find((x) => x.id === id)
+  if (!g) return null
+  if (!ownsGear(state, id)) {
+    if (state.gems < g.price) return null
+    state.gems -= g.price
+    state.ownedGear.push(id)
+  }
+  state.gear = { ...state.gear, [g.slot]: id }
   save()
   return id
 }

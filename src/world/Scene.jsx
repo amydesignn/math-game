@@ -54,7 +54,7 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes }) {
   const marker = useRef() // the ring that pings on tap
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
@@ -371,7 +371,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
       {/* the placement ghost */}
       {placing && ghostPos && <Ghost pack={placing.pack} asset={placing.asset} position={ghostPos} rotation={ghostRot} scale={assetScale(placing.pack, placing.asset, placing.size)} />}
 
-      <Character id={characterId} start={spawn} targetRef={targetRef} posRef={charPosRef} reactUntilRef={reactUntilRef} />
+      <Character id={characterId} gear={gear} start={spawn} targetRef={targetRef} posRef={charPosRef} reactUntilRef={reactUntilRef} />
       <Pet id={petId} start={spawn} targetPosRef={charPosRef} posRef={petPosRef} reactUntilRef={reactUntilRef} />
 
       {/* ── Phase B: the other player (and their pet) in the Together meadow ──

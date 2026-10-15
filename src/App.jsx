@@ -18,7 +18,7 @@ import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } f
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
 import * as metrics from './metrics'
-import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
+import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, buyGear, setGear, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
@@ -131,6 +131,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   // ── Gems (uncapped since the beta cap retired 2026-07-18) ──
   const [gems, setGems] = useState(state.gems)
   const [petId, setPetId] = useState(state.pet) // her companion (Gem Shop)
+  const [gear, setGearOn] = useState(state.gear) // what the Sorcerer wears (Gem Shop wardrobe)
 
   // ── Phase 5-A: Player Level ──
   // `points` IS lifetimeGems — the same accumulator, read for a different job:
@@ -282,6 +283,15 @@ export default function App({ cloud = false, justSignedIn = false }) {
   }
   function handleChoosePet(id) {
     if (setPet(id)) setPetId(id)
+  }
+  // ── Wardrobe: buy a hat/staff (she wears it right away), or wear/take off one she owns ──
+  function handleBuyGear(id) {
+    if (!buyGear(id)) return // can't afford — shop shows it greyed anyway
+    setGems(getState().gems)
+    setGearOn(getState().gear)
+  }
+  function handleWearGear(slot, id) {
+    if (setGear(slot, id)) setGearOn(getState().gear)
   }
   function onSparkleExpire() {
     getActiveSparkle() // clears the lapsed one in the store
@@ -896,6 +906,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
             selectedId={selectedId}
             onSelectPlaced={(id) => setSelectedId(id)}
             characterId={state.character}
+            gear={gear}
             petId={petId}
             targetRef={targetRef}
             charPosRef={charPosRef}
@@ -996,6 +1007,10 @@ export default function App({ cloud = false, justSignedIn = false }) {
           ownedPets={getState().ownedPets}
           onBuyPet={handleBuyPet}
           onChoosePet={handleChoosePet}
+          gear={gear}
+          ownedGear={getState().ownedGear}
+          onBuyGear={handleBuyGear}
+          onWearGear={handleWearGear}
           onPlaceOwned={(o) => startPlacing({ id: o.id, asset: o.asset, pack: o.pack, size: o.size })}
           onClose={() => setShopOpen(false)}
         />
