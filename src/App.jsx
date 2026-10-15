@@ -27,6 +27,9 @@ import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
 
+// Exploration: ?pet=sprout previews a pet without touching saved state.
+const PET_PREVIEW = new URLSearchParams(window.location.search).get('pet') === 'sprout' ? 'sprout' : null
+
 export default function App({ cloud = false, justSignedIn = false }) {
   const [state] = useState(getState)
   const [moved, setMoved] = useState(false)
@@ -886,7 +889,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
             selectedId={selectedId}
             onSelectPlaced={(id) => setSelectedId(id)}
             characterId={state.character}
-            petId={state.pet}
+            petId={PET_PREVIEW || state.pet}
             targetRef={targetRef}
             charPosRef={charPosRef}
             petPosRef={petPosRef}
