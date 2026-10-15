@@ -11,7 +11,7 @@ import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
 import Buddy from './Buddy'
 import Neighbour from './Neighbour'
-import GardenPlot, { useDevGarden } from './GardenPlot'
+import GardenPlot from './GardenPlot'
 import { Ambient } from './Spooky'
 import { FxProp } from './fx'
 import { WORLD, GEMS, STATION, CHARACTERS, assetScale } from '../config'
@@ -20,6 +20,12 @@ import { stationFor } from '../stations'
 import { SKINS } from '../ui/skins'
 
 const GATE_RADIUS = 1.7 // walk this close to a gate's glow → travel (forgiving: tap-walks stop at the ring's edge)
+
+// garden bed: where she stands to tend it (in front, camera side), how close
+// counts as "there", and how far she walks before its bar closes
+const GARDEN_FRONT = 1.5
+const GARDEN_REACH = 2.4
+const GARDEN_LEAVE = 4
 
 /**
  * Scatter this visit's gem sparkles: random spots on the map, kept clear of
@@ -55,14 +61,24 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes, garden, gardenOpen, onGardenNear, onHarvest }) {
   const marker = useRef() // the ring that pings on tap
-  // Grow a Garden: the plot's stage. Ticket 5 swaps this for the store's plot;
-  // until then it's the DEV toggle (?garden=0..3|empty, window.__garden(n),
-  // window.__water()) and undefined (= no plot drawn) everywhere else,
-  // production included. Ticket 8 swaps `harvest` for the store's harvest.
-  const devGarden = useDevGarden()
-  const gardenStage = devGarden.stage
+  // Grow a Garden (ticket 5): `garden` = { stage, watering } from App (the
+  // store's plot). Tapping the bed walks her to its front edge; arriving opens
+  // App's garden bar (onGardenNear(true)), walking off closes it. A bloom bed
+  // is picked straight from the tap (GardenPlot), no walk.
+  const gardenPending = useRef(false)
+  const gardenTarget = useRef(null)
+  function walkToGarden() {
+    const [gx, gz] = map.gardenPlot
+    gardenTarget.current = new THREE.Vector3(gx, 0, gz + GARDEN_FRONT)
+    targetRef.current = gardenTarget.current
+    gardenPending.current = true
+    if (marker.current) {
+      marker.current.position.set(gx, 0.03, gz + GARDEN_FRONT)
+      markerLife.current = 1
+    }
+  }
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
 
@@ -259,6 +275,19 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
       }
     }
 
+    // garden check — arrive after tapping the bed → its bar opens; walk off → closes
+    if (map.gardenPlot && garden) {
+      const gdx = desired.x - map.gardenPlot[0]
+      const gdz = desired.z - map.gardenPlot[1]
+      const gd2 = gdx * gdx + gdz * gdz
+      if (gardenPending.current) {
+        if (gd2 < GARDEN_REACH * GARDEN_REACH) {
+          gardenPending.current = false
+          if (!gardenOpen) onGardenNear(true)
+        } else if (targetRef.current !== gardenTarget.current) gardenPending.current = false // she went elsewhere
+      } else if (gardenOpen && gd2 > GARDEN_LEAVE * GARDEN_LEAVE) onGardenNear(false)
+    }
+
     // station check — walking into the ring opens the mini-quest. Re-arms only
     // after she walks off (same kindness as the sparkle popup), and never while
     // it's saying goodbye (farewellActive) or already done for the day.
@@ -335,14 +364,15 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
         </Suspense>
       ))}
 
-      {map.gardenPlot && gardenStage !== undefined && (
+      {map.gardenPlot && garden && (
         <Suspense fallback={null}>
           <GardenPlot
             position={[map.gardenPlot[0], 0, map.gardenPlot[1]]}
-            stage={gardenStage}
-            watering={devGarden.watering}
+            stage={garden.stage}
+            watering={garden.watering}
             canTap={() => !gestureRef.current.pinching && !placing && !(mathBusyRef && mathBusyRef.current)}
-            onHarvest={devGarden.harvest}
+            onTap={walkToGarden}
+            onHarvest={onHarvest}
           />
         </Suspense>
       )}

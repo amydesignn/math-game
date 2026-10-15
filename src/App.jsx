@@ -19,11 +19,11 @@ import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } f
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
 import * as metrics from './metrics'
-import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, buyGear, setGear, buyHero, setCharacter, pendingLevelUps, recordLevelUp, getLevelUps, claimPromo, hasSeenPromo } from './store'
+import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, buyGear, setGear, buyHero, setCharacter, pendingLevelUps, recordLevelUp, getLevelUps, claimPromo, hasSeenPromo, getGarden, plantSeed, waterPlot, harvest } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
-import { WORLD, REFRESH } from './config'
+import { WORLD, REFRESH, GARDEN } from './config'
 import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
@@ -280,6 +280,32 @@ export default function App({ cloud = false, justSignedIn = false }) {
     setOwned([...getState().owned])
   }
 
+  // ── Grow a Garden (ticket 5): her plot in Sunny Town, driven by the store ──
+  // She taps the bed → walks over → this bar opens (Scene's onGardenNear).
+  // Plant a held seed, buy water with gems (one watering = one stage), and a
+  // bloom is picked by tapping the flowers. `watering` is a local counter that
+  // only tells GardenPlot to play the drops — the store keeps the real stage.
+  const plotStage = (g) => (g.plot.seed ? g.plot.seed.stage : null)
+  const [garden, setGarden] = useState(() => ({ stage: plotStage(getGarden()), seeds: getGarden().seeds, watering: 0 }))
+  const [gardenOpen, setGardenOpen] = useState(false)
+  function syncGarden(watered) {
+    const g = getGarden()
+    setGarden((p) => ({ stage: plotStage(g), seeds: g.seeds, watering: p.watering + (watered ? 1 : 0) }))
+  }
+  function handlePlant() {
+    if (plantSeed()) syncGarden(false)
+  }
+  function handleWater() {
+    if (waterPlot() == null) return // can't afford / nothing to water — the button says so
+    setGems(getState().gems)
+    syncGarden(true)
+  }
+  function handleHarvest() {
+    if (harvest() == null) return
+    syncGarden(false)
+    showNote('You picked your flowers! 🌸')
+  }
+
   // ── Sparkle Pack: the 15-minute consumable trail ──
   const [sparkle, setSparkle] = useState(getActiveSparkle) // { colorId, expiresAt } | null
 
@@ -398,6 +424,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   const [toast, setToast] = useState(null)
   const travelling = useRef(false)
   const toastTimer = useRef()
+  useEffect(() => setGardenOpen(false), [mapId, view]) // the bar never follows her out of the town
 
   // the assets she's placed in the map she's standing in (mapId lives just above)
   const placedHere = placed.filter((w) => w.map === mapId)
@@ -937,6 +964,10 @@ export default function App({ cloud = false, justSignedIn = false }) {
             gestureRef={gestureRef}
             buddies={meadow && mapId === 'meadow' ? buddies : []}
             buddyEmotes={buddyEmotes}
+            garden={garden}
+            gardenOpen={gardenOpen}
+            onGardenNear={setGardenOpen}
+            onHarvest={handleHarvest}
           />
         </Suspense>
       </Canvas>
@@ -1006,6 +1037,9 @@ export default function App({ cloud = false, justSignedIn = false }) {
             { label: '✕', aria: 'Cancel', onTap: cancelPlace },
           ]}
         />
+      )}
+      {gardenOpen && MAPS[mapId].gardenPlot && !placing && selectedId == null && !math && !station && !shopOpen && (
+        <GardenBar garden={garden} gems={gems} onPlant={handlePlant} onWater={handleWater} onClose={() => setGardenOpen(false)} />
       )}
       {!placing && selectedId != null && !meadow && (
         <ActionBar
@@ -1373,6 +1407,29 @@ function MapToast({ name }) {
 /* SpeakerButton retired 2026-08-30 — Sound is now the toggle inside the Settings
    sheet (the gear absorbed the standalone speaker on both the Door and the rail). */
 
+/** The garden's bar: what she can do for her plot right now (one main action). */
+function GardenBar({ garden, gems, onPlant, onWater, onClose }) {
+  const close = { label: '✕', aria: 'Close', onTap: onClose }
+  if (garden.stage == null) {
+    return garden.seeds > 0 ? (
+      <ActionBar hint="Your garden 🌱" buttons={[{ label: '🌱 Plant your seed', aria: 'Plant your seed', primary: true, onTap: onPlant }, close]} />
+    ) : (
+      <ActionBar hint="No seeds right now — more are on the way ✨" buttons={[{ label: 'OK', aria: 'OK', primary: true, onTap: onClose }]} />
+    )
+  }
+  if (garden.stage >= GARDEN.waterings) {
+    return <ActionBar hint="It bloomed! Tap your flowers to pick them 🌸" buttons={[close]} />
+  }
+  const cost = GARDEN.waterCost
+  const can = gems >= cost
+  return (
+    <ActionBar
+      hint={can ? 'Water it to help it grow 💧' : `Water costs ${cost} 💎 — solve a problem to earn more!`}
+      buttons={[{ label: `💧 Water · ${cost} 💎`, aria: 'Water your plant', primary: true, disabled: !can, onTap: onWater }, close]}
+    />
+  )
+}
+
 /** Bottom-center pill of big kid-sized buttons (placement + edit modes). */
 function ActionBar({ hint, buttons }) {
   return (
@@ -1396,6 +1453,7 @@ function ActionBar({ hint, buttons }) {
             key={b.aria}
             aria-label={b.aria}
             onClick={b.onTap}
+            disabled={b.disabled}
             style={{
               minWidth: 46,
               height: 46,
@@ -1406,7 +1464,8 @@ function ActionBar({ hint, buttons }) {
               color: b.primary ? '#ffffff' : 'var(--brand-lilac-900)',
               fontSize: 16,
               fontWeight: 700,
-              cursor: 'pointer',
+              cursor: b.disabled ? 'default' : 'pointer',
+              opacity: b.disabled ? 0.45 : 1,
             }}
           >
             {b.label}

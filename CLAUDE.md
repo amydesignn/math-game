@@ -264,8 +264,8 @@ in `GardenPlot.jsx`, per-frame three.js in `useFrame` — no DOM, no video.
   there just walks her. No store writes, no counting — ticket 8.
 - **Reduced motion** (read at trigger time): snap — no pop, no drops, no
   burst; a harvest tap calls `onHarvest` at once.
-- **Dev hooks** (`useDevGarden()` replaced `useDevGardenStage()` → `{stage,
-  watering, harvest}`): `?garden=0..3|empty`, `__garden(n)`, `__water()`, and
+- **Dev hooks** (ticket 5 removed all of these except `__gardenSlow`; at the time,
+  `useDevGarden()` replaced `useDevGardenStage()` → `{stage, watering, harvest}`): `?garden=0..3|empty`, `__garden(n)`, `__water()`, and
   `window.__gardenSlow = 8` plays it all 8× slower (feel-checks + frame capture
   — swiftshader screenshots are slower than the whole 0.8s pop). Scene's
   `onHarvest` stub sets the toggle to null. **Ticket 5/8:** swap `devGarden.*`
@@ -274,6 +274,32 @@ in `GardenPlot.jsx`, per-frame three.js in `useFrame` — no DOM, no video.
   short ripple, harvest timer waits for the last plant) → 270 green. Verified in
   headless Chrome (swiftshader) incl. `reducedMotion: 'reduce'`; the harvest
   tap leaves her position unchanged; zero page errors.
+
+## Grow a Garden — ticket 5: the plot grows from the store 💧 (2026-10-15, branch `feat/garden-water`)
+The garden is LIVE in Sunny Town for everyone: the plot reads `store.garden`
+(ticket 3, PR #54, stacked under this branch) and the dev stage toggle is gone.
+Per the updated spec, she WATERS it with gems; correct answers don't feed it directly.
+- **Flow:** tap the bed → she walks to its front (`GARDEN_FRONT`, Scene) →
+  arriving (`GARDEN_REACH` 2.4) opens `GardenBar` (App, on the shared
+  `ActionBar`); walking off (`GARDEN_LEAVE` 4), travel or Exit closes it.
+  Bar states: empty + seed → "🌱 Plant your seed" (`plantSeed`) · growing →
+  "💧 Water · 5 💎" (`waterPlot`, disabled + "solve a problem to earn more" when
+  short) · bloom → "Tap your flowers to pick them 🌸" (the 3D tap → ticket 7's
+  harvest motion → `store.harvest()` + a toast) · empty, no seed → "No seeds
+  right now — more are on the way ✨" (**ticket 4 grants seeds; until it lands
+  the starter seed is the only one**).
+- **Water → drops land first, THEN the pop:** GardenPlot keeps a `shown` stage
+  that trails `stage` by `WATER_LAND_MS` when a watering and a stage change
+  arrive together. App's `garden.watering` is a local counter that just plays
+  the drops; the store holds the real stage.
+- `ActionBar` buttons take an additive `disabled`.
+- Kept from ticket 7: `window.__gardenSlow`. Gone: `useDevGarden`, `?garden=`,
+  `__garden`, `__water` (QA = the real path + `__award(n)` for gems).
+- ⚠️ Dev `__overview` returns early from Scene's frame loop, so the garden bar (like
+  sparkles) never opens while it's on — turn it off while she walks.
+- Verified headless (swiftshader): tap → walk → plant → water ×3 (gems 40→25,
+  lifetimeGems untouched) → bloom → pick (`harvests: 1`) → reload persists;
+  zero page errors. 286 tests green.
 
 ## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
 Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
