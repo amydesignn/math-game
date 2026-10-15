@@ -44,11 +44,76 @@ const COPY = {
   trick: { title: 'Trick! …just kidding.', body: 'Luxi Math would never. Here are some gems to spend on your world.' },
 }
 
+// Choreography (ms from the pick). The burst owns 0 → ~1100; the chip's gems
+// start dropping as the big ones leave, one every CHIP_STAGGER; each "lands" at
+// 55% of its 520ms drop — that's when the count ticks.
+const BURST_MS = 1700
+const CHIP_START = 950
+const CHIP_STAGGER = 200
+const chipDelay = (i) => CHIP_START + i * CHIP_STAGGER
+const GEM_LAND = (i) => chipDelay(i) + 290
+
+// Sparkles flung out from the burst (36, 14–31px) — fixed (not random per render), spread
+// round the full circle by the golden angle so they never clump.
+const SPARK_COLORS = ['#22D3EE', '#FBBF24', '#8570D2', '#F97316', '#FFFFFF']
+const SPARKS = Array.from({ length: 36 }, (_, i) => {
+  const a = i * 2.39996 // golden angle, radians
+  const r = 140 + ((i * 53) % 150) // 140–290px out
+  return { dx: Math.round(Math.cos(a) * r), dy: Math.round(Math.sin(a) * r), size: 14 + ((i * 7) % 18), delay: (i * 37) % 260, color: SPARK_COLORS[i % SPARK_COLORS.length], gem: i % 4 === 0 }
+})
+
+/** The treat burst: three big gems pop up over the card, a shockwave ring,
+ *  and sparkles (+ a few mini gems) flung out across the screen. Pure CSS
+ *  keyframes (index.css .luxiBurst-*), pointer-events none. */
+function TreatBurst({ gems }) {
+  return (
+    <div className="luxiBurst" aria-hidden="true">
+      <span className="luxiBurst-ring" />
+      <span className="luxiBurst-ring luxiBurst-ring2" />
+      {SPARKS.map((k, i) => (
+        <span key={i} className="luxiBurst-spark" style={{ '--dx': `${k.dx}px`, '--dy': `${k.dy}px`, animationDelay: `${k.delay}ms` }}>
+          {k.gem ? (
+            <GemIcon size={k.size + 6} />
+          ) : (
+            <svg width={k.size} height={k.size} viewBox="0 0 24 24">
+              <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" fill={k.color} />
+            </svg>
+          )}
+        </span>
+      ))}
+      <div className="luxiBurst-gems">
+        {Array.from({ length: gems }, (_, i) => (
+          <span key={i} className="luxiBurst-gem" style={{ animationDelay: `${i * 110}ms`, '--tilt': `${(i - (gems - 1) / 2) * 14}deg` }}>
+            <GemIcon size={80} />
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function PromoPopup({ promo = PROMO, onClose }) {
   const [pick, setPick] = useState(null) // null | 'trick' | 'treat'
   const [soundOn, setSoundOn] = useState(false)
+  const [counted, setCounted] = useState(0) // the chip's number, ticking up as each gem lands
+  const [burst, setBurst] = useState(false) // the big treat burst layer (unmounted once it's played)
   const videoRef = useRef(null)
   const reduceMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+  // The pick → the treat lands. The burst plays over the card, then the chip's
+  // gems drop in one by one and the count ticks +1 per gem in step with them
+  // (GEM_LAND below). Reduced motion: no burst, the full count at once.
+  useEffect(() => {
+    if (!pick) return
+    if (reduceMotion) {
+      setCounted(promo.gems)
+      return
+    }
+    setBurst(true)
+    const timers = Array.from({ length: promo.gems }, (_, i) => setTimeout(() => setCounted(i + 1), GEM_LAND(i)))
+    timers.push(setTimeout(() => setBurst(false), BURST_MS))
+    return () => timers.forEach(clearTimeout)
+  }, [pick, reduceMotion, promo.gems])
 
   // Escape closes, like the house's other modals.
   useEffect(() => {
@@ -133,21 +198,24 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
           <div id="promo-title" style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{copy.title}</div>
           <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{copy.body}</p>
           {pick && (
-            // The treat landing: one gem per gem earned drops in, tumbles and
-            // settles (staggered), each with a twinkle as it lands; then the
-            // count. Motion lives in index.css (.luxiPromo-*), delays set here.
-            <div className="luxiPromo-gift" style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px 8px 12px', borderRadius: 999, background: '#F6F4FE', border: '1px solid #EEE9FB' }}>
+            // The chip the burst lands in: one gem per gem earned drops in,
+            // tumbles and settles (staggered) with a twinkle; the number ticks
+            // up +1 as each lands and pops. Motion: index.css .luxiPromo-*.
+            <div className="luxiPromo-gift" style={{ animationDelay: reduceMotion ? '0ms' : `${CHIP_START - 150}ms`, marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 12, padding: '8px 20px 8px 12px', borderRadius: 999, background: '#F6F4FE', border: '1px solid #EEE9FB' }}>
               <span style={{ display: 'inline-flex', gap: 4 }} aria-hidden="true">
                 {Array.from({ length: promo.gems }, (_, i) => (
-                  <span key={i} className="luxiPromo-gem" style={{ animationDelay: `${120 + i * 90}ms` }}>
-                    <GemIcon size={24} />
-                    <svg className="luxiPromo-spark" width="12" height="12" viewBox="0 0 24 24" style={{ animationDelay: `${120 + i * 90 + 300}ms` }}>
+                  <span key={i} className="luxiPromo-gem" style={{ animationDelay: `${chipDelay(i)}ms` }}>
+                    <GemIcon size={32} />
+                    <svg className="luxiPromo-spark" width="16" height="16" viewBox="0 0 24 24" style={{ animationDelay: `${GEM_LAND(i)}ms` }}>
                       <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" fill="#22D3EE" />
                     </svg>
                   </span>
                 ))}
               </span>
-              <span className="luxiPromo-count" style={{ fontSize: 16, fontWeight: 700, color: '#262626', animationDelay: `${120 + promo.gems * 90 + 160}ms` }}>+{promo.gems} gems</span>
+              <span aria-hidden="true" style={{ fontSize: 20, fontWeight: 700, color: '#262626', fontVariantNumeric: 'tabular-nums' }}>
+                <span key={counted} className={counted ? 'luxiPromo-tick' : undefined} style={{ display: 'inline-block' }}>+{counted}</span> gems
+              </span>
+              <span className="sr-only">You got {promo.gems} gems</span>
             </div>
           )}
         </div>
@@ -170,6 +238,7 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
           )}
         </div>
       </div>
+      {burst && <TreatBurst gems={promo.gems} />}
     </div>
   )
 }

@@ -335,6 +335,13 @@ Door, with a trick-or-treat pick — EITHER pick pays 3 gems.
   while it has sound). Reduced motion → poster + controls, no autoplay. Amy's
   1080p HEVC source (8.5MB, unplayable in some browsers) → `public/promo/`
   720p WebM (430KB) + H.264 MP4 (600KB) + JPG poster.
+- **The treat animation (Amy: "more dramatic"):** on the pick, `TreatBurst` (a
+  fixed layer over the card) pops three big glowing gems in a fan + two
+  shockwave rings + 36 sparkles/mini gems flung across the screen (golden-angle
+  spread); the big gems shrink away as the chip's gems drop in one by one and
+  the count ticks +1 per landing. Choreography constants live at the top of
+  PromoPopup (`CHIP_START`, `GEM_LAND`); all CSS keyframes (`.luxiBurst-*`,
+  `.luxiPromo-*`). Reduced motion = no burst, a plain fade, full count at once.
 - **Next promo:** new id (NEVER reuse — the id is the seen key), new media,
   season + year. Tests `promo.test.js` (+5) → 253 green.
 
