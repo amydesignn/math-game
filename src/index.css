@@ -450,9 +450,32 @@ canvas { touch-action: none; display: block; }
 .luxiPromo-pick:hover { background: #E8E3F5; }
 .luxiPromo-pick:active { transform: translateY(4px); box-shadow: 0 0 0 #D6CFEA; }
 .luxiPromo-treat { flex: 1; }
-.luxiPromo-gift { animation: promoGift .4s cubic-bezier(.2,.9,.3,1.2) both; }
-@keyframes promoGift { 0% { transform: scale(.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-@media (prefers-reduced-motion: reduce) { .luxiPromo-gift { animation: obScrimIn .2s ease-out both; } }
+/* The treat landing (first-and-only view = the delight budget). CSS keyframes,
+   not JS: the Door's R3F hero renders underneath, and CSS stays smooth off the
+   main thread. transform + opacity only; never from scale(0).
+   1. gift — the chip rises in (ease-out, 240ms).
+   2. gem — each gem drops from above with a tumble, overshoots, settles (on-
+      screen landing → a single overshoot keyframe, 520ms), staggered 90ms.
+   3. spark — a gem-cyan twinkle pops off each gem as it lands.
+   4. count — "+3 gems" slides in after the last gem. */
+.luxiPromo-gift { animation: promoGift .24s var(--ease-out) both; }
+.luxiPromo-gem { position: relative; display: inline-flex; opacity: 0; animation: promoGemDrop .52s var(--ease-out) both; }
+.luxiPromo-spark { position: absolute; top: -4px; right: -4px; opacity: 0; animation: promoSpark .6s var(--ease-out) both; }
+.luxiPromo-count { display: inline-block; opacity: 0; animation: promoCount .24s var(--ease-out) both; }
+@keyframes promoGift { 0% { transform: translateY(8px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes promoGemDrop {
+  0% { transform: translateY(-28px) rotate(-24deg) scale(.7); opacity: 0; }
+  55% { transform: translateY(3px) rotate(8deg) scale(1.1); opacity: 1; }
+  78% { transform: translateY(-2px) rotate(-3deg) scale(.98); opacity: 1; }
+  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+}
+@keyframes promoSpark { 0% { transform: scale(.6) rotate(0deg); opacity: 0; } 40% { transform: scale(1.1) rotate(25deg); opacity: 1; } 100% { transform: scale(.8) rotate(45deg); opacity: 0; } }
+@keyframes promoCount { 0% { transform: translateX(-6px); opacity: 0; } 100% { transform: translateX(0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  /* gentler, not zero: the gems + count still fade in, in turn; no drop, no tumble, no sparks */
+  .luxiPromo-gift, .luxiPromo-gem, .luxiPromo-count { animation-name: obScrimIn; animation-duration: .2s; }
+  .luxiPromo-spark { display: none; }
+}
 
 /* ── Feedback Flow (Oscar's "Luxi Feedback Flow.dc.html", lifted 2026-09-19
    → src/ui/FeedbackModal.jsx) ──

@@ -133,9 +133,21 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
           <div id="promo-title" style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{copy.title}</div>
           <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{copy.body}</p>
           {pick && (
+            // The treat landing: one gem per gem earned drops in, tumbles and
+            // settles (staggered), each with a twinkle as it lands; then the
+            // count. Motion lives in index.css (.luxiPromo-*), delays set here.
             <div className="luxiPromo-gift" style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 16px 8px 12px', borderRadius: 999, background: '#F6F4FE', border: '1px solid #EEE9FB' }}>
-              <GemIcon size={24} />
-              <span style={{ fontSize: 16, fontWeight: 700, color: '#262626' }}>+{promo.gems} gems</span>
+              <span style={{ display: 'inline-flex', gap: 4 }} aria-hidden="true">
+                {Array.from({ length: promo.gems }, (_, i) => (
+                  <span key={i} className="luxiPromo-gem" style={{ animationDelay: `${120 + i * 90}ms` }}>
+                    <GemIcon size={24} />
+                    <svg className="luxiPromo-spark" width="12" height="12" viewBox="0 0 24 24" style={{ animationDelay: `${120 + i * 90 + 300}ms` }}>
+                      <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" fill="#22D3EE" />
+                    </svg>
+                  </span>
+                ))}
+              </span>
+              <span className="luxiPromo-count" style={{ fontSize: 16, fontWeight: 700, color: '#262626', animationDelay: `${120 + promo.gems * 90 + 160}ms` }}>+{promo.gems} gems</span>
             </div>
           )}
         </div>
