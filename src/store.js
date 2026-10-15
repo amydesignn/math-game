@@ -43,6 +43,10 @@ function freshState() {
     // it); migrate() seeds existing saves true so returning players (Ivy, Amy)
     // are never re-onboarded. Still re-openable any time from the gear menu.
     seenOnboarding: false,
+    // Seasonal one-time popups (e.g. 'halloween-2026') she has already been
+    // shown AND paid for. One id = one popup + its gift, once per player. Old
+    // saves get [] from the freshState merge, so returning players see new ones.
+    promos: [],
     // Her last standing spot in `map`, so the Door's Resume drops her exactly
     // where she left off (Play drops at the map's centre instead). Always paired
     // with `map`: every write that changes the map also writes pos, so it can
@@ -441,6 +445,25 @@ export function markOnboardingSeen() {
     state.seenOnboarding = true
     save()
   }
+}
+
+/**
+ * A seasonal popup's one-time gift (src/ui/PromoPopup.jsx). Marks the promo as
+ * seen AND pays its gems in ONE save, the moment the popup shows — the
+ * seen-on-show lesson from onboarding (Finn 2026-10-10): a reload, closed tab or
+ * back-button mid-popup can neither re-show it nor lose the treat.
+ * Idempotent: returns the new balance on the first claim, null after that.
+ */
+export function claimPromo(id, gems) {
+  if (!Array.isArray(state.promos)) state.promos = []
+  if (state.promos.includes(id)) return null
+  state.promos.push(id)
+  return addGems(gems) // addGems saves (and counts it toward lifetimeGems)
+}
+
+/** Has this promo already been shown + paid? */
+export function hasSeenPromo(id) {
+  return Array.isArray(state.promos) && state.promos.includes(id)
 }
 
 /** Remember where she's standing in the current map, so the Door's Resume

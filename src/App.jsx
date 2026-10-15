@@ -13,12 +13,13 @@ import SignupModal, { SavedToast } from './ui/SignupModal'
 import { SettingsSheet, ProfilePopover } from './ui/Settings'
 import { Onboarding } from './ui/Onboarding'
 import { FeedbackModal } from './ui/FeedbackModal'
+import PromoPopup, { PROMO, promoActive } from './ui/PromoPopup'
 import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
 import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
 import * as metrics from './metrics'
-import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, buyGear, setGear, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
+import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, buyGear, setGear, pendingLevelUps, recordLevelUp, getLevelUps, claimPromo, hasSeenPromo } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
@@ -130,6 +131,17 @@ export default function App({ cloud = false, justSignedIn = false }) {
 
   // ── Gems (uncapped since the beta cap retired 2026-07-18) ──
   const [gems, setGems] = useState(state.gems)
+  // Seasonal popup (Halloween 2026: the clip + trick-or-treat, 3 gems). Shows
+  // ONCE over the Door, only in its season, and never on top of first-run
+  // onboarding — a brand-new player gets it right after that closes. Claimed
+  // (seen + paid, one save) the moment it shows: see store.claimPromo.
+  const [promoOpen, setPromoOpen] = useState(() => promoActive() && !hasSeenPromo(PROMO.id))
+  const promoShowing = promoOpen && view === 'door' && !showOnboarding
+  useEffect(() => {
+    if (!promoShowing) return
+    const g = claimPromo(PROMO.id, PROMO.gems)
+    if (g !== null) setGems(g)
+  }, [promoShowing])
   const [petId, setPetId] = useState(state.pet) // her companion (Gem Shop)
   const [gear, setGearOn] = useState(state.gear) // what the Sorcerer wears (Gem Shop wardrobe)
 
@@ -1104,6 +1116,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
       {savedToast && <SavedToast onDone={() => setSavedToast(false)} />}
       {/* First-run walkthrough / gear → How to Play — over the Door and the world */}
       {showOnboarding && <Onboarding onClose={closeOnboarding} />}
+      {/* Seasonal one-time popup — over the Door only, after onboarding */}
+      {promoShowing && <PromoPopup onClose={() => setPromoOpen(false)} />}
       {/* Feedback Flow — gear → Send Feedback, over the Door and the world */}
       {feedbackOpen && <FeedbackModal onSubmit={onFeedbackSubmit} onLostSubmit={onFeedbackLost} onClose={() => setFeedbackOpen(false)} />}
 

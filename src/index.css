@@ -440,6 +440,20 @@ canvas { touch-action: none; display: block; }
 .luxiOb-cta:hover { filter: brightness(1.04); }
 .luxiOb-cta:active { transform: translateY(4px); box-shadow: 0 0 0 #3D43BE; }
 
+/* ── Seasonal promo popup (src/ui/PromoPopup.jsx, 2026-10-15) ──
+   Chrome is .luxiOb-*; these are only its new pieces. Interactive states here,
+   not inline (inline beats :hover). 4px grid; press = the governed 4px snap. */
+.luxiPromo-sound { position: absolute; right: 12px; bottom: 12px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(29,23,48,.6); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s ease; }
+.luxiPromo-sound:hover { background: rgba(29,23,48,.8); }
+.luxiPromo-sound:focus-visible, .luxiPromo-pick:focus-visible, .luxiPromo-treat:focus-visible { outline: 2px solid #6169E0; outline-offset: 2px; }
+.luxiPromo-pick { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; padding: 12px 24px; background: #F1EEF9; color: #262626; font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 #D6CFEA; cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, background .15s ease; }
+.luxiPromo-pick:hover { background: #E8E3F5; }
+.luxiPromo-pick:active { transform: translateY(4px); box-shadow: 0 0 0 #D6CFEA; }
+.luxiPromo-treat { flex: 1; }
+.luxiPromo-gift { animation: promoGift .4s cubic-bezier(.2,.9,.3,1.2) both; }
+@keyframes promoGift { 0% { transform: scale(.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .luxiPromo-gift { animation: obScrimIn .2s ease-out both; } }
+
 /* ── Feedback Flow (Oscar's "Luxi Feedback Flow.dc.html", lifted 2026-09-19
    → src/ui/FeedbackModal.jsx) ──
    Keyframes namespaced fb* — the comp's `popIn`/`pop` share names with, but
