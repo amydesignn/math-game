@@ -268,6 +268,23 @@ export const GEMS = {
   collectRadius: 1.0, // walk this close to a sparkle → collected
 }
 
+// ── Grow a Garden (2026-10-15, spec: Notion "Luxi Math — Grow a Garden") ──
+// Math is the only fuel: seeds come from lifetime gems (earned-only, never
+// bought), and she waters her plot with gems she won from answers. Nothing
+// wilts, no clocks, no streaks. These are the two knobs Amy tunes from play —
+// too rare / too many → change a NUMBER here, never the logic in store.js.
+//   seedEveryGems — one seed per this many LIFETIME gems (answers pay 1–3)
+//   waterCost     — gems per watering ("Water 💧 for 5 💎")
+//   waterings     — waterings from planted to bloom. One watering = one stage:
+//                   0 mound → 1 sprout → 2 bud → 3 bloom (the 4 stage models
+//                   assume 3 — retune the art mapping if this changes).
+// 3 × 5 = 15 gems a plant, a bit under the seed rate so seeds never wait on water.
+export const GARDEN = {
+  seedEveryGems: 20,
+  waterCost: 5,
+  waterings: 3,
+}
+
 // ── Background music: two tracks, player's choice (2026-10-04) ──
 // "Island" is the new default (Amy's Suno brief: grounded light-adventure —
 // marimba + nylon guitar + upright bass, no piano/glockenspiel so it never reads
