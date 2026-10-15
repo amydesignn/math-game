@@ -224,8 +224,11 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
 Spec + tickets: Notion "🌱 Luxi Math — Grow a Garden (Spec + Tickets)". This
 ticket is ART ONLY — no store, no growth motion (ticket 7), no harvest.
 - **`src/world/GardenPlot.jsx`** — `<GardenPlot position stage>`; `stage` 0 mound
-  · 1 sprout · 2 bud · 3 bloom, `null` = empty bed. Bed = two crossed mini-forest
-  `patch-dirt`; sprout = mini-forest `plant`; bud/bloom = platformer-kit `plant`
+  · 1 sprout · 2 bud · 3 bloom, `null` = empty bed. **One seed fills the whole
+  bed** (Amy, from a cosy-game ref): a raised bed of 6 × 3 of the same plant,
+  all at one stage, each with a fixed small turn/size wobble. Bed = wooden
+  edging + a soil base (primitives) under a stretched mini-forest `patch-dirt`;
+  sprout = mini-forest `plant`; bud/bloom = platformer-kit `plant`
   + `flowers-tall` (staged in `public/models/platformer/` with its OWN
   `Textures/` — the collision rule). Kenney had no usable mound (its dirt clumps
   are flat + bed-coloured — tried, vanished, stretched = a stump) and no closed
@@ -233,7 +236,7 @@ ticket is ART ONLY — no store, no growth motion (ticket 7), no harvest.
   the bloom's red so bud → bloom reads as one flower.
 - **Placement:** `town.gardenPlot = [-10, -2]` (maps.js) — just inside the west
   (Clearing) gate, off the walk in, the middle left open for building. It's in
-  `blockers()` (r 1.2) so sparkles/stations skip the bed. Test-guarded in
+  `blockers()` (r 1.8) so sparkles/stations skip the bed. Test-guarded in
   season-maps.test.js.
 - **Dev toggle (until ticket 5 wires the store):** `?garden=0..3|empty` or
   `window.__garden(n|null)`. Without it — and ALWAYS in prod — no plot is drawn

@@ -361,9 +361,10 @@ export const MAPS = {
       { character: 'character-male-e', pet: 'animal-panda', home: [7.5, 7.5],
         lines: ['Welcome to Sunny Town! ☀️', "I'm Max — I live here!", 'Maths makes gems ✨', 'Build something next to me!'] },
     ],
-    // Ivy's garden plot (Grow a Garden): just inside the west gate, off the
-    // path into the square, so it's the first thing she meets from the Clearing
-    // and the open middle stays hers to build. Drawn by world/GardenPlot.jsx.
+    // Ivy's garden plot (Grow a Garden): a raised bed (~3 × 1.6, long side
+    // east-west) just inside the west gate, off the path into the square, so
+    // it's the first thing she meets from the Clearing and the open middle
+    // stays hers to build. Drawn by world/GardenPlot.jsx.
     gardenPlot: [-10, -2],
     gates: [
       { to: 'clearing', position: [-16, 0, 2] },
@@ -657,7 +658,7 @@ export function blockers(map) {
     // a keeper/stroller's home, or a shopper's first stop
     ...(map.neighbours || []).map((n) => { const [x, z] = n.home || n.route[0]; return [x, z, 1.5] }),
     // the garden plot's bed
-    ...(map.gardenPlot ? [[map.gardenPlot[0], map.gardenPlot[1], 1.2]] : []),
+    ...(map.gardenPlot ? [[map.gardenPlot[0], map.gardenPlot[1], 1.8]] : []),
   ]
 }
 
