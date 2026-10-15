@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR, HEROES } from './config'
+import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR, HEROES, GARDEN } from './config'
 import { localBackend } from './backend'
 
 const KEY = 'math_world_v1'
@@ -87,9 +87,21 @@ function freshState() {
     // solvedCount, completed }. Rebuilt every refresh window (stations.js) so
     // 2–3 worlds get a fresh themed quest and there's always something to earn.
     stations: { window: null, byMap: {} },
+    // Grow a Garden (2026-10-15): her one plot in Sunny Town. plot.seed is null
+    // (empty) or { kind: 'starter', stage } — stage 0 mound → 1 sprout → 2 bud →
+    // 3 bloom (= GARDEN.waterings). seeds = held, not yet planted; everyone
+    // starts with ONE starter seed. seedsGranted = how many lifetime-gem seeds
+    // have been handed out, so grants from lifetimeGems are idempotent (see
+    // seedsOwed). harvests = blooms she has picked and kept. Conservation law
+    // the cloud merge relies on: seeds + (planted ? 1 : 0) + harvests = 1 + seedsGranted.
+    garden: freshGarden(),
     startedISO: null,
     lastActive: null,
   }
+}
+
+function freshGarden() {
+  return { plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0 }
 }
 
 // ── Phase A: cloud-sync machinery (design: docs/accounts-boot-gate.md) ──
@@ -157,12 +169,42 @@ function adoptReadResult(remote, { allowAdopt }) {
   cloudLedger = remote ? remote.state.lifetimeGems || 0 : -1
   const remoteWins = remote && pickWinner(state, remote.state) === 'remote'
   if (remoteWins && allowAdopt) {
+    const local = state
     state = migrate(remote.state)
+    // The ledger picks the winner, but a garden can grow without earning (water
+    // spends gems, the ledger stays put) — so the losing copy may hold a seed
+    // or a harvest the winner doesn't. Fold it in rather than lose it.
+    const before = JSON.stringify(state.garden)
+    state.garden = mergeGarden(state.garden, local.garden)
     writeLocal()
-    dirty = false // the pre-boot local copy lost the merge; nothing of hers is in it
+    if (JSON.stringify(state.garden) !== before) scheduleCloudPush() // the cloud lacks what we kept
+    else dirty = false // the pre-boot local copy lost the merge; nothing of hers is in it
   } else if (!remoteWins) {
-    scheduleCloudPush() // local is authoritative (cloud empty or behind) — sync up
+    // Local is authoritative (cloud empty or behind) — sync up. At boot, keep
+    // any garden progress only the cloud copy has (same reason as above).
+    if (remote && allowAdopt) {
+      state.garden = mergeGarden(state.garden, migrate(remote.state).garden)
+      writeLocal()
+    }
+    scheduleCloudPush()
   }
+}
+
+/** Merge two (normalized) gardens so neither a seed nor a harvest is ever lost:
+ *  the higher harvest count and grant count win, the plot comes from whichever
+ *  copy is further along, and held seeds are re-derived from the conservation
+ *  law so the result is self-consistent. Errs in her favour (like the refund
+ *  floor): two-device divergence is out of scope, so a watering paid on the
+ *  losing copy is kept rather than charged twice. Pure + exported for tests. */
+export function mergeGarden(a, b) {
+  const progress = (g) => (g.plot.seed ? g.plot.seed.stage + 1 : 0)
+  const harvests = Math.max(a.harvests, b.harvests)
+  const seedsGranted = Math.max(a.seedsGranted, b.seedsGranted)
+  // Ahead on harvests wins the plot outright; on a tie, the further-grown plot.
+  const lead = a.harvests !== b.harvests ? (a.harvests > b.harvests ? a : b) : progress(b) > progress(a) ? b : a
+  const plot = { seed: lead.plot.seed ? { ...lead.plot.seed } : null }
+  const seeds = Math.max(0, 1 + seedsGranted - harvests - (plot.seed ? 1 : 0))
+  return { plot, seeds, seedsGranted, harvests }
 }
 
 /** The merge rule: the monotonic ledger picks the winner, not the clock —
@@ -333,6 +375,11 @@ function migrate(parsed) {
   }
   merged.gear = gear
 
+  // Grow a Garden (2026-10-15): saves from before it get a fresh garden (one
+  // starter seed, empty plot) via normalizeGarden; a partial or edited one is
+  // repaired field by field, never reset.
+  merged.garden = normalizeGarden(merged.garden)
+
   // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
   // While the 15-gem beta cap was live, a correct answer over the cap paid
   // NOTHING — Ivy solved 6 problems, was told she was right, and got zero.
@@ -345,6 +392,21 @@ function migrate(parsed) {
     merged.capRetiredAt = new Date().toISOString()
   }
   return merged
+}
+
+function normalizeGarden(g) {
+  const out = freshGarden()
+  if (!g || typeof g !== 'object') return out
+  const count = (v, d) => (Number.isInteger(v) && v >= 0 ? v : d)
+  out.seeds = count(g.seeds, out.seeds)
+  out.seedsGranted = count(g.seedsGranted, 0)
+  out.harvests = count(g.harvests, 0)
+  const seed = g.plot && g.plot.seed
+  if (seed && typeof seed === 'object') {
+    const stage = Math.min(GARDEN.waterings, count(seed.stage, 0))
+    out.plot.seed = { kind: typeof seed.kind === 'string' ? seed.kind : 'starter', stage }
+  }
+  return out
 }
 
 function writeLocal() {
@@ -636,6 +698,58 @@ export function buySparkle(colorId) {
 export function giftSparkle(colorId) {
   activateSparkle(colorId)
   return colorId
+}
+
+// ── Grow a Garden: one plot, math is the only fuel (2026-10-15) ──
+// Seeds arrive from lifetime gems (earned-only, never bought); water is bought
+// with gems; nothing wilts and nothing runs on a clock. Spending on water only
+// lowers the BALANCE — lifetimeGems (her level) is never touched here.
+
+/** Seeds she has earned from lifetime gems but not yet been handed. Pure:
+ *  one seed per cfg.seedEveryGems lifetime gems, minus those already granted,
+ *  so calling it again after a grant returns 0 (idempotent grants). */
+export function seedsOwed(lifetimeGems, seedsGranted, cfg = GARDEN) {
+  const earned = Math.floor(Math.max(0, lifetimeGems || 0) / cfg.seedEveryGems)
+  return Math.max(0, earned - Math.max(0, seedsGranted || 0))
+}
+
+export function getGarden() {
+  return state.garden
+}
+
+/** Plant a held seed in the empty plot (stage 0, the mound). False if the plot
+ *  is already growing something or she has no seed. */
+export function plantSeed() {
+  const g = state.garden
+  if (g.plot.seed || g.seeds < 1) return false
+  g.seeds -= 1
+  g.plot.seed = { kind: 'starter', stage: 0 }
+  save()
+  return true
+}
+
+/** Buy one watering (GARDEN.waterCost gems) → the plant grows one stage.
+ *  Returns the new stage, or null when there is nothing to water (empty plot,
+ *  already in bloom) or she can't afford it — refused before any gem is spent. */
+export function waterPlot() {
+  const seed = state.garden.plot.seed
+  if (!seed || seed.stage >= GARDEN.waterings) return null
+  if (state.gems < GARDEN.waterCost) return null
+  state.gems -= GARDEN.waterCost
+  seed.stage += 1
+  save()
+  return seed.stage
+}
+
+/** Pick a bloom: it's hers to keep (harvests + 1) and the plot is empty again.
+ *  Returns the new harvest count, or null if nothing is in bloom. */
+export function harvest() {
+  const g = state.garden
+  if (!g.plot.seed || g.plot.seed.stage < GARDEN.waterings) return null
+  g.harvests += 1
+  g.plot.seed = null
+  save()
+  return g.harvests
 }
 
 // ── Phase 5: station daily plan ──

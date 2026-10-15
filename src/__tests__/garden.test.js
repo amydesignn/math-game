@@ -1,0 +1,251 @@
+/*
+ * Grow a Garden — the data layer (ticket 3). The plot, held seeds, idempotent
+ * grants, water + harvest, the migration for saves from before the garden
+ * (Ivy's!), and the boot merge that must never lose a seed or a harvest.
+ * Same harness as store-boot.test.js: a fresh store module per test, an
+ * in-memory localStorage, and a scriptable mock backend.
+ */
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { GARDEN } from '../config'
+
+const KEY = 'math_world_v1'
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+const clone = (o) => JSON.parse(JSON.stringify(o))
+const FAST = { pushDebounceMs: 5, bootReadTimeoutMs: 100, retryReadMs: 10 }
+
+/** A save from BEFORE the garden existed — no `garden` field at all. */
+const oldSave = (over = {}) => ({
+  character: 'sorcerer',
+  pet: 'animal-cat',
+  map: 'town',
+  gems: 480,
+  lifetimeGems: 520,
+  capRetiredAt: '2026-07-18T00:00:00.000Z',
+  celebratedLevel: 11,
+  levelUps: 10,
+  soundOn: true,
+  world: [],
+  owned: [],
+  nextId: 1,
+  topicProgress: {},
+  sparkle: null,
+  stations: { window: null, byMap: {} },
+  played: true,
+  seenOnboarding: true,
+  startedISO: '2026-07-01T00:00:00.000Z',
+  lastActive: '2026-10-14T00:00:00.000Z',
+  ...over,
+})
+
+const garden = (over = {}) => ({ plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0, ...over })
+
+function mockBackend({ cloud = null } = {}) {
+  let remote = cloud ? clone(cloud) : null
+  const calls = { writes: [] }
+  return {
+    kind: 'mock',
+    calls,
+    get cloud() {
+      return remote
+    },
+    async loadRemote() {
+      return remote ? { state: clone(remote) } : null
+    },
+    async saveRemote(blob) {
+      calls.writes.push(clone(blob))
+      remote = clone(blob)
+      return true
+    },
+  }
+}
+
+function fakeStorage() {
+  const m = new Map()
+  return {
+    getItem: (k) => (m.has(k) ? m.get(k) : null),
+    setItem: (k, v) => m.set(k, String(v)),
+    removeItem: (k) => m.delete(k),
+    clear: () => m.clear(),
+  }
+}
+
+let storage
+beforeEach(() => {
+  vi.resetModules()
+  storage = fakeStorage()
+  globalThis.localStorage = storage
+})
+
+async function fresh(seed) {
+  if (seed) storage.setItem(KEY, JSON.stringify(seed))
+  return import('../store.js')
+}
+async function boot(mock) {
+  const store = await import('../store.js')
+  await store.initStore(mock, FAST)
+  return store
+}
+const saved = () => JSON.parse(storage.getItem(KEY))
+
+describe('config knobs', () => {
+  it('ships the numbers from the spec (20 lifetime gems a seed, 3 × 5 💎 water)', () => {
+    expect(GARDEN).toEqual({ seedEveryGems: 20, waterCost: 5, waterings: 3 })
+  })
+})
+
+describe('seedsOwed (pure)', () => {
+  it('one seed per seedEveryGems lifetime gems, minus those already granted', async () => {
+    const { seedsOwed } = await import('../store.js')
+    expect(seedsOwed(0, 0)).toBe(0)
+    expect(seedsOwed(19, 0)).toBe(0)
+    expect(seedsOwed(20, 0)).toBe(1)
+    expect(seedsOwed(59, 0)).toBe(2)
+    expect(seedsOwed(520, 0)).toBe(26)
+    expect(seedsOwed(520, 26)).toBe(0) // idempotent: granted already
+    expect(seedsOwed(540, 26)).toBe(1)
+  })
+  it('never negative, and reads the knob it is given', async () => {
+    const { seedsOwed } = await import('../store.js')
+    expect(seedsOwed(10, 5)).toBe(0)
+    expect(seedsOwed(undefined, undefined)).toBe(0)
+    expect(seedsOwed(30, 0, { seedEveryGems: 10 })).toBe(3)
+  })
+})
+
+describe('the plot: plant → water ×3 → harvest', () => {
+  it('a brand-new player starts with one starter seed and an empty plot', async () => {
+    const store = await fresh()
+    expect(store.getGarden()).toEqual(garden())
+  })
+
+  it('the whole loop, gems spent but level (lifetimeGems) untouched', async () => {
+    const store = await fresh(oldSave({ gems: 20, lifetimeGems: 120 }))
+    expect(store.plantSeed()).toBe(true)
+    expect(store.getGarden()).toMatchObject({ seeds: 0, plot: { seed: { kind: 'starter', stage: 0 } } })
+    expect(store.harvest()).toBe(null) // not in bloom yet
+    expect(store.waterPlot()).toBe(1)
+    expect(store.waterPlot()).toBe(2)
+    expect(store.waterPlot()).toBe(3) // bloom
+    expect(store.getState().gems).toBe(20 - 3 * GARDEN.waterCost)
+    expect(store.getState().lifetimeGems).toBe(120) // spending never lowers her level
+    expect(store.waterPlot()).toBe(null) // already in bloom — no gem taken
+    expect(store.getState().gems).toBe(5)
+    expect(store.harvest()).toBe(1)
+    expect(store.getGarden()).toMatchObject({ harvests: 1, plot: { seed: null } })
+    expect(saved().garden).toEqual(store.getGarden()) // persisted
+    expect(saved().lifetimeGems).toBe(120)
+  })
+
+  it('refusals: nothing planted, a second seed in a full plot, no seeds, too few gems', async () => {
+    const store = await fresh(oldSave({ gems: 4 }))
+    expect(store.waterPlot()).toBe(null) // nothing planted
+    expect(store.getState().gems).toBe(4)
+    expect(store.plantSeed()).toBe(true)
+    expect(store.plantSeed()).toBe(false) // one plot, one seed
+    expect(store.waterPlot()).toBe(null) // 4 < 5 — refused, nothing spent
+    expect(store.getState().gems).toBe(4)
+    expect(store.getGarden().plot.seed.stage).toBe(0)
+  })
+
+  it('with no seed held, plantSeed refuses', async () => {
+    const store = await fresh(oldSave({ garden: garden({ seeds: 0, harvests: 1 }) }))
+    expect(store.plantSeed()).toBe(false)
+    expect(store.getGarden().plot.seed).toBe(null)
+  })
+})
+
+describe('migration (saves from before the garden — Ivy\'s)', () => {
+  it('an old save with no garden fields loads cleanly with the starter garden, nothing else changes', async () => {
+    const before = oldSave()
+    const store = await fresh(before)
+    const s = store.getState()
+    expect(s.garden).toEqual(garden())
+    expect(s.gems).toBe(before.gems)
+    expect(s.lifetimeGems).toBe(before.lifetimeGems)
+    expect(s.celebratedLevel).toBe(before.celebratedLevel)
+    expect(saved().garden).toEqual(garden()) // the boot save writes it
+  })
+
+  it('an existing garden is kept as-is', async () => {
+    const g = garden({ seeds: 2, seedsGranted: 3, harvests: 1, plot: { seed: { kind: 'starter', stage: 2 } } })
+    const store = await fresh(oldSave({ garden: g }))
+    expect(store.getGarden()).toEqual(g)
+  })
+
+  it('a partial or edited garden is repaired field by field, never reset', async () => {
+    const store = await fresh(oldSave({ garden: { harvests: 4, seeds: -2, plot: { seed: { stage: 9 } } } }))
+    expect(store.getGarden()).toEqual({
+      plot: { seed: { kind: 'starter', stage: GARDEN.waterings } }, // clamped to bloom
+      seeds: 1, // bad count → default
+      seedsGranted: 0,
+      harvests: 4, // kept
+    })
+  })
+})
+
+describe('mergeGarden (pure)', () => {
+  it('never loses a harvest, a grant, or a growing plant; seeds re-derived', async () => {
+    const { mergeGarden } = await import('../store.js')
+    const a = garden({ seedsGranted: 2, seeds: 2, harvests: 1 }) // 1 + 2 = 2 held + 1 harvested
+    const b = garden({ seedsGranted: 1, seeds: 0, harvests: 0, plot: { seed: { kind: 'starter', stage: 2 } } })
+    // a is ahead on harvests → a's (empty) plot; seeds from the law: 1 + 2 − 1 − 0
+    expect(mergeGarden(a, b)).toEqual(garden({ seedsGranted: 2, seeds: 2, harvests: 1 }))
+    expect(mergeGarden(b, a)).toEqual(mergeGarden(a, b)) // order doesn't matter
+  })
+  it('tie on harvests → the further-grown plot wins', async () => {
+    const { mergeGarden } = await import('../store.js')
+    const empty = garden()
+    const growing = garden({ seeds: 0, plot: { seed: { kind: 'starter', stage: 1 } } })
+    expect(mergeGarden(empty, growing)).toEqual(growing)
+    expect(mergeGarden(growing, empty)).toEqual(growing)
+  })
+})
+
+describe('boot merge with the cloud (the ledger still picks the winner)', () => {
+  it('cloud wins on the ledger, but a plant only this device grew is kept — and pushed up', async () => {
+    // This iPad watered twice (gems spent, ledger unchanged); the cloud is ahead on the ledger.
+    storage.setItem(
+      KEY,
+      JSON.stringify(oldSave({ gems: 10, lifetimeGems: 100, garden: garden({ seeds: 0, plot: { seed: { kind: 'starter', stage: 2 } } }) })),
+    )
+    const mock = mockBackend({ cloud: oldSave({ gems: 30, lifetimeGems: 110 }) })
+    const store = await boot(mock)
+    expect(store.getState().lifetimeGems).toBe(110) // the winner's ledger
+    expect(store.getState().gems).toBe(30)
+    expect(store.getGarden()).toEqual(garden({ seeds: 0, plot: { seed: { kind: 'starter', stage: 2 } } }))
+    expect(saved().garden.plot.seed.stage).toBe(2)
+    await sleep(25)
+    expect(mock.calls.writes.length).toBe(1) // the cloud lacked the plant
+    expect(mock.cloud.garden.plot.seed.stage).toBe(2)
+    expect(mock.cloud.lifetimeGems).toBe(110)
+  })
+
+  it('local wins on the ledger, but a harvest only the cloud has is kept', async () => {
+    storage.setItem(KEY, JSON.stringify(oldSave({ lifetimeGems: 200 })))
+    const mock = mockBackend({ cloud: oldSave({ lifetimeGems: 150, garden: garden({ seeds: 0, harvests: 1 }) }) })
+    const store = await boot(mock)
+    expect(store.getState().lifetimeGems).toBe(200)
+    expect(store.getGarden()).toEqual(garden({ seeds: 0, harvests: 1 }))
+    await sleep(25)
+    expect(mock.cloud.garden.harvests).toBe(1)
+    expect(mock.cloud.lifetimeGems).toBe(200)
+  })
+
+  it('cloud wins and the gardens agree → no push (fixture 4 unchanged)', async () => {
+    storage.setItem(KEY, JSON.stringify(oldSave({ lifetimeGems: 100 })))
+    const mock = mockBackend({ cloud: oldSave({ lifetimeGems: 110 }) })
+    const store = await boot(mock)
+    expect(store.getGarden()).toEqual(garden())
+    await sleep(25)
+    expect(mock.calls.writes.length).toBe(0)
+  })
+
+  it('a pre-garden cloud save adopted on a fresh device gets the starter garden', async () => {
+    const mock = mockBackend({ cloud: oldSave() })
+    const store = await boot(mock)
+    expect(store.getGarden()).toEqual(garden())
+    expect(store.getState().lifetimeGems).toBe(520)
+    await sleep(25)
+    expect(mock.calls.writes.length).toBe(0)
+  })
+})
