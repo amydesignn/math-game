@@ -77,9 +77,11 @@ export const WORLD = {
   arriveThreshold: 0.12, // stop when this close to the tap target
   groundSize: 120, // large enough that the edge never shows under the follow cam
   bounds: 18, // half-extent of the playable map — walks clamp to ±bounds
-  // camera offset from the character — steep 3/4 top-down so the trailing pet
-  // never looms between camera and character
-  camOffset: [0, 9, 6.5],
+  // camera offset from the character — a 3/4 view, steep enough that the
+  // trailing pet never looms between camera and character. Eased from
+  // [0, 9, 6.5] (~54°) to ~41° (2026-10-14) so her face shows under the
+  // Sorcerer's hat brim; same distance.
+  camOffset: [0, 7, 8],
   zoomMin: 0.55, // pinch-in limit (closer)
   zoomMax: 2.2, // pinch-out limit (see more of the map)
 }
