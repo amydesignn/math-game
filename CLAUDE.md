@@ -255,9 +255,10 @@ Higgsfield → Blender → here); this section is what's in the code.
   pet changed and would throw once `petSound` went null. `setupAudio` now
   reschedules (or stops) on a pet change, and the timer guards `petSound`.
 - **Silent:** no `PET_SOUNDS` entry for the Sproutling.
-- **Provenance — still to note:** the source image came from Amy's character
-  sheet (6 characters + accessories, 2026-10-14). Record where it came from and
-  its licence here; it's a public kids' app (same care as crediting Kenney).
+- **Provenance:** the source image is OUR OWN — the character sheet was
+  rendered in-house by the family's assistant (2026-10-14), not third-party
+  art, so there is no outside licence to credit. The 3D model is Higgsfield
+  output on Amy's paid plan.
 
 ## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
 Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
