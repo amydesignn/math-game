@@ -36,8 +36,8 @@ import { modelUrl } from '../config'
  * prefers-reduced-motion → every change snaps: no pop, no drops, no burst;
  * a harvest tap calls onHarvest at once. Read at trigger time, the house way.
  *
- * The stage comes from the store in ticket 5 (and the harvest's count in
- * ticket 8). Until then Scene drives it from the dev-only toggle below.
+ * Ticket 5: Scene drives `stage` from the store (garden.plot.seed.stage) and
+ * App owns the plant / water / harvest actions — this file only draws + moves.
  */
 
 const BUD = new THREE.MeshStandardMaterial({ color: '#e8553f', flatShading: true, roughness: 0.85 })
@@ -71,6 +71,8 @@ const SPOTS = Array.from({ length: COLS * ROWS }, (_, i) => {
 export const POP = { from: 0.55, dur: 0.55, colStep: 0.04, rowStep: 0.02 }
 export const HARVEST = { dur: 0.6, lift: 0.7 }
 const WATER = { fall: 0.38, gap: 0.06, from: 1.7 }
+// a watering's new stage pops in as the drops hit (the third drop lands)
+const WATER_LAND_MS = Math.round((WATER.fall + 2 * WATER.gap) * 1000)
 export const HARVEST_MS = Math.round((HARVEST.dur + spotDelay(COLS - 1, ROWS - 1)) * 1000) + 80
 
 /** Ripple delay for the plant at column c, row r (left → right, back → front). */
@@ -221,11 +223,14 @@ const HARVEST_SPARKS = ['#ff8fb1', '#f5b623', '#ffffff', '#e8553f', '#fff6c8']
 
 /**
  * The plot. `stage`: 0–3 (every plant in the bed), or null for an empty bed.
- * `watering`: a counter — each increment plays the water drops. At stage 3 a
- * tap (when `canTap(e)` allows it) harvests: the flowers pop off, then
- * `onHarvest()` is called — the caller empties the bed.
+ * `watering`: a counter — each increment plays the water drops; when a
+ * watering and a stage change arrive together (store.waterPlot), the drops
+ * land FIRST and the bed pops to its new stage as they hit. The bed is one
+ * big tap target: at stage 3 a tap (when `canTap(e)` allows it) harvests —
+ * the flowers pop off, then `onHarvest()` is called and the caller empties the
+ * bed; at any other stage (empty included) a tap calls `onTap()` instead.
  */
-export default function GardenPlot({ position, stage = null, watering = 0, canTap, onHarvest }) {
+export default function GardenPlot({ position, stage = null, watering = 0, canTap, onTap, onHarvest }) {
   const SOIL_Y = 0.08 // soil sits raised, just under the edging's top
   const plants = useRef([]) // inner groups, one per spot — motion writes their transform
   const drops = useRef([])
@@ -233,40 +238,55 @@ export default function GardenPlot({ position, stage = null, watering = 0, canTa
   const anim = useRef({ pop: -1, water: -1, harvest: -1 }) // start times (s), -1 = idle
   const clock = useRef(0)
   const harvestTimer = useRef(0)
+  const swapTimer = useRef(0)
   const [harvesting, setHarvesting] = useState(false)
+  // the stage the bed is SHOWING — trails `stage` while a watering's drops fall
+  const [shown, setShown] = useState(stage)
   const onHarvestRef = useRef(onHarvest)
   onHarvestRef.current = onHarvest
 
-  // a stage change pops the bed (not on first mount — she walks up to it as is)
+  // A watering plays the drops; a stage change swaps the bed (after the drops
+  // land, if both came together). Neither plays on first mount — she walks up
+  // to the bed as it is. Reduced motion: no drops, the swap is immediate.
   const lastStage = useRef(stage)
-  useEffect(() => {
-    if (lastStage.current === stage) return
-    lastStage.current = stage
-    clearTimeout(harvestTimer.current)
-    setHarvesting(false)
-    anim.current.harvest = -1
-    if (stage == null || reducedMotion()) { anim.current.pop = -1; return }
-    anim.current.pop = clock.current
-    sparks.fire(stage === 3 ? 22 : 14, POP_SPARKS)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stage])
-
-  // each watering plays the drops (skipped on mount and under reduced motion)
   const lastWater = useRef(watering)
   useEffect(() => {
-    if (lastWater.current === watering) return
+    const watered = lastWater.current !== watering
+    const grew = lastStage.current !== stage
     lastWater.current = watering
-    if (reducedMotion()) return
-    anim.current.water = clock.current
-    DROPS.forEach((_, i) => { if (drops.current[i]) drops.current[i].userData.splashed = false })
-  }, [watering])
+    lastStage.current = stage
+    const reduce = reducedMotion()
+    if (watered && !reduce) {
+      anim.current.water = clock.current
+      DROPS.forEach((_, i) => { if (drops.current[i]) drops.current[i].userData.splashed = false })
+    }
+    if (!grew) return
+    clearTimeout(harvestTimer.current)
+    clearTimeout(swapTimer.current)
+    setHarvesting(false)
+    anim.current.harvest = -1
+    if (watered && !reduce) swapTimer.current = setTimeout(() => setShown(stage), WATER_LAND_MS * slow())
+    else setShown(stage)
+  }, [stage, watering])
 
-  useEffect(() => () => clearTimeout(harvestTimer.current), [])
+  // the bed changed what it shows → pop into it (never on mount, never empty)
+  const lastShown = useRef(shown)
+  useEffect(() => {
+    if (lastShown.current === shown) return
+    lastShown.current = shown
+    if (shown == null || reducedMotion()) { anim.current.pop = -1; return }
+    anim.current.pop = clock.current
+    sparks.fire(shown === 3 ? 22 : 14, POP_SPARKS)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shown])
 
-  function tapHarvest(e) {
-    if (stage !== 3 || harvesting) return
+  useEffect(() => () => { clearTimeout(harvestTimer.current); clearTimeout(swapTimer.current) }, [])
+
+  function tapBed(e) {
+    if (harvesting) return
     if (canTap && !canTap(e)) return
     e.stopPropagation()
+    if (shown !== 3 || stage !== 3) { onTap?.(); return }
     setHarvesting(true)
     if (reducedMotion()) { onHarvestRef.current?.(); return }
     anim.current.harvest = clock.current
@@ -332,19 +352,18 @@ export default function GardenPlot({ position, stage = null, watering = 0, canTa
           left sand showing at the corners) */}
       <mesh material={BED_SOIL} position={[0, SOIL_Y / 2, 0]}><boxGeometry args={[BED.w, SOIL_Y, BED.d]} /></mesh>
       <Prop pack="forest" name="patch-dirt" position={[0, SOIL_Y - 0.06, 0]} scale={[BED.w + 0.1, 1, BED.d + 0.1]} />
-      {stage != null &&
+      {shown != null &&
         SPOTS.map((p, i) => (
           <group key={i} position={[p.x, SOIL_Y + 0.02, p.z]} rotation={[0, p.rot, 0]} scale={p.k}>
             <group ref={(el) => (plants.current[i] = el)}>
-              <Plant stage={stage} />
+              <Plant stage={shown} />
             </group>
           </group>
         ))}
-      {/* a bloom bed is the harvest button: an invisible hitbox over the whole
-          bed (kid fingers). Only mounted at bloom, so other stages tap through
-          to the ground and she just walks there. */}
-      {stage === 3 && !harvesting && (
-        <mesh position={[0, 0.4, 0]} onPointerDown={tapHarvest} visible={false}>
+      {/* the whole bed is one tap target: an invisible hitbox (kid fingers).
+          Bloom → harvest; anything else → onTap (Scene walks her over). */}
+      {!harvesting && (onTap || shown === 3) && (
+        <mesh position={[0, 0.4, 0]} onPointerDown={tapBed} visible={false}>
           <boxGeometry args={[w + 0.4, 0.8, d + 0.4]} />
           <meshBasicMaterial />
         </mesh>
@@ -361,31 +380,3 @@ export default function GardenPlot({ position, stage = null, watering = 0, canTa
 
 for (const [pack, name] of [['forest', 'patch-dirt'], ['forest', 'plant'], ['platformer', 'plant'], ['platformer', 'flowers-tall']])
   useGLTF.preload(modelUrl(pack, name))
-
-/**
- * DEV-only garden toggle until ticket 5 wires the store: `?garden=0..3` (or
- * `?garden=empty`) on the URL, or `window.__garden(n)` / `__garden(null)` from
- * the console; `window.__water()` plays a watering. Returns `{ stage, watering,
- * harvest }` — `stage` is undefined (= no plot rendered) when nothing has been
- * toggled, and always in production builds; `harvest` empties the bed (the
- * stub for ticket 8's real harvest).
- */
-export function useDevGarden() {
-  const [stage, setStage] = useState(() => {
-    if (!import.meta.env.DEV) return undefined
-    const q = new URLSearchParams(window.location.search).get('garden')
-    if (q == null) return undefined
-    return /^[0-3]$/.test(q) ? Number(q) : null
-  })
-  const [watering, setWatering] = useState(0)
-  useEffect(() => {
-    if (!import.meta.env.DEV) return
-    window.__garden = (n = null) => setStage(n == null ? null : Math.max(0, Math.min(3, n | 0)))
-    window.__water = () => setWatering((w) => w + 1)
-    return () => {
-      delete window.__garden
-      delete window.__water
-    }
-  }, [])
-  return { stage, watering, harvest: () => setStage(null) }
-}
