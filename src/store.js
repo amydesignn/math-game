@@ -379,6 +379,9 @@ function migrate(parsed) {
   // starter seed, empty plot) via normalizeGarden; a partial or edited one is
   // repaired field by field, never reset.
   merged.garden = normalizeGarden(merged.garden)
+  // Ticket 4 (Amy 2026-10-15: "pay them all is fair"): a save that earned
+  // lifetime gems before the garden existed is owed every seed now, at once.
+  grantOwedSeeds(merged)
 
   // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
   // While the 15-gem beta cap was live, a correct answer over the cap paid
@@ -595,6 +598,7 @@ export function addGems(n) {
   // answer could pay NOTHING — effort with no reward, the one thing this app
   // must never do. The economy self-limits by what a problem pays instead.
   state.gems = Math.max(0, state.gems + n)
+  grantOwedSeeds(state) // every GARDEN.seedEveryGems lifetime gems = a seed
   save()
   return state.gems
 }
@@ -711,6 +715,18 @@ export function giftSparkle(colorId) {
 export function seedsOwed(lifetimeGems, seedsGranted, cfg = GARDEN) {
   const earned = Math.floor(Math.max(0, lifetimeGems || 0) / cfg.seedEveryGems)
   return Math.max(0, earned - Math.max(0, seedsGranted || 0))
+}
+
+/** Hand over every seed `s` has earned and not yet received. Raises seeds and
+ *  seedsGranted TOGETHER (the conservation law mergeGarden relies on) and is
+ *  idempotent — a second call grants nothing. Returns how many were granted. */
+function grantOwedSeeds(s) {
+  const owed = seedsOwed(s.lifetimeGems, s.garden.seedsGranted)
+  if (owed > 0) {
+    s.garden.seeds += owed
+    s.garden.seedsGranted += owed
+  }
+  return owed
 }
 
 export function getGarden() {
