@@ -240,10 +240,40 @@ ticket is ART ONLY — no store, no growth motion (ticket 7), no harvest.
   season-maps.test.js.
 - **Dev toggle (until ticket 5 wires the store):** `?garden=0..3|empty` or
   `window.__garden(n|null)`. Without it — and ALWAYS in prod — no plot is drawn
-  (`useDevGardenStage()` → undefined). Ticket 5: replace that hook's value in
+  (`useDevGarden().stage` → undefined; renamed in ticket 7). Ticket 5: replace that hook's value in
   Scene with the store's plot stage (null = empty) and drop the toggle.
 - Verified headless (playwright-core + system Chrome, swiftshader, `__overview`
   close-ups): all 4 stages + empty + no-toggle, zero page errors. 266 tests green.
+
+## Grow a Garden — ticket 7: growth motion + tap to harvest 🌸 (2026-10-15, branch `feat/garden-motion`)
+Motion only, on the locked ticket-6 art (models/layout/colours untouched). All
+in `GardenPlot.jsx`, per-frame three.js in `useFrame` — no DOM, no video.
+- **Stage pop:** a stage change (not first mount) pops every plant into its new
+  stage — damped spring from 0.55 → ~5% overshoot → exactly 1 (`popScale`),
+  rippling left→right/back→front (`spotDelay`, last plant +0.24s) — plus a
+  gold/mint glint burst. ~0.8s total. The motion writes an INNER group per spot,
+  so the spot's fixed wobble (`k`, `rot`) is never touched.
+- **Water:** `watering` is a counter prop; each increment drops 6 water drops
+  onto the bed (gravity fall), splash glints on landing, plants give a small
+  squash. Effect only — gems/growth are tickets 4/5.
+- **Harvest:** at stage 3 an invisible hitbox over the bed takes the tap
+  (`canTap` = Scene's pinch / placing / math-busy guards, then
+  `stopPropagation` so she doesn't walk). Flowers swell, lift and pop off in
+  sparkles, then `onHarvest()` fires on a plain `setTimeout(HARVEST_MS)` — NOT
+  the frame loop (the rAF-starve lesson). Other stages have no hitbox: a tap
+  there just walks her. No store writes, no counting — ticket 8.
+- **Reduced motion** (read at trigger time): snap — no pop, no drops, no
+  burst; a harvest tap calls `onHarvest` at once.
+- **Dev hooks** (`useDevGarden()` replaced `useDevGardenStage()` → `{stage,
+  watering, harvest}`): `?garden=0..3|empty`, `__garden(n)`, `__water()`, and
+  `window.__gardenSlow = 8` plays it all 8× slower (feel-checks + frame capture
+  — swiftshader screenshots are slower than the whole 0.8s pop). Scene's
+  `onHarvest` stub sets the toggle to null. **Ticket 5/8:** swap `devGarden.*`
+  for the store's plot stage / water count / harvest action.
+- Tests `garden-motion.test.js` (+4: pop rests at exactly 1, soft overshoot,
+  short ripple, harvest timer waits for the last plant) → 270 green. Verified in
+  headless Chrome (swiftshader) incl. `reducedMotion: 'reduce'`; the harvest
+  tap leaves her position unchanged; zero page errors.
 
 ## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
 Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy

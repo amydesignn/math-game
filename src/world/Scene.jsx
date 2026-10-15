@@ -11,7 +11,7 @@ import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
 import Buddy from './Buddy'
 import Neighbour from './Neighbour'
-import GardenPlot, { useDevGardenStage } from './GardenPlot'
+import GardenPlot, { useDevGarden } from './GardenPlot'
 import { Ambient } from './Spooky'
 import { FxProp } from './fx'
 import { WORLD, GEMS, STATION, CHARACTERS, assetScale } from '../config'
@@ -58,9 +58,11 @@ function spawnSparkles(map, spawn, placed = []) {
 export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes }) {
   const marker = useRef() // the ring that pings on tap
   // Grow a Garden: the plot's stage. Ticket 5 swaps this for the store's plot;
-  // until then it's the DEV toggle (?garden=0..3|empty, window.__garden(n)) and
-  // undefined (= no plot drawn) everywhere else, production included.
-  const gardenStage = useDevGardenStage()
+  // until then it's the DEV toggle (?garden=0..3|empty, window.__garden(n),
+  // window.__water()) and undefined (= no plot drawn) everywhere else,
+  // production included. Ticket 8 swaps `harvest` for the store's harvest.
+  const devGarden = useDevGarden()
+  const gardenStage = devGarden.stage
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
 
@@ -335,7 +337,13 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
 
       {map.gardenPlot && gardenStage !== undefined && (
         <Suspense fallback={null}>
-          <GardenPlot position={[map.gardenPlot[0], 0, map.gardenPlot[1]]} stage={gardenStage} />
+          <GardenPlot
+            position={[map.gardenPlot[0], 0, map.gardenPlot[1]]}
+            stage={gardenStage}
+            watering={devGarden.watering}
+            canTap={() => !gestureRef.current.pinching && !placing && !(mathBusyRef && mathBusyRef.current)}
+            onHarvest={devGarden.harvest}
+          />
         </Suspense>
       )}
 
