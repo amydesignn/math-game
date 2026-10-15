@@ -220,6 +220,61 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## Grow a Garden — ticket 6: the plot + 4 stage models 🌱 (2026-10-15, branch `feat/garden-plot`)
+Spec + tickets: Notion "🌱 Luxi Math — Grow a Garden (Spec + Tickets)". This
+ticket is ART ONLY — no store, no growth motion (ticket 7), no harvest.
+- **`src/world/GardenPlot.jsx`** — `<GardenPlot position stage>`; `stage` 0 mound
+  · 1 sprout · 2 bud · 3 bloom, `null` = empty bed. **One seed fills the whole
+  bed** (Amy, from a cosy-game ref): a raised bed of 6 × 3 of the same plant,
+  all at one stage, each with a fixed small turn/size wobble. Bed = wooden
+  edging + a soil base (primitives) under a stretched mini-forest `patch-dirt`;
+  sprout = mini-forest `plant`; bud/bloom = platformer-kit `plant`
+  + `flowers-tall` (staged in `public/models/platformer/` with its OWN
+  `Textures/` — the collision rule). Kenney had no usable mound (its dirt clumps
+  are flat + bed-coloured — tried, vanished, stretched = a stump) and no closed
+  bud, so those two are flat-shaded primitives (the Outdoor.jsx way); buds share
+  the bloom's red so bud → bloom reads as one flower.
+- **Placement:** `town.gardenPlot = [-10, -2]` (maps.js) — just inside the west
+  (Clearing) gate, off the walk in, the middle left open for building. It's in
+  `blockers()` (r 1.8) so sparkles/stations skip the bed. Test-guarded in
+  season-maps.test.js.
+- **Dev toggle (until ticket 5 wires the store):** `?garden=0..3|empty` or
+  `window.__garden(n|null)`. Without it — and ALWAYS in prod — no plot is drawn
+  (`useDevGarden().stage` → undefined; renamed in ticket 7). Ticket 5: replace that hook's value in
+  Scene with the store's plot stage (null = empty) and drop the toggle.
+- Verified headless (playwright-core + system Chrome, swiftshader, `__overview`
+  close-ups): all 4 stages + empty + no-toggle, zero page errors. 266 tests green.
+
+## Grow a Garden — ticket 7: growth motion + tap to harvest 🌸 (2026-10-15, branch `feat/garden-motion`)
+Motion only, on the locked ticket-6 art (models/layout/colours untouched). All
+in `GardenPlot.jsx`, per-frame three.js in `useFrame` — no DOM, no video.
+- **Stage pop:** a stage change (not first mount) pops every plant into its new
+  stage — damped spring from 0.55 → ~5% overshoot → exactly 1 (`popScale`),
+  rippling left→right/back→front (`spotDelay`, last plant +0.24s) — plus a
+  gold/mint glint burst. ~0.8s total. The motion writes an INNER group per spot,
+  so the spot's fixed wobble (`k`, `rot`) is never touched.
+- **Water:** `watering` is a counter prop; each increment drops 6 water drops
+  onto the bed (gravity fall), splash glints on landing, plants give a small
+  squash. Effect only — gems/growth are tickets 4/5.
+- **Harvest:** at stage 3 an invisible hitbox over the bed takes the tap
+  (`canTap` = Scene's pinch / placing / math-busy guards, then
+  `stopPropagation` so she doesn't walk). Flowers swell, lift and pop off in
+  sparkles, then `onHarvest()` fires on a plain `setTimeout(HARVEST_MS)` — NOT
+  the frame loop (the rAF-starve lesson). Other stages have no hitbox: a tap
+  there just walks her. No store writes, no counting — ticket 8.
+- **Reduced motion** (read at trigger time): snap — no pop, no drops, no
+  burst; a harvest tap calls `onHarvest` at once.
+- **Dev hooks** (`useDevGarden()` replaced `useDevGardenStage()` → `{stage,
+  watering, harvest}`): `?garden=0..3|empty`, `__garden(n)`, `__water()`, and
+  `window.__gardenSlow = 8` plays it all 8× slower (feel-checks + frame capture
+  — swiftshader screenshots are slower than the whole 0.8s pop). Scene's
+  `onHarvest` stub sets the toggle to null. **Ticket 5/8:** swap `devGarden.*`
+  for the store's plot stage / water count / harvest action.
+- Tests `garden-motion.test.js` (+4: pop rests at exactly 1, soft overshoot,
+  short ripple, harvest timer waits for the last plant) → 270 green. Verified in
+  headless Chrome (swiftshader) incl. `reducedMotion: 'reduce'`; the harvest
+  tap leaves her position unchanged; zero page errors.
+
 ## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
 Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
 Garden. Amy's order: **Star Arcade → Halloween, Sunny Town → open plot +
