@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { SHOP, SHOP_CATEGORIES, SIZES, SPARKLE, COMPANIONS, GEAR } from '../config'
+import { useEffect, useState } from 'react'
+import { useGLTF } from '@react-three/drei'
+import { SHOP, SHOP_CATEGORIES, SIZES, SPARKLE, COMPANIONS, GEAR, HEROES, PLAYER, modelUrl } from '../config'
 
 // display fill for each sparkle swatch (metallics + rainbow read as gradients)
 const SWATCH_BG = {
@@ -18,11 +19,15 @@ const SWATCH_BG = {
  * shop and hands the item to App, which enters placement mode. "Your things"
  * lists bought-but-unplaced items (e.g. a cancelled placement) to place later.
  */
-export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], gear = {}, ownedGear = [], onBuy, onBuySparkle, onBuyPet, onChoosePet, onBuyGear, onWearGear, onPlaceOwned, onClose }) {
+export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], gear = {}, ownedGear = [], character, ownedHeroes = [], onBuyHero, onChooseHero, onBuy, onBuySparkle, onBuyPet, onChoosePet, onBuyGear, onWearGear, onPlaceOwned, onClose }) {
   const [selected, setSelected] = useState(null) // "pack:asset" of the selected tile
   const [magicSel, setMagicSel] = useState(null) // selected sparkle colorId
   const [petSel, setPetSel] = useState(null) // selected companion id (not yet owned)
   const [gearSel, setGearSel] = useState(null) // selected wardrobe piece (not yet owned)
+  const [heroSel, setHeroSel] = useState(null) // selected locked hero (asking to unlock)
+  // Warm every hero's model while the shop is open, so a swap doesn't
+  // suspend the world on a fetch (most are cached already — neighbours).
+  useEffect(() => { HEROES.forEach((h) => useGLTF.preload(modelUrl('characters', h.id))) }, [])
   const [size, setSize] = useState(1) // ×1/×2/×3 — resets each time the shop opens
 
   const sheet = {
@@ -77,9 +82,60 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
             </>
           )}
 
+          {/* Heroes — who she plays as. Free ones swap any time; a locked one
+              unlocks with gems ONCE (tap → Unlock pill, the same two-tap buy as
+              every shelf) and she plays as them right away. */}
+          <SectionLabel>🦸 Heroes</SectionLabel>
+          <div style={{ ...grid, marginBottom: 6 }}>
+            {HEROES.map((h) => {
+              const isHers = h.price === 0 || ownedHeroes.includes(h.id)
+              const isOn = character === h.id
+              const affordable = isHers || gems >= h.price
+              const isSel = heroSel === h.id
+              return (
+                <button
+                  key={h.id}
+                  onClick={() => {
+                    if (isOn) return
+                    if (isHers) onChooseHero(h.id)
+                    else if (affordable) setHeroSel(isSel ? null : h.id)
+                  }}
+                  aria-disabled={(!affordable || isOn) || undefined}
+                  aria-pressed={isOn}
+                  aria-label={isHers ? h.name : `${h.name}, locked, ${h.price} gems`}
+                  style={{ ...tile(affordable), outline: isSel || isOn ? '3px solid var(--brand-iris-600)' : undefined }}
+                >
+                  <img
+                    src={import.meta.env.BASE_URL + h.thumb}
+                    alt=""
+                    width={48}
+                    height={48}
+                    style={{ objectFit: 'contain', filter: affordable ? 'none' : 'grayscale(1)', opacity: affordable ? 1 : 0.5 }}
+                  />
+                  <span style={tileName(affordable)}>{h.name}</span>
+                  {isOn ? (
+                    <span style={{ ...tilePrice, color: 'var(--color-text-brand)' }}>Playing 💜</span>
+                  ) : isHers ? (
+                    <span style={{ ...tilePrice, color: 'var(--color-component-button-link-text-default)' }}>Play</span>
+                  ) : isSel ? (
+                    <span
+                      onClick={(e) => { e.stopPropagation(); onBuyHero(h.id); setHeroSel(null) }}
+                      style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '4px 12px', fontWeight: 800, whiteSpace: 'nowrap' }}
+                    >
+                      Unlock 💎{h.price}
+                    </span>
+                  ) : (
+                    <span style={{ ...tilePrice, color: affordable ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>🔒 💎 {h.price}</span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+
           {/* Wardrobe — the Sorcerer's hat + staff: buy a colour and she wears it
-              right away; switch (or take one off) any time */}
-          {[['hat', '🧙 Hats', 'No hat'], ['staff', '🪄 Staffs', 'No staff']].map(([slot, label, bare]) => (
+              right away; switch (or take one off) any time. Only the Sorcerer has
+              the sockets, so the shelves show only while she's the hero. */}
+          {character === PLAYER && [['hat', '🧙 Hats', 'No hat'], ['staff', '🪄 Staffs', 'No staff']].map(([slot, label, bare]) => (
             <div key={slot}>
               <SectionLabel>{label}</SectionLabel>
               <div style={{ ...grid, marginBottom: 6 }}>

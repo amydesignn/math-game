@@ -26,8 +26,10 @@ export default function Character({ id, start = [0, 0], targetRef, posRef, react
   const body = useRef()
   const bounce = animations.length === 0
 
-  // start idle
+  // start idle — and again on a hero swap (new model, new actions; forget
+  // the old model's clip name or play('idle') would think it's already on)
   useEffect(() => {
+    current.current = null
     play('idle')
     return () => current.current && actions[current.current]?.stop()
     // eslint-disable-next-line react-hooks/exhaustive-deps
