@@ -220,6 +220,45 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## Companion shop + generated 3D models 🌱 ✅ SHIPPED 2026-10-14 (PR #49, `6b92c6b`)
+Ivy wanted a new companion. The first model we GENERATED rather than took
+from Kenney: the **Sproutling** (Ivy named it), sold in the Gem Shop for 💎50.
+**How to make the next one = the `math-game-3d-model` skill** (image →
+Higgsfield → Blender → here); this section is what's in the code.
+- **Data = `COMPANIONS` in `src/config.js`** (`{id, name, thumb, price}`): the
+  cat (free, always hers) + `sprout` (label "Sproutling", 💎50). `PET_IDS` =
+  the cube `PETS` + every companion id — the list anything validating a pet
+  id must use (Buddy does; `PETS` stays the 24 cube pets the tests check).
+  A new companion = one entry + a GLB + a thumbnail, nothing else.
+- **Store:** `ownedPets` (fresh save `['animal-cat']`). `buyPet(id)` charges
+  ONCE, adds it, and makes it her pet; owning it already → free switch.
+  `setPet(id)` refuses a pet she doesn't own. `migrate()` gives old saves the
+  cat, drops ids we don't ship, and falls back to the cat for any unowned
+  `pet` (a hand-edited save can't grant one). Tests `companions.test.js` (+6).
+- **Shop:** a "💜 Companions" shelf at the TOP of `Shop.jsx`, tiles show the
+  `public/thumbs/pet-*.png` render: active = "With you 💜", owned = "Choose",
+  else price → Buy pill. App holds `petId` in state (`handleBuyPet` /
+  `handleChoosePet`) so the swap is instant — no reload.
+- **Door hero** (`HeroStage.jsx`) now shows HER companion (`getState().pet`);
+  the character is still the one default for everyone.
+- **Motion for clip-less models:** a generated GLB has no skeleton or
+  animations, so `Pet.jsx` checks `animations.length === 0` and drives an inner
+  `body` group in code — hop while walking (faster when running), breathe at
+  rest, spin-hop on a solve (`reactUntilRef`). Kenney pets are untouched. Ivy's
+  verdict on the bounce: the best part. The meadow `Buddy` doesn't bounce yet
+  (meadow paused).
+- **Asset budget:** `public/models/pets/sprout.glb` = 10k tris / 542KB (the cube
+  pets are ~150KB). 10k is the floor for a painted face — 4k cracked the
+  texture. ⚠️ Not yet tested on a real iPad; check before a world shows many
+  generated characters at once.
+- **Fixed along the way (`audio.js`):** the meow timer kept running after the
+  pet changed and would throw once `petSound` went null. `setupAudio` now
+  reschedules (or stops) on a pet change, and the timer guards `petSound`.
+- **Silent:** no `PET_SOUNDS` entry for the Sproutling.
+- **Provenance — still to note:** the source image came from Amy's character
+  sheet (6 characters + accessories, 2026-10-14). Record where it came from and
+  its licence here; it's a public kids' app (same care as crediting Kenney).
+
 ## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
 Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
 Garden. Amy's order: **Star Arcade → Halloween, Sunny Town → open plot +
