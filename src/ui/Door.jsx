@@ -219,12 +219,17 @@ function QuestCard({ quest }) {
 }
 
 /* ── badge + status indicator — Datum styling-v0.21. Two components, two jobs:
-   Badge 'new' = a fact about the CONTENT (the Beta amber, 6.84:1, top-right).
+   Badge 'new' = a fact about the CONTENT (green since 2026-10-10, top-right).
    Status indicator = a live state about HER ("Last played", 10.37:1, top-left):
    a green dot that breathes (motion-pulse). Token names copied verbatim into index.css. ── */
 const pill = { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1, 4px)', height: 20, padding: '0 var(--space-2, 8px)', borderRadius: 9999, borderWidth: 1, borderStyle: 'solid', fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' }
 const badgeS = {
-  new: { background: 'var(--color-component-badge-new-background)', borderColor: 'var(--color-component-badge-new-border)', color: 'var(--color-component-badge-new-text)' },
+  // Colour swap (Amy 2026-10-10): New = GREEN, Beta = ORANGE/amber. Datum's own
+  // `new` variant is amber, so New now reads Datum's success tokens and Beta the
+  // amber ones (warning tokens = the same amber values). Variant names here say
+  // what the badge MEANS on the Door; the token names say where the colour lives.
+  new: { background: 'var(--color-component-badge-success-background)', borderColor: 'var(--color-component-badge-success-border)', color: 'var(--color-component-badge-success-text)' },
+  beta: { background: 'var(--color-component-badge-warning-background)', borderColor: 'var(--color-component-badge-warning-border)', color: 'var(--color-component-badge-warning-text)' },
 }
 function Badge({ variant, children, style }) {
   return <span style={{ ...pill, ...badgeS[variant], ...style }}>{children}</span>
@@ -364,7 +369,7 @@ function Header({ onOpenSettings, onOpenProfile, settingsActive, avatar }) {
   return (
     <header className="doorHdr">
       <div className="doorHdrIn">
-        <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Luxi Math</span></div>
+        <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Luxi Math</span><Badge variant="beta">Beta</Badge></div>
         <div style={hS.right}>
           {/* Gear first, profile at the corner (Amy 2026-08-30). */}
           <button style={{ ...hS.gear, background: settingsActive ? '#DDD1F7' : '#EDE7FC' }} onClick={onOpenSettings} aria-label="Settings" title="Settings">⚙️</button>
