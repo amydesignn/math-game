@@ -18,7 +18,7 @@ import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } f
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
 import * as metrics from './metrics'
-import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
+import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, pendingLevelUps, recordLevelUp, getLevelUps } from './store'
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
@@ -26,9 +26,6 @@ import { WORLD, REFRESH } from './config'
 import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
-
-// Exploration: ?pet=sprout previews a pet without touching saved state.
-const PET_PREVIEW = new URLSearchParams(window.location.search).get('pet') === 'sprout' ? 'sprout' : null
 
 export default function App({ cloud = false, justSignedIn = false }) {
   const [state] = useState(getState)
@@ -133,6 +130,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
 
   // ── Gems (uncapped since the beta cap retired 2026-07-18) ──
   const [gems, setGems] = useState(state.gems)
+  const [petId, setPetId] = useState(state.pet) // her companion (Gem Shop)
 
   // ── Phase 5-A: Player Level ──
   // `points` IS lifetimeGems — the same accumulator, read for a different job:
@@ -149,8 +147,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
 
   // ── Phase 2: sound (Ivy's bgm + the cat's meow) ──
   useEffect(() => {
-    setupAudio({ petId: state.pet, on: state.soundOn, track: state.musicTrack })
-  }, [state.pet, state.soundOn, state.musicTrack])
+    setupAudio({ petId, on: state.soundOn, track: state.musicTrack })
+  }, [petId, state.soundOn, state.musicTrack])
 
   // ── Phase 4: the math loop — sparkles open problems ──
   const [math, setMath] = useState(null) // { sparkleId, problem, skin }
@@ -275,6 +273,15 @@ export default function App({ cloud = false, justSignedIn = false }) {
     if (!buySparkle(colorId)) return // can't afford — shop shows it greyed anyway
     setGems(getState().gems)
     setSparkle(getActiveSparkle())
+  }
+  // ── Companions: buy one (becomes hers right away) or switch to one she owns ──
+  function handleBuyPet(id) {
+    if (!buyPet(id)) return // can't afford — shop shows it greyed anyway
+    setGems(getState().gems)
+    setPetId(id)
+  }
+  function handleChoosePet(id) {
+    if (setPet(id)) setPetId(id)
   }
   function onSparkleExpire() {
     getActiveSparkle() // clears the lapsed one in the store
@@ -889,7 +896,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
             selectedId={selectedId}
             onSelectPlaced={(id) => setSelectedId(id)}
             characterId={state.character}
-            petId={PET_PREVIEW || state.pet}
+            petId={petId}
             targetRef={targetRef}
             charPosRef={charPosRef}
             petPosRef={petPosRef}
@@ -985,6 +992,10 @@ export default function App({ cloud = false, justSignedIn = false }) {
           activeSparkle={sparkle}
           onBuy={handleBuy}
           onBuySparkle={handleBuySparkle}
+          pet={petId}
+          ownedPets={getState().ownedPets}
+          onBuyPet={handleBuyPet}
+          onChoosePet={handleChoosePet}
           onPlaceOwned={(o) => startPlacing({ id: o.id, asset: o.asset, pack: o.pack, size: o.size })}
           onClose={() => setShopOpen(false)}
         />

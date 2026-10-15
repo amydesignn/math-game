@@ -24,6 +24,18 @@ export const PETS = [
   'animal-penguin', 'animal-pig', 'animal-polar', 'animal-tiger',
 ]
 
+// Companions she can buy in the Gem Shop and switch between (Ivy, 2026-10-14).
+// The cat is hers from the start. `thumb` is a still render for the shop tile.
+// Generated models (Higgsfield → Blender) have no skeleton — Pet.jsx bounces
+// them in code instead of playing clips.
+export const COMPANIONS = [
+  { id: 'animal-cat', name: 'Cat', thumb: 'thumbs/pet-cat.png', price: 0 },
+  { id: 'sprout', name: 'Sprout', thumb: 'thumbs/pet-sprout.png', price: 50 },
+]
+
+// Every pet id the game can load — the cube pets plus the bought companions.
+export const PET_IDS = [...PETS, ...COMPANIONS.map((c) => c.id).filter((id) => !PETS.includes(id))]
+
 // Forest props for world-building (Stage C).
 export const PROPS = [
   'tree', 'tree-high', 'rocks-low', 'rocks-high', 'rocks-ramp',

@@ -3,10 +3,9 @@
  * alive (idle animation + the cat's gentle bob), on a transparent stage so the
  * card's lavender gradient shows through.
  *
- * ONE build for everyone (Amy, 2026-07-31): this is always character-female-a +
- * animal-cat — the game's default avatar — not a per-account render. When a real
- * avatar picker lands, this reads the chosen ids; until then it's the one face of
- * Luxi Math. Models + animations are the SAME assets the world uses (already
+ * ONE build for everyone (Amy, 2026-07-31): the character is always
+ * character-female-a — the game's default avatar. The companion is HERS: the cat
+ * until she buys another in the Gem Shop (2026-10-14). Models + animations are the SAME assets the world uses (already
  * preloaded there), so it paints instantly and can never drift from in-game.
  */
 import { Suspense, useEffect, useMemo, useRef } from 'react'
@@ -15,6 +14,7 @@ import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
 import { modelUrl, WORLD } from '../config'
 import BlobShadow from '../world/BlobShadow'
+import { getState } from '../store'
 
 /** One clone of a Kenney GLB, playing an animation, grounded with a blob shadow.
  *  `bob` adds a gentle vertical hop (the cube pet's liveliness, standing still). */
@@ -71,7 +71,7 @@ export default function HeroStage() {
       <Suspense fallback={null}>
         <Turntable>
           <Avatar pack="characters" id="character-female-a" position={[-0.22, 0, 0.25]} rotationY={0.3} scale={WORLD.characterScale} shadow={0.55} />
-          <Avatar pack="pets" id="animal-cat" position={[0.78, 0, -0.35]} rotationY={-0.5} scale={WORLD.petScale} shadow={0.42} bob={0.05} />
+          <Avatar pack="pets" id={getState().pet} position={[0.78, 0, -0.35]} rotationY={-0.5} scale={WORLD.petScale} shadow={0.42} bob={0.05} />
         </Turntable>
       </Suspense>
     </Canvas>
