@@ -181,6 +181,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   function onMathAward(n) {
     setGems(addGems(n)) // every correct answer pays, always
     setPoints(getState().lifetimeGems) // …and the same answer moves her level bar
+    syncGarden(false) // …and may have earned a seed (every GARDEN.seedEveryGems lifetime gems)
   }
 
   /** The bar finished its theatre and handed us a new level — queue the applause. */
@@ -424,7 +425,13 @@ export default function App({ cloud = false, justSignedIn = false }) {
   const [toast, setToast] = useState(null)
   const travelling = useRef(false)
   const toastTimer = useRef()
-  useEffect(() => setGardenOpen(false), [mapId, view]) // the bar never follows her out of the town
+  // the bar never follows her out of the town; and every arrival re-reads the
+  // plot (a seed can land while she's elsewhere — e.g. the Door's promo gems)
+  useEffect(() => {
+    setGardenOpen(false)
+    syncGarden(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapId, view])
 
   // the assets she's placed in the map she's standing in (mapId lives just above)
   const placedHere = placed.filter((w) => w.map === mapId)

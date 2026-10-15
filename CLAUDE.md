@@ -275,6 +275,24 @@ in `GardenPlot.jsx`, per-frame three.js in `useFrame` — no DOM, no video.
   headless Chrome (swiftshader) incl. `reducedMotion: 'reduce'`; the harvest
   tap leaves her position unchanged; zero page errors.
 
+## Grow a Garden — ticket 4: seeds paid from lifetime gems 🌱 (2026-10-15, branch `feat/garden-seeds`)
+One seed per `GARDEN.seedEveryGems` (20) LIFETIME gems — not per level (the
+knob supersedes the spec's level table). **Amy: "pay them all is fair"** — an
+old save gets every seed it ever earned at once (Ivy, ~520 lifetime → the
+starter + 26).
+- `grantOwedSeeds(s)` (store.js, private) raises `seeds` AND `seedsGranted`
+  together (mergeGarden's conservation law) and is idempotent via `seedsOwed`.
+  Called in `migrate()` (old + cloud-adopted saves, every load = no-op once
+  paid) and in `addGems()` (every earn; spends never grant).
+- App: `onMathAward` and every world arrival re-read the plot (`syncGarden`),
+  so the bar's "Plant your seed" shows up as soon as a seed lands.
+- **No "you got a seed!" toast yet** — logged to the Notion backlog (Amy:
+  backlog, not scope).
+- Tests: garden.test.js updated to the pay-out rule (+2: grant on crossing a
+  multiple of 20 / never on a spend, never paid twice across a reload) → 288.
+  Verified headless with an Ivy-shaped save: 27 seeds, plant → water ×3 →
+  pick → still "Plant your seed", reload pays nothing more, zero errors.
+
 ## Grow a Garden — ticket 5: the plot grows from the store 💧 (2026-10-15, branch `feat/garden-water`)
 The garden is LIVE in Sunny Town for everyone: the plot reads `store.garden`
 (ticket 3, PR #54, stacked under this branch) and the dev stage toggle is gone.
@@ -286,8 +304,7 @@ Per the updated spec, she WATERS it with gems; correct answers don't feed it dir
   "💧 Water · 5 💎" (`waterPlot`, disabled + "solve a problem to earn more" when
   short) · bloom → "Tap your flowers to pick them 🌸" (the 3D tap → ticket 7's
   harvest motion → `store.harvest()` + a toast) · empty, no seed → "No seeds
-  right now — more are on the way ✨" (**ticket 4 grants seeds; until it lands
-  the starter seed is the only one**).
+  right now — more are on the way ✨" (ticket 4 grants them).
 - **Water → drops land first, THEN the pop:** GardenPlot keeps a `shown` stage
   that trails `stage` by `WATER_LAND_MS` when a watering and a stage change
   arrive together. App's `garden.watering` is a local counter that just plays
