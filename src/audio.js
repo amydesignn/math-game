@@ -74,6 +74,14 @@ export function setMusic(id) {
   if (wasPlaying && enabled && unlocked) bgm.play().catch(() => {})
 }
 
+/** A promo clip playing WITH sound (PromoPopup) — the loop steps aside so two
+ *  tracks never play over each other, and comes back after if it was allowed. */
+export function holdMusic(on) {
+  if (!bgm) return
+  if (on) bgm.pause()
+  else if (enabled && unlocked) bgm.play().catch(() => {})
+}
+
 /** Ivy's research: nothing interrupts during a problem. Meow holds in focus mode. */
 export function setFocusMode(on) {
   focus = on

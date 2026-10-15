@@ -316,6 +316,35 @@ skill `math-game-3d-model` → "Modular characters").
   the pane: Door hero, walk + bounce, buy green hat + pink staff, No hat,
   reload persists, zero console errors on a fresh tab.
 
+## Halloween popup + trick-or-treat 🎃 (2026-10-15, branch `feat/halloween-treat`)
+Amy's Halloween promo: the Sorcerer's Halloween clip as a ONE-TIME popup over the
+Door, with a trick-or-treat pick — EITHER pick pays 3 gems.
+- **`src/ui/PromoPopup.jsx`** — `PROMO` config (id `halloween-2026`, season
+  `halloween`, year 2026, 3 gems, media) + `promoActive()` = same window as the
+  Spooky Arcade (`season.js`, Oct 1 → Nov 2, `?season=` override) AND this year.
+  Chrome reuses `.luxiOb-*`; new bits are `.luxiPromo-*` in index.css.
+- **Once and gone, paid on SHOW:** `store.claimPromo(id, gems)` marks the id in
+  `state.promos` AND pays in one save, the moment the popup mounts (the
+  onboarding seen-on-show lesson). The pick only REVEALS the treat — closing
+  early / reloading can neither lose it nor re-pay. Old saves get `promos: []`
+  from the freshState merge, so returning players (Ivy) DO see it.
+- **Never stacks:** App shows it only on the Door and only when first-run
+  onboarding is closed — a brand-new player gets onboarding, then the treat.
+- **Video:** muted autoplay + loop + playsInline (browsers only autoplay muted);
+  corner button = sound on (restarts the clip; `audio.holdMusic` pauses the bgm
+  while it has sound). Reduced motion → poster + controls, no autoplay. Amy's
+  1080p HEVC source (8.5MB, unplayable in some browsers) → `public/promo/`
+  720p WebM (430KB) + H.264 MP4 (600KB) + JPG poster.
+- **The treat animation (Amy: "more dramatic"):** on the pick, `TreatBurst` (a
+  fixed layer over the card) pops three big glowing gems in a fan + two
+  shockwave rings + 36 sparkles/mini gems flung across the screen (golden-angle
+  spread); the big gems shrink away as the chip's gems drop in one by one and
+  the count ticks +1 per landing. Choreography constants live at the top of
+  PromoPopup (`CHIP_START`, `GEM_LAND`); all CSS keyframes (`.luxiBurst-*`,
+  `.luxiPromo-*`). Reduced motion = no burst, a plain fade, full count at once.
+- **Next promo:** new id (NEVER reuse — the id is the seen key), new media,
+  season + year. Tests `promo.test.js` (+5) → 253 green.
+
 ## Play metrics — anonymous session counts (2026-10-07, branch `feat/play-metrics`)
 Amy wants to watch engagement + session time before marketing; Vercel page views
 can't say (one-page app = "it loaded"). **`src/metrics.js`** tallies ONE session
