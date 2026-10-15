@@ -289,8 +289,8 @@ hat and staff swap (exploration + scripts: `~/projects/luxi-3d-explore/sorcerer`
 skill `math-game-3d-model` → "Modular characters").
 - **Models:** `public/models/characters/sorcerer.glb` (base, no hat/staff; two
   empty nodes `socket_head` + `socket_hand_R`; the `base` node carries
-  `scale 0.55` → ~1.1 body / ~1.5 with the hat vs Kenney's 0.78 — a touch
-  bigger than the neighbours, she's the hero). ⚠️ **Kenney mini characters are
+  `scale 0.45` → ~0.9 body / ~1.25 with the hat vs Kenney's 0.78 — about
+  neighbour-sized, the hat stands taller; Amy chose smaller than the first 0.55). ⚠️ **Kenney mini characters are
   0.78 tall** — their meshes are skinned in bone space, so a Blender bbox
   reads 2.0; read the GLB node chain (or look in-world) before sizing.
   `public/models/gear/{hat,staff}.glb` (origin = attach point) +

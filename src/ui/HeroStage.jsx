@@ -63,8 +63,8 @@ export default function HeroStage() {
     <Canvas
       dpr={[1, 2]}
       gl={{ alpha: true, antialias: true }}
-      camera={{ fov: 30, position: [0.55, 1.55, 4.6], near: 0.1, far: 50 }}
-      onCreated={({ camera }) => camera.lookAt(0.05, 0.76, 0)}
+      camera={{ fov: 30, position: [0.55, 1.4, 4.0], near: 0.1, far: 50 }}
+      onCreated={({ camera }) => camera.lookAt(0.05, 0.68, 0)}
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
     >
       {/* the world's exact lighting rig, so the hero matches in-game */}
