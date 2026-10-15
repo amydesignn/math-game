@@ -54,6 +54,27 @@ export const GEAR = [
   { id: 'staff-orange', slot: 'staff', name: 'Orange staff', model: 'staff', tex: 'crystal-orange', thumb: 'thumbs/gear-staff-orange.png', price: 10 },
 ]
 export const DEFAULT_GEAR = { hat: 'hat-blue', staff: 'staff-purple' }
+
+// Heroes (Gem Shop, 2026-10-15): the player swaps who she plays as. The
+// Sorcerer + two Kenney minis are free; the rest unlock with gems, ONCE. Only
+// the Sorcerer has gear sockets, so the hat/staff shelves are hers alone.
+// Names + the 💎50 price are placeholders until Amy sets them.
+const hero = (id, name, price) => ({ id, name, price, thumb: `thumbs/hero-${id.replace('character-', '')}.png` })
+export const HEROES = [
+  hero(PLAYER, 'Sorcerer', 0),
+  hero('character-female-b', 'Sunny', 0),
+  hero('character-male-a', 'Bookworm', 0),
+  hero('character-female-a', 'Champ', 50),
+  hero('character-female-c', 'Bluebell', 50),
+  hero('character-female-d', 'Boss', 50),
+  hero('character-female-e', 'Scientist', 50),
+  hero('character-female-f', 'Rocker', 50),
+  hero('character-male-b', 'Grandpa', 50),
+  hero('character-male-c', 'Officer', 50),
+  hero('character-male-d', 'Mayor', 50),
+  hero('character-male-e', 'Builder', 50),
+  hero('character-male-f', 'Gardener', 50),
+]
 export const gearUrl = (model) => `${B}models/gear/${model}.glb`
 export const gearTexUrl = (tex) => `${B}models/gear/tex/${tex}.jpg`
 

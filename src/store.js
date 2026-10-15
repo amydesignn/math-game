@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR } from './config'
+import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR, HEROES } from './config'
 import { localBackend } from './backend'
 
 const KEY = 'math_world_v1'
@@ -18,7 +18,8 @@ const KEY = 'math_world_v1'
 /** The complete game state. Add fields here as stages land; keep it flat + serialisable. */
 function freshState() {
   return {
-    character: PLAYER, // Ivy's avatar — the Sorcerer (2026-10-14)
+    character: PLAYER, // who she plays as — the Sorcerer by default (2026-10-14)
+    ownedHeroes: [], // heroes she's unlocked with gems (free ones are always hers)
     // What she's wearing (slot → GEAR id, or null = bare) and what she owns.
     // Free pieces (price 0) are always hers; ownedGear lists bought ones.
     gear: { ...DEFAULT_GEAR },
@@ -315,10 +316,13 @@ function migrate(parsed) {
   merged.ownedPets = merged.ownedPets.filter((id) => PET_IDS.includes(id))
   if (!merged.ownedPets.includes(merged.pet)) merged.pet = 'animal-cat'
 
-  // The Sorcerer (2026-10-14) is the player character; older saves had the
-  // Kenney default (there was never a picker). Wardrobe: keep only pieces we
-  // ship, in the right slot, that she owns.
-  merged.character = PLAYER
+  // Heroes (2026-10-15): she plays as a hero she owns (free, or unlocked).
+  // Anything else — the old Kenney default from before the Sorcerer, a hero we
+  // no longer ship, an edited save — falls back to the Sorcerer. Wardrobe: keep
+  // only pieces we ship, in the right slot, that she owns.
+  if (!Array.isArray(merged.ownedHeroes)) merged.ownedHeroes = []
+  merged.ownedHeroes = merged.ownedHeroes.filter((id) => HEROES.some((h) => h.id === id))
+  if (!ownsHero(merged, merged.character)) merged.character = PLAYER
   if (!Array.isArray(merged.ownedGear)) merged.ownedGear = []
   merged.ownedGear = merged.ownedGear.filter((id) => GEAR.some((g) => g.id === id))
   const gear = { ...DEFAULT_GEAR, ...(merged.gear && typeof merged.gear === 'object' ? merged.gear : {}) }
@@ -363,9 +367,32 @@ export function getState() {
   return state
 }
 
+function ownsHero(s, id) {
+  const h = HEROES.find((x) => x.id === id)
+  return !!h && (h.price === 0 || s.ownedHeroes.includes(id))
+}
+
+/** Switch hero — only to one she owns. */
 export function setCharacter(id) {
+  if (!ownsHero(state, id)) return false
   state.character = id
   save()
+  return true
+}
+
+/** Unlock a hero with gems → she plays as them right away. Costs once.
+ *  Returns the id, or null if she can't afford it (or it isn't a hero). */
+export function buyHero(id) {
+  const h = HEROES.find((x) => x.id === id)
+  if (!h) return null
+  if (!ownsHero(state, id)) {
+    if (state.gems < h.price) return null
+    state.gems -= h.price
+    state.ownedHeroes.push(id)
+  }
+  state.character = id
+  save()
+  return id
 }
 
 /** Switch companion — only to one she owns. */

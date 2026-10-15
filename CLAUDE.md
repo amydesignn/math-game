@@ -316,6 +316,30 @@ skill `math-game-3d-model` → "Modular characters").
   the pane: Door hero, walk + bounce, buy green hat + pink staff, No hat,
   reload persists, zero console errors on a fresh tab.
 
+## Heroes — swap who you play as 🦸 (2026-10-15, branch `feat/hero-picker`)
+Amy: let kids set up their character — 3 free, the rest locked. Scope = the
+character swap ONLY (companions are already Cat + Sproutling, unchanged), on
+existing models: the Sorcerer + the 12 Kenney minis.
+- **`HEROES` (config.js):** Sorcerer, Sunny (`female-b`), Bookworm (`male-a`)
+  free; the other 10 Kenney minis **💎50 = placeholder** (names placeholders too).
+  Thumbs `public/thumbs/hero-*.png` — Kenney meshes are skinned, so plain
+  `thumb.py` frames the bind-pose bbox (tiny, T-pose); use
+  `~/projects/luxi-3d-explore/thumb-kenney.py` (idle pose, deformed-mesh bounds,
+  1600px) then `thumb-crop.py` (autocrop → 256).
+- **Store:** `ownedHeroes`; `setCharacter` (owned/free only) / `buyHero` (spend
+  once, play now). migrate: an unowned/unshipped `character` → the Sorcerer
+  (this also covers the pre-Sorcerer Kenney default — `female-a` is locked).
+- **Gem Shop → 🦸 Heroes** shelf first; locked = 🔒 💎50 → tap → "Unlock 💎50"
+  pill. **Hats/Staffs only show while the Sorcerer is the hero** (only she has
+  sockets); her gear is kept while she's swapped out. The shop preloads every
+  hero GLB on open so a swap doesn't suspend the world.
+- `Character.jsx` resets its clip cursor on a model swap (else the new model
+  never starts idle). Kenney heroes are Kenney-sized (0.78 — smaller than the
+  Sorcerer), same as the neighbours.
+- Tests `heroes.test.js` (+12) → 265 green. Verified in the pane: unlock
+  (💎 spent once), swap back to the Sorcerer (hat/staff return), reload
+  persists, Door hero card follows, zero console errors.
+
 ## Halloween popup + trick-or-treat 🎃 (2026-10-15, branch `feat/halloween-treat`)
 Amy's Halloween promo: the Sorcerer's Halloween clip as a ONE-TIME popup over the
 Door, with a trick-or-treat pick — EITHER pick pays 3 gems.
