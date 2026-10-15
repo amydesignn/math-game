@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { SHOP, SHOP_CATEGORIES, SIZES, SPARKLE } from '../config'
+import { SHOP, SHOP_CATEGORIES, SIZES, SPARKLE, COMPANIONS } from '../config'
 
 // display fill for each sparkle swatch (metallics + rainbow read as gradients)
 const SWATCH_BG = {
@@ -18,9 +18,10 @@ const SWATCH_BG = {
  * shop and hands the item to App, which enters placement mode. "Your things"
  * lists bought-but-unplaced items (e.g. a cancelled placement) to place later.
  */
-export default function Shop({ gems, owned, activeSparkle, onBuy, onBuySparkle, onPlaceOwned, onClose }) {
+export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], onBuy, onBuySparkle, onBuyPet, onChoosePet, onPlaceOwned, onClose }) {
   const [selected, setSelected] = useState(null) // "pack:asset" of the selected tile
   const [magicSel, setMagicSel] = useState(null) // selected sparkle colorId
+  const [petSel, setPetSel] = useState(null) // selected companion id (not yet owned)
   const [size, setSize] = useState(1) // ×1/×2/×3 — resets each time the shop opens
 
   const sheet = {
@@ -74,6 +75,53 @@ export default function Shop({ gems, owned, activeSparkle, onBuy, onBuySparkle, 
               </div>
             </>
           )}
+
+          {/* Companions — buy one and it follows her right away; switch any time */}
+          <SectionLabel>💜 Companions</SectionLabel>
+          <div style={{ ...grid, marginBottom: 6 }}>
+            {COMPANIONS.map((c) => {
+              const isHers = ownedPets.includes(c.id)
+              const isActive = pet === c.id
+              const affordable = isHers || gems >= c.price
+              const isSel = petSel === c.id
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    if (isActive) return
+                    if (isHers) onChoosePet(c.id)
+                    else if (affordable) setPetSel(isSel ? null : c.id)
+                  }}
+                  aria-disabled={(!affordable || isActive) || undefined}
+                  aria-pressed={isActive}
+                  style={{ ...tile(affordable), outline: isSel || isActive ? '3px solid var(--brand-iris-600)' : undefined }}
+                >
+                  <img
+                    src={import.meta.env.BASE_URL + c.thumb}
+                    alt=""
+                    width={48}
+                    height={48}
+                    style={{ objectFit: 'contain', filter: affordable ? 'none' : 'grayscale(1)', opacity: affordable ? 1 : 0.5 }}
+                  />
+                  <span style={tileName(affordable)}>{c.name}</span>
+                  {isActive ? (
+                    <span style={{ ...tilePrice, color: 'var(--color-text-brand)' }}>With you 💜</span>
+                  ) : isHers ? (
+                    <span style={{ ...tilePrice, color: 'var(--color-component-button-link-text-default)' }}>Choose</span>
+                  ) : isSel ? (
+                    <span
+                      onClick={(e) => { e.stopPropagation(); onBuyPet(c.id); setPetSel(null) }}
+                      style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '4px 12px', fontWeight: 800 }}
+                    >
+                      Buy 💎{c.price}
+                    </span>
+                  ) : (
+                    <span style={{ ...tilePrice, color: affordable ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>💎 {c.price}</span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
 
           {/* Magic — the sparkle consumable (15-min trail on her character) */}
           <SectionLabel>✨ Magic — a sparkle trail for 15 min</SectionLabel>

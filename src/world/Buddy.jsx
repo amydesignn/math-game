@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber'
 import { useGLTF, useAnimations, Html } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
 import * as THREE from 'three'
-import { modelUrl, WORLD, SPARKLE, CHARACTERS, PETS } from '../config'
+import { modelUrl, WORLD, SPARKLE, CHARACTERS, PET_IDS } from '../config'
 import BlobShadow from './BlobShadow'
 import { dampAngle } from '../walk'
 import SparkleTrail from './SparkleTrail'
@@ -34,7 +34,7 @@ export default function Buddy({ profile, sim, emote }) {
   // the WHOLE canvas down to <Oops> — so unknown ids degrade to the defaults
   // instead of trusting the wire (adversarial-verify catch).
   const charId = CHARACTERS.includes(profile.character) ? profile.character : CHARACTERS[0]
-  const petId = PETS.includes(profile.pet) ? profile.pet : 'animal-cat'
+  const petId = PET_IDS.includes(profile.pet) ? profile.pet : 'animal-cat'
 
   const { scene: charScene, animations: charAnims } = useGLTF(modelUrl('characters', charId))
   const charModel = useMemo(() => SkeletonUtils.clone(charScene), [charScene])

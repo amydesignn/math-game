@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC } from './config'
+import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS } from './config'
 import { localBackend } from './backend'
 
 const KEY = 'math_world_v1'
@@ -20,6 +20,7 @@ function freshState() {
   return {
     character: 'character-female-a', // Ivy's avatar (chosen later in a picker)
     pet: 'animal-cat', // her companion
+    ownedPets: ['animal-cat'], // companions she owns (Gem Shop) — the cat is free
     // Profile photo — a small square JPEG data URL, or null. ON-DEVICE ONLY:
     // set from the OS photo picker, re-encoded + EXIF-stripped in avatar.js, and
     // kept right here in localStorage. It is NEVER uploaded — a child's photo is
@@ -299,6 +300,13 @@ function migrate(parsed) {
   // freshState merge above; an id we no longer ship falls back to it too.
   if (!MUSIC_TRACKS.some((t) => t.id === merged.musicTrack)) merged.musicTrack = DEFAULT_MUSIC
 
+  // Companion shop (2026-10-14): the cat is always hers; a pet she doesn't own
+  // (or one we no longer ship) falls back to the cat.
+  if (!Array.isArray(merged.ownedPets)) merged.ownedPets = []
+  if (!merged.ownedPets.includes('animal-cat')) merged.ownedPets.unshift('animal-cat')
+  merged.ownedPets = merged.ownedPets.filter((id) => PET_IDS.includes(id))
+  if (!merged.ownedPets.includes(merged.pet)) merged.pet = 'animal-cat'
+
   // ── One-time CAP-RETIREMENT REFUND (2026-07-18) ──
   // While the 15-gem beta cap was live, a correct answer over the cap paid
   // NOTHING — Ivy solved 6 problems, was told she was right, and got zero.
@@ -338,9 +346,27 @@ export function setCharacter(id) {
   save()
 }
 
+/** Switch companion — only to one she owns. */
 export function setPet(id) {
+  if (!state.ownedPets.includes(id)) return false
   state.pet = id
   save()
+  return true
+}
+
+/** Buy a companion from the Gem Shop → it becomes her companion right away.
+ *  Returns the id, or null if she can't afford it (or it isn't for sale). */
+export function buyPet(id) {
+  const c = COMPANIONS.find((x) => x.id === id)
+  if (!c) return null
+  if (!state.ownedPets.includes(id)) {
+    if (state.gems < c.price) return null
+    state.gems -= c.price
+    state.ownedPets.push(id)
+  }
+  state.pet = id
+  save()
+  return id
 }
 
 export function setMap(id) {

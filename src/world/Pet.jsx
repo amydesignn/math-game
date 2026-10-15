@@ -16,7 +16,10 @@ export default function Pet({ id, start = [0, 0], targetPosRef, posRef, reactUnt
   const model = useMemo(() => SkeletonUtils.clone(scene), [scene])
   const { actions } = useAnimations(animations, model)
   const current = useRef(null)
-
+  // Generated models (Higgsfield → Blender) ship no skeleton or clips, so
+  // they get a code bounce instead: hop on the move, breathe at rest.
+  const body = useRef()
+  const bounce = animations.length === 0
 
   useEffect(() => {
     play('idle')
@@ -38,9 +41,12 @@ export default function Pet({ id, start = [0, 0], targetPosRef, posRef, reactUnt
     const char = targetPosRef.current
     if (!g || !char) return
 
+    const t = performance.now() / 1000
+
     // solved a problem → celebrate (cube pets ship a real dance animation)
     if (reactUntilRef && reactUntilRef.current > performance.now()) {
       play(actions['dance'] ? 'dance' : 'gesture-positive')
+      if (bounce) hop(t, 7, 0.45, true)
       if (posRef) posRef.current.copy(g.position)
       return
     }
@@ -56,18 +62,38 @@ export default function Pet({ id, start = [0, 0], targetPosRef, posRef, reactUnt
       g.rotation.y = dampAngle(g.rotation.y, Math.atan2(dx, dz), 12, dt)
       // 'run' when far behind, 'walk' when just trailing
       play(dist > WORLD.petFollowDistance * 2 ? 'run' : 'walk')
+      if (bounce) hop(t, dist > WORLD.petFollowDistance * 2 ? 14 : 10, 0.18)
     } else {
       play('idle')
+      if (bounce) breathe(t)
     }
 
     if (posRef) posRef.current.copy(g.position)
   })
 
+  function hop(t, speed, height, spin = false) {
+    const b = body.current
+    const u = Math.abs(Math.sin(t * speed))
+    b.position.y = u * height
+    b.scale.set(1 + (1 - u) * 0.08, 1 - (1 - u) * 0.1, 1 + (1 - u) * 0.08)
+    b.rotation.y = spin ? t * 6 : 0
+  }
+
+  function breathe(t) {
+    const b = body.current
+    const u = Math.sin(t * 2.2) * 0.025
+    b.position.y = 0
+    b.scale.set(1 - u, 1 + u, 1 - u)
+    b.rotation.y = 0
+  }
+
   return (
     <group ref={group} position={[start[0] + 1.4, 0, start[1] + 1.4]}>
       <BlobShadow radius={0.45} />
       <group scale={WORLD.petScale}>
-        <primitive object={model} />
+        <group ref={body}>
+          <primitive object={model} />
+        </group>
       </group>
     </group>
   )

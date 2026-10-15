@@ -34,6 +34,7 @@ export function setupAudio({ petId, on, track }) {
   const file = PET_SOUNDS[petId]
   petSound = file ? new Audio(`${BASE}audio/${file}`) : null
   if (petSound) petSound.volume = 0.6
+  if (unlocked) schedulePetSound() // pet changed → restart (or stop) its sound loop
   if (import.meta.env.DEV) {
     window.__meow = () => petSound?.play()
     window.__audio = () => ({ unlocked, enabled, bgmTrack, bgmSrc: bgm?.src, bgmVolume: bgm?.volume, bgmPaused: bgm?.paused, bgmTime: bgm?.currentTime })
@@ -83,7 +84,7 @@ function schedulePetSound() {
   if (!petSound) return
   const [min, max] = PET_SOUND_GAP_MS
   petTimer = setTimeout(() => {
-    if (enabled && !focus && document.visibilityState === 'visible') {
+    if (petSound && enabled && !focus && document.visibilityState === 'visible') {
       petSound.currentTime = 0
       petSound.play().catch(() => {})
     }
