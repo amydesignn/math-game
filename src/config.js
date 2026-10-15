@@ -30,7 +30,7 @@ export const PETS = [
 // them in code instead of playing clips.
 export const COMPANIONS = [
   { id: 'animal-cat', name: 'Cat', thumb: 'thumbs/pet-cat.png', price: 0 },
-  { id: 'sprout', name: 'Sprout', thumb: 'thumbs/pet-sprout.png', price: 50 },
+  { id: 'sprout', name: 'Sproutling', thumb: 'thumbs/pet-sprout.png', price: 50 },
 ]
 
 // Every pet id the game can load — the cube pets plus the bought companions.
