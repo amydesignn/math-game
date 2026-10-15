@@ -282,6 +282,40 @@ The last of Amy's three map redos. Dense (Ivy's taste), alive (people).
   market prop. `season-maps.test.js` → 211 green; oxlint + build clean.
 - New Door card `public/worlds/market.jpg`.
 
+## The Sorcerer — Ivy's main character + wardrobe 🧙 (2026-10-14, branch `feat/sorcerer-accessories`)
+Ivy picked the sorcerer off Amy's character sheet; she is now **the player
+character for every save** (Door hero + every world). Built in PARTS so her
+hat and staff swap (exploration + scripts: `~/projects/luxi-3d-explore/sorcerer`,
+skill `math-game-3d-model` → "Modular characters").
+- **Models:** `public/models/characters/sorcerer.glb` (base, no hat/staff; two
+  empty nodes `socket_head` + `socket_hand_R`; the `base` node carries
+  `scale 0.55` → ~1.1 body / ~1.5 with the hat vs Kenney's 0.78 — a touch
+  bigger than the neighbours, she's the hero). ⚠️ **Kenney mini characters are
+  0.78 tall** — their meshes are skinned in bone space, so a Blender bbox
+  reads 2.0; read the GLB node chain (or look in-world) before sizing.
+  `public/models/gear/{hat,staff}.glb` (origin = attach point) +
+  `gear/tex/*.jpg` colour variants (hue-band repaints of one texture).
+- **`src/world/Gear.jsx`** mounts each equipped piece on its socket via R3F
+  `createPortal` (the Neighbour tool pattern); a `tex` swaps the base-colour
+  map on a cloned material (`flipY=false`, sRGB). Used by Character AND the
+  Door's HeroStage. A model without sockets wears nothing — safe for Kenney.
+- **Character.jsx** got the clip-less code bounce (hop walking, breathe idle,
+  spin-hop on a solve) — same as generated pets. Kenney characters unchanged.
+- **Store:** `character` is always `PLAYER` (migrate forces it — there was never
+  a picker); `gear` {hat, staff} (id or null = taken off) + `ownedGear`;
+  `buyGear` (spend once, wear now) / `setGear` (owned or free only, right slot).
+  migrate drops unshipped/unowned pieces back to the default; a bare slot stays bare.
+- **Gem Shop → 🧙 Hats / 🪄 Staffs** above Companions: 4 colours each + "No
+  hat"/"No staff". Blue hat + purple staff free; the rest **💎10 = placeholder
+  until Amy prices them**. Thumbs `public/thumbs/gear-*.png` (thumb.py now takes
+  an optional texture to swap).
+- **Not changed:** the meadow Buddy still draws Kenney (it sanitises unknown
+  character ids to `CHARACTERS[0]`) — meadow is paused. HeroStage camera pulled
+  back for the hat.
+- Tests `wardrobe.test.js` (+9) → 248 green; oxlint + build clean. Verified in
+  the pane: Door hero, walk + bounce, buy green hat + pink staff, No hat,
+  reload persists, zero console errors on a fresh tab.
+
 ## Play metrics — anonymous session counts (2026-10-07, branch `feat/play-metrics`)
 Amy wants to watch engagement + session time before marketing; Vercel page views
 can't say (one-page app = "it loaded"). **`src/metrics.js`** tallies ONE session

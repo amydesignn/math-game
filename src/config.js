@@ -33,6 +33,30 @@ export const COMPANIONS = [
   { id: 'sprout', name: 'Sproutling', thumb: 'thumbs/pet-sprout.png', price: 50 },
 ]
 
+// The player character (Ivy's pick, 2026-10-14): the Sorcerer, generated in
+// parts (Higgsfield → Blender) so her hat and staff swap. Her model carries
+// two empty nodes, socket_head + socket_hand_R; Gear.jsx mounts the equipped
+// piece on each. No skeleton — Character.jsx bounces her in code.
+export const PLAYER = 'sorcerer'
+export const GEAR_SOCKETS = { hat: 'socket_head', staff: 'socket_hand_R' }
+
+// Wardrobe (Gem Shop). One mesh per slot; colours are repainted textures
+// (`tex` swaps the base-colour map; null = the model's own). price 0 = hers
+// from the start. Prices are placeholders until Amy sets them.
+export const GEAR = [
+  { id: 'hat-blue', slot: 'hat', name: 'Blue hat', model: 'hat', tex: null, thumb: 'thumbs/gear-hat-blue.png', price: 0 },
+  { id: 'hat-green', slot: 'hat', name: 'Green hat', model: 'hat', tex: 'hat-green', thumb: 'thumbs/gear-hat-green.png', price: 10 },
+  { id: 'hat-red', slot: 'hat', name: 'Red hat', model: 'hat', tex: 'hat-red', thumb: 'thumbs/gear-hat-red.png', price: 10 },
+  { id: 'hat-cream', slot: 'hat', name: 'Cream hat', model: 'hat', tex: 'hat-cream', thumb: 'thumbs/gear-hat-cream.png', price: 10 },
+  { id: 'staff-purple', slot: 'staff', name: 'Purple staff', model: 'staff', tex: null, thumb: 'thumbs/gear-staff-purple.png', price: 0 },
+  { id: 'staff-blue', slot: 'staff', name: 'Blue staff', model: 'staff', tex: 'crystal-blue', thumb: 'thumbs/gear-staff-blue.png', price: 10 },
+  { id: 'staff-pink', slot: 'staff', name: 'Pink staff', model: 'staff', tex: 'crystal-pink', thumb: 'thumbs/gear-staff-pink.png', price: 10 },
+  { id: 'staff-orange', slot: 'staff', name: 'Orange staff', model: 'staff', tex: 'crystal-orange', thumb: 'thumbs/gear-staff-orange.png', price: 10 },
+]
+export const DEFAULT_GEAR = { hat: 'hat-blue', staff: 'staff-purple' }
+export const gearUrl = (model) => `${B}models/gear/${model}.glb`
+export const gearTexUrl = (tex) => `${B}models/gear/tex/${tex}.jpg`
+
 // Every pet id the game can load — the cube pets plus the bought companions.
 export const PET_IDS = [...PETS, ...COMPANIONS.map((c) => c.id).filter((id) => !PETS.includes(id))]
 
