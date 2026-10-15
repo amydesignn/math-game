@@ -220,6 +220,28 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## Grow a Garden — ticket 6: the plot + 4 stage models 🌱 (2026-10-15, branch `feat/garden-plot`)
+Spec + tickets: Notion "🌱 Luxi Math — Grow a Garden (Spec + Tickets)". This
+ticket is ART ONLY — no store, no growth motion (ticket 7), no harvest.
+- **`src/world/GardenPlot.jsx`** — `<GardenPlot position stage>`; `stage` 0 mound
+  · 1 sprout · 2 bud · 3 bloom, `null` = empty bed. Bed = two crossed mini-forest
+  `patch-dirt`; sprout = mini-forest `plant`; bud/bloom = platformer-kit `plant`
+  + `flowers-tall` (staged in `public/models/platformer/` with its OWN
+  `Textures/` — the collision rule). Kenney had no usable mound (its dirt clumps
+  are flat + bed-coloured — tried, vanished, stretched = a stump) and no closed
+  bud, so those two are flat-shaded primitives (the Outdoor.jsx way); buds share
+  the bloom's red so bud → bloom reads as one flower.
+- **Placement:** `town.gardenPlot = [-10, -2]` (maps.js) — just inside the west
+  (Clearing) gate, off the walk in, the middle left open for building. It's in
+  `blockers()` (r 1.2) so sparkles/stations skip the bed. Test-guarded in
+  season-maps.test.js.
+- **Dev toggle (until ticket 5 wires the store):** `?garden=0..3|empty` or
+  `window.__garden(n|null)`. Without it — and ALWAYS in prod — no plot is drawn
+  (`useDevGardenStage()` → undefined). Ticket 5: replace that hook's value in
+  Scene with the store's plot stage (null = empty) and drop the toggle.
+- Verified headless (playwright-core + system Chrome, swiftshader, `__overview`
+  close-ups): all 4 stages + empty + no-toggle, zero page errors. 266 tests green.
+
 ## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
 Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
 Garden. Amy's order: **Star Arcade → Halloween, Sunny Town → open plot +
