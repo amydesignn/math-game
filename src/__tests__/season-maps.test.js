@@ -111,8 +111,19 @@ describe('Sunny Town', () => {
   })
 
   it('makes sparkles and stations keep clear of neighbours too', () => {
-    const homes = blockers(town).filter(([, , r]) => r > 0)
+    const homes = blockers(town).filter(([x, z, r]) => r > 0 && town.neighbours.some((n) => n.home[0] === x && n.home[1] === z))
     expect(homes.length).toBe(town.neighbours.length)
+  })
+
+  it('has the garden plot near the west gate, clear of gates, neighbours and the open middle', () => {
+    const [px, pz] = town.gardenPlot
+    // a blocker, so sparkles + stations never spawn on the bed
+    expect(blockers(town).some(([x, z, r]) => x === px && z === pz && r >= 1)).toBe(true)
+    for (const g of town.gates) expect(Math.hypot(px - g.position[0], pz - g.position[2])).toBeGreaterThan(4.5)
+    for (const n of town.neighbours) expect(Math.hypot(px - n.home[0], pz - n.home[1])).toBeGreaterThan(4)
+    expect(Math.hypot(px, pz)).toBeGreaterThan(6) // the middle stays hers to build
+    const west = town.gates.find((g) => g.to === 'clearing')
+    expect(Math.hypot(px - west.position[0], pz - west.position[2])).toBeLessThan(8) // first thing she meets
   })
 })
 
