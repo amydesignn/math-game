@@ -318,6 +318,29 @@ Per the updated spec, she WATERS it with gems; correct answers don't feed it dir
   lifetimeGems untouched) → bloom → pick (`harvests: 1`) → reload persists;
   zero page errors. 286 tests green.
 
+## Grow a Garden — ticket 8: harvests counted and kept 🧺 (2026-10-15, branch `feat/garden-harvests`)
+- **One counter, already there:** `garden.harvests` (ticket 3) IS the total — no
+  second field. New: `garden.basket` = the same harvests BY SEED KIND
+  (`{ starter: 3 }`); its counts always add up to `harvests`. `harvest()` files
+  the bloom under `plot.seed.kind`.
+- **Never goes down (like the ledger):** `mergeGarden` takes the higher count
+  PER KIND and `harvests = max(a, b, Σ basket)`. normalizeGarden files a
+  pre-basket save's harvests as `starter` (the only kind there's been — Ivy's)
+  and never lets the total sit below the basket.
+- **UI = Amy's design:** a 🧺 round button bottom-LEFT (`src/ui/Basket.jsx`) with
+  an iris count chip (gempop replays on each new harvest). Tap → a card above it:
+  "YOUR BASKET", the total in generic units ("3 harvests"), then one line per
+  kind from `SEED_KINDS` (config.js — a new seed kind = one entry; unknown ids
+  fall back to 🌼 Flowers). Empty state points to Sunny Town. Tap outside closes
+  and never walks her. Hidden with the rest of the HUD (placing/shop/math/
+  station/meadow); below 600px it steps aside while the garden bar is open.
+  The pick toast now says "They're in your basket 🧺".
+- **Parked (spec):** what harvests exchange for — a rare, permanent item gems
+  can't buy. Nothing in the basket is spendable yet.
+- Tests garden.test.js (+7) → 295 green; sabotage-checked (merge `max` → 4
+  fail). Verified headless (iPad + 390 phone + empty save): Ivy-shaped save →
+  basket 2 → pick → 3 → reload → 3, zero page errors.
+
 ## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
 Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
 Garden. Amy's order: **Star Arcade → Halloween, Sunny Town → open plot +
