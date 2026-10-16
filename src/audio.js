@@ -7,6 +7,11 @@
  * keys off the pet id — pet ≠ always a cat, so pets without a sound file
  * simply stay quiet. The meow is occasional and ambient by design (Ivy's
  * research: calm over busy; nothing interrupts focus).
+ *
+ * 2026-10-16: sound effects (Notion "Luxi Math — Sound Effects", ticket 1).
+ * playSfx() makes tiny chimes in code with Web Audio — no files, nothing to
+ * license. Same rules as the rest: the speaker toggle mutes them, nothing plays
+ * before the first tap, and a throttle keeps a burst of gems from stacking.
  */
 
 import { MUSIC_TRACKS, DEFAULT_MUSIC } from './config'
@@ -23,6 +28,7 @@ let enabled = true
 let unlocked = false
 let petTimer = null
 let focus = false // math focus time — pet sounds hold (music stays, it soothes)
+let sfxCtx = null // Web Audio context for playSfx — made on the first tap
 
 export function setupAudio({ petId, on, track }) {
   enabled = on
@@ -37,6 +43,7 @@ export function setupAudio({ petId, on, track }) {
   if (unlocked) schedulePetSound() // pet changed → restart (or stop) its sound loop
   if (import.meta.env.DEV) {
     window.__meow = () => petSound?.play()
+    window.__sfx = (name = 'gem') => playSfx(name)
     window.__audio = () => ({ unlocked, enabled, bgmTrack, bgmSrc: bgm?.src, bgmVolume: bgm?.volume, bgmPaused: bgm?.paused, bgmTime: bgm?.currentTime })
   }
 }
@@ -45,6 +52,9 @@ export function setupAudio({ petId, on, track }) {
 export function unlockAudio() {
   if (unlocked) return
   unlocked = true
+  const Ctx = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)
+  if (Ctx && !sfxCtx) sfxCtx = new Ctx()
+  sfxCtx?.resume?.().catch(() => {})
   if (enabled && bgm) bgm.play().catch(() => {})
   schedulePetSound()
 }
@@ -98,4 +108,53 @@ function schedulePetSound() {
     }
     schedulePetSound()
   }, min + Math.random() * (max - min))
+}
+
+// ── Sound effects ──
+// Each recipe is a few soft sine notes: [frequency Hz, start s, length s],
+// optionally played `repeat` times, `every` seconds apart. Quieter than the music.
+const CHIME = [[1318.5, 0, 0.45], [1661.2, 0.09, 0.5], [1975.5, 0.18, 0.8]] // E6 → G#6 → B6
+export const SFX = {
+  // gems landing in the wallet. 2026-10-16, Amy's pick after three listens: the
+  // three-note chime, 3 times back to back (~2.8 s). One burst of gems = ONE
+  // sequence, so the 3 flying gems (and a station's bonus gem) never pile up.
+  gem: { gain: 0.1, notes: CHIME, repeat: 3, every: 1.0 },
+}
+const lastSfx = {} // name → when its current play finishes (ms) — a burst inside it is skipped
+
+/** How long a recipe plays, in seconds (the last repeat's longest note). */
+export function sfxLength(r) {
+  const tail = Math.max(...r.notes.map(([, at, len]) => at + len))
+  return (r.every || 0) * ((r.repeat || 1) - 1) + tail
+}
+
+/** Play a named effect. Quiet no-op when sound is off, before the first tap,
+ *  in a hidden tab, without Web Audio, or while the same effect is still
+ *  playing. Returns true if it played. */
+export function playSfx(name) {
+  const r = SFX[name]
+  if (!r || !enabled || !unlocked || !sfxCtx) return false
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return false
+  const now = Date.now()
+  if (now < (lastSfx[name] || 0)) return false
+  lastSfx[name] = now + sfxLength(r) * 1000
+  const t0 = sfxCtx.currentTime
+  for (let k = 0; k < (r.repeat || 1); k++) {
+    const tk = t0 + k * (r.every || 0)
+    const detune = (Math.random() - 0.5) * 30 // ±15 cents — no two chimes are exact copies
+    for (const [freq, at, len] of r.notes) {
+      const osc = sfxCtx.createOscillator()
+      const amp = sfxCtx.createGain()
+      osc.type = 'sine'
+      osc.frequency.value = freq
+      osc.detune.value = detune
+      amp.gain.setValueAtTime(0.0001, tk + at)
+      amp.gain.exponentialRampToValueAtTime(r.gain, tk + at + 0.008) // soft attack, no click
+      amp.gain.exponentialRampToValueAtTime(0.0001, tk + at + len)
+      osc.connect(amp).connect(sfxCtx.destination)
+      osc.start(tk + at)
+      osc.stop(tk + at + len + 0.02)
+    }
+  }
+  return true
 }
