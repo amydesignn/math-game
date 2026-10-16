@@ -112,12 +112,14 @@ function schedulePetSound() {
 
 // ── Sound effects ──
 // Each recipe is a few soft sine notes: [frequency Hz, start s, length s].
-// Kept quieter than the music and under ~0.6 s (calm over busy).
+// Kept quieter than the music and about a second at most (calm over busy).
 export const SFX = {
   // a gem landing in the wallet — a small two-note "tink" (E6 → B6)
-  gem: { gain: 0.09, notes: [[1318.5, 0, 0.22], [1975.5, 0.05, 0.3]] },
+  // 2026-10-16 Amy: "make it longer" → the notes ring out ~2× (≈0.75 s); gain a
+  // touch lower because 3 gems now overlap into one shimmer
+  gem: { gain: 0.08, notes: [[1318.5, 0, 0.45], [1975.5, 0.07, 0.68]] },
   // the amber completion gem — the same tink, one note taller (E6 → G#6 → B6)
-  gemBonus: { gain: 0.11, notes: [[1318.5, 0, 0.22], [1661.2, 0.06, 0.24], [1975.5, 0.12, 0.4]] },
+  gemBonus: { gain: 0.1, notes: [[1318.5, 0, 0.45], [1661.2, 0.09, 0.5], [1975.5, 0.18, 0.8]] },
 }
 const SFX_GAP_MS = 60 // same sound closer than this = skipped, so bursts never stack
 const lastSfx = {}

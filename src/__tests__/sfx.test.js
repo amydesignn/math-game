@@ -48,10 +48,10 @@ describe('playSfx', () => {
     expect(audio.playSfx('gem')).toBe(true)
   })
 
-  it('stays gentle: quieter than the music, under 0.6 s', () => {
+  it('stays gentle: quieter than the music, about a second at most', () => {
     for (const r of Object.values(audio.SFX)) {
       expect(r.gain).toBeLessThan(0.2)
-      for (const [, at, len] of r.notes) expect(at + len).toBeLessThanOrEqual(0.6)
+      for (const [, at, len] of r.notes) expect(at + len).toBeLessThanOrEqual(1)
     }
   })
 
