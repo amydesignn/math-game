@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Gem from './Gem'
 import { OPSYM, buildStages, buildStagesMulti } from '../math'
+import { playSfx } from '../audio'
 
 /*
  * mathkit — the shared visual atoms of the math surface. Oscar's handoff is
@@ -591,7 +592,8 @@ export function FlyGem({ from, to, delay, bonus }) {
   const [pos, setPos] = useState(from)
   useEffect(() => {
     const t = setTimeout(() => setPos(to), 30 + delay)
-    return () => clearTimeout(t)
+    const land = setTimeout(() => playSfx(bonus ? 'gemBonus' : 'gem'), 30 + delay + 560) // the tink as it reaches the wallet
+    return () => { clearTimeout(t); clearTimeout(land) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   const size = bonus ? 46 : 34

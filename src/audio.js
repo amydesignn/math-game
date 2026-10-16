@@ -7,6 +7,11 @@
  * keys off the pet id — pet ≠ always a cat, so pets without a sound file
  * simply stay quiet. The meow is occasional and ambient by design (Ivy's
  * research: calm over busy; nothing interrupts focus).
+ *
+ * 2026-10-16: sound effects (Notion "Luxi Math — Sound Effects", ticket 1).
+ * playSfx() makes tiny chimes in code with Web Audio — no files, nothing to
+ * license. Same rules as the rest: the speaker toggle mutes them, nothing plays
+ * before the first tap, and a throttle keeps a burst of gems from stacking.
  */
 
 import { MUSIC_TRACKS, DEFAULT_MUSIC } from './config'
@@ -23,6 +28,7 @@ let enabled = true
 let unlocked = false
 let petTimer = null
 let focus = false // math focus time — pet sounds hold (music stays, it soothes)
+let sfxCtx = null // Web Audio context for playSfx — made on the first tap
 
 export function setupAudio({ petId, on, track }) {
   enabled = on
@@ -37,6 +43,7 @@ export function setupAudio({ petId, on, track }) {
   if (unlocked) schedulePetSound() // pet changed → restart (or stop) its sound loop
   if (import.meta.env.DEV) {
     window.__meow = () => petSound?.play()
+    window.__sfx = (name = 'gem') => playSfx(name)
     window.__audio = () => ({ unlocked, enabled, bgmTrack, bgmSrc: bgm?.src, bgmVolume: bgm?.volume, bgmPaused: bgm?.paused, bgmTime: bgm?.currentTime })
   }
 }
@@ -45,6 +52,9 @@ export function setupAudio({ petId, on, track }) {
 export function unlockAudio() {
   if (unlocked) return
   unlocked = true
+  const Ctx = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext)
+  if (Ctx && !sfxCtx) sfxCtx = new Ctx()
+  sfxCtx?.resume?.().catch(() => {})
   if (enabled && bgm) bgm.play().catch(() => {})
   schedulePetSound()
 }
@@ -98,4 +108,43 @@ function schedulePetSound() {
     }
     schedulePetSound()
   }, min + Math.random() * (max - min))
+}
+
+// ── Sound effects ──
+// Each recipe is a few soft sine notes: [frequency Hz, start s, length s].
+// Kept quieter than the music and under ~0.6 s (calm over busy).
+export const SFX = {
+  // a gem landing in the wallet — a small two-note "tink" (E6 → B6)
+  gem: { gain: 0.09, notes: [[1318.5, 0, 0.22], [1975.5, 0.05, 0.3]] },
+  // the amber completion gem — the same tink, one note taller (E6 → G#6 → B6)
+  gemBonus: { gain: 0.11, notes: [[1318.5, 0, 0.22], [1661.2, 0.06, 0.24], [1975.5, 0.12, 0.4]] },
+}
+const SFX_GAP_MS = 60 // same sound closer than this = skipped, so bursts never stack
+const lastSfx = {}
+
+/** Play a named effect. Quiet no-op when sound is off, before the first tap,
+ *  in a hidden tab, or without Web Audio. Returns true if it played. */
+export function playSfx(name) {
+  const r = SFX[name]
+  if (!r || !enabled || !unlocked || !sfxCtx) return false
+  if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return false
+  const now = Date.now()
+  if (now - (lastSfx[name] || 0) < SFX_GAP_MS) return false
+  lastSfx[name] = now
+  const t0 = sfxCtx.currentTime
+  const detune = (Math.random() - 0.5) * 30 // ±15 cents — the 20th tink isn't a copy of the first
+  for (const [freq, at, len] of r.notes) {
+    const osc = sfxCtx.createOscillator()
+    const amp = sfxCtx.createGain()
+    osc.type = 'sine'
+    osc.frequency.value = freq
+    osc.detune.value = detune
+    amp.gain.setValueAtTime(0.0001, t0 + at)
+    amp.gain.exponentialRampToValueAtTime(r.gain, t0 + at + 0.008) // soft attack, no click
+    amp.gain.exponentialRampToValueAtTime(0.0001, t0 + at + len)
+    osc.connect(amp).connect(sfxCtx.destination)
+    osc.start(t0 + at)
+    osc.stop(t0 + at + len + 0.02)
+  }
+  return true
 }
