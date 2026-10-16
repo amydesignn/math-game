@@ -94,6 +94,9 @@ function freshState() {
     // have been handed out, so grants from lifetimeGems are idempotent (see
     // seedsOwed). harvests = blooms she has picked and kept. Conservation law
     // the cloud merge relies on: seeds + (planted ? 1 : 0) + harvests = 1 + seedsGranted.
+    // basket = the same harvests broken down by seed kind ({ starter: 3 }) for
+    // the 🧺 Basket panel (ticket 8); its counts always add up to harvests.
+    // Like the ledger, neither ever goes down.
     garden: freshGarden(),
     startedISO: null,
     lastActive: null,
@@ -101,8 +104,10 @@ function freshState() {
 }
 
 function freshGarden() {
-  return { plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0 }
+  return { plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0, basket: {} }
 }
+
+const basketTotal = (b) => Object.values(b).reduce((n, v) => n + v, 0)
 
 // ── Phase A: cloud-sync machinery (design: docs/accounts-boot-gate.md) ──
 // The public API below stays SYNCHRONOUS — async lives only here at the
@@ -198,13 +203,16 @@ function adoptReadResult(remote, { allowAdopt }) {
  *  losing copy is kept rather than charged twice. Pure + exported for tests. */
 export function mergeGarden(a, b) {
   const progress = (g) => (g.plot.seed ? g.plot.seed.stage + 1 : 0)
-  const harvests = Math.max(a.harvests, b.harvests)
+  // Per kind, the higher count wins; the total is never below either copy's.
+  const basket = {}
+  for (const k of new Set([...Object.keys(a.basket), ...Object.keys(b.basket)])) basket[k] = Math.max(a.basket[k] || 0, b.basket[k] || 0)
+  const harvests = Math.max(a.harvests, b.harvests, basketTotal(basket))
   const seedsGranted = Math.max(a.seedsGranted, b.seedsGranted)
   // Ahead on harvests wins the plot outright; on a tie, the further-grown plot.
   const lead = a.harvests !== b.harvests ? (a.harvests > b.harvests ? a : b) : progress(b) > progress(a) ? b : a
   const plot = { seed: lead.plot.seed ? { ...lead.plot.seed } : null }
   const seeds = Math.max(0, 1 + seedsGranted - harvests - (plot.seed ? 1 : 0))
-  return { plot, seeds, seedsGranted, harvests }
+  return { plot, seeds, seedsGranted, harvests, basket }
 }
 
 /** The merge rule: the monotonic ledger picks the winner, not the clock —
@@ -404,6 +412,14 @@ function normalizeGarden(g) {
   out.seeds = count(g.seeds, out.seeds)
   out.seedsGranted = count(g.seedsGranted, 0)
   out.harvests = count(g.harvests, 0)
+  if (g.basket && typeof g.basket === 'object') {
+    for (const [k, v] of Object.entries(g.basket)) if (count(v, 0) > 0) out.basket[k] = v
+  }
+  // Harvests picked before the basket existed were all starter blooms (the only
+  // kind there has been) — file them there so the breakdown adds up.
+  const missing = out.harvests - basketTotal(out.basket)
+  if (missing > 0) out.basket.starter = (out.basket.starter || 0) + missing
+  else out.harvests = basketTotal(out.basket) // never below what the basket holds
   const seed = g.plot && g.plot.seed
   if (seed && typeof seed === 'object') {
     const stage = Math.min(GARDEN.waterings, count(seed.stage, 0))
@@ -763,6 +779,8 @@ export function harvest() {
   const g = state.garden
   if (!g.plot.seed || g.plot.seed.stage < GARDEN.waterings) return null
   g.harvests += 1
+  const kind = g.plot.seed.kind
+  g.basket[kind] = (g.basket[kind] || 0) + 1
   g.plot.seed = null
   save()
   return g.harvests

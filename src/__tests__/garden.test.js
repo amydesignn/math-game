@@ -37,7 +37,8 @@ const oldSave = (over = {}) => ({
   ...over,
 })
 
-const garden = (over = {}) => ({ plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0, ...over })
+// basket defaults to the harvests filed as starter blooms (the only kind so far).
+const garden = (over = {}) => ({ plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0, basket: over.harvests ? { starter: over.harvests } : {}, ...over })
 
 function mockBackend({ cloud = null } = {}) {
   let remote = cloud ? clone(cloud) : null
@@ -204,6 +205,7 @@ describe('migration (saves from before the garden — Ivy\'s)', () => {
       seeds: 27, // bad count → default (1), then the 26 owed seeds paid
       seedsGranted: 26,
       harvests: 4, // kept
+      basket: { starter: 4 }, // filed as starter blooms
     })
   })
 })
@@ -273,5 +275,72 @@ describe('boot merge with the cloud (the ledger still picks the winner)', () => 
     expect(store.getState().lifetimeGems).toBe(520)
     await sleep(25)
     expect(mock.calls.writes.length).toBe(0)
+  })
+})
+
+// Ticket 8: harvests are counted and KEPT. `garden.harvests` (ticket 3) is the
+// one counter — no second field. Like the ledger, it can only ever go up.
+describe('harvests: counted and kept (ticket 8)', () => {
+  const bloom = { kind: 'starter', stage: GARDEN.waterings }
+
+  it('each pick adds one, and the count survives a reload', async () => {
+    const store = await fresh(oldSave({ garden: garden({ seeds: 24, seedsGranted: 26, harvests: 2, plot: { seed: bloom } }) }))
+    expect(store.harvest()).toBe(3)
+    expect(saved().garden.harvests).toBe(3)
+    vi.resetModules()
+    const again = await import('../store.js')
+    expect(again.getGarden().harvests).toBe(3)
+  })
+
+  it('cloud wins on the ledger but holds FEWER harvests → hers are kept and pushed up', async () => {
+    // This iPad picked 3 blooms (gems spent on water, ledger unchanged); the cloud is ahead on the ledger.
+    storage.setItem(KEY, JSON.stringify(oldSave({ lifetimeGems: 100, garden: garden({ seeds: 2, seedsGranted: 5, harvests: 3 }) })))
+    const mock = mockBackend({ cloud: oldSave({ lifetimeGems: 110, garden: garden({ seeds: 5, seedsGranted: 5, harvests: 1 }) }) })
+    const store = await boot(mock)
+    expect(store.getState().lifetimeGems).toBe(110)
+    expect(store.getGarden().harvests).toBe(3)
+    await sleep(25)
+    expect(mock.cloud.garden.harvests).toBe(3)
+  })
+
+  it('mergeGarden never lowers the count, whatever the two copies hold', async () => {
+    const { mergeGarden } = await import('../store.js')
+    const plots = [null, { kind: 'starter', stage: 0 }, bloom]
+    for (const ha of [0, 1, 7]) for (const hb of [0, 2, 7]) for (const pa of plots) for (const pb of plots) {
+      const a = garden({ harvests: ha, seedsGranted: 9, plot: { seed: pa } })
+      const b = garden({ harvests: hb, seedsGranted: 9, plot: { seed: pb } })
+      const m = mergeGarden(a, b)
+      expect(m.harvests).toBe(Math.max(ha, hb))
+      expect(mergeGarden(m, a).harvests).toBe(m.harvests) // merging again is a no-op
+    }
+  })
+})
+
+describe('the basket: harvests by kind (ticket 8)', () => {
+  it('a pick files the bloom under its seed kind, and the breakdown adds up to the total', async () => {
+    const store = await fresh(oldSave({ garden: garden({ seeds: 25, seedsGranted: 26, plot: { seed: { kind: 'starter', stage: GARDEN.waterings } } }) }))
+    store.harvest()
+    expect(store.getGarden()).toMatchObject({ harvests: 1, basket: { starter: 1 } })
+    expect(saved().garden.basket).toEqual({ starter: 1 })
+  })
+
+  it('a save from before the basket files its old harvests as starter blooms', async () => {
+    const store = await fresh(oldSave({ garden: { plot: { seed: null }, seeds: 22, seedsGranted: 26, harvests: 5 } }))
+    expect(store.getGarden()).toMatchObject({ harvests: 5, basket: { starter: 5 } })
+  })
+
+  it('bad basket entries are dropped; the total is never below the basket', async () => {
+    const store = await fresh(oldSave({ garden: garden({ seeds: 22, seedsGranted: 26, harvests: 1, basket: { starter: 2, rose: 2, bad: -1, worse: 'x' } }) }))
+    expect(store.getGarden()).toMatchObject({ harvests: 4, basket: { starter: 2, rose: 2 } })
+  })
+
+  it('merge keeps the higher count per kind, and a kind only one copy has', async () => {
+    const { mergeGarden } = await import('../store.js')
+    const a = garden({ seedsGranted: 9, harvests: 3, basket: { starter: 3 } })
+    const b = garden({ seedsGranted: 9, harvests: 3, basket: { starter: 1, rose: 2 } })
+    const m = mergeGarden(a, b)
+    expect(m.basket).toEqual({ starter: 3, rose: 2 })
+    expect(m.harvests).toBe(5)
+    expect(mergeGarden(b, a)).toEqual(m)
   })
 })

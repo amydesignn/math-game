@@ -285,6 +285,15 @@ export const GARDEN = {
   waterings: 3,
 }
 
+// Seed kinds — how each harvest is named in the 🧺 Basket (ticket 8). Only the
+// starter exists today; a new kind = one entry here, and the Basket gives it its
+// own line. Every harvest counts as ONE generic unit in the total, whatever its
+// kind. (What harvests later exchange for — a rare, permanent item gems can't
+// buy — is parked in the Notion spec.) Unknown kinds fall back to a generic row.
+export const SEED_KINDS = {
+  starter: { name: 'Red flowers', emoji: '🌸' },
+}
+
 // ── Background music: two tracks, player's choice (2026-10-04) ──
 // "Island" is the new default (Amy's Suno brief: grounded light-adventure —
 // marimba + nylon guitar + upright bass, no piano/glockenspiel so it never reads

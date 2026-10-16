@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
 import Scene from './world/Scene'
 import Minimap from './ui/Minimap'
+import Basket from './ui/Basket'
 import Shop from './ui/Shop'
 import MathPopup, { SKINS } from './ui/MathPopup'
 import StationPopup from './ui/StationPopup'
@@ -287,11 +288,12 @@ export default function App({ cloud = false, justSignedIn = false }) {
   // bloom is picked by tapping the flowers. `watering` is a local counter that
   // only tells GardenPlot to play the drops — the store keeps the real stage.
   const plotStage = (g) => (g.plot.seed ? g.plot.seed.stage : null)
-  const [garden, setGarden] = useState(() => ({ stage: plotStage(getGarden()), seeds: getGarden().seeds, watering: 0 }))
+  const gardenView = (g) => ({ stage: plotStage(g), seeds: g.seeds, harvests: g.harvests, basket: { ...g.basket } })
+  const [garden, setGarden] = useState(() => ({ ...gardenView(getGarden()), watering: 0 }))
   const [gardenOpen, setGardenOpen] = useState(false)
   function syncGarden(watered) {
     const g = getGarden()
-    setGarden((p) => ({ stage: plotStage(g), seeds: g.seeds, watering: p.watering + (watered ? 1 : 0) }))
+    setGarden((p) => ({ ...gardenView(g), watering: p.watering + (watered ? 1 : 0) }))
   }
   function handlePlant() {
     if (plantSeed()) syncGarden(false)
@@ -304,7 +306,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   function handleHarvest() {
     if (harvest() == null) return
     syncGarden(false)
-    showNote('You picked your flowers! 🌸')
+    showNote('You picked your flowers! 🌸 They’re in your basket 🧺')
   }
 
   // ── Sparkle Pack: the 15-minute consumable trail ──
@@ -1021,6 +1023,10 @@ export default function App({ cloud = false, justSignedIn = false }) {
           </button>
         )}
       </div>
+      {/* BOTTOM-LEFT: 🧺 the Basket — every harvest she's picked, kept (ticket 8). */}
+      {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
+        <Basket total={garden.harvests} basket={garden.basket} className={gardenOpen ? 'hud-basket--bar' : ''} />
+      )}
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
       <MapLabel name={MAPS[mapId].name} />
 

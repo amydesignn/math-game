@@ -576,3 +576,12 @@ canvas { touch-action: none; display: block; }
    the house ring and fell back to a faint browser default (1.24:1). Same 1px
    Iris 700 ring, 2px out, as every other Luxi control. */
 .lvlbar-pill:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+
+/* ── 🧺 Basket (Grow a Garden ticket 8) ──
+   The card grows up out of the bottom-left button. On phones the garden bar
+   (bottom-centre) is wide enough to reach the button, so while it's open the
+   basket steps aside below 600px; iPad keeps both. */
+.basket-card { animation: basketIn 0.22s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes basketIn { 0% { transform: scale(.9) translateY(8px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .basket-card, .hud-basket span { animation: none !important; } }
+@media (max-width: 600px) { .hud-basket--bar { display: none !important; } }
