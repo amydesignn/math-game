@@ -4,7 +4,8 @@ import { SEED_KINDS } from '../config'
 /*
  * 🧺 The Basket (Grow a Garden ticket 8, Amy's design 2026-10-15): everything
  * she has harvested, kept. A round button at the bottom-left; a tap opens a
- * small card above it — the total (every harvest = one unit, whatever the seed)
+ * small card above it — the total (every harvest = one unit, whatever the seed;
+ * no unit label, the 🧺 is the icon)
  * and then one line per seed kind. Counts only: nothing personal, and nothing
  * here can be spent yet (the exchange for a rare item is parked in the spec).
  * The numbers come from store.garden.harvests + .basket, which never go down.
@@ -106,8 +107,9 @@ export function BasketCard({ total, basket, onClose }) {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
+          {/* one generic unit, no label (spec: the basket IS the currency icon — "5 🧺") */}
           <span style={{ fontSize: 40, fontWeight: 800, lineHeight: 1, color: 'var(--brand-iris-900)' }}>{total}</span>
-          <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--neutral-800)' }}>{total === 1 ? 'harvest' : 'harvests'}</span>
+          <span style={{ fontSize: 28, lineHeight: 1 }} aria-hidden>🧺</span>
         </div>
 
         {rows.length > 0 ? (

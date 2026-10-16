@@ -329,7 +329,7 @@ Per the updated spec, she WATERS it with gems; correct answers don't feed it dir
   and never lets the total sit below the basket.
 - **UI = Amy's design:** a 🧺 round button bottom-LEFT (`src/ui/Basket.jsx`) with
   an iris count chip (gempop replays on each new harvest). Tap → a card above it:
-  "YOUR BASKET", the total in generic units ("3 harvests"), then one line per
+  "YOUR BASKET", the total as "3 🧺" (one generic unit, NO label — spec), then one line per
   kind from `SEED_KINDS` (config.js — a new seed kind = one entry; unknown ids
   fall back to 🌼 Flowers). Empty state points to Sunny Town. Tap outside closes
   and never walks her. Hidden with the rest of the HUD (placing/shop/math/
