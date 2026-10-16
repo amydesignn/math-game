@@ -289,7 +289,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   // bloom is picked by tapping the flowers. `watering` is a local counter that
   // only tells GardenPlot to play the drops — the store keeps the real stage.
   const plotStage = (g) => (g.plot.seed ? g.plot.seed.stage : null)
-  const gardenView = (g) => ({ stage: plotStage(g), seeds: g.seeds, harvests: g.harvests, basket: { ...g.basket } })
+  const gardenView = (g) => ({ stage: plotStage(g), kind: g.plot.seed?.kind, seeds: g.seeds, harvests: g.harvests, basket: { ...g.basket } })
   const [garden, setGarden] = useState(() => ({ ...gardenView(getGarden()), watering: 0 }))
   const [gardenOpen, setGardenOpen] = useState(false)
   function syncGarden(watered) {

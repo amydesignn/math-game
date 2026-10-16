@@ -10,8 +10,9 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR, HEROES, GARDEN } from './config'
+import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR, HEROES, GARDEN, SEED_KINDS } from './config'
 import { localBackend } from './backend'
+import { drawKind, normalizeBag } from './gardenBag'
 
 const KEY = 'math_world_v1'
 
@@ -88,7 +89,7 @@ function freshState() {
     // 2–3 worlds get a fresh themed quest and there's always something to earn.
     stations: { window: null, byMap: {} },
     // Grow a Garden (2026-10-15): her one plot in Sunny Town. plot.seed is null
-    // (empty) or { kind: 'starter', stage } — stage 0 mound → 1 sprout → 2 bud →
+    // (empty) or { kind, stage } (kind = a SEED_KINDS id, e.g. 'starter') — stage 0 mound → 1 sprout → 2 bud →
     // 3 bloom (= GARDEN.waterings). seeds = held, not yet planted; everyone
     // starts with ONE starter seed. seedsGranted = how many lifetime-gem seeds
     // have been handed out, so grants from lifetimeGems are idempotent (see
@@ -97,6 +98,9 @@ function freshState() {
     // basket = the same harvests broken down by seed kind ({ starter: 3 }) for
     // the 🧺 Basket panel (ticket 8); its counts always add up to harvests.
     // Like the ledger, neither ever goes down.
+    // bag = the seed-colour shuffle bag (ticket 10, gardenBag.js): { left, last }
+    // — kinds still to deal this round + the kind planted last. The kind is
+    // drawn at PLANT time, so a reload mid-grow never changes the colour.
     garden: freshGarden(),
     startedISO: null,
     lastActive: null,
@@ -104,8 +108,10 @@ function freshState() {
 }
 
 function freshGarden() {
-  return { plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0, basket: {} }
+  return { plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0, basket: {}, bag: { left: [], last: null } }
 }
+
+const seedKinds = () => Object.keys(SEED_KINDS)
 
 const basketTotal = (b) => Object.values(b).reduce((n, v) => n + v, 0)
 
@@ -212,7 +218,9 @@ export function mergeGarden(a, b) {
   const lead = a.harvests !== b.harvests ? (a.harvests > b.harvests ? a : b) : progress(b) > progress(a) ? b : a
   const plot = { seed: lead.plot.seed ? { ...lead.plot.seed } : null }
   const seeds = Math.max(0, 1 + seedsGranted - harvests - (plot.seed ? 1 : 0))
-  return { plot, seeds, seedsGranted, harvests, basket }
+  // the colour bag travels with the plot it dealt (outside the conservation law)
+  const bag = lead.bag ? { left: [...lead.bag.left], last: lead.bag.last } : { left: [], last: null }
+  return { plot, seeds, seedsGranted, harvests, basket, bag }
 }
 
 /** The merge rule: the monotonic ledger picks the winner, not the clock —
@@ -425,6 +433,10 @@ function normalizeGarden(g) {
     const stage = Math.min(GARDEN.waterings, count(seed.stage, 0))
     out.plot.seed = { kind: typeof seed.kind === 'string' ? seed.kind : 'starter', stage }
   }
+  // A save from before the colour bag (ticket 10): her last seed was the plot's,
+  // or — if she's picked any — a starter (the only kind there was), so her very
+  // next seed is never that same red twice in a row.
+  out.bag = normalizeBag(g.bag, seedKinds(), out.plot.seed ? out.plot.seed.kind : out.harvests > 0 ? 'starter' : null)
   return out
 }
 
@@ -750,12 +762,15 @@ export function getGarden() {
 }
 
 /** Plant a held seed in the empty plot (stage 0, the mound). False if the plot
- *  is already growing something or she has no seed. */
-export function plantSeed() {
+ *  is already growing something or she has no seed. Its colour (kind) comes
+ *  out of the shuffle bag now (ticket 10) — never the same kind twice in a row. */
+export function plantSeed(rand = Math.random) {
   const g = state.garden
   if (g.plot.seed || g.seeds < 1) return false
+  const { kind, bag } = drawKind(g.bag, seedKinds(), rand)
   g.seeds -= 1
-  g.plot.seed = { kind: 'starter', stage: 0 }
+  g.bag = bag
+  g.plot.seed = { kind, stage: 0 }
   save()
   return true
 }
