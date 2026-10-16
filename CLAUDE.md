@@ -363,6 +363,33 @@ bed into the 🧺 button, THEN the chip ticks +1.
   `reducedMotion: 'reduce'`: store 3 at pick, chip 2 in flight → 3 on landing,
   zero page errors.
 
+## Grow a Garden — ticket 10: seed colours rotate 🌺🌸🌼🪻 (2026-10-15, branch `feat/garden-seed-colours`)
+Each seed grows a different colour so the next bloom is a surprise (Amy + Finn).
+- **Finn's shuffle bag, `src/gardenBag.js` (pure, `rand` injectable):** `drawKind(bag,
+  kinds, rand)` deals every kind once before refilling, and NEVER the same kind
+  twice in a row — the first draw of a refilled bag skips `last`. `normalizeBag`
+  makes a saved bag safe (known kinds only, no dupes, never `last`).
+- **Decided at PLANT time:** `plantSeed(rand = Math.random)` draws the kind; the
+  save holds `garden.bag = { left, last }`, so a reload mid-grow keeps the colour
+  and the bag carries on. `mergeGarden` takes the bag from the copy whose plot wins
+  (outside the conservation law). **Migration:** no bag → `{ left: [], last: plot
+  kind ‖ ('starter' if she's picked anything) }` — Ivy's red bed stays red and her
+  next seed is never red again straight away.
+- **Kinds = `SEED_KINDS` (config.js), 4:** `starter` Red 🌺 (id kept — old saves
+  hold it; emoji was 🌸, now 🌺 so pink can have 🌸), `pink` 🌸, `yellow` 🌼,
+  `purple` 🪻. A new kind = one entry (`petal` swatch + `bud` hex); the bag and
+  the Basket pick it up. Colour is visual only — every pick is +1 in the total.
+- **Locked art untouched:** GardenPlot's `kind` prop moves ONLY flowers-tall's
+  petal UVs to another swatch of Kenney's own platformer colormap
+  (`petalGeometry`, cached per kind; starter = the stock geometry) and recolours
+  stage 2's buds to match. Stems, leaves, yellow centres, layout, motion unchanged.
+- App diff = one field (`kind`) in `gardenView`; Scene passes it. Handlers untouched.
+- Tests `garden-colours.test.js` (+16; sabotage: dropping the refill's `last`
+  exclusion fails 4) + garden.test.js helper gains `bag`. Verified headless
+  (swiftshader, the real path: tap bed → plant → water ×3 → pick ×5): purple →
+  pink → red → yellow → (refill) pink, flying emoji + basket lines match, zero
+  page errors.
+
 ## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
 Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
 Garden. Amy's order: **Star Arcade → Halloween, Sunny Town → open plot +

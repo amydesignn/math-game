@@ -37,8 +37,18 @@ const oldSave = (over = {}) => ({
   ...over,
 })
 
-// basket defaults to the harvests filed as starter blooms (the only kind so far).
-const garden = (over = {}) => ({ plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0, basket: over.harvests ? { starter: over.harvests } : {}, ...over })
+// basket defaults to the harvests filed as starter blooms (the only kind before
+// ticket 10); bag defaults to what migration derives: an empty bag whose `last`
+// is the plot's kind, else 'starter' once anything was picked.
+const garden = (over = {}) => ({
+  plot: { seed: null },
+  seeds: 1,
+  seedsGranted: 0,
+  harvests: 0,
+  basket: over.harvests ? { starter: over.harvests } : {},
+  bag: { left: [], last: over.plot?.seed?.kind ?? (over.harvests ? 'starter' : null) },
+  ...over,
+})
 
 function mockBackend({ cloud = null } = {}) {
   let remote = cloud ? clone(cloud) : null
@@ -121,7 +131,7 @@ describe('the plot: plant → water ×3 → harvest', () => {
 
   it('the whole loop, gems spent but level (lifetimeGems) untouched', async () => {
     const store = await fresh(oldSave({ gems: 20, lifetimeGems: 120 }))
-    expect(store.plantSeed()).toBe(true)
+    expect(store.plantSeed(() => 0)).toBe(true) // rand 0 → the first kind out of a full bag
     // 120 lifetime gems → 6 seeds owed and paid on load (ticket 4), + the starter, − the one planted
     expect(store.getGarden()).toMatchObject({ seeds: 6, plot: { seed: { kind: 'starter', stage: 0 } } })
     expect(store.harvest()).toBe(null) // not in bloom yet
@@ -206,6 +216,7 @@ describe('migration (saves from before the garden — Ivy\'s)', () => {
       seedsGranted: 26,
       harvests: 4, // kept
       basket: { starter: 4 }, // filed as starter blooms
+      bag: { left: [], last: 'starter' }, // no bag yet → its last seed was the plot's
     })
   })
 })

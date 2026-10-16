@@ -285,13 +285,24 @@ export const GARDEN = {
   waterings: 3,
 }
 
-// Seed kinds — how each harvest is named in the 🧺 Basket (ticket 8). Only the
-// starter exists today; a new kind = one entry here, and the Basket gives it its
-// own line. Every harvest counts as ONE generic unit in the total, whatever its
-// kind. (What harvests later exchange for — a rare, permanent item gems can't
-// buy — is parked in the Notion spec.) Unknown kinds fall back to a generic row.
+// Seed kinds — each seed's bloom COLOUR (ticket 10) and how its harvest is
+// named in the 🧺 Basket (ticket 8). A new kind = one entry here: the Basket
+// gives it its own line and the shuffle bag (gardenBag.js) starts dealing it.
+// Every harvest counts as ONE generic unit in the total, whatever its kind.
+// (What harvests later exchange for — a rare, permanent item gems can't buy —
+// is parked in the Notion spec.) Unknown kinds fall back to a generic row.
+// Colour is visual only, drawn from Kenney's own platformer colormap so the
+// bed stays in the kit's palette (GardenPlot.jsx):
+//   petal = { col, row } — a swatch in public/models/platformer/Textures/
+//           colormap.png (16 columns × 32px; row 0 = the band at y 128–255
+//           where the stock petals sit, 1 = y 256–383, 2 = y 384–511)
+//   bud   = stage 2's closed buds, the petals' colour (bud → bloom = one flower)
+// `starter` stays the id of the red flower: saves from before ticket 10 hold it.
 export const SEED_KINDS = {
-  starter: { name: 'Red flowers', emoji: '🌸' },
+  starter: { name: 'Red flowers', emoji: '🌺', petal: { col: 5, row: 0 }, bud: '#e8553f' },
+  pink: { name: 'Pink flowers', emoji: '🌸', petal: { col: 9, row: 2 }, bud: '#f08aaa' },
+  yellow: { name: 'Yellow flowers', emoji: '🌼', petal: { col: 0, row: 0 }, bud: '#ffc044' },
+  purple: { name: 'Purple flowers', emoji: '🪻', petal: { col: 11, row: 0 }, bud: '#8f63d8' },
 }
 
 // ── Background music: two tracks, player's choice (2026-10-04) ──

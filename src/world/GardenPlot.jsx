@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
+import { SkeletonUtils } from 'three-stdlib'
 import * as THREE from 'three'
 import Prop from './Prop'
 import BlobShadow from './BlobShadow'
-import { modelUrl } from '../config'
+import { modelUrl, SEED_KINDS } from '../config'
 
 /*
  * GardenPlot.jsx — Ivy's one garden plot in Sunny Town (Grow a Garden, ticket 6).
@@ -38,6 +39,13 @@ import { modelUrl } from '../config'
  *
  * Ticket 5: Scene drives `stage` from the store (garden.plot.seed.stage) and
  * App owns the plant / water / harvest actions — this file only draws + moves.
+ *
+ * Ticket 10 — seed colours: `kind` (garden.plot.seed.kind) picks the bloom's
+ * petal colour and the buds' colour from SEED_KINDS. Nothing else about the
+ * look changes (Amy locked the art): the petals keep Kenney's own model and
+ * texture — their UVs are just pointed at a different swatch of the same
+ * platformer colormap (`petalGeometry`), and the buds' colour follows. The
+ * starter (red) is the stock model, untouched.
  */
 
 const BUD = new THREE.MeshStandardMaterial({ color: '#e8553f', flatShading: true, roughness: 0.85 })
@@ -106,20 +114,76 @@ const slow = () => (import.meta.env.DEV && window.__gardenSlow > 0 ? window.__ga
 
 const reducedMotion = () => !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
+// ── seed colours (ticket 10) ──────────────────────────────────────────────
+// Kenney's colormap is a palette of 32px swatches; flowers-tall's petals sample
+// the starter's swatch (`SEED_KINDS.starter.petal`). A kind recolours them by
+// moving just those UVs to its own swatch — same column offset, same spot in
+// the band — so the petals keep the kit's shading gradient and nothing else on
+// the model (stems, leaves, yellow centres) moves.
+const kindOf = (kind) => SEED_KINDS[kind] || SEED_KINDS.starter
+const swatchU = (col) => (col * 32 + 16) / 512
+const STOCK = SEED_KINDS.starter.petal
+const recoloured = new WeakMap() // stock geometry → Map(kind → geometry)
+
+/** The flowers' geometry with its petal UVs moved to `kind`'s swatch (cached). */
+export function petalGeometry(geo, kind) {
+  const { petal } = kindOf(kind)
+  if (petal.col === STOCK.col && petal.row === STOCK.row) return geo
+  if (!recoloured.has(geo)) recoloured.set(geo, new Map())
+  const byKind = recoloured.get(geo)
+  if (!byKind.has(kind)) {
+    const out = geo.clone()
+    const uv = out.attributes.uv.clone()
+    const from = swatchU(STOCK.col), to = swatchU(petal.col), dv = (petal.row - STOCK.row) * 0.25
+    for (let i = 0; i < uv.count; i++) {
+      if (Math.abs(uv.getX(i) - from) < 1e-3) uv.setXY(i, to, uv.getY(i) + dv)
+    }
+    out.setAttribute('uv', uv)
+    byKind.set(kind, out)
+  }
+  return byKind.get(kind)
+}
+
+const budMats = new Map() // kind → the buds' material
+function budMaterial(kind) {
+  const { bud } = kindOf(kind)
+  if (bud === '#e8553f') return BUD
+  if (!budMats.has(bud)) budMats.set(bud, new THREE.MeshStandardMaterial({ color: bud, flatShading: true, roughness: 0.85 }))
+  return budMats.get(bud)
+}
+
+/** Kenney's flowers-tall in `kind`'s colour (the Prop, with recoloured petals). */
+function Flowers({ kind, scale }) {
+  const { scene } = useGLTF(modelUrl('platformer', 'flowers-tall'))
+  const model = useMemo(() => {
+    const m = SkeletonUtils.clone(scene)
+    m.traverse((o) => {
+      if (o.isMesh) o.geometry = petalGeometry(o.geometry, kind)
+    })
+    return m
+  }, [scene, kind])
+  return (
+    <group scale={scale}>
+      <primitive object={model} />
+    </group>
+  )
+}
+
 // three closed buds on short stems, poking up out of the leaves
 const BUDS = [[-0.08, 0.04, 0.34], [0.1, -0.05, 0.4], [0.0, 0.1, 0.3]]
 
-function Buds() {
+function Buds({ kind }) {
+  const mat = budMaterial(kind)
   return BUDS.map(([x, z, h], i) => (
     <group key={i} position={[x, 0, z]}>
       <mesh geometry={STEM_GEO} material={STEM} position={[0, h / 2, 0]} scale={[1, h, 1]} />
-      <mesh geometry={BUD_GEO} material={BUD} position={[0, h, 0]} scale={[1, 1.35, 1]} />
+      <mesh geometry={BUD_GEO} material={mat} position={[0, h, 0]} scale={[1, 1.35, 1]} />
     </group>
   ))
 }
 
-/** One plant at `stage`, sized for a bed spot (~SP wide). */
-function Plant({ stage }) {
+/** One plant at `stage` (in `kind`'s colour), sized for a bed spot (~SP wide). */
+function Plant({ stage, kind }) {
   switch (stage) {
     case 0: // mound — the seed is in
       return <mesh geometry={MOUND_GEO} material={SOIL} scale={[0.6, 0.45, 0.6]} />
@@ -134,14 +198,14 @@ function Plant({ stage }) {
       return (
         <group scale={0.6}>
           <Prop pack="platformer" name="plant" scale={1.9} />
-          <Buds />
+          <Buds kind={kind} />
         </group>
       )
     case 3: // bloom
       return (
         <group scale={0.6}>
           <Prop pack="platformer" name="plant" scale={1.9} />
-          <Prop pack="platformer" name="flowers-tall" scale={1.7} />
+          <Flowers kind={kind} scale={1.7} />
         </group>
       )
     default:
@@ -223,6 +287,7 @@ const HARVEST_SPARKS = ['#ff8fb1', '#f5b623', '#ffffff', '#e8553f', '#fff6c8']
 
 /**
  * The plot. `stage`: 0–3 (every plant in the bed), or null for an empty bed.
+ * `kind`: the seed's SEED_KINDS id — the colour of its buds + bloom.
  * `watering`: a counter — each increment plays the water drops; when a
  * watering and a stage change arrive together (store.waterPlot), the drops
  * land FIRST and the bed pops to its new stage as they hit. The bed is one
@@ -230,7 +295,7 @@ const HARVEST_SPARKS = ['#ff8fb1', '#f5b623', '#ffffff', '#e8553f', '#fff6c8']
  * the flowers pop off, then `onHarvest()` is called and the caller empties the
  * bed; at any other stage (empty included) a tap calls `onTap()` instead.
  */
-export default function GardenPlot({ position, stage = null, watering = 0, canTap, onTap, onHarvest }) {
+export default function GardenPlot({ position, stage = null, kind = 'starter', watering = 0, canTap, onTap, onHarvest }) {
   const SOIL_Y = 0.08 // soil sits raised, just under the edging's top
   const plants = useRef([]) // inner groups, one per spot — motion writes their transform
   const drops = useRef([])
@@ -356,7 +421,7 @@ export default function GardenPlot({ position, stage = null, watering = 0, canTa
         SPOTS.map((p, i) => (
           <group key={i} position={[p.x, SOIL_Y + 0.02, p.z]} rotation={[0, p.rot, 0]} scale={p.k}>
             <group ref={(el) => (plants.current[i] = el)}>
-              <Plant stage={shown} />
+              <Plant stage={shown} kind={kind} />
             </group>
           </group>
         ))}

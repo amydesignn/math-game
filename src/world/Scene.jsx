@@ -65,7 +65,7 @@ function spawnSparkles(map, spawn, placed = []) {
  */
 export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes, garden, gardenOpen, onGardenNear, onHarvest }) {
   const marker = useRef() // the ring that pings on tap
-  // Grow a Garden (ticket 5): `garden` = { stage, watering } from App (the
+  // Grow a Garden (ticket 5): `garden` = { stage, kind, watering } from App (the
   // store's plot). Tapping the bed walks her to its front edge; arriving opens
   // App's garden bar (onGardenNear(true)), walking off closes it. A bloom bed
   // is picked straight from the tap (GardenPlot), no walk.
@@ -371,6 +371,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
           <GardenPlot
             position={[map.gardenPlot[0], 0, map.gardenPlot[1]]}
             stage={garden.stage}
+            kind={garden.kind}
             watering={garden.watering}
             canTap={() => !gestureRef.current.pinching && !placing && !(mathBusyRef && mathBusyRef.current)}
             onTap={walkToGarden}
