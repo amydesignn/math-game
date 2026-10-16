@@ -121,7 +121,6 @@ export default function App({ cloud = false, justSignedIn = false }) {
   function onSignOut() {
     try {
       localStorage.removeItem('luxi.account')
-      localStorage.removeItem('lumio.account')
     } catch { /* private mode */ }
     // Full reboot to a clean guest session (drops the ?account/redeem URL too).
     signOut().finally(() => {
