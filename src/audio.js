@@ -111,42 +111,50 @@ function schedulePetSound() {
 }
 
 // ── Sound effects ──
-// Each recipe is a few soft sine notes: [frequency Hz, start s, length s].
-// Kept quieter than the music and about a second at most (calm over busy).
+// Each recipe is a few soft sine notes: [frequency Hz, start s, length s],
+// optionally played `repeat` times, `every` seconds apart. Quieter than the music.
+const CHIME = [[1318.5, 0, 0.45], [1661.2, 0.09, 0.5], [1975.5, 0.18, 0.8]] // E6 → G#6 → B6
 export const SFX = {
-  // a gem landing in the wallet — a small two-note "tink" (E6 → B6)
-  // 2026-10-16 Amy: "make it longer" → the notes ring out ~2× (≈0.75 s); gain a
-  // touch lower because 3 gems now overlap into one shimmer
-  gem: { gain: 0.08, notes: [[1318.5, 0, 0.45], [1975.5, 0.07, 0.68]] },
-  // the amber completion gem — the same tink, one note taller (E6 → G#6 → B6)
-  gemBonus: { gain: 0.1, notes: [[1318.5, 0, 0.45], [1661.2, 0.09, 0.5], [1975.5, 0.18, 0.8]] },
+  // gems landing in the wallet. 2026-10-16, Amy's pick after three listens: the
+  // three-note chime, 3 times back to back (~2.8 s). One burst of gems = ONE
+  // sequence, so the 3 flying gems (and a station's bonus gem) never pile up.
+  gem: { gain: 0.1, notes: CHIME, repeat: 3, every: 1.0 },
 }
-const SFX_GAP_MS = 60 // same sound closer than this = skipped, so bursts never stack
-const lastSfx = {}
+const lastSfx = {} // name → when its current play finishes (ms) — a burst inside it is skipped
+
+/** How long a recipe plays, in seconds (the last repeat's longest note). */
+export function sfxLength(r) {
+  const tail = Math.max(...r.notes.map(([, at, len]) => at + len))
+  return (r.every || 0) * ((r.repeat || 1) - 1) + tail
+}
 
 /** Play a named effect. Quiet no-op when sound is off, before the first tap,
- *  in a hidden tab, or without Web Audio. Returns true if it played. */
+ *  in a hidden tab, without Web Audio, or while the same effect is still
+ *  playing. Returns true if it played. */
 export function playSfx(name) {
   const r = SFX[name]
   if (!r || !enabled || !unlocked || !sfxCtx) return false
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return false
   const now = Date.now()
-  if (now - (lastSfx[name] || 0) < SFX_GAP_MS) return false
-  lastSfx[name] = now
+  if (now < (lastSfx[name] || 0)) return false
+  lastSfx[name] = now + sfxLength(r) * 1000
   const t0 = sfxCtx.currentTime
-  const detune = (Math.random() - 0.5) * 30 // ±15 cents — the 20th tink isn't a copy of the first
-  for (const [freq, at, len] of r.notes) {
-    const osc = sfxCtx.createOscillator()
-    const amp = sfxCtx.createGain()
-    osc.type = 'sine'
-    osc.frequency.value = freq
-    osc.detune.value = detune
-    amp.gain.setValueAtTime(0.0001, t0 + at)
-    amp.gain.exponentialRampToValueAtTime(r.gain, t0 + at + 0.008) // soft attack, no click
-    amp.gain.exponentialRampToValueAtTime(0.0001, t0 + at + len)
-    osc.connect(amp).connect(sfxCtx.destination)
-    osc.start(t0 + at)
-    osc.stop(t0 + at + len + 0.02)
+  for (let k = 0; k < (r.repeat || 1); k++) {
+    const tk = t0 + k * (r.every || 0)
+    const detune = (Math.random() - 0.5) * 30 // ±15 cents — no two chimes are exact copies
+    for (const [freq, at, len] of r.notes) {
+      const osc = sfxCtx.createOscillator()
+      const amp = sfxCtx.createGain()
+      osc.type = 'sine'
+      osc.frequency.value = freq
+      osc.detune.value = detune
+      amp.gain.setValueAtTime(0.0001, tk + at)
+      amp.gain.exponentialRampToValueAtTime(r.gain, tk + at + 0.008) // soft attack, no click
+      amp.gain.exponentialRampToValueAtTime(0.0001, tk + at + len)
+      osc.connect(amp).connect(sfxCtx.destination)
+      osc.start(tk + at)
+      osc.stop(tk + at + len + 0.02)
+    }
   }
   return true
 }

@@ -28,10 +28,11 @@ describe('playSfx', () => {
     expect(audio.playSfx('gem')).toBe(false)
   })
 
-  it('plays the gem tink after the first tap (one oscillator per note)', () => {
+  it('plays the three-note chime 3 times after the first tap', () => {
     audio.unlockAudio()
     expect(audio.playSfx('gem')).toBe(true)
-    expect(ctx.created).toBe(audio.SFX.gem.notes.length)
+    expect(audio.SFX.gem.notes.length).toBe(3)
+    expect(ctx.created).toBe(3 * 3)
   })
 
   it('the speaker toggle mutes it', () => {
@@ -40,18 +41,22 @@ describe('playSfx', () => {
     expect(audio.playSfx('gem')).toBe(false)
   })
 
-  it('a burst of the same sound never stacks, but gems 90 ms apart each tink', () => {
+  it('a burst of gems (3 flying + a bonus) plays ONE sequence, the next answer plays again', () => {
     audio.unlockAudio()
     expect(audio.playSfx('gem')).toBe(true)
-    expect(audio.playSfx('gem')).toBe(false)
     vi.advanceTimersByTime(90)
+    expect(audio.playSfx('gem')).toBe(false)
+    vi.advanceTimersByTime(1500)
+    expect(audio.playSfx('gem')).toBe(false)
+    vi.advanceTimersByTime(audio.sfxLength(audio.SFX.gem) * 1000)
     expect(audio.playSfx('gem')).toBe(true)
   })
 
-  it('stays gentle: quieter than the music, about a second at most', () => {
+  it('stays gentle: quieter than the music, each chime about a second, the whole sequence under 3 s', () => {
     for (const r of Object.values(audio.SFX)) {
       expect(r.gain).toBeLessThan(0.2)
       for (const [, at, len] of r.notes) expect(at + len).toBeLessThanOrEqual(1)
+      expect(audio.sfxLength(r)).toBeLessThan(3)
     }
   })
 

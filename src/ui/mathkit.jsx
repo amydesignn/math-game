@@ -592,7 +592,7 @@ export function FlyGem({ from, to, delay, bonus }) {
   const [pos, setPos] = useState(from)
   useEffect(() => {
     const t = setTimeout(() => setPos(to), 30 + delay)
-    const land = setTimeout(() => playSfx(bonus ? 'gemBonus' : 'gem'), 30 + delay + 560) // the tink as it reaches the wallet
+    const land = setTimeout(() => playSfx('gem'), 30 + delay + 560) // the chime starts as the first gem reaches the wallet
     return () => { clearTimeout(t); clearTimeout(land) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
