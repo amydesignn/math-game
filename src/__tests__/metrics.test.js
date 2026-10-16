@@ -121,4 +121,28 @@ describe('a whole session', () => {
     m.enteredWorld('town')
     expect(sent).toEqual([]) // vitest runs as DEV
   })
+
+  it('garden acts send one bare row each — no counts, no ids, nothing outside the whitelist', async () => {
+    const { sent } = stubBrowser()
+    const m = await import('../metrics')
+    m.startMetrics({ player: 'account', appVersion: 'abc1234' })
+    m.gardenEvent('plant_first')
+    m.gardenEvent('water')
+    m.gardenEvent('harvest')
+    m.gardenEvent('replant')
+    m.gardenEvent('dig') // not a garden act → nothing
+    const garden = sent.filter((r) => r.event.startsWith('garden_'))
+    expect(garden.map((r) => r.event)).toEqual(['garden_plant_first', 'garden_water', 'garden_harvest', 'garden_replant'])
+    for (const row of garden) expect(Object.keys(row).sort()).toEqual(['app_version', 'event', 'player'])
+  })
+
+  it('a garden act while the page is hidden sends nothing', async () => {
+    const { sent, fire } = stubBrowser()
+    const m = await import('../metrics')
+    m.startMetrics({})
+    fire('pagehide')
+    const n = sent.length
+    m.gardenEvent('water')
+    expect(sent.length).toBe(n)
+  })
 })

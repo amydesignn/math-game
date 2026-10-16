@@ -22,6 +22,12 @@
  *   session_end   — when the page hides (the rest + maps). EVERY session_start
  *                   gets one, Door-only visits too (maps 0), so starts − ends =
  *                   sessions genuinely lost.
+ *   garden_*      — Grow a Garden (2026-10-15, ticket 11): one bare row per act,
+ *                   no counts. garden_plant_first (her very first seed — no
+ *                   harvest yet) vs garden_replant (planting again after a
+ *                   harvest) is the whole replant signal, so no column links a
+ *                   plant to its harvest. garden_water, garden_harvest.
+ *                   Replant rate ≈ COUNT(garden_replant) ÷ COUNT(garden_harvest).
  * minutes/problems/solved/quests are DELTAS since the session's last row — no
  * id links rows, so the honest total is SUM(...) over progress + session_end.
  * A session that comes back to the foreground starts a fresh tally.
@@ -163,6 +169,14 @@ export function answered(correct) {
   tally.problems++
   if (correct) tally.solved++
   if (tally.problems % CHECKPOINT_EVERY === 0) flush('progress')
+}
+
+const GARDEN_EVENTS = new Set(['plant_first', 'replant', 'water', 'harvest'])
+
+/** A garden act: 'plant_first' | 'replant' | 'water' | 'harvest'. */
+export function gardenEvent(kind) {
+  if (!tally || !GARDEN_EVENTS.has(kind)) return
+  send({ event: `garden_${kind}` })
 }
 
 export function questDone() {

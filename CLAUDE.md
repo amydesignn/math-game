@@ -543,6 +543,16 @@ WORD so family accounts can be filtered out.
   this change (`app_version` 3d375d0) are cumulative-in-one-end-row — same SUM.
 - Tests `metrics.test.js` (+7) incl. a **field whitelist** — adding any field
   fails there first. Read the numbers via the Supabase MCP (`play_events`).
+- **Garden events (2026-10-15, Grow a Garden ticket 11):** `metrics.gardenEvent(kind)`
+  sends ONE bare row per act (event + player + app_version, no counts):
+  `garden_plant_first` (no harvest yet = her very first seed) · `garden_replant`
+  (planting after a harvest) · `garden_water` · `garden_harvest`. Hooked in App
+  `handlePlant` / `handleWater` / `handleHarvest`, AFTER the store write succeeds.
+  The first/replant split IS the replant signal — no column links a plant to a
+  harvest. Migration `play_events_garden_events` widens the event check.
+  Readings: replant rate ≈ replant ÷ harvest; plant rate ≈ plant_first ÷
+  session_start(came_back='new') (rough — rows aren't linked); problems/session
+  before vs after = SUM(problems) ÷ COUNT(session_start) split by date.
 
 ## People in the Rosy Garden + Forest Clearing 🌹🏕️ (2026-10-06, branch `feat/world-people`)
 Ivy's verdict on the dense/light A/B: **dense**, and "people there too, like
