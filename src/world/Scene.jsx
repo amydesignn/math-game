@@ -18,6 +18,7 @@ import { WORLD, GEMS, STATION, CHARACTERS, assetScale } from '../config'
 import { MAPS, blockers } from '../maps'
 import { stationFor } from '../stations'
 import { SKINS } from '../ui/skins'
+import { worldToScreen } from '../ui/BasketFlight'
 
 const GATE_RADIUS = 1.7 // walk this close to a gate's glow → travel (forgiving: tap-walks stop at the ring's edge)
 
@@ -26,6 +27,7 @@ const GATE_RADIUS = 1.7 // walk this close to a gate's glow → travel (forgivin
 const GARDEN_FRONT = 1.5
 const GARDEN_REACH = 2.4
 const GARDEN_LEAVE = 4
+const GARDEN_PICK_Y = 1.1 // where the picked flowers hang as they pop off (plant + HARVEST.lift)
 
 /**
  * Scatter this visit's gem sparkles: random spots on the map, kept clear of
@@ -219,7 +221,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
   }
 
   // Follow camera + tap-marker animation (must live under the Canvas).
-  const { camera } = useThree()
+  const { camera, gl } = useThree()
   const camTarget = useRef(new THREE.Vector3())
   // dev-only bird's-eye for layout review: window.__overview(30) → top-down over
   // the map centre; window.__overview(0) → back to the follow camera
@@ -372,7 +374,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
             watering={garden.watering}
             canTap={() => !gestureRef.current.pinching && !placing && !(mathBusyRef && mathBusyRef.current)}
             onTap={walkToGarden}
-            onHarvest={onHarvest}
+            onHarvest={() => onHarvest?.(worldToScreen([map.gardenPlot[0], GARDEN_PICK_Y, map.gardenPlot[1]], camera, gl.domElement.getBoundingClientRect()))}
           />
         </Suspense>
       )}

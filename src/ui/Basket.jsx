@@ -12,9 +12,10 @@ import { SEED_KINDS } from '../config'
  */
 const kindOf = (id) => SEED_KINDS[id] || { name: 'Flowers', emoji: '🌼' }
 
-export function BasketButton({ total, onTap, className = '' }) {
+export function BasketButton({ total, onTap, className = '', buttonRef }) {
   return (
     <button
+      ref={buttonRef}
       aria-label={`Open your basket — ${total} harvested`}
       className={`hud-basket ${className}`}
       onPointerDown={(e) => e.stopPropagation()}
@@ -136,12 +137,12 @@ export function BasketCard({ total, basket, onClose }) {
 }
 
 /** Button + card together, owning the open state. */
-export default function Basket({ total, basket, className }) {
+export default function Basket({ total, basket, className, buttonRef }) {
   const [open, setOpen] = useState(false)
   return (
     <>
       {open && <BasketCard total={total} basket={basket} onClose={() => setOpen(false)} />}
-      <BasketButton total={total} className={className} onTap={() => setOpen((o) => !o)} />
+      <BasketButton total={total} className={className} buttonRef={buttonRef} onTap={() => setOpen((o) => !o)} />
     </>
   )
 }
