@@ -297,10 +297,14 @@ export default function App({ cloud = false, justSignedIn = false }) {
     setGarden((p) => ({ ...gardenView(g), watering: p.watering + (watered ? 1 : 0) }))
   }
   function handlePlant() {
-    if (plantSeed()) syncGarden(false)
+    const first = getGarden().harvests === 0 // one plot: no harvest yet = her very first seed
+    if (!plantSeed()) return
+    metrics.gardenEvent(first ? 'plant_first' : 'replant')
+    syncGarden(false)
   }
   function handleWater() {
     if (waterPlot() == null) return // can't afford / nothing to water — the button says so
+    metrics.gardenEvent('water')
     setGems(getState().gems)
     syncGarden(true)
   }
@@ -317,6 +321,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   function handleHarvest(from) {
     const kind = getGarden().plot.seed?.kind
     if (harvest() == null) return
+    metrics.gardenEvent('harvest')
     const btn = basketBtnRef.current
     const r = btn?.getBoundingClientRect()
     const reduce = !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
