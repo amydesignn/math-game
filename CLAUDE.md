@@ -341,6 +341,28 @@ Per the updated spec, she WATERS it with gems; correct answers don't feed it dir
   fail). Verified headless (iPad + 390 phone + empty save): Ivy-shaped save →
   basket 2 → pick → 3 → reload → 3, zero page errors.
 
+## Grow a Garden — the harvest flight 🌸→🧺 (2026-10-15, branch `feat/garden-basket-flight`, stacked on ticket 8)
+The locked "Harvest + exchange" beat: the picked flower flies AS ITSELF from the
+bed into the 🧺 button, THEN the chip ticks +1.
+- **`src/ui/BasketFlight.jsx`:** `worldToScreen(p, camera, rect)` (Scene projects
+  the bed at `GARDEN_PICK_Y` 1.1 when GardenPlot's onHarvest fires and hands the
+  point to App) + `<FlyFlower>` — one emoji (`SEED_KINDS[kind].emoji`) on a
+  quadratic arc (`arcPoint`, bows up, then drops in, fading the last 12%),
+  `FLY_MS` 760, driven by a Web Animations keyframe track (no React re-renders).
+- **Award vs display:** `store.harvest()` still runs at onHarvest (GardenPlot's
+  plain setTimeout, unchanged). Only the SHOWN count waits: App's
+  `syncGarden` + the toast ride a plain `setTimeout(FLY_MS)` — never the
+  flight's frames (the rAF-starve lesson; headless shows the flower freezing
+  between frames while the tick still lands on time).
+- **Phones:** the basket steps aside while the garden bar is open (<600px), so
+  `catching` brings it back for the flight + 900ms after the tick.
+- **Reduced motion / basket hidden / no screen point:** no flight, tick at once.
+- GardenPlot (locked art + motion) untouched. Tests `basket-flight.test.js` (+5)
+  → 300 green. Verified headless (swiftshader, Ivy-shaped save, the real path:
+  tap bed → walk → water → bloom → pick) on iPad 768, phone 390 and
+  `reducedMotion: 'reduce'`: store 3 at pick, chip 2 in flight → 3 on landing,
+  zero page errors.
+
 ## Spooky Arcade 🎃 + Sunny Town neighbours (2026-10-06, branch `feat/spooky-arcade-sunny-neighbours`)
 Amy + Ivy's map pass. Ivy prefers the DENSE Forest Clearing over the light Rosy
 Garden. Amy's order: **Star Arcade → Halloween, Sunny Town → open plot +

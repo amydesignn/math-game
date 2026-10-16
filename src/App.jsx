@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import Scene from './world/Scene'
 import Minimap from './ui/Minimap'
 import Basket from './ui/Basket'
+import { FlyFlower, FLY_MS } from './ui/BasketFlight'
 import Shop from './ui/Shop'
 import MathPopup, { SKINS } from './ui/MathPopup'
 import StationPopup from './ui/StationPopup'
@@ -24,7 +25,7 @@ import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setS
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
-import { WORLD, REFRESH, GARDEN } from './config'
+import { WORLD, REFRESH, GARDEN, SEED_KINDS } from './config'
 import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
@@ -303,10 +304,41 @@ export default function App({ cloud = false, justSignedIn = false }) {
     setGems(getState().gems)
     syncGarden(true)
   }
-  function handleHarvest() {
+  // The pick → the flower flies into the 🧺, THEN the chip ticks +1 (spec:
+  // "Harvest + exchange"). The store write happens right here, at GardenPlot's
+  // plain-timer onHarvest; only the shown count waits for the landing, on its
+  // own plain setTimeout — never on the flight's frames (the rAF-starve lesson).
+  // `from` = the bed on screen (Scene projects it). Reduced motion, no basket on
+  // screen, or no `from` → no flight, the count ticks at once.
+  const basketBtnRef = useRef(null)
+  const [flights, setFlights] = useState([]) // [{ id, from, to, emoji }] in the air
+  const [catching, setCatching] = useState(false) // keeps the basket on screen (phones) until the tick has shown
+  const catchTimer = useRef()
+  function handleHarvest(from) {
+    const kind = getGarden().plot.seed?.kind
     if (harvest() == null) return
-    syncGarden(false)
-    showNote('You picked your flowers! 🌸 They’re in your basket 🧺')
+    const btn = basketBtnRef.current
+    const r = btn?.getBoundingClientRect()
+    const reduce = !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (reduce || !from || !r) {
+      syncGarden(false)
+      showNote('You picked your flowers! 🌸 They’re in your basket 🧺')
+      return
+    }
+    const emoji = (SEED_KINDS[kind] || { emoji: '🌼' }).emoji
+    // the basket must be visible to catch it — below 600px it steps aside for the garden bar
+    clearTimeout(catchTimer.current)
+    setCatching(true)
+    // the button may be display:none right now (phone + bar), so aim at where it sits
+    const to = r.width ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : { x: 16 + 26, y: window.innerHeight - 20 - 26 }
+    const id = Date.now()
+    setFlights((f) => [...f, { id, from, to, emoji }])
+    setTimeout(() => {
+      setFlights((f) => f.filter((x) => x.id !== id))
+      syncGarden(false) // ← the tick: the chip remounts on the new total and pops
+      showNote('You picked your flowers! 🌸 They’re in your basket 🧺')
+      catchTimer.current = setTimeout(() => setCatching(false), 900)
+    }, FLY_MS)
   }
 
   // ── Sparkle Pack: the 15-minute consumable trail ──
@@ -1025,8 +1057,9 @@ export default function App({ cloud = false, justSignedIn = false }) {
       </div>
       {/* BOTTOM-LEFT: 🧺 the Basket — every harvest she's picked, kept (ticket 8). */}
       {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
-        <Basket total={garden.harvests} basket={garden.basket} className={gardenOpen ? 'hud-basket--bar' : ''} />
+        <Basket total={garden.harvests} basket={garden.basket} buttonRef={basketBtnRef} className={gardenOpen && !catching ? 'hud-basket--bar' : ''} />
       )}
+      {flights.map((f) => <FlyFlower key={f.id} {...f} />)}
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
       <MapLabel name={MAPS[mapId].name} />
 
