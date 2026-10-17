@@ -18,7 +18,7 @@ import { FeedbackModal } from './ui/FeedbackModal'
 import PromoPopup, { PROMO, promoActive } from './ui/PromoPopup'
 import HintLayer from './hints/HintLayer'
 import { createHintController, beginSession } from './hints'
-import { GAME_HINTS, GARDEN_HINT_ID, hintCtx } from './gameHints'
+import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, arrowForMap } from './gameHints'
 import { HINT_COPY } from './gameHintsCopy'
 import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
 import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } from './math'
@@ -29,7 +29,7 @@ import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setS
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic, playSfx } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
-import { WORLD, REFRESH, GARDEN, SEED_KINDS, HINTS_ON, HINT_ARROW } from './config'
+import { WORLD, REFRESH, GARDEN, SEED_KINDS, HINTS_ON, HINT_ARROW_OVERRIDE } from './config'
 import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
@@ -600,10 +600,12 @@ export default function App({ cloud = false, justSignedIn = false }) {
       hintsRef.current = null
     }
   }, [])
-  // A natural pause: in a world, nothing open over it, nothing mid-move.
+  // A natural pause: in a world, nothing open over it, nothing mid-move — and
+  // she has walked once, so "Tap anywhere to walk" (MoveHint, the first lesson)
+  // always speaks first and the two never share the screen (job 2).
   // (The GardenBar does NOT break calm — at the bed the hint goes arrow-only.)
   const hintCalm =
-    !worldBusy && !mathBusyRef.current && !levelPopup && !settingsOpen && !showOnboarding && !promoShowing && !signup && !feedbackOpen && selectedId == null
+    moved && !worldBusy && !mathBusyRef.current && !levelPopup && !settingsOpen && !showOnboarding && !promoShowing && !signup && !feedbackOpen && selectedId == null
   const currentHintCtx = () => hintCtx({ mapId, hasPlot: !!MAPS[mapId]?.gardenPlot, garden: getGarden(), calm: hintCalm, gardenOpen })
   useEffect(() => {
     hintsRef.current?.update(currentHintCtx())
@@ -1117,14 +1119,14 @@ export default function App({ cloud = false, justSignedIn = false }) {
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
       <MapLabel name={MAPS[mapId].name} />
 
-      {!moved && !meadow && <MoveHint />}
+      {!moved && !meadow && !hintView.hint?.text && <MoveHint />}
       {toast && <MapToast name={toast} />}
       {note && <NoteToast text={note} />}
       {HINTS_ON && (
         <HintLayer
           hint={hintView.hint}
           exitReason={hintView.exitReason}
-          arrowStyle={HINT_ARROW}
+          arrowStyle={arrowForMap(MAPS[mapId], HINT_ARROW_OVERRIDE)}
           getTargetPos={(t) => hintPosRef.current?.(t) ?? null}
           dismissLabel={HINT_COPY.dismiss.aria}
           dismissText={HINT_COPY.dismiss.label}
@@ -1338,6 +1340,7 @@ function DoorExitIcon({ size = 22 }) {
 function ExitButton({ onTap }) {
   return (
     <button
+      data-hint="exit-button"
       aria-label="Exit to the Door"
       className="hud-exit"
       onPointerDown={(e) => e.stopPropagation()}

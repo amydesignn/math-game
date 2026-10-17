@@ -72,3 +72,43 @@ Screenshots are in `scratchpad/guide/qa/`.
 5. **Fern's bolder done beat** (`boldDone`, off by default) vs the calm one.
 6. **Should `?hints` be able to turn hints on in a production build?** (Rowan's reading)
 7. **Next hint candidate: water (#2).** After planting she had 3 💎 and water costs 5. That's the playtest's stuck #3. Show it when the plot is growing, gems < 5, and she's away from the bed. It needs one config entry plus a copy line, with no spend nudge.
+
+---
+
+## Addendum: Amy's review 1 + job 2 (dock the pill), 2026-10-17
+**What changed:**
+- Arrows: green by default, pink on green ground, `?arrow=iris` kept for comparison.
+- The dark pill now sits in ONE bottom dock at every size: centred, bottom 136, which is 12 px above the bar band.
+- The teaching card waits until a hint needs a title + body (crew poll; Amy agreed).
+
+**Regression check (Clover):** "the top pill covers the bed" was **not a regression**. `184d9f9` shows the same thing (edge arrow at 162°, toast over the bed's back half; `qa/r184-desk-nearbed.png`).
+- **Root cause:** a guessed flat top band (168/188 px plus the arrow body, up to ~252). The follow-cam projects a target just north of her into exactly that band.
+- **Fix (Rowan + Linden):** the band was deleted. The arrow now avoids the real `[data-hint]` HUD rects, measured live, and the margins are just a 16 px screen gutter.
+
+**QA after job 2** (headless at 375×812 / 768×1024 / 1024×768 / 1280×800, plus the iPad pane):
+
+| Check | Result |
+|---|---|
+| Pill in the dock at all 4 sizes | PASS: same spot, centred (375 → y 628–676 · 768 → 840–888 · 1024 → 584–632 · 1280 → 616–664) |
+| Just south of the bed | PASS: a DOWN arrow on the soil (world mode, 0°) at all 4 sizes. On the phone it's clear of her hat. |
+| Bed below the screen | PASS: edge arrow at the bottom centre, under the pill, pointing down |
+| GardenBar opens while the hint is up (iPad pane, real bed tap) | PASS: pill hides, arrow stays, bar at y 901–1004 (13 px below the dock). Plant → done, hintDone +4. |
+| MoveHint vs pill | PASS: the hint waits for her first tap, and MoveHint hides while a hint shows. *Note: the Door's Resume tap seems to count as that first tap.* |
+| Pink | PARTIAL: renders with the full candy motion (`?arrow=pink`, `qa/j2-pink-edge.png`). **Not seen on the real Forest Clearing**, because the only hint lives in Sunny Town. Per-map selection is unit-tested. |
+| Random sparkles on the walk path | Correctly pause the hint (a maths popup). They made one headless route flaky, but that's not a bug. |
+
+**What worked**
+- Checking the old commit before "fixing" found the real cause. Without that check, the dock would have hidden an arrow bug that it didn't fix.
+- Measuring real HUD rects instead of guessed bands (Linden, Rowan). Any future HUD piece marked `data-hint` is avoided for free.
+- Tying sound to meaning, not to the surface. Moving the pill cost zero sound changes (Wren).
+- Fern's dock motion is the panel contract, so it's already proven on real copy before the card exists.
+- An honest crew poll. Four of five changed or softened their position, and Amy agreed to wait on the card.
+
+**What didn't**
+- Linden's "drop while covering" fix was built before the poll and then removed by Amy's decision. It was cheap, but it was rework.
+- Shared dev-origin localStorage: someone else's session changed the pane's save between my runs. I had to reseed every time.
+
+**Change next time**
+- For any layout bug, run the old commit first (temporary worktree + its own port) before anyone fixes it.
+- QA scripts must make one trusted tap before waiting for a hint: hints now wait for the first walk.
+- Give headless walk routes an alternative path, because daily sparkles can sit on a route.

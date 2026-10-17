@@ -3,9 +3,10 @@
  * device memory + session boot in store.js, and the dev/prod flag.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, everPlanted } from '../gameHints'
+import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, everPlanted, arrowForMap, isGreenGround } from '../gameHints'
 import { HINT_COPY } from '../gameHintsCopy'
-import { hintsEnabled, hintArrowVariant } from '../config'
+import { hintsEnabled, hintArrowOverride, HINT_ARROW_VARIANTS } from '../config'
+import { MAPS } from '../maps'
 import { createHintController, beginSession } from '../hints/engine.js'
 
 const hint = GAME_HINTS.find((h) => h.id === GARDEN_HINT_ID)
@@ -103,11 +104,32 @@ describe('store: device memory + one session per boot', () => {
   })
 })
 
-describe('arrow look switch (?arrow=green, Amy review 1)', () => {
-  it('defaults to iris; green only when asked; junk falls back', () => {
-    expect(hintArrowVariant('')).toBe('iris')
-    expect(hintArrowVariant('?arrow=green')).toBe('green')
-    expect(hintArrowVariant('?hints&arrow=green')).toBe('green')
-    expect(hintArrowVariant('?arrow=<script>')).toBe('iris')
+describe('arrow colour per map (Amy: green default, pink on green ground)', () => {
+  it('every map resolves to a known arrow', () => {
+    for (const m of Object.values(MAPS)) expect(HINT_ARROW_VARIANTS).toContain(arrowForMap(m))
+  })
+  it('green-ground maps resolve to pink; every other map to green', () => {
+    const grassy = Object.values(MAPS).filter((m) => isGreenGround(m.ground))
+    expect(grassy.map((m) => m.id)).toContain('clearing') // the Forest Clearing is the grass map today
+    for (const m of grassy) expect(arrowForMap(m)).toBe('pink')
+    for (const m of Object.values(MAPS).filter((m) => !isGreenGround(m.ground) && !m.hintArrow)) expect(arrowForMap(m)).toBe('green')
+    expect(arrowForMap(MAPS.town)).toBe('green') // the garden's own map
+  })
+  it('the hue test: grass greens yes; sand, pink, lilac, yellow no', () => {
+    for (const g of ['#c7e6b8', '#7cc46a', '#2e8b57', '#a8d8a0']) expect(isGreenGround(g)).toBe(true)
+    for (const g of ['#f9d9a8', '#fad4e6', '#ddcef6', '#fdf0b8', '#e7dcf7', '#b3a2e0', '#888888', 'nope']) expect(isGreenGround(g)).toBe(false)
+  })
+  it('a map pin and the dev override win, in that order', () => {
+    expect(arrowForMap({ ground: '#c7e6b8', hintArrow: 'iris' })).toBe('iris')
+    expect(arrowForMap({ ground: '#c7e6b8' }, 'green')).toBe('green')
+  })
+})
+
+describe('dev override (?arrow=iris|green|pink)', () => {
+  it('only known values; junk is no override', () => {
+    expect(hintArrowOverride('')).toBe(null)
+    expect(hintArrowOverride('?arrow=pink')).toBe('pink')
+    expect(hintArrowOverride('?hints&arrow=iris')).toBe('iris')
+    expect(hintArrowOverride('?arrow=<script>')).toBe(null)
   })
 })

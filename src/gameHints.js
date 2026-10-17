@@ -3,6 +3,30 @@
 // A new hint = one entry in GAME_HINTS (+ its line in gameHintsCopy.js).
 import { HINT_COPY } from './gameHintsCopy'
 
+// ── Which arrow, per map (Amy 2026-10-17): green by default, pink on green
+// ground. ONE source: the map's own `ground` colour — a new grass map gets the
+// pink arrow without anyone remembering a flag. A map may still pin one with
+// `hintArrow: 'green' | 'pink' | 'iris'` if its lighting fools the hue test.
+/** Is this ground colour green? Hue in the green band, with real saturation. */
+export function isGreenGround(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '')
+  if (!m) return false
+  const n = parseInt(m[1], 16)
+  const r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min
+  if (!d) return false
+  const l = (max + min) / 2
+  const sat = d / (1 - Math.abs(2 * l - 1))
+  const hue = max === r ? 60 * (((g - b) / d + 6) % 6) : max === g ? 60 * ((b - r) / d + 2) : 60 * ((r - g) / d + 4)
+  return hue >= 75 && hue <= 165 && sat >= 0.2
+}
+/** The hint arrow for a map: dev override > the map's pin > ground colour. */
+export function arrowForMap(map, override = null) {
+  if (override) return override
+  if (map?.hintArrow) return map.hintArrow
+  return isGreenGround(map?.ground) ? 'pink' : 'green'
+}
+
 /** "Has she ever planted?" — derived from garden state, never stored.
  *  A planted plot, or any harvest, means yes. (Old saves that planted before
  *  this feature therefore never see the garden hint.) */

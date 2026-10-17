@@ -15,7 +15,7 @@
  *     insets={{ top, right, bottom, left }}         // optional edge-arrow safe rect
  *     dismissLabel="Not now" dismissText="✕" onDismiss={(id) => …}
  *     boldDone={false}  // Amy's taste call: Fern's ground-ripple "you did it"
- *     arrowStyle="iris"   // 'iris' (default) | 'green': Amy's chunkier candy arrow test
+ *     arrowStyle="green"  // 'green' (default, Amy) | 'pink' (green ground) | 'iris' (the original)
  *   />
  *
  * Mount it ALWAYS (hint may be null). The polite live region has to exist before
@@ -36,12 +36,25 @@ const DONE_ARROW_MS = HINT_MOTION?.doneArrowMs ?? 700
 const EDGE_REST_MS = (HINT_MOTION?.edgeTapDelayMs ?? 300) + (HINT_MOTION?.edgeTaps ?? 5) * (HINT_MOTION?.edgeTapMs ?? 2400) // a tap run, then rest
 const POLL_MS = 250 // fallback beside rAF: the arrow never freezes in a throttled pane
 
-/** Safe rect for the edge arrow, measured against the Luxi HUD (2026-10-17).
- *  top: below the level row, minimap (ends 120) and map label (ends ~150).
- *  ≤600px: Exit + 🛍️ drop to y 72–178. bottom: above GardenBar/ActionBar
- *  (bottom 20 + ~98) and MoveHint. A host on another page passes its own. */
-function defaultInsets(w) {
-  return { top: w <= 600 ? 188 : 168, right: 16, bottom: 132, left: 16 }
+/** Screen gutter only: the HUD itself is avoided rect by rect (hudRects). */
+const GUTTER = { top: 16, right: 16, bottom: 16, left: 16 }
+
+/** Layer-relative rects of every visible HUD piece marked [data-hint] (the
+ *  host's convention), except the hint's own DOM target. Layout rects for the
+ *  pill (offset*), so Fern's rise/sink transform never moves the avoid zone. */
+function hudRects(layer, target) {
+  const lr = layer.getBoundingClientRect()
+  const out = []
+  for (const el of document.querySelectorAll('[data-hint]')) {
+    if (target?.dom != null && el.dataset.hint === String(target.dom)) continue
+    if (layer.contains(el)) {
+      if (el.offsetHeight > 0) out.push({ left: el.offsetLeft, top: el.offsetTop, right: el.offsetLeft + el.offsetWidth, bottom: el.offsetTop + el.offsetHeight })
+      continue
+    }
+    const r = el.getBoundingClientRect()
+    if (r.width > 0 && r.height > 0) out.push({ left: r.left - lr.left, top: r.top - lr.top, right: r.right - lr.left, bottom: r.bottom - lr.top })
+  }
+  return out
 }
 
 const targetKey = (t) => (t ? (t.world != null ? `w:${t.world}` : t.dom != null ? `d:${t.dom}` : '') : '')
@@ -55,12 +68,14 @@ export default function HintLayer({
   dismissText = '✕',
   onDismiss,
   boldDone = false,
-  arrowStyle = 'iris',
+  arrowStyle = 'green',
 }) {
-  const variant = ARROW[arrowStyle] ? arrowStyle : 'iris'
+  const variant = ARROW[arrowStyle] ? arrowStyle : 'green'
   const arrowH = ARROW[variant].h
   const arrowHRef = useRef(arrowH)
   arrowHRef.current = arrowH
+  const variantRef = useRef(variant)
+  variantRef.current = variant
   // What's on screen. It outlives `hint` by the exit duration.
   const [shown, setShown] = useState(null) // { id, text, target, arrow: state, toast: state }
   const timers = useRef([])
@@ -150,30 +165,17 @@ export default function HintLayer({
         el.style.visibility = 'hidden'
         return
       }
-      const ins = { ...defaultInsets(w), ...insetsRef.current }
-      // While a toast is up, keep the arrow body (48px above its tip) clear of it.
-      const toast = toastRef.current
-      if (toast) {
-        const lr = layer.getBoundingClientRect()
-        const tr = toast.getBoundingClientRect()
-        if (tr.height > 0) ins.top = Math.max(ins.top, tr.bottom - lr.top + 8)
-      }
-      // The tip sits ON the point and the 48px body rises above it, so the safe
-      // rect's top moves down by the body height. placeArrow then counts a point
-      // inside a HUD band as edge too, which clamps it and points toward it.
+      const ins = { ...GUTTER, ...insetsRef.current }
       const AH = arrowHRef.current
       const m = motionRef.current
       const wasEdge = m?.dataset.mode === 'edge'
-      // Hysteresis (Amy's review): entering edge is immediate, leaving it waits
-      // until the point is EDGE_HYSTERESIS px clear inside, so walking along a
-      // HUD band can't stutter the edge keyframes on and off.
-      let p = placeArrow(pt, { w, h }, { ...ins, top: ins.top + AH }, { wasEdge, hysteresis: EDGE_HYSTERESIS })
-      // A target just under the top band (no room for the body above it): keep
-      // the tip ON it and hang the body below, pointing up. Not while sticky-edge,
-      // or it would undo the hysteresis frame to frame.
-      if (!wasEdge && p.edge && pt.y >= ins.top && pt.y < ins.top + AH && pt.x >= ins.left && pt.x <= w - ins.right) {
-        p = { x: pt.x, y: pt.y, angle: 180, edge: false }
-      }
+      // Avoid the REAL HUD, not guessed bands (Clover's root cause, job 2): every
+      // visible [data-hint] piece, the docked pill included, is a rect the arrow
+      // box must never touch. World arrows hang (body below) to clear one; edge
+      // arrows slide along their edge. Hysteresis: entering edge is immediate,
+      // leaving it waits until the point is EDGE_HYSTERESIS px clear inside.
+      const avoid = hudRects(layer, t)
+      const p = placeArrow(pt, { w, h }, { ...ins, top: ins.top + AH }, { wasEdge, hysteresis: EDGE_HYSTERESIS, avoid, arrow: ARROW[variantRef.current] })
       const edge = !!p.edge
       const mode = edge ? 'edge' : 'world'
       el.style.visibility = ''
@@ -232,13 +234,14 @@ export default function HintLayer({
           aria-hidden="true"
           data-motion={boldDone ? 'bold' : undefined}
           data-arrow={variant}
+          data-candy={ARROW[variant].candy ? '' : undefined}
           data-state={shown.arrow}
           style={{ visibility: 'hidden' }}
         >
           {/* Ground shadow: OUTSIDE the motion box so it stays on the ground while
               the arrow drops in and lifts (Fern animates it against the bob).
-              Green only; it mirrors the arrow's state. */}
-          {variant === 'green' && <div className="luxiHint-arrowShadow" data-state={shown.arrow} />}
+              Candy arrows only; it mirrors the arrow's state. */}
+          {ARROW[variant].candy && <div className="luxiHint-arrowShadow" data-state={shown.arrow} />}
           <div
             className="luxiHint-arrowMotion"
             ref={motionRef}
@@ -248,7 +251,7 @@ export default function HintLayer({
             data-soft={shown.soft ? '' : undefined}
           >
             <div className="luxiHint-arrowBob">
-              {variant === 'green' ? <CandyArrowGlyph /> : <ArrowGlyph />}
+              {ARROW[variant].candy ? <CandyArrowGlyph /> : <ArrowGlyph />}
             </div>
           </div>
         </div>
@@ -260,6 +263,7 @@ export default function HintLayer({
           ref={toastRef}
           data-state={shown.toast}
           data-soft={shown.soft ? '' : undefined}
+          data-hint="hint-dock"
           data-dismissable={canDismiss ? 'true' : 'false'}
         >
           <span className="luxiHint-toastText" aria-hidden="true">{shown.toastText}</span>
@@ -282,7 +286,7 @@ export default function HintLayer({
 }
 
 /** Glyph sizes (tip at the bottom-centre = the .luxiHint-arrow origin). */
-const ARROW = { iris: { w: 40, h: 48 }, green: { w: 56, h: 64 } }
+const ARROW = { iris: { w: 40, h: 48 }, green: { w: 56, h: 64, candy: true }, pink: { w: 56, h: 64, candy: true } }
 
 /** World targets come from the host; DOM targets via Rowan's domTargetPos
  *  (top-centre of [data-hint="name"], in this layer's coordinates). */
@@ -309,7 +313,8 @@ function ArrowGlyph() {
   )
 }
 
-/** Amy's review #1 test: a chunky, glossy "candy" arrow in the house 3D-button
+/** The candy arrow (green = default, pink = on green ground; colours come from
+ *  CSS vars per data-arrow, the shape is shared). Amy's review #1: a chunky, glossy "candy" arrow in the house 3D-button
  *  language (a lit face over a darker extrusion, like the Iris 500 face / 700
  *  shadow buttons). Layered shapes, one soft gradient, no images.
  *  Contrast comes from the silhouette, not the face: green 400/500 is only

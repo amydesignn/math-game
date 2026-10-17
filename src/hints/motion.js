@@ -12,7 +12,7 @@
 export const HINT_MOTION = {
   inMs: 280, //          arrow arrival (opacity + drop + scale, ease-out)
   toastDelayMs: 120, //  toast follows the arrow: "look here", then read
-  toastInMs: 260, //     toast arrival
+  toastInMs: 280, //     toast (dock pill) arrival: rises 16 px from the dock
   outMs: 200, //         quiet retire (dismissed / left / paused), arrow + toast
   doneArrowMs: 600, //   first-plant swell: peak 270 ms, gone by 600 ms
   bobDelayMs: 700, //    bob starts after the hintShow tail; ×3 at 1.6 s, then rests

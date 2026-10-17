@@ -1,6 +1,6 @@
 /* In-game hints — the arrow's screen maths (src/hints/position.js). */
 import { describe, it, expect } from 'vitest'
-import { placeArrow, arrowAngle, domTargetPos, movedEnough, EDGE_HYSTERESIS } from '../hints/position.js'
+import { placeArrow, arrowAngle, domTargetPos, movedEnough, arrowBox, EDGE_HYSTERESIS } from '../hints/position.js'
 
 const size = { w: 1000, h: 800 }
 const ins = { top: 100, right: 20, bottom: 100, left: 20 } // safe rect x 20..980, y 100..700
@@ -104,4 +104,50 @@ describe('movedEnough (edge re-arm when the camera moves)', () => {
   it('angle wraps (179° vs -179° is a 2° turn)', () =>
     expect(movedEnough({ x: 0, y: 0, angle: 179 }, { x: 0, y: 0, angle: -179 })).toBe(false))
   it('missing placement never re-arms', () => expect(movedEnough(null, a)).toBe(false))
+})
+
+describe('avoid the real HUD (job 2: no guessed top band)', () => {
+  const gutter = { top: 16 + 64, right: 16, bottom: 16, left: 16 } // tip may go anywhere the body fits
+  const arrow = { w: 56, h: 64 }
+  const box = (p) => arrowBox(p, arrow)
+  const overlaps = (b, r) => b.left < r.right && b.right > r.left && b.top < r.bottom && b.bottom > r.top
+  const minimap = { left: 880, right: 984, top: 16, bottom: 150 }
+  const pill = { left: 350, right: 650, top: 664, bottom: 712 }
+
+  it('with no avoid list, nothing changes (old behaviour)', () => {
+    expect(placeArrow({ x: 500, y: 400 }, size, ins, { avoid: [] })).toEqual(placeArrow({ x: 500, y: 400 }, size, ins))
+  })
+  it("Clover's case: a bed just north of her (y≈250) stays a DOWN arrow on the soil", () => {
+    const p = placeArrow({ x: 640, y: 250 }, size, gutter, { avoid: [minimap, pill], arrow })
+    expect(p).toMatchObject({ x: 640, y: 250, angle: 0, edge: false })
+  })
+  it('a world point right under the minimap hangs (body below) instead of covering it', () => {
+    const p = placeArrow({ x: 930, y: 190 }, size, gutter, { avoid: [minimap], arrow })
+    expect(p).toMatchObject({ x: 930, y: 190, angle: 180, edge: false })
+    expect(overlaps(box(p), minimap)).toBe(false)
+  })
+  it('an edge arrow slides off the minimap along its edge, still pointing at the target', () => {
+    const target = { x: 1200, y: -50 } // up and off to the right → clamps into the minimap's corner
+    const raw = placeArrow(target, size, gutter, { arrow })
+    expect(overlaps(box(raw), minimap)).toBe(true) // the problem
+    const p = placeArrow(target, size, gutter, { avoid: [minimap], arrow })
+    expect(p.edge).toBe(true)
+    expect(overlaps(box(p), minimap)).toBe(false)
+    expect(p.x).toBe(raw.x) // stayed on its (right) edge, slid down past the minimap
+    expect(p.y).toBeGreaterThan(minimap.bottom)
+    expect(p.angle).toBeLessThan(-90) // still pointing up and right, at the target
+  })
+  it('an edge arrow at the bottom never sits on the docked pill', () => {
+    const lowPill = { left: 350, right: 650, top: 730, bottom: 778 }
+    expect(overlaps(box(placeArrow({ x: 500, y: 3000 }, size, gutter, { arrow })), lowPill)).toBe(true) // the problem
+    const p = placeArrow({ x: 500, y: 3000 }, size, gutter, { avoid: [lowPill], arrow })
+    expect(overlaps(box(p), lowPill)).toBe(false)
+    expect(p.edge).toBe(true)
+  })
+  it('arrowBox: a down arrow body is above its tip; an up arrow body below', () => {
+    expect(box({ x: 100, y: 200, angle: 0 })).toMatchObject({ top: 136, bottom: 200, left: 72, right: 128 })
+    const up = box({ x: 100, y: 200, angle: 180 })
+    expect(up.top).toBeCloseTo(200)
+    expect(up.bottom).toBeCloseTo(264)
+  })
 })
