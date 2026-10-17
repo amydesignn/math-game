@@ -2,7 +2,7 @@
   "component": "SignupModal",
   "file": "src/ui/SignupModal.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-17T18:32:55.521Z",
+  "ranAt": "2026-10-17T18:46:17.855Z",
   "variants": [
     "Form",
     "Sending",
