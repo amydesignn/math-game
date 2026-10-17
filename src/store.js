@@ -898,3 +898,41 @@ export function resetAll() {
   flushCloudNow()
   return state
 }
+
+// ── In-game hints: the quiet-budget memory (Trail crew, job 1) ──
+// { session, lastNudgeSession, quietUntil, tips } — which session we're in,
+// when a nudge last showed, how long a "not now" keeps things quiet. It is
+// per DEVICE and stays in its own localStorage key, never in `state`, so it is
+// never in a cloud push (no new data leaves the device; COPPA posture). Whether
+// a hint is RETIRED is never stored here: that is derived from game state (a
+// planted garden), so it follows the save across devices on its own.
+const HINTS_KEY = 'luxi.hints'
+let hintMem = null
+export function getHintMemory() {
+  if (hintMem) return hintMem
+  try {
+    hintMem = JSON.parse(globalThis.localStorage?.getItem(HINTS_KEY) || 'null') || {}
+  } catch {
+    hintMem = {}
+  }
+  return hintMem
+}
+/** Count this page load as ONE hint session. Memoized per module load, so
+ *  StrictMode's double effects can't count two sessions (that would halve the
+ *  "quiet for 2 sessions" after a dismiss). `begin` = the engine's beginSession
+ *  (passed in so the store stays free of the hint module). */
+let hintSessionBegun = false
+export function beginHintSession(begin) {
+  if (hintSessionBegun) return getHintMemory()
+  hintSessionBegun = true
+  setHintMemory(begin(getHintMemory()))
+  return hintMem
+}
+export function setHintMemory(m) {
+  hintMem = m
+  try {
+    globalThis.localStorage?.setItem(HINTS_KEY, JSON.stringify(m))
+  } catch {
+    // private mode / full storage: the budget just lives for this page
+  }
+}

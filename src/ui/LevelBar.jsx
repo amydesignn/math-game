@@ -116,6 +116,7 @@ export default function LevelBar({ points, gems, gemRef, onLevelUp, onOpen }) {
       onKeyDown={onOpen ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen() } } : undefined}
       role={onOpen ? 'button' : undefined}
       tabIndex={onOpen ? 0 : undefined}
+      data-hint="level-pill"
       className="lvlbar-pill"
       style={{ ...barStyles.pill,
         cursor: tappable ? 'pointer' : 'default',

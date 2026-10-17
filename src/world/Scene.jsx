@@ -28,6 +28,8 @@ const GARDEN_FRONT = 1.5
 const GARDEN_REACH = 2.4
 const GARDEN_LEAVE = 4
 const GARDEN_PICK_Y = 1.1 // where the picked flowers hang as they pop off (plant + HARVEST.lift)
+const HINT_BED_BACK = 0.4 // …and toward the bed's back half, so the arrow clears her hat when she stands at the front to plant
+const HINT_BED_Y = 0.3 // the hint arrow's tip: ON the soil (not the 1.1 flower height, which projects up into the toast's band and gets edge-clamped)
 
 /**
  * Scatter this visit's gem sparkles: random spots on the map, kept clear of
@@ -63,7 +65,7 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes, garden, gardenOpen, onGardenNear, onHarvest }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes, garden, gardenOpen, onGardenNear, onHarvest, hintPosRef }) {
   const marker = useRef() // the ring that pings on tap
   // Grow a Garden (ticket 5): `garden` = { stage, kind, watering } from App (the
   // store's plot). Tapping the bed walks her to its front edge; arriving opens
@@ -229,6 +231,31 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
   useEffect(() => {
     if (import.meta.env.DEV) window.__overview = (h = 30, tilt = 0.5, cx = 0, cz = 0) => (overview.current = h ? [h, tilt, cx, cz] : 0)
   }, [])
+
+  // In-game hints: world targets → px in the HUD layer (the canvas fills the
+  // app root, so canvas-relative = layer-relative). Off-screen points come back
+  // UNclamped so the layer can edge-arrow them; behind the camera → null.
+  // Read on demand by the layer's own loop — no per-frame React state here.
+  useEffect(() => {
+    if (!hintPosRef) return
+    const hintPoint = (t) => {
+      if (t?.world === 'garden-bed' && map.gardenPlot) return [map.gardenPlot[0], HINT_BED_Y, map.gardenPlot[1] - HINT_BED_BACK]
+      return null
+    }
+    const v = new THREE.Vector3()
+    hintPosRef.current = (t) => {
+      const p = hintPoint(t)
+      if (!p) return null
+      const rect = gl.domElement.getBoundingClientRect()
+      if (!rect.width) return null
+      v.set(p[0], p[1], p[2]).project(camera)
+      if (v.z > 1) return null
+      return { x: ((v.x + 1) / 2) * rect.width, y: ((1 - v.y) / 2) * rect.height }
+    }
+    return () => {
+      if (hintPosRef.current) hintPosRef.current = null
+    }
+  }, [hintPosRef, map, camera, gl])
 
   // On entering a map, snap the camera straight to the spawn point — the fade
   // overlay hides the cut; without this it would swoosh across the new map.

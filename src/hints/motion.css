@@ -1,0 +1,174 @@
+/*
+ * Hint motion (Fern, Trail crew job 1). Keyframes, timing and easing ONLY.
+ * Layout and look live in hints.css (Linden). Timings mirror ./motion.js
+ * (HINT_MOTION), so change both together.
+ *
+ * Every motion has a purpose, and anything without one was cut:
+ *   arrival  = "look here"     arrow drops in 280 ms, toast follows +120 ms
+ *   bob      = "still here"    6 px toward the target, 1.6 s, x3, then it RESTS
+ *   edge     = "over there"    the same bob; Linden's rotate aims it at the bed
+ *   retire   = "ok, gone"      200 ms, faster than the arrival
+ *   done     = "you did it"    a small hop, peak 270 ms (Wren's hintDone note 4), sinks in, gone 600 ms
+ *
+ * Hooks (Linden's HintLayer):
+ *   .luxiHint-arrow         Linden: translate + rotate, written per frame. NOT animated here.
+ *     .luxiHint-arrowMotion data-state in|shown|out|done · data-mode world|edge · [data-soft]
+ *       .luxiHint-arrowBob  the bob loop
+ *         glyph             points DOWN (+Y) in local space, tip at the bottom centre
+ *   .luxiHint-toast         data-state in|shown|out|done · [data-soft]. Centred WITHOUT transform.
+ *
+ * States change on plain setTimeouts (never rAF or animationend, the rAF-starve
+ * lesson). Arrival and retire are TRANSITIONS, so a hint that comes back
+ * mid-retire ("paused", then calm again) retargets from where it is instead of
+ * restarting. Only the bob and the one-shot done swell are keyframes.
+ *
+ * transform + opacity only. Keyframes are luxiHint-prefixed (dv / su / fb history).
+ */
+
+.luxiHint-arrowMotion,
+.luxiHint-toast {
+  --luxiHint-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)); /* Datum's ease-out */
+}
+
+/* ── Arrow: arrival + retire (transitions) ─────────────────────────────── */
+.luxiHint-arrowMotion {
+  transform-origin: 50% 100%; /* the tip: it grows from, and stays on, the bed */
+  will-change: transform, opacity;
+}
+.luxiHint-arrowMotion[data-state='in'] {
+  opacity: 0;
+  transform: translateY(-12px) scale(0.92);
+}
+.luxiHint-arrowMotion[data-state='shown'] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 280ms var(--luxiHint-ease), transform 280ms var(--luxiHint-ease);
+}
+.luxiHint-arrowMotion[data-state='out'] {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  transition: opacity 200ms var(--luxiHint-ease), transform 200ms var(--luxiHint-ease);
+}
+/* soft re-entry after a pause: fade only, no drop */
+.luxiHint-arrowMotion[data-soft][data-state='in'] { transform: none; }
+
+/* ── Arrow: done = one swell from the tip, then gone ────────────────────── */
+.luxiHint-arrowMotion[data-state='done'] {
+  animation: luxiHintPointerDone 600ms var(--luxiHint-ease) both;
+}
+@keyframes luxiHintPointerDone {
+  /* a small hop that PEAKS on hintDone's E7 (270 ms), holds a beat while it
+     rings, then sinks into the bed and fades ("planted"). Segment 1 is
+     ease-in-out so the top lands AT 270 ms, not at 90 ms (the frames showed a
+     plain ease-out plateaus early and the peak doesn't read as a moment). */
+  0%   { opacity: 1; transform: translateY(0) scale(1); animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1); }
+  45%  { opacity: 1; transform: translateY(-4px) scale(1.15); animation-timing-function: ease-out; }
+  60%  { opacity: 1; transform: translateY(-3px) scale(1.12); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  100% { opacity: 0; transform: translateY(4px) scale(0.9); }
+}
+
+/* ── Arrow: bob, on target and at the edge ──────────────────────────────── */
+/* Toward the target along the arrow's own axis (+Y, inside Linden's rotate),
+   then back. It waits for hintShow's tail (700 ms), runs 3 slow cycles, then
+   rests. A still arrow still points, and an endless pulse tires the eye. */
+.luxiHint-arrowBob {
+  animation: luxiHintBob 1600ms ease-in-out 700ms 3 both;
+}
+.luxiHint-arrowMotion[data-soft] .luxiHint-arrowBob { animation-iteration-count: 1; }
+.luxiHint-arrowMotion[data-state='out'] .luxiHint-arrowBob,
+.luxiHint-arrowMotion[data-state='done'] .luxiHint-arrowBob { animation: none; }
+@keyframes luxiHintBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(6px); }
+}
+
+/* ── Toast: arrival + retire (transitions) ──────────────────────────────── */
+/* Drops in from above, beside NoteToast's top-centre slot. It follows the arrow
+   by 120 ms ("look here", then read). Toast-only hints get the same 120 ms,
+   which is imperceptible after the engine's 3 s calm wait. Its motion never
+   depends on an arrow. */
+.luxiHint-toast {
+  will-change: transform, opacity;
+}
+.luxiHint-toast[data-state='in'] {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+.luxiHint-toast[data-state='shown'] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 260ms var(--luxiHint-ease) 120ms, transform 260ms var(--luxiHint-ease) 120ms;
+}
+.luxiHint-toast[data-state='out'],
+.luxiHint-toast[data-state='done'] {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 200ms var(--luxiHint-ease), transform 200ms var(--luxiHint-ease);
+}
+.luxiHint-toast[data-soft][data-state='in'] { transform: none; }
+
+/* ── Bolder done (Amy's taste call, OFF by default) ─────────────────────── */
+/* Set data-motion="bold" on .luxiHint-arrow: a bigger swell plus two soft gold
+   ripples spreading across the soil from the tip. The ripples are ellipses
+   because the bed is seen from above at an angle. They sit on .luxiHint-arrow
+   (not the fading motion layer) so they outlive the swell, and both finish
+   by 600 ms. */
+.luxiHint-arrow[data-motion='bold']:has(> .luxiHint-arrowMotion[data-state='done']) .luxiHint-arrowMotion {
+  animation-name: luxiHintPointerDoneBold;
+}
+@keyframes luxiHintPointerDoneBold {
+  0%   { opacity: 1; transform: translateY(0) scale(1); animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1); }
+  45%  { opacity: 1; transform: translateY(-8px) scale(1.25); animation-timing-function: ease-out; }
+  60%  { opacity: 1; transform: translateY(-6px) scale(1.2); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  100% { opacity: 0; transform: translateY(4px) scale(0.9); }
+}
+.luxiHint-arrow[data-motion='bold']:has(> .luxiHint-arrowMotion[data-state='done'])::before,
+.luxiHint-arrow[data-motion='bold']:has(> .luxiHint-arrowMotion[data-state='done'])::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 56px;
+  height: 20px;
+  margin: -10px 0 0 -28px;
+  border-radius: 50%;
+  border: 3px solid rgba(245, 182, 35, 0.85); /* --star-gold, the house reward accent */
+  opacity: 0;
+  pointer-events: none;
+  animation: luxiHintRipple 400ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 200ms forwards; /* forwards, not both: nothing shows during the delay */
+}
+.luxiHint-arrow[data-motion='bold']:has(> .luxiHint-arrowMotion[data-state='done'])::after {
+  border-color: rgba(46, 197, 197, 0.7); /* --gem-cyan */
+  animation-delay: 260ms;
+  animation-duration: 340ms;
+}
+@keyframes luxiHintRipple {
+  0%   { opacity: 0.9; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+
+/* ── Reduced motion: calm and static, still communicates ────────────────── */
+/* No drop, bob, swell or ripple. Opacity fades only (200 ms ease), and the
+   arrow sits still, pointing. The timers in motion.js are unchanged: every
+   state still finishes inside them. */
+@media (prefers-reduced-motion: reduce) {
+  .luxiHint-arrowMotion[data-state],
+  .luxiHint-toast[data-state] {
+    transform: none !important;
+  }
+  .luxiHint-arrowMotion[data-state='shown'],
+  .luxiHint-arrowMotion[data-state='out'],
+  .luxiHint-toast[data-state='shown'],
+  .luxiHint-toast[data-state='out'],
+  .luxiHint-toast[data-state='done'] {
+    transition: opacity 200ms ease;
+  }
+  .luxiHint-arrowMotion[data-state='done'] {
+    animation: none !important;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  .luxiHint-arrowBob { animation: none !important; }
+  .luxiHint-arrow::before,
+  .luxiHint-arrow::after { animation: none !important; content: none !important; }
+}
