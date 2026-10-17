@@ -194,31 +194,53 @@ canvas { touch-action: none; display: block; }
   justify-content: space-between;
   gap: 16px;
 }
-/* Door top bar = Luxi app switcher (2026-10-17). Same 23/600 wordmark type for
-   every app; current = iris 600, others = text-tertiary until hovered. */
+/* Door top bar = Luxi app switcher (2026-10-17). Current app = iris 600 + its
+   coloured mark; other apps sit after a light divider, lighter until hovered.
+   Inactive = #8C8C8C, an OFF-RAMP grey: Datum has no step between neutral-400
+   (#A1A1A1, 2.6:1 ✗) and neutral-500 (#737373, 4.74:1, felt too heavy beside
+   Luxi Math, Amy). #8C8C8C = 3.36:1 on the white bar → AA for LARGE text, which
+   is why the app names are 24px (large at any weight). Phones drop below large
+   text, so ≤600px falls back to text-tertiary (4.74). Datum gap: a neutral-450 /
+   "text-muted-large" step. Hover ≈ active (Amy): iris words + the mark in colour. */
 .doorApps { display: flex; align-items: center; gap: 4px; min-width: 0; }
 .doorAppsMark { margin-right: 6px; }
+.doorAppsSep { flex: none; width: 1px; height: 28px; margin: 0 8px; background: var(--color-border-default); }
 .doorApp {
-  font-size: 23px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3;
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 24px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3;
   white-space: nowrap; padding: 4px 8px; border-radius: 12px; text-decoration: none;
-  color: var(--color-text-tertiary);
-  transition: color .12s ease, background-color .12s ease;
+  color: #8C8C8C;
+  transition: color .12s ease;
 }
 .doorApp--on { color: #4B54DD; }
-a.doorApp:hover { color: var(--brand-iris-600); background: var(--brand-iris-50); }
-a.doorApp:active { background: var(--brand-iris-100); }
+.doorAppIcon { flex: none; }
+.doorApp .hgHook { stroke: #A1A1A1; }
+.doorApp .hgL { fill: #E5E5E5; }
+.doorApp .hgM { fill: #C4C4C4; }
+.doorApp .hgD { fill: #A1A1A1; }
+.doorApp .doorAppIcon path { transition: fill .12s ease, stroke .12s ease; }
+a.doorApp:hover, a.doorApp:focus-visible { color: var(--brand-iris-600); }
+a.doorApp:hover .hgHook, a.doorApp:focus-visible .hgHook { stroke: #BE185D; }
+a.doorApp:hover .hgL, a.doorApp:focus-visible .hgL { fill: #FBCFE8; }
+a.doorApp:hover .hgM, a.doorApp:focus-visible .hgM { fill: #F472B6; }
+a.doorApp:hover .hgD, a.doorApp:focus-visible .hgD { fill: #BE185D; }
+a.doorApp:active { color: var(--brand-iris-700); }
 a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
 @media (max-width: 600px) {
   .doorHdrIn { gap: 8px; }
-  .doorApp { font-size: 17px; padding: 4px 6px; }
+  .doorApp { font-size: 17px; padding: 4px 6px; gap: 6px; color: var(--color-text-tertiary); }
+  .doorApp--on { color: #4B54DD; }
   .doorAppsMark svg { width: 28px; height: 28px; }
+  .doorAppIcon { width: 24px; height: 24px; }
+  .doorAppsSep { height: 20px; margin: 0 4px; }
 }
 @media (max-width: 440px) {
-  .doorAppsMark { display: none !important; } /* beats hS.mark inline display:flex */
-  .doorApp { font-size: 16px; padding: 4px; }
+  .doorAppsMark, .doorAppIcon { display: none !important; } /* beats hS.mark inline display:flex */
+  .doorApp { font-size: 15px; padding: 4px 2px; }
+  .doorAppsSep { margin: 0 2px; }
 }
 /* very narrow phones (≤360, e.g. iPhone SE 1st gen): let the second app wrap under */
-@media (max-width: 360px) { .doorApps { flex-wrap: wrap; row-gap: 0; } }
+@media (max-width: 360px) { .doorApps { flex-wrap: wrap; row-gap: 0; } .doorAppsSep { display: none; } }
 .doorWrap {
   max-width: 1180px;
   margin: 0 auto;

@@ -1151,11 +1151,19 @@ three nav columns, © + Kenney CC0 bottom bar). Commit `522b1c9`,
   `rel=noopener`. **Instagram is now the REAL link** (`https://www.instagram.com/luxiland_/`,
   updated 2026-09-20); Facebook + LinkedIn stay placeholders until Amy creates them
   (~end of the week of 2026-09-28).
-- **App switcher (2026-10-17, Amy):** the Door's top-bar wordmark row is now Luxi's
-  app nav (`<nav className="doorApps">` in `Door.jsx`, `.doorApp*` in index.css):
-  **Luxi Math** = current (iris, `aria-current`), **Luxi Cozy Closet** beside it in the
-  same 23/600 type, inactive = text-tertiary (4.74:1, AA) → iris on hover/focus, same
-  tab. Phones: 17px ≤600, gem hidden ≤440, second app wraps ≤360. Add future apps here.
+- **App switcher (2026-10-17, Amy):** the Door's top-bar wordmark row is Luxi's app
+  nav (`<nav className="doorApps">` in `Door.jsx`, `.doorApp*` in index.css).
+  **Luxi Math** = current (gem + iris, `aria-current`) · light divider
+  (`--color-border-default`) · **Luxi Cozy Closet** with a faceted **hanger** mark
+  (`HangerIcon`, the gem's language in pink 200/400/700). Inactive = the name and the
+  hanger in light grey; hover/focus ≈ active (iris + pink hanger). Same tab.
+  - **Inactive grey is OFF-RAMP `#8C8C8C`** (3.36:1 on white): Datum has nothing
+    between neutral-400 (2.6 ✗) and neutral-500 (4.74, too heavy per Amy). It passes AA
+    only as LARGE text, so the names are **24px**. Phones (≤600, 17/15px) fall back to
+    text-tertiary. Datum gap: a neutral-450 step.
+  - Phones: hanger + gem hidden ≤440; second app wraps under ≤360.
+  - **Parked (Amy):** a desktop tooltip "Play Luxi Cozy Closet" on hover. Not built.
+  - Add future apps to this nav.
 - **Cross-links (2026-10-17):** new "More from Luxi" column → Luxi Land
   (https://luxi.land) · Luxi Cozy Closet (https://closet.luxi.land), same tab, Door-only
   so it never interrupts a math session. Naming rule (Amy + Finn): pair Cozy Closet
