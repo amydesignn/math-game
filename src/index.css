@@ -63,6 +63,10 @@
   --color-border-interactive-default: #737373; /* neutral-500 */
   --color-border-interactive-hover: #525252; /* neutral-600 */
   --color-border-interactive-focus: #4B54DD; /* brand-iris-600 */
+  /* Datum stroke widths (icon ladder) — mirror Datum's --border-stroke-* (Amy, 2026-10-17).
+     Fields at rest stay 1.5px for now; field FOCUS = --border-stroke-md in Iris 600. */
+  --border-stroke-xs: 1.6px;
+  --border-stroke-md: 2px;
   --color-background-interactive-disabled: #F5F5F5; /* neutral-100 */
   --color-border-disabled: #E5E5E5; /* neutral-200 */
   --color-text-primary: #262626; /* neutral-800 */
@@ -566,7 +570,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
 .luxiFb-star:hover { transform: scale(1.22) rotate(-6deg) !important; } /* !important: the on/off scale is inline */
 .luxiFb-ta { border: 1.5px solid var(--color-border-interactive-default); outline: none; transition: border-color .15s; }
 .luxiFb-ta:hover { border-color: var(--color-border-interactive-hover); }
-.luxiFb-ta:focus { border-color: var(--color-border-interactive-focus); } /* after :hover so focus wins */
+.luxiFb-ta:focus { border-color: var(--color-border-interactive-focus); outline: var(--border-stroke-md) solid var(--color-border-interactive-focus); outline-offset: calc(-1 * var(--border-stroke-md)); } /* after :hover so focus wins. Field focus = a 2px Iris 600 stroke (--border-stroke-md, Amy 2026-10-17), drawn as an inset outline over the 1.5px border so nothing shifts. The colour swap alone (neutral-500 → iris-600) is 1.23:1, too faint to be a focus indicator. */
 .luxiFb-press { transition: transform .07s, box-shadow .07s, background .15s; }
 .luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
 
@@ -582,7 +586,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
 .luxiSu-primary:active:not(:disabled):not([aria-busy]) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
 .luxiSu-input { border: 1.5px solid var(--color-border-interactive-default); background: var(--color-background-interactive-default); outline: none; transition: border-color .15s; }
 .luxiSu-input:hover { border-color: var(--color-border-interactive-hover); }
-.luxiSu-input:focus { border-color: var(--color-border-interactive-focus); outline: 1px solid var(--brand-iris-700); outline-offset: 2px; } /* after :hover so focus wins. The border shift alone (neutral-500 → iris-600) is 1.23:1, too faint to be a focus indicator, so it also gets the house 1px Iris 700 ring, 2px out (7.65:1). */
+.luxiSu-input:focus { border-color: var(--color-border-interactive-focus); outline: var(--border-stroke-md) solid var(--color-border-interactive-focus); outline-offset: calc(-1 * var(--border-stroke-md)); } /* after :hover so focus wins. Same field-focus rule as .luxiFb-ta: a 2px Iris 600 stroke (--border-stroke-md, Amy 2026-10-17), replacing the old 1px Iris 700 ring. */
 .luxiSu-input::placeholder { color: var(--color-text-placeholder); }
 .luxiSu-input:disabled { background: var(--color-background-interactive-disabled); }
 .luxiSu-notnow { transition: background .15s, color .15s; }
