@@ -1151,6 +1151,10 @@ three nav columns, © + Kenney CC0 bottom bar). Commit `522b1c9`,
   `rel=noopener`. **Instagram is now the REAL link** (`https://www.instagram.com/luxiland_/`,
   updated 2026-09-20); Facebook + LinkedIn stay placeholders until Amy creates them
   (~end of the week of 2026-09-28).
+- **Cross-links (2026-10-17):** new "More from Luxi" column → Luxi Land
+  (https://luxi.land) · Luxi Cozy Closet (https://closet.luxi.land), new tab, Door-only
+  so it never interrupts a math session. Naming rule (Amy + Finn): pair Cozy Closet
+  with Luxi in marketing.
 - **Visible-but-INERT** (marketing pages that don't exist on the app Door yet):
   Play Luxi Math (self-link on the Door), How it works, Send feedback — rendered
   as `<Muted>` spans so the column layout matches Oscar's comp exactly.

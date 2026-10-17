@@ -118,6 +118,15 @@ export default function Footer({ onFeedback }) {
               <Muted>How it works</Muted>
             </nav>
 
+            {/* Cross-links to the rest of the family (2026-10-17). Door-only — the
+                footer never shows mid-session. New tab so the game stays put.
+                Naming rule (Amy + Finn): always "Luxi Cozy Closet", never bare "Cozy Closet". */}
+            <nav style={F.nav}>
+              <div style={F.colHead}>More from Luxi</div>
+              <a href="https://luxi.land" target="_blank" rel="noopener" className="lf-link" style={F.link}>Luxi Land</a>
+              <a href="https://closet.luxi.land" target="_blank" rel="noopener" className="lf-link" style={F.link}>Luxi Cozy Closet</a>
+            </nav>
+
             <nav style={F.nav}>
               <div style={F.colHead}>Support</div>
               {/* Send feedback went LIVE 2026-09-19 (Oscar's Feedback Flow) —
