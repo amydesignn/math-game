@@ -44,15 +44,7 @@ const params = new URLSearchParams(window.location.search)
 const REDEEMING = window.location.hash.includes('access_token')
 const REMEMBERED = (() => {
   try {
-    // 'luxi.account' is the key going forward. 'lumio.account' is read as a
-    // TRANSITIONAL fallback so a device already remembered on the old
-    // math.lumio.land origin stays signed in until the lumio.land → luxi.land
-    // redirect settles (no repeat of Ivy's guest-world drop). Safe to delete the
-    // lumio fallback in a later cleanup once the redirect has been live a while.
-    return (
-      localStorage.getItem('luxi.account') === '1' ||
-      localStorage.getItem('lumio.account') === '1'
-    )
+    return localStorage.getItem('luxi.account') === '1'
   } catch {
     return false
   }
