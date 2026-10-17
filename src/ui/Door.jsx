@@ -352,7 +352,6 @@ function WorldCard({ world, current, locked, together, onPlay, onResume }) {
 const hS = {
   brand: { display: 'flex', alignItems: 'center', gap: 10 },
   mark: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  word: { fontSize: 23, fontWeight: 600, color: T.iris, letterSpacing: '-.02em' },
   right: { display: 'flex', alignItems: 'center', gap: 10 },
   // Profile (personalization) and the gear (settings, incl. sound + account) — the
   // two Door chrome buttons. Emoji glyph, matching the Door's existing button look
@@ -364,7 +363,18 @@ function Header({ onOpenSettings, onOpenProfile, settingsActive, avatar }) {
   return (
     <header className="doorHdr">
       <div className="doorHdrIn">
-        <div style={hS.brand}><span style={hS.mark}><GemIcon size={36} /></span><span style={hS.word}>Luxi Math</span></div>
+        {/* App switcher (Amy 2026-10-17): the wordmark row doubles as Luxi Land's
+            app nav. Luxi Math = the current app (iris); the other apps sit beside it
+            in the same type, inactive (text-tertiary, 4.74:1 on white = AA at any
+            size), and light up iris on hover/focus. Door-only, so it never
+            interrupts a math session. Same tab: the closet is its own app. Naming
+            rule (Amy + Finn): always "Luxi Cozy Closet". Hover/focus live in
+            index.css (.doorApp*), not inline. */}
+        <nav className="doorApps" aria-label="Luxi apps">
+          <span style={hS.mark} className="doorAppsMark"><GemIcon size={36} /></span>
+          <span className="doorApp doorApp--on" aria-current="page">Luxi Math</span>
+          <a className="doorApp" href="https://closet.luxi.land">Luxi Cozy Closet</a>
+        </nav>
         <div style={hS.right}>
           {/* Gear first, profile at the corner (Amy 2026-08-30). */}
           <button style={{ ...hS.gear, background: settingsActive ? '#DDD1F7' : '#EDE7FC' }} onClick={onOpenSettings} aria-label="Settings" title="Settings">⚙️</button>

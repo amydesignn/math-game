@@ -194,6 +194,31 @@ canvas { touch-action: none; display: block; }
   justify-content: space-between;
   gap: 16px;
 }
+/* Door top bar = Luxi app switcher (2026-10-17). Same 23/600 wordmark type for
+   every app; current = iris 600, others = text-tertiary until hovered. */
+.doorApps { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.doorAppsMark { margin-right: 6px; }
+.doorApp {
+  font-size: 23px; font-weight: 600; letter-spacing: -.02em; line-height: 1.3;
+  white-space: nowrap; padding: 4px 8px; border-radius: 12px; text-decoration: none;
+  color: var(--color-text-tertiary);
+  transition: color .12s ease, background-color .12s ease;
+}
+.doorApp--on { color: #4B54DD; }
+a.doorApp:hover { color: var(--brand-iris-600); background: var(--brand-iris-50); }
+a.doorApp:active { background: var(--brand-iris-100); }
+a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+@media (max-width: 600px) {
+  .doorHdrIn { gap: 8px; }
+  .doorApp { font-size: 17px; padding: 4px 6px; }
+  .doorAppsMark svg { width: 28px; height: 28px; }
+}
+@media (max-width: 440px) {
+  .doorAppsMark { display: none !important; } /* beats hS.mark inline display:flex */
+  .doorApp { font-size: 16px; padding: 4px; }
+}
+/* very narrow phones (≤360, e.g. iPhone SE 1st gen): let the second app wrap under */
+@media (max-width: 360px) { .doorApps { flex-wrap: wrap; row-gap: 0; } }
 .doorWrap {
   max-width: 1180px;
   margin: 0 auto;

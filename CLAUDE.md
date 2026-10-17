@@ -1151,8 +1151,13 @@ three nav columns, © + Kenney CC0 bottom bar). Commit `522b1c9`,
   `rel=noopener`. **Instagram is now the REAL link** (`https://www.instagram.com/luxiland_/`,
   updated 2026-09-20); Facebook + LinkedIn stay placeholders until Amy creates them
   (~end of the week of 2026-09-28).
+- **App switcher (2026-10-17, Amy):** the Door's top-bar wordmark row is now Luxi's
+  app nav (`<nav className="doorApps">` in `Door.jsx`, `.doorApp*` in index.css):
+  **Luxi Math** = current (iris, `aria-current`), **Luxi Cozy Closet** beside it in the
+  same 23/600 type, inactive = text-tertiary (4.74:1, AA) → iris on hover/focus, same
+  tab. Phones: 17px ≤600, gem hidden ≤440, second app wraps ≤360. Add future apps here.
 - **Cross-links (2026-10-17):** new "More from Luxi" column → Luxi Land
-  (https://luxi.land) · Luxi Cozy Closet (https://closet.luxi.land), new tab, Door-only
+  (https://luxi.land) · Luxi Cozy Closet (https://closet.luxi.land), same tab, Door-only
   so it never interrupts a math session. Naming rule (Amy + Finn): pair Cozy Closet
   with Luxi in marketing.
 - **Visible-but-INERT** (marketing pages that don't exist on the app Door yet):
