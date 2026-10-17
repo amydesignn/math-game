@@ -29,7 +29,7 @@ import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setS
 import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic, playSfx } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
-import { WORLD, REFRESH, GARDEN, SEED_KINDS, HINTS_ON } from './config'
+import { WORLD, REFRESH, GARDEN, SEED_KINDS, HINTS_ON, HINT_ARROW } from './config'
 import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
@@ -1124,6 +1124,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
         <HintLayer
           hint={hintView.hint}
           exitReason={hintView.exitReason}
+          arrowStyle={HINT_ARROW}
           getTargetPos={(t) => hintPosRef.current?.(t) ?? null}
           dismissLabel={HINT_COPY.dismiss.aria}
           dismissText={HINT_COPY.dismiss.label}

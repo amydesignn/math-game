@@ -330,3 +330,13 @@ export function hintsEnabled(dev, search = '') {
   return !!dev
 }
 export const HINTS_ON = hintsEnabled(import.meta.env.DEV, globalThis.location?.search || '')
+
+// Arrow look under test (Amy's review 1, 2026-10-17): `?arrow=green` swaps the
+// hint arrow for Linden's chunky glossy test arrow so Amy can compare it with
+// the current Iris one. Dev/preview comparison only. Unknown values → 'iris'.
+export const HINT_ARROW_VARIANTS = ['iris', 'green']
+export function hintArrowVariant(search = '') {
+  const v = new URLSearchParams(search).get('arrow')
+  return HINT_ARROW_VARIANTS.includes(v) ? v : 'iris'
+}
+export const HINT_ARROW = hintArrowVariant(globalThis.location?.search || '')

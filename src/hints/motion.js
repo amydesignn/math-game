@@ -16,4 +16,9 @@ export const HINT_MOTION = {
   outMs: 200, //         quiet retire (dismissed / left / paused), arrow + toast
   doneArrowMs: 600, //   first-plant swell: peak 270 ms, gone by 600 ms
   bobDelayMs: 700, //    bob starts after the hintShow tail; ×3 at 1.6 s, then rests
+  // green edge arrow (Amy review 1): taps toward the off-screen target, then rests.
+  // The host re-arms it (data-arm 1↔2) only after edgeTaps × edgeTapMs + edgeTapDelayMs.
+  edgeTapDelayMs: 300, // first tap after entering edge / re-arming
+  edgeTapMs: 2400, //    one tap per period (the press is the first ~30%)
+  edgeTaps: 5, //        then rest (~12 s in total)
 }

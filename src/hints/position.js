@@ -6,6 +6,9 @@
 // safe rect along the line from the rect's centre, and rotated to point at it.
 
 export const DEFAULT_INSETS = { top: 168, right: 16, bottom: 132, left: 16 } // Linden's measured HUD bands
+export const EDGE_HYSTERESIS = 24 // px a point must be clear inside before an edge arrow returns to world mode
+export const REARM_MOVE_PX = 24 // the edge arrow re-arms its taps after a rest once its spot moves this far…
+export const REARM_TURN_DEG = 10 // …or turns this much (the camera moved)
 
 /**
  * @param {{x:number,y:number}} pt   target point, px relative to the layer (may be off-screen)
@@ -13,11 +16,20 @@ export const DEFAULT_INSETS = { top: 168, right: 16, bottom: 132, left: 16 } // 
  * @param {{top,right,bottom,left}} insets safe rect = size minus these bands
  * @returns {{x:number,y:number,angle:number,edge:boolean}}
  */
-export function placeArrow(pt, size, insets = DEFAULT_INSETS) {
+export function placeArrow(pt, size, insets = DEFAULT_INSETS, { wasEdge = false, hysteresis = EDGE_HYSTERESIS } = {}) {
   const i = { ...DEFAULT_INSETS, ...insets }
   const L = i.left, T = i.top
   const R = Math.max(L, size.w - i.right), B = Math.max(T, size.h - i.bottom)
-  if (pt.x >= L && pt.x <= R && pt.y >= T && pt.y <= B) return { x: pt.x, y: pt.y, angle: 0, edge: false }
+  if (pt.x >= L && pt.x <= R && pt.y >= T && pt.y <= B) {
+    // Hysteresis (Amy's review): world→edge flips AT the boundary, but edge→world
+    // only once the point is `hysteresis` px clear inside. Without it a bed near a
+    // HUD band flips mode frame to frame and restarts the edge keyframes. Inside
+    // that strip the geometry still follows the point (no jump) — only the MODE
+    // stays edge. Asymmetric on purpose: a world arrow never sits inside a band.
+    const h = Math.max(0, Math.min(hysteresis, (R - L) / 2, (B - T) / 2))
+    const clear = pt.x >= L + h && pt.x <= R - h && pt.y >= T + h && pt.y <= B - h
+    return { x: pt.x, y: pt.y, angle: 0, edge: wasEdge && !clear }
+  }
   const cx = (L + R) / 2, cy = (T + B) / 2
   const dx = pt.x - cx, dy = pt.y - cy
   const hx = (R - L) / 2, hy = (B - T) / 2
@@ -49,4 +61,13 @@ export function domTargetPos(key, origin = { left: 0, top: 0 }, doc = globalThis
   const r = el.getBoundingClientRect()
   if (!r.width && !r.height) return null
   return { x: r.left + r.width / 2 - origin.left, y: r.top - origin.top }
+}
+
+/** Has an edge arrow moved enough since its last arm to tap again? (Amy's
+ *  "5 taps, rest, re-arm when the camera moves".) Compares two placements. */
+export function movedEnough(a, b, px = REARM_MOVE_PX, deg = REARM_TURN_DEG) {
+  if (!a || !b) return false
+  if (Math.hypot(a.x - b.x, a.y - b.y) >= px) return true
+  const d = Math.abs((((a.angle - b.angle) % 360) + 540) % 360 - 180)
+  return d >= deg
 }

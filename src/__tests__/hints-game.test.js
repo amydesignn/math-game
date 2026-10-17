@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, everPlanted } from '../gameHints'
 import { HINT_COPY } from '../gameHintsCopy'
-import { hintsEnabled } from '../config'
+import { hintsEnabled, hintArrowVariant } from '../config'
 import { createHintController, beginSession } from '../hints/engine.js'
 
 const hint = GAME_HINTS.find((h) => h.id === GARDEN_HINT_ID)
@@ -100,5 +100,14 @@ describe('store: device memory + one session per boot', () => {
     const store = await import('../store')
     expect(() => store.beginHintSession(beginSession)).not.toThrow()
     expect(store.getHintMemory().session).toBe(1)
+  })
+})
+
+describe('arrow look switch (?arrow=green, Amy review 1)', () => {
+  it('defaults to iris; green only when asked; junk falls back', () => {
+    expect(hintArrowVariant('')).toBe('iris')
+    expect(hintArrowVariant('?arrow=green')).toBe('green')
+    expect(hintArrowVariant('?hints&arrow=green')).toBe('green')
+    expect(hintArrowVariant('?arrow=<script>')).toBe('iris')
   })
 })

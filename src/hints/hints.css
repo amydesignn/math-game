@@ -140,3 +140,35 @@
    2px out, keeps WCAG 1.4.11 (≥3:1) on the pill. */
 .luxiHint-dismiss:focus-visible { outline: 1px solid var(--luxiHint-toast-text); outline-offset: 2px; }
 .luxiHint-toast[data-state='out'] .luxiHint-dismiss { pointer-events: none; }
+
+/* ── Green "candy" arrow (Amy's review #1 test, ?arrow=green) ──
+   Bigger, glossy, with depth. Iris stays the default for the A/B.
+   Datum green ramp (Tailwind v4 values, as Datum writes them). */
+.luxiHint-layer[data-arrow='green'] {
+  --luxiHint-candy-top: #05DF72;     /* green-400: the lit top */
+  --luxiHint-candy-face: #00C950;    /* green-500: the face */
+  --luxiHint-candy-depth: #008236;   /* green-700: the extrusion */
+  --luxiHint-candy-outline: #0D542B; /* green-900: the silhouette that carries contrast */
+  --luxiHint-candy-rim: #FFFFFF;
+}
+.luxiHint-arrow[data-arrow='green'] .luxiHint-arrowMotion {
+  left: -28px; /* 56 × 64, tip at the bottom-centre = the origin */
+  top: -64px;
+  width: 56px;
+  height: 64px;
+}
+.luxiHint-glyph--candy {
+  filter: drop-shadow(0 2px 2px rgba(13, 84, 43, 0.3)); /* tight contact; the ground shadow does the rest */
+}
+/* Ground shadow, centred on the tip (the 0×0 origin), outside the motion box.
+   Fern animates it against the tap and hides it in edge mode. */
+.luxiHint-arrowShadow {
+  position: absolute;
+  left: -18px;
+  top: -5px;
+  width: 36px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(29, 32, 80, 0.32), rgba(29, 32, 80, 0));
+  pointer-events: none;
+}

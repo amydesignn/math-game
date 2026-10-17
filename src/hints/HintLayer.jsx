@@ -15,6 +15,7 @@
  *     insets={{ top, right, bottom, left }}         // optional edge-arrow safe rect
  *     dismissLabel="Not now" dismissText="✕" onDismiss={(id) => …}
  *     boldDone={false}  // Amy's taste call: Fern's ground-ripple "you did it"
+ *     arrowStyle="iris"   // 'iris' (default) | 'green': Amy's chunkier candy arrow test
  *   />
  *
  * Mount it ALWAYS (hint may be null). The polite live region has to exist before
@@ -23,8 +24,8 @@
  * moves the arrow and steps data-state on plain timers. It never uses
  * animationend, which stalls in hidden or throttled windows.
  */
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { placeArrow, domTargetPos } from './position.js'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { placeArrow, domTargetPos, movedEnough, EDGE_HYSTERESIS } from './position.js'
 import { HINT_MOTION } from './motion.js'
 import './hints.css'
 import './motion.css'
@@ -32,6 +33,7 @@ import './motion.css'
 const IN_MS = 16 // "in" → "shown" on the next tick, so the arrival transition runs
 const OUT_MS = HINT_MOTION?.outMs ?? 200
 const DONE_ARROW_MS = HINT_MOTION?.doneArrowMs ?? 700
+const EDGE_REST_MS = (HINT_MOTION?.edgeTapDelayMs ?? 300) + (HINT_MOTION?.edgeTaps ?? 5) * (HINT_MOTION?.edgeTapMs ?? 2400) // a tap run, then rest
 const POLL_MS = 250 // fallback beside rAF: the arrow never freezes in a throttled pane
 
 /** Safe rect for the edge arrow, measured against the Luxi HUD (2026-10-17).
@@ -53,7 +55,12 @@ export default function HintLayer({
   dismissText = '✕',
   onDismiss,
   boldDone = false,
+  arrowStyle = 'iris',
 }) {
+  const variant = ARROW[arrowStyle] ? arrowStyle : 'iris'
+  const arrowH = ARROW[variant].h
+  const arrowHRef = useRef(arrowH)
+  arrowHRef.current = arrowH
   // What's on screen. It outlives `hint` by the exit duration.
   const [shown, setShown] = useState(null) // { id, text, target, arrow: state, toast: state }
   const timers = useRef([])
@@ -120,6 +127,7 @@ export default function HintLayer({
   const getPosRef = useRef(getTargetPos)
   const insetsRef = useRef(insets)
   const targetRef = useRef(null)
+  const armRef = useRef({ timer: 0, resting: false, at: null }) // edge tap run → rest → re-arm
   useLayoutEffect(() => {
     getPosRef.current = getTargetPos
     insetsRef.current = insets
@@ -153,24 +161,56 @@ export default function HintLayer({
       // The tip sits ON the point and the 48px body rises above it, so the safe
       // rect's top moves down by the body height. placeArrow then counts a point
       // inside a HUD band as edge too, which clamps it and points toward it.
-      let p = placeArrow(pt, { w, h }, { ...ins, top: ins.top + ARROW_H })
+      const AH = arrowHRef.current
+      const m = motionRef.current
+      const wasEdge = m?.dataset.mode === 'edge'
+      // Hysteresis (Amy's review): entering edge is immediate, leaving it waits
+      // until the point is EDGE_HYSTERESIS px clear inside, so walking along a
+      // HUD band can't stutter the edge keyframes on and off.
+      let p = placeArrow(pt, { w, h }, { ...ins, top: ins.top + AH }, { wasEdge, hysteresis: EDGE_HYSTERESIS })
       // A target just under the top band (no room for the body above it): keep
-      // the tip ON it and hang the body below, pointing up. Otherwise the edge
-      // clamp would park the arrow below the target, pointing "away" at the HUD.
-      if (p.edge && pt.y >= ins.top && pt.y < ins.top + ARROW_H && pt.x >= ins.left && pt.x <= w - ins.right) {
+      // the tip ON it and hang the body below, pointing up. Not while sticky-edge,
+      // or it would undo the hysteresis frame to frame.
+      if (!wasEdge && p.edge && pt.y >= ins.top && pt.y < ins.top + AH && pt.x >= ins.left && pt.x <= w - ins.right) {
         p = { x: pt.x, y: pt.y, angle: 180, edge: false }
       }
       const edge = !!p.edge
+      const mode = edge ? 'edge' : 'world'
       el.style.visibility = ''
       el.style.transform = `translate3d(${Math.round(p.x)}px, ${Math.round(p.y)}px, 0) rotate(${p.angle}deg)`
+      if (el.dataset.mode !== mode) el.dataset.mode = mode // mirrored for Fern (no :has())
+      if (m && m.dataset.mode !== mode) m.dataset.mode = mode
+      // Edge re-arm: a tap run, then rest; once rested, a camera move (the
+      // clamped placement moved) starts a fresh run by flipping data-arm 1↔2.
+      const arm = armRef.current
+      if (!edge) {
+        if (arm.timer) clearTimeout(arm.timer)
+        arm.timer = 0; arm.resting = false; arm.at = null
+      } else if (!arm.at) {
+        armStart(p, false)
+      } else if (arm.resting && movedEnough(arm.at, p)) {
+        armStart(p, true)
+      }
+    }
+    const armStart = (p, flip) => {
+      const arm = armRef.current
       const m = motionRef.current
-      if (m && m.dataset.mode !== (edge ? 'edge' : 'world')) m.dataset.mode = edge ? 'edge' : 'world'
+      if (flip && m) m.dataset.arm = m.dataset.arm === '1' ? '2' : '1'
+      arm.at = { x: p.x, y: p.y, angle: p.angle }
+      arm.resting = false
+      if (arm.timer) clearTimeout(arm.timer)
+      arm.timer = setTimeout(() => { arm.resting = true; arm.timer = 0 }, EDGE_REST_MS)
     }
     const loop = () => { if (!alive) return; tick(); raf = requestAnimationFrame(loop) }
     raf = requestAnimationFrame(loop)
     const poll = setInterval(tick, POLL_MS)
     tick()
-    return () => { alive = false; cancelAnimationFrame(raf); clearInterval(poll) }
+    return () => {
+      alive = false; cancelAnimationFrame(raf); clearInterval(poll)
+      const arm = armRef.current
+      if (arm.timer) clearTimeout(arm.timer)
+      armRef.current = { timer: 0, resting: false, at: null }
+    }
   }, [hasArrow])
 
   const leaving = shown?.toast === 'out'
@@ -178,7 +218,7 @@ export default function HintLayer({
   const canDismiss = typeof onDismiss === 'function'
 
   return (
-    <div className="luxiHint-layer" ref={layerRef}>
+    <div className="luxiHint-layer" ref={layerRef} data-arrow={variant}>
       {/* Always mounted, always the same node: the polite announcement. The visible
           toast text below is aria-hidden so it isn't read twice. */}
       <div className="luxiHint-live" role="status" aria-live="polite" aria-atomic="true">
@@ -191,17 +231,24 @@ export default function HintLayer({
           ref={arrowRef}
           aria-hidden="true"
           data-motion={boldDone ? 'bold' : undefined}
+          data-arrow={variant}
+          data-state={shown.arrow}
           style={{ visibility: 'hidden' }}
         >
+          {/* Ground shadow: OUTSIDE the motion box so it stays on the ground while
+              the arrow drops in and lifts (Fern animates it against the bob).
+              Green only; it mirrors the arrow's state. */}
+          {variant === 'green' && <div className="luxiHint-arrowShadow" data-state={shown.arrow} />}
           <div
             className="luxiHint-arrowMotion"
             ref={motionRef}
             data-state={shown.arrow}
             data-mode="world"
+            data-arm="1"
             data-soft={shown.soft ? '' : undefined}
           >
             <div className="luxiHint-arrowBob">
-              <ArrowGlyph />
+              {variant === 'green' ? <CandyArrowGlyph /> : <ArrowGlyph />}
             </div>
           </div>
         </div>
@@ -234,7 +281,8 @@ export default function HintLayer({
   )
 }
 
-const ARROW_H = 48
+/** Glyph sizes (tip at the bottom-centre = the .luxiHint-arrow origin). */
+const ARROW = { iris: { w: 40, h: 48 }, green: { w: 56, h: 64 } }
 
 /** World targets come from the host; DOM targets via Rowan's domTargetPos
  *  (top-centre of [data-hint="name"], in this layer's coordinates). */
@@ -257,6 +305,39 @@ function ArrowGlyph() {
         strokeLinejoin="round"
         paintOrder="stroke"
       />
+    </svg>
+  )
+}
+
+/** Amy's review #1 test: a chunky, glossy "candy" arrow in the house 3D-button
+ *  language (a lit face over a darker extrusion, like the Iris 500 face / 700
+ *  shadow buttons). Layered shapes, one soft gradient, no images.
+ *  Contrast comes from the silhouette, not the face: green 400/500 is only
+ *  ~1.3-1.9:1 on every Luxi ground, so a green-900 outline (3.95-7.9:1 on all
+ *  grounds) and a white rim (4.3:1 on the bed's soil) carry it.
+ *  56 × 64, points DOWN, extruded tip at (28, 62). */
+function CandyArrowGlyph() {
+  const gid = useId().replace(/:/g, '')
+  const face = 'M22 6h12a4 4 0 0 1 4 4v18h10a3 3 0 0 1 2.2 5L30.2 56a3 3 0 0 1-4.4 0L5.8 33A3 3 0 0 1 8 28h10V10a4 4 0 0 1 4-4z'
+  return (
+    <svg className="luxiHint-glyph luxiHint-glyph--candy" width="56" height="64" viewBox="0 0 56 64" focusable="false">
+      <defs>
+        <linearGradient id={`${gid}f`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="var(--luxiHint-candy-top)" />
+          <stop offset="1" stopColor="var(--luxiHint-candy-face)" />
+        </linearGradient>
+      </defs>
+      {/* depth: the extrusion, 4px under the face, inside one dark outline */}
+      <path d={face} transform="translate(0 4)" fill="var(--luxiHint-candy-depth)" stroke="var(--luxiHint-candy-outline)" strokeWidth="6" strokeLinejoin="round" paintOrder="stroke" />
+      <path d={face} fill="none" stroke="var(--luxiHint-candy-outline)" strokeWidth="6" strokeLinejoin="round" />
+      {/* face + white rim */}
+      <path d={face} fill={`url(#${gid}f)`} stroke="var(--luxiHint-candy-rim)" strokeWidth="2" strokeLinejoin="round" />
+      {/* gloss: a soft sheen down the shaft and across the head, plus one glint */}
+      <g className="luxiHint-gloss" fill="var(--luxiHint-candy-rim)">
+        <rect x="21" y="9" width="5" height="17" rx="2.5" opacity="0.55" />
+        <path d="M10 31.5h10.5a2 2 0 0 1 0 4H14a2 2 0 0 1-1.6-.8l-2.4-3.2z" opacity="0.45" />
+        <circle cx="23.5" cy="11.5" r="1.6" opacity="0.95" />
+      </g>
     </svg>
   )
 }
