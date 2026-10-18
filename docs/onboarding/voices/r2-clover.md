@@ -1,0 +1,6 @@
+# Clover, round 2 (kid seat, QA)
+
+- **Zoom: I back the camera (B) and drop my round-1 support for "Pinch to see more".** I checked Linden's paper maths against the code (camOffset [0,7,8], fov 42) and it holds. A 375 phone sees about ±1.9 units side to side, and sparkles spawn at least 4 away. So from where I sit as the kid, the first minute is empty because of the shape of the screen. Reading a slide doesn't change that.
+- **QA cost I'm flagging:** Linden's number for the 375 phone is 2.2, which is already the pinch-out max. On a phone she'd lose all "see more" headroom, so B probably also means raising `zoomMax` a little. Every hint measurement from job 3 (the pill pairing, the arrow-to-edge distances) was taken at 1×, so I'd re-run `qa-pair.mjs` at the new start zoom before calling it done.
+- **I can measure Rowan's number cheaply:** seeded spawns × every map × 375 / 768 / 1024 × zoom 1 / 1.4 / 1.8, with the share of runs that have a gem or station on screen. It's headless and has no source change (my CDP recipe), so it can run in this job before anyone picks a number.
+- **Q4: explain only.** From the kid seat, a grade question on the very first screen is a test before she's played, and a kid who guesses high gets a hard cold open (Kestrel). Ask nothing until the answer changes the game.

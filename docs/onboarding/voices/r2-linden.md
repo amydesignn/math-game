@@ -1,0 +1,14 @@
+# Linden (UI), round 2
+
+## Zoom
+- **What it is:** the follow-camera sits close behind her. Pinch (iPad) or scroll (desktop) pulls it back, so she can see more of the world. Nothing in the game says you can do this.
+- **Why it matters, in numbers** (camera fov 42 with camOffset [0,7,8], from the code; a paper calculation, not yet a screenshot): from top to bottom she sees about 15 world units at every size. But the camera holds its *vertical* angle fixed, so on a tall, narrow screen the *sides* get cut off. Side to side at her feet she sees about ±1.9 units on a 375 phone, ±3 on a 768 iPad portrait and ±6.5 on a 1280 desktop. Sparkles spawn at least 4 units from her. So **on phone and iPad portrait, the first gem is almost always off-screen to the side.** That's the playtest's 1.5 minutes stuck, and it's a camera problem, not a teaching problem.
+- **Options:** A) a "Pinch to see more" line in How to Play. B) **(my pick)** a camera that adapts to the screen shape: on portrait, start further back so she sees about ±5 units side to side. That's roughly zoom 1.65 at 768 and the max (2.2) at 375. Desktop stays as it is. Rowan sets one number in config, no new UI. C) the guided first station (an arrow to the nearest gem). That one's parked, and it pairs well with B later.
+- **Pushback on A:** a slide line is the weakest fix. It's text for a reader, it's the wrong gesture on desktop (scroll, not pinch), and a kid forgets a slide by the time she's in the world. If the camera is right, nobody needs to learn zoom to start. Pinch stays as a bonus.
+- **Concern about B:** she gets smaller on screen (about 40% of the iPad's height today, maybe 25% after). Before Amy decides, I'd measure it at 375 first, then 768, with real screenshots: is she still easy to see, does the cat still clear her, and does the HUD cover anything new?
+
+## Q4: should About ask anything?
+- **What it is:** the first screen could ask her something (her grade, or a hero pick) instead of only saying what the game is.
+- **Options:** A) **(my pick)** explain only for now. B) a grade pick, once the grade data contract exists, as its OWN screen after About, not squeezed into it. C) a hero pick. No: heroes live in the Gem Shop, and Amy kept one place for them.
+- **Why A, from the UI seat:** a question turns a read-and-tap card into a form, with a selected state, a "can't continue until you answer" state and something to save. That's the heaviest thing we could put in the very first 10 seconds. Asking her grade when the problems don't change by grade yet is a promise the game doesn't keep (the same rule that killed "coming soon").
+- **Concern:** when grades do land, keep it a single tap (large pills, Iris for the selected one, AA contrast, a skip). And re-ask Amy then, because by that point it touches the first-run flow everyone has already played.
