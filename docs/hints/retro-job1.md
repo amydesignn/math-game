@@ -159,3 +159,6 @@ Screenshots are in `scratchpad/guide/qa/`.
 3. **Build test fixtures from real measured rects** (QA's numbers), not hand-made ones.
 4. Motion specs state every time **from t=0 (onShow)**.
 5. Before reporting a crewmate's dissent, **re-check against the latest build.**
+
+**Decision (Amy, after job 3):** the phone spot in front of the bed keeps **(c), the dock**. Her reason: "(a) would cover almost the garden bed, especially on smaller phone". At 375 px the bed is ~240 px wide and the pill is up to 256 px and two lines, so (a) would hide the very thing the arrow points at. Nathan had recommended (a) after sizing it against the iPad, and says he was wrong. No code change.
+**Lesson:** check every size or placement call at the **smallest screen first** (375 × 812), then scale up.

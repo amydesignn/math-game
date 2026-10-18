@@ -54,6 +54,17 @@ export function hintCtx({ mapId, hasPlot, garden, calm, gardenOpen }) {
   }
 }
 
+/** Does this pointerdown count as "she walked" (the MoveHint lesson is learned)?
+ *  Only a tap on the WORLD canvas while she's in a world — never the Door's
+ *  Play/Resume tap (the Door lives inside the same root div), never a HUD
+ *  button, never the minimap (also a canvas, but marked data-hint). Amy
+ *  2026-10-17: walk lesson first, then the garden hint. */
+export function isWorldTap(view, target) {
+  if (view !== 'world' || !target) return false
+  if (String(target.tagName).toUpperCase() !== 'CANVAS') return false
+  return !target.closest?.('[data-hint]')
+}
+
 export const GARDEN_HINT_ID = 'garden-first-plant'
 
 export const GAME_HINTS = [

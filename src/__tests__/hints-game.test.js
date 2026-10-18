@@ -3,7 +3,7 @@
  * device memory + session boot in store.js, and the dev/prod flag.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, everPlanted, arrowForMap, isGreenGround } from '../gameHints'
+import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, everPlanted, arrowForMap, isGreenGround, isWorldTap } from '../gameHints'
 import { HINT_COPY } from '../gameHintsCopy'
 import { hintsEnabled, hintArrowOverride, HINT_ARROW_VARIANTS } from '../config'
 import { MAPS } from '../maps'
@@ -132,4 +132,19 @@ describe('dev override (?arrow=iris|green|pink)', () => {
     expect(hintArrowOverride('?hints&arrow=iris')).toBe('iris')
     expect(hintArrowOverride('?arrow=<script>')).toBe(null)
   })
+})
+
+describe('isWorldTap — the walk lesson counts only taps IN the world (Amy, 2026-10-17)', () => {
+  const el = (tagName, marked = false) => ({ tagName, closest: (q) => (q === '[data-hint]' && marked ? {} : null) })
+  it("the Door's Play/Resume tap never counts (the bug that hid MoveHint)", () => {
+    expect(isWorldTap('door', el('BUTTON'))).toBe(false)
+    expect(isWorldTap('door', el('CANVAS'))).toBe(false) // the Door's hero stage is a canvas too
+  })
+  it('a tap on the world canvas counts', () => expect(isWorldTap('world', el('CANVAS'))).toBe(true))
+  it('HUD buttons and the minimap canvas do not', () => {
+    expect(isWorldTap('world', el('BUTTON'))).toBe(false)
+    expect(isWorldTap('world', el('CANVAS', true))).toBe(false)
+    expect(isWorldTap('world', el('DIV'))).toBe(false)
+  })
+  it('no target → no', () => expect(isWorldTap('world', null)).toBe(false))
 })

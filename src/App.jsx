@@ -18,7 +18,7 @@ import { FeedbackModal } from './ui/FeedbackModal'
 import PromoPopup, { PROMO, promoActive } from './ui/PromoPopup'
 import HintLayer from './hints/HintLayer'
 import { createHintController, beginSession } from './hints'
-import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, arrowForMap } from './gameHints'
+import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, arrowForMap, isWorldTap } from './gameHints'
 import { HINT_COPY } from './gameHintsCopy'
 import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
 import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } from './math'
@@ -948,7 +948,10 @@ export default function App({ cloud = false, justSignedIn = false }) {
   const clampZoom = (z) => Math.min(WORLD.zoomMax, Math.max(WORLD.zoomMin, z))
 
   function onPointerDown(e) {
-    setMoved(true)
+    // The walk lesson is learned by a tap IN the world — not the Door's Play /
+    // Resume tap, which also lands in this root div (that bug hid MoveHint).
+    // Once per page session: gate travel and Door round-trips don't re-teach it.
+    if (isWorldTap(view, e.target)) setMoved(true)
     unlockAudio() // browsers only allow sound after a user gesture
 
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
