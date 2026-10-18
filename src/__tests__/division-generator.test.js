@@ -75,9 +75,11 @@ describe('divGems — Finn C2 payout, both phases (Phase 2 tested before it ship
 })
 
 describe('rotation — division is a live frontier topic now', () => {
+  // start = null → the normal frontier mix (a fresh save would start in the easy
+  // pool — onboarding decision #7, tested in first-problem.test.js).
   it('nextProblem serves long-div alongside multiplication + the confidence pool', () => {
     const seen = new Set()
-    for (let i = 0; i < 500; i++) seen.add(nextProblem().type)
+    for (let i = 0; i < 500; i++) seen.add(nextProblem(null).type)
     expect(seen.has('long-div')).toBe(true)
     expect(seen.has('long-mult')).toBe(true)
   })
@@ -89,7 +91,7 @@ describe('rotation — division is a live frontier topic now', () => {
       p.type === 'long-mult' ? p.level : p.type === 'long-div' ? divGems(p.sneakyZero) : 1
     let sawDiv = false
     for (let i = 0; i < 500; i++) {
-      for (const p of generateStation(2)) {
+      for (const p of generateStation(2, null)) {
         expect(p.gems).toBe(expectedGems(p))
         if (p.type === 'long-div') sawDiv = true
       }

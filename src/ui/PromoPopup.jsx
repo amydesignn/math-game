@@ -38,6 +38,17 @@ export function promoActive(promo = PROMO, now = new Date()) {
   return now.getFullYear() === promo.year && currentSeason(now) === promo.season
 }
 
+/**
+ * May the popup show right now? (Onboarding decision #6, Amy 2026-10-18.)
+ * Over the Door only, never on top of the onboarding card, and only AFTER her
+ * first world visit (`played` flips in enterWorld) — a brand-new player meets
+ * the game first, then the treat lands on her first Exit or her next boot.
+ * Old saves already have played: true, so nothing changes for them.
+ */
+export function promoShouldShow({ promoOpen, played, view, onboardingOpen }) {
+  return !!promoOpen && !!played && view === 'door' && !onboardingOpen
+}
+
 const COPY = {
   ask: { title: 'Trick or treat?', body: 'Luxi Math has a little something for you. Pick one!' },
   treat: { title: 'A treat from Luxi Math!', body: 'Happy Halloween! Here are some gems to spend on your world.' },

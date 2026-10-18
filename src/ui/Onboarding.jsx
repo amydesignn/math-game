@@ -1,212 +1,214 @@
 /*
- * Onboarding.jsx — the first-run "How to Play" walkthrough.
- * Lifted 1:1 from Oscar's two comps (~/Downloads/handoff — onboarding/, 2026-09-19):
- *   · "Onboarding Card.dc.html"  → <OnboardingCard> (the 5-step carousel)
- *   · "Luxi Onboarding.dc.html"  → the modal-overlay frame around it
- * Oscar's newer design-code (.dc) export — inline styles + style-hover/active
- * attributes, same format as the Door footer. Lifted verbatim; adaptations are
- * commented at their site.
+ * Onboarding.jsx — the first-run About + "How to Play" card.
  *
- * TWO ENTRY POINTS, ONE COMPONENT (App wires both):
- *   1. FIRST RUN — shows once over the Door the first time someone plays, then
- *      never again (store.seenOnboarding; migration seeds existing saves true so
- *      Ivy/Amy are never re-onboarded). "Once and gone."
- *   2. SETTINGS → How to Play — the gear row opens this same modal; it REPLACES
- *      the old in-sheet 3-step text list (Settings.jsx).
+ * LOOK: Oscar's two comps (~/Downloads/handoff — onboarding/, lifted 2026-09-19):
+ * "Luxi Onboarding.dc.html" (modal frame) + "Onboarding Card.dc.html" (card).
+ * Header, ✕, number badge, dots, ghost Back, the Iris CTA and the gem stage are
+ * his; the CTA wears Brand Iris 500 #6169E0 (his #7C6CE8 failed AA with white,
+ * Amy 2026-10-04). Golden-4px values kept (2026-09-19 pass).
  *
- * We only ever use Oscar's MODAL chrome. His INLINE chrome (an eyebrow + a 16:9
- * image-slot, for a marketing webpage) is intentionally NOT lifted — the app has
- * no media to show there and never renders the card inline.
+ * REBUILT 2026-10-18 (Trail crew onboarding job — docs/onboarding/proposal.md,
+ * decisions.md, round2-consensus.md). Linden owns this file + its .luxiOb-* CSS.
  *
- * Colours are Oscar's comp values, except the primary: his #7C6CE8 failed AA
- * with white text (4.06:1), so the CTA wears Brand Iris 500 #6169E0 (active dot: Iris 600)
- * like every other action (Amy 2026-10-04).
- * Hover/active + the entrance animation live in index.css (.luxiOb-*): an inline
- * style overrides a CSS :hover, so interactive states can't be inline (same
- * lesson as .luxiFooter / su* / dv*).
+ * CONTRACT (Rowan wires it in App):
+ *   <Onboarding entry={'first'|'howto'} onClose={fn} />
+ *   · 'first' — About cover (gem stage, 3 kid lines + parent small print, no dot,
+ *     no Back, one Next) → steps 1–3 with 3 dots; Back from step 1 → About.
+ *     Closes on the ✕ ONLY (Amy's decision #5: a kid's stray tap on the scrim
+ *     must not dismiss it at word zero).
+ *   · 'howto' — Settings → How to Play: opens on step 1, 3 dots, no Back on
+ *     step 1. The ✕, a scrim tap and Escape all close it.
+ *   · The last step's "Let's play →" closes. There is no 4th card and no
+ *     "What's next"/SOON branch (deleted: the game never says "coming soon").
+ *   ALL words come from onboardingPages(entry) (src/onboardingCopy.js, built from
+ *   config). Never hard-code copy here.
  *
- * Governance: the golden-4px pass was applied 2026-09-19 (Amy's call) as the
- * final production touch — spacing / dimension / radius snapped to a 4px base
- * (Oscar's off-grid 22/15/13/46/150/7/9/3 → 24/16/12/48/152/8/8/4). Typography
- * and colours are left as Oscar's. Doc: nathan-mcp-codebase-01/docs/governance-layer.md.
+ * LAYOUT RULES
+ *   · ONE fixed 16:9 media box. Every page's media is mounted at once, stacked,
+ *     with data-active on the current one, and decode()d on open — never swap
+ *     `src` (swapping gave the playtest its stale/empty boxes). About's gem stage
+ *     is just another layer. A step with media:null shows the box's own lilac
+ *     as a calm placeholder; the box never collapses.
+ *   · All page texts are stacked in one grid cell too, so the text block is
+ *     always as tall as the tallest page: the card height is constant and Next
+ *     never moves under her finger.
+ *   · Phone landscape (812×375): the card caps at 100dvh − 40px; header and
+ *     footer stay put and the middle scrolls, so the ✕ is always visible.
+ *
+ * MOTION HOOKS (Fern owns every keyframe/transition — none inline here):
+ *   .luxiOb-scrim[data-state="open"|"closing"]   exit: OB_EXIT_MS, plain timer
+ *   .luxiOb-card[data-entry][data-page]          the current page id
+ *   .luxiOb-media[data-active="true"|"false"]    image/stage layers (crossfade)
+ *   .luxiOb-media[data-prev="true"]              the layer just left (holds under the new one)
+ *   .luxiOb-mediaBox[data-empty]                 no layer for this page (fade to lilac)
+ *   .luxiOb-page[data-active="true"|"false"]     text layers (crossfade)
+ *   .luxiOb-dot[data-state="current"|"past"|"future"]
+ *   .luxiOb-gemIn > .luxiOb-gemFloat + .luxiOb-gemShadow, .luxiOb-twinkle
+ *
+ * Interactive states live in index.css, not inline (an inline style beats a CSS
+ * :hover — the .luxiFooter / su- / dv- lesson). stopPropagation keeps every tap
+ * off the R3F canvas underneath.
  */
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { GemIcon } from './hudkit'
+import { onboardingPages } from '../onboardingCopy'
 
-// Oscar's four core steps + a fifth "What's next" step (verbatim copy).
-//
-// `media` is an optional per-step image — the illustration / screenshot / GIF
-// slot from Oscar's INLINE variant, brought into the modal (Amy's ask). It is
-// baked in as an asset like the world-card art, NOT a runtime upload: drop a
-// file in public/onboarding/ and set its path here. A step with media:null just
-// shows text and the image box collapses, so images can be added one at a time.
-const CORE = [
-  { num: 1, title: 'Pick your character & map', body: 'Choose your character and a companion, then pick a map to explore.', media: '/onboarding/step-1.jpg' },
-  { num: 2, title: 'Explore & collect gems', body: 'Guide your character across the map. Visit the gem and bonus stations and answer math questions to collect gems.', media: '/onboarding/step-2.jpg' },
-  { num: 3, title: 'Build your world', body: 'Spend your gems on assets to build a world that’s entirely your own.', media: '/onboarding/step-3.jpg' },
-  { num: 4, title: 'Add some sparkle', body: 'Treat your character to a sparkle trail and other playful extras.', media: '/onboarding/step-4.jpg' },
+/** How long the card waits after a close before unmounting (Fern's exit).
+ *  = the 200ms exit in index.css (scrim fade + card sinks 8px). A plain timer,
+ *  never animationend (it stalls in hidden panes). Keep the two in sync. */
+export const OB_EXIT_MS = 200
+
+const TITLE = { fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }
+const BODY = { margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }
+
+// Three twinkles around the gem: gem cyan + the card's lilac star (% of the stage).
+const TWINKLES = [
+  { l: '30%', t: '24%', s: 20, d: 0, c: '#22D3EE' },
+  { l: '68%', t: '18%', s: 16, d: 0.6, c: '#8570D2' },
+  { l: '66%', t: '62%', s: 16, d: 1.2, c: '#22D3EE' },
 ]
 
-// Step 0 — "what is this?" before "how to play" (Finn 2026-10-10: jumping
-// straight into instructions skipped what the game IS). No number badge: it is
-// the welcome, not a how-to step. Understated, a tool not a world (Luxi tone).
-const INTRO = {
-  title: 'What is Luxi Math?',
-  body: 'A math practice game. Answer questions to earn gems, then spend them building a world that’s all yours.',
-  media: null,
+function GemStage({ active, prev }) {
+  return (
+    <div className="luxiOb-media luxiOb-stage" data-active={active} data-prev={prev} aria-hidden="true">
+      <div className="luxiOb-gemIn">
+        <div className="luxiOb-gemFloat">
+          <GemIcon size={104} />
+        </div>
+        <span className="luxiOb-gemShadow" />
+      </div>
+      {TWINKLES.map((k, i) => (
+        <svg key={i} className="luxiOb-twinkle" width={k.s} height={k.s} viewBox="0 0 24 24" style={{ position: 'absolute', left: k.l, top: k.t, animationDelay: `${0.45 + k.d}s` }}>
+          <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" fill={k.c} />
+        </svg>
+      ))}
+    </div>
+  )
+}
+
+function PageText({ page, stepNum }) {
+  if (page.kind === 'about') {
+    return (
+      <div>
+        <ul className="luxiOb-lines">
+          {page.lines.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+        <p className="luxiOb-small">{page.small}</p>
+      </div>
+    )
+  }
+  return (
+    <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+      <div className="luxiOb-num" aria-hidden="true">{stepNum}</div>
+      <div>
+        <div style={TITLE}>{page.title}</div>
+        <p style={BODY}>{page.body}</p>
+      </div>
+    </div>
+  )
 }
 
 /**
- * The 6-step carousel: welcome + four how-to steps + "What's next". Owns its own step cursor (like Oscar's comp).
- * onClose = the header back-control (dismiss). onFinish = the final CTA.
+ * The card. Owns its own page cursor. `onClose` = the ✕ and the last CTA.
  */
-export function OnboardingCard({ onClose, onFinish }) {
-  const [step, setStep] = useState(0)
-  const STEPS = [INTRO, ...CORE]
-  const total = STEPS.length + 1 // + the "What's next" step
-  const isIntro = step === 0
-  const isWhatsNext = step === STEPS.length
-  const cur = isWhatsNext ? null : STEPS[step]
+export function OnboardingCard({ entry = 'first', onClose }) {
+  const pages = useMemo(() => onboardingPages(entry), [entry])
+  // `prev` = the page just left: its media layer holds under the incoming one
+  // for the crossfade (Fern). Every older layer drops at once, so a fast Next
+  // never shows a picture from two pages ago.
+  const [{ i, prev }, setNav] = useState({ i: 0, prev: -1 })
+  const page = pages[i]
+  const steps = pages.filter((p) => p.kind === 'step')
+  const stepIdx = steps.indexOf(page) // -1 on About
+  const isLast = i === pages.length - 1
+  const titleId = `luxiOb-title-${entry}`
 
-  // Progress dots: one per step + one for "What's next" (Oscar's rule —
-  // current = pill, already-passed = faded lilac, future = light).
-  const dots = []
-  for (let i = 0; i < STEPS.length; i++) {
-    dots.push({ w: i === step ? 24 : 8, bg: i === step ? '#4B54DD' : i < step ? '#C6B4F0' : '#EDE7FC' })
-  }
-  dots.push({ w: isWhatsNext ? 24 : 8, bg: isWhatsNext ? '#4B54DD' : '#EDE7FC' })
+  // Preload + decode every step image the moment the card opens (~50KB, during
+  // the seconds she spends on the first page), so a fast Next never paints a
+  // half-decoded frame. The <img>s below are mounted too; this just warms them.
+  useEffect(() => {
+    for (const p of pages) {
+      if (!p.media) continue
+      const img = new Image()
+      img.src = p.media
+      img.decode?.().catch(() => {})
+    }
+  }, [pages])
 
-  const next = () => setStep((s) => Math.min(s + 1, total - 1))
-  const back = () => setStep((s) => Math.max(s - 1, 0))
+  const go = (d) => setNav((s) => {
+    const n = Math.min(Math.max(s.i + d, 0), pages.length - 1)
+    return n === s.i ? s : { i: n, prev: s.i }
+  })
+  const next = () => go(1)
+  const back = () => go(-1)
 
   return (
     <div
       className="luxiOb-card"
-      style={{
-        fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-        width: '100%',
-        background: '#fff',
-        borderRadius: 24,
-        overflow: 'hidden',
-        boxShadow: '0 24px 60px rgba(74,54,110,.22), inset 0 0 0 1px rgba(255,255,255,.6)',
-      }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      data-entry={entry}
+      data-page={page.id}
     >
-      {/* Header — modal chrome: title + ✕ close.
-          FIX (Amy, 2026-09-19 live test): the lifted ‹ back-chevron DID close, but
-          read as "back a step", so it was invisible as an exit — she got stuck on
-          both surfaces. Now a real ✕ on the RIGHT (the house header idiom —
-          Settings / Feedback / Signup all close there); the footer's own "Back"
-          button covers stepping. */}
-      <div style={{ padding: '16px 16px 16px 24px', background: 'linear-gradient(180deg,#E9E2FA,#F8F5FE)', borderBottom: '1px solid #E7E0F3' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <span style={{ fontSize: 20, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{isIntro ? 'Welcome' : 'How to Play'}</span>
-          <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>
-            ✕
-          </button>
-        </div>
+      {/* Header — title + ✕ (the house header idiom; the ✕ is always visible). */}
+      <div className="luxiOb-head">
+        <span id={titleId} style={{ fontSize: 20, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>
+          {page.kind === 'about' ? page.title : 'How to Play'}
+        </span>
+        <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>
+          ✕
+        </button>
       </div>
 
-      {/* Per-step media (Oscar's inline image-slot styling, brought into the
-          modal). Renders only when the current step has media, so a step without
-          an image simply shows text — the box collapses, no empty placeholder. */}
-      {/* Step 0's stage — the Luxi gem, animated (Amy 2026-10-10: "more exciting
-          than a static screen"). Same 16:9 box as the step images so the card
-          doesn't jump height on Next. Motion lives in index.css (.luxiOb-gem*). */}
-      {isIntro && (
+      {/* Middle — scrolls only when the viewport is shorter than the card. */}
+      <div className="luxiOb-scroll">
         <div style={{ padding: '16px 16px 0' }}>
-          <div className="luxiOb-stage" style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', background: 'radial-gradient(120% 100% at 50% 30%, #F6F1FF 0%, #ECE4FB 62%, #E4D9F6 100%)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="luxiOb-gemIn">
-              <div className="luxiOb-gemFloat">
-                <GemIcon size={104} />
-              </div>
-              <span className="luxiOb-gemShadow" />
+          <div className="luxiOb-mediaBox" data-empty={page.kind !== 'about' && !page.media}>
+            {pages.map((p, n) =>
+              p.kind === 'about' ? (
+                <GemStage key={p.id} active={p === page} prev={n === prev} />
+              ) : p.media ? (
+                <img key={p.id} className="luxiOb-media" data-active={p === page} data-prev={n === prev} src={p.media} alt="" decoding="async" draggable={false} />
+              ) : null,
+            )}
+          </div>
+        </div>
+
+        {/* Every page's text in one grid cell: constant height, crossfade-ready. */}
+        <div className="luxiOb-pages">
+          {pages.map((p) => (
+            <div key={p.id} className="luxiOb-page" data-active={p === page} aria-hidden={p !== page}>
+              <PageText page={p} stepNum={steps.indexOf(p) + 1} />
             </div>
-            {/* three twinkles around the gem — gem cyan + the card's lilac star (#8570D2); positions are % of the stage */}
-            {[{ l: '30%', t: '24%', s: 20, d: 0, c: '#22D3EE' }, { l: '68%', t: '18%', s: 16, d: 0.6, c: '#8570D2' }, { l: '66%', t: '62%', s: 16, d: 1.2, c: '#22D3EE' }].map((k, i) => (
-              <svg key={i} className="luxiOb-twinkle" width={k.s} height={k.s} viewBox="0 0 24 24" aria-hidden="true" style={{ position: 'absolute', left: k.l, top: k.t, animationDelay: `${0.45 + k.d}s` }}>
-                <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" fill={k.c} />
-              </svg>
+          ))}
+        </div>
+
+        {/* Steps only: 3 dots (About is a cover, it gets none). The slot keeps
+            its height on About so nothing below it moves. */}
+        <div className="luxiOb-dots" aria-hidden="true">
+          {stepIdx >= 0 &&
+            steps.map((s, n) => (
+              <span key={s.id} className="luxiOb-dot" data-state={n === stepIdx ? 'current' : n < stepIdx ? 'past' : 'future'} />
             ))}
-          </div>
         </div>
-      )}
-
-      {cur?.media && (
-        <div style={{ padding: '16px 16px 0' }}>
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', background: 'linear-gradient(150deg,#EDE7FB,#E3DBF7)', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.5)' }}>
-            <img src={cur.media} alt="" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} />
-          </div>
-        </div>
-      )}
-
-      {/* Step content */}
-      <div style={{ padding: '24px 24px 8px', minHeight: 152 }}>
-        {isIntro ? (
-          <div>
-            <div style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{cur.title}</div>
-            <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{cur.body}</p>
-          </div>
-        ) : !isWhatsNext ? (
-          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-            <div style={{ width: 48, height: 48, borderRadius: '50%', background: '#EDE7FC', color: '#5B4B9E', fontSize: 20, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>{cur.num}</div>
-            <div>
-              <div style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{cur.title}</div>
-              <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{cur.body}</p>
-            </div>
-          </div>
-        ) : (
-          <div>
-            <div style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>What&#8217;s next</div>
-            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', background: '#F6F4FE', border: '1px solid #EEE9FB', borderRadius: 16, padding: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: '#EAF9FB', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0092B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="9" cy="9" r="3.2" /><path d="M3.6 19c.7-3 3-4.6 5.4-4.6s4.7 1.6 5.4 4.6" /><circle cx="17.6" cy="8" r="2.2" /><path d="M16.2 13.7c2.1.1 3.7 1.5 4.3 3.8" /></svg>
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#262626' }}>Meet friends</span>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B4B9E', background: '#EDE7FC', padding: '4px 8px', borderRadius: 999 }}>SOON</span>
-                  </div>
-                  <p style={{ margin: '4px 0 0', fontSize: 14.5, fontWeight: 400, color: '#5C5470', lineHeight: 1.5 }}>A shared space for signed-in players. No chat &#8212; just wave and send a few emoji.</p>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', background: '#F6F4FE', border: '1px solid #EEE9FB', borderRadius: 16, padding: 16 }}>
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: '#F3ECFF', display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 'none' }}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="#8570D2" aria-hidden="true"><path d="M12 2.6l2.5 5.5 6 .5-4.5 3.9 1.4 5.9L12 21l-5.4 2.9 1.4-5.9-4.5-3.9 6-.5z" /></svg>
-                </div>
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: '#262626' }}>Lots more</span>
-                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.05em', color: '#5B4B9E', background: '#EDE7FC', padding: '4px 8px', borderRadius: 999 }}>SOON</span>
-                  </div>
-                  <p style={{ margin: '4px 0 0', fontSize: 14.5, fontWeight: 400, color: '#5C5470', lineHeight: 1.5 }}>Many more features are on the way.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        <span className="sr-only" aria-live="polite">
+          {stepIdx >= 0 ? `Step ${stepIdx + 1} of ${steps.length}` : ''}
+        </span>
       </div>
 
-      {/* Progress dots */}
-      <div style={{ padding: '16px 24px 0', display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center' }}>
-        {dots.map((d, i) => (
-          <span key={i} style={{ height: 8, borderRadius: 99, transition: 'width .2s ease, background .2s ease', width: d.w, background: d.bg }} />
-        ))}
-      </div>
-
-      {/* Footer nav: Back (hidden on first step) · Next / final CTA */}
-      <div style={{ padding: '16px 24px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        {step === 0 ? <span /> : (
+      {/* Footer — Back (never on the first page) · Next / Let's play. */}
+      <div className="luxiOb-foot">
+        {i === 0 ? <span /> : (
           <button className="luxiOb-back" onClick={back}>Back</button>
         )}
-        {!isWhatsNext ? (
-          <button className="luxiOb-cta" style={{ padding: '12px 24px' }} onClick={next}>Next</button>
+        {!isLast ? (
+          <button className="luxiOb-cta" onClick={next}>Next</button>
         ) : (
-          // ADAPTATION: Oscar's last-step CTA is a marketing <a href="math.luxi.land">
-          // "Play now — it's free →". In the app she is already here, so it CLOSES
-          // the walkthrough instead, relabelled "Let's play →" (no "it's free").
-          <button className="luxiOb-cta" style={{ padding: '12px 24px' }} onClick={onFinish}>
-            Let&#8217;s play <span style={{ lineHeight: 0, transform: 'translateY(1px)' }}>&#8594;</span>
+          <button className="luxiOb-cta" onClick={onClose}>
+            Let&#8217;s play <span aria-hidden="true" style={{ lineHeight: 0, transform: 'translateY(1px)' }}>&#8594;</span>
           </button>
         )}
       </div>
@@ -215,37 +217,42 @@ export function OnboardingCard({ onClose, onFinish }) {
 }
 
 /**
- * The full-screen modal: scrim + centered card. `onClose` dismisses (and, for
- * first-run, marks it seen — App owns that). Tapping OUTSIDE the card closes.
- * (Oscar's comp made the scrim non-dismissing so a child couldn't lose it by
- * accident; Amy's live test 2026-09-19 found the real failure was the inverse —
- * players felt trapped with no visible exit. Amy's call: scrim-click + ✕ both
- * dismiss, matching every other modal in the app.)
+ * The modal: scrim + centred card. On 'first' only the ✕ closes (the scrim does
+ * nothing — Amy's decision #5); on 'howto' the scrim and Escape close it too.
  */
-export function Onboarding({ onClose }) {
+export function Onboarding({ entry = 'first', onClose }) {
+  const [state, setState] = useState('open')
+  const closing = useRef(false)
+  const timer = useRef(0)
+
+  const close = () => {
+    if (closing.current) return
+    closing.current = true
+    setState('closing')
+    timer.current = setTimeout(() => onClose?.(), OB_EXIT_MS)
+  }
+  useEffect(() => () => clearTimeout(timer.current), [])
+
+  const dismissable = entry === 'howto'
+  useEffect(() => {
+    if (!dismissable) return
+    const onKey = (e) => { if (e.key === 'Escape') close() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  })
+
   return (
     <div
       className="luxiOb-scrim"
-      // stopPropagation so a tap on the overlay never falls through to the R3F
-      // canvas underneath and walks the character (the lift-skill rule).
+      data-state={state}
+      data-entry={entry}
+      // never let a tap fall through to the R3F canvas and walk her
       onPointerDown={(e) => e.stopPropagation()}
-      onClick={onClose}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 1000,
-        background: 'rgba(29,23,48,.5)',
-        backdropFilter: 'blur(2px)',
-        WebkitBackdropFilter: 'blur(2px)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-      }}
+      onClick={dismissable ? close : undefined}
     >
-      {/* clicks INSIDE the card must not bubble to the scrim's onClick */}
-      <div style={{ width: '100%', maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
-        <OnboardingCard onClose={onClose} onFinish={onClose} />
+      {/* clicks INSIDE the card must not bubble to the scrim */}
+      <div className="luxiOb-frame" onClick={(e) => e.stopPropagation()}>
+        <OnboardingCard entry={entry} onClose={close} />
       </div>
     </div>
   )

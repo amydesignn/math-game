@@ -76,3 +76,40 @@ describe('promoActive — season + year', () => {
     expect(promoActive(undefined, new Date(2027, 9, 15))).toBe(false) // next year's Halloween = a new promo
   })
 })
+
+describe('promoShouldShow — Halloween waits for the first world visit (decision #6)', () => {
+  const base = { promoOpen: true, played: true, view: 'door', onboardingOpen: false }
+
+  it('a brand-new player on the Door, before any world: no', async () => {
+    const { promoShouldShow } = await import('../ui/PromoPopup.jsx')
+    expect(promoShouldShow({ ...base, played: false })).toBe(false)
+  })
+
+  it('the same player back on the Door after her first world: yes', async () => {
+    const { promoShouldShow } = await import('../ui/PromoPopup.jsx')
+    expect(promoShouldShow(base)).toBe(true)
+  })
+
+  it('in a world: no, even for an old save', async () => {
+    const { promoShouldShow } = await import('../ui/PromoPopup.jsx')
+    expect(promoShouldShow({ ...base, view: 'world' })).toBe(false)
+  })
+
+  it('an old save (Ivy-shaped, pre-`played`) boots as played → gets it on the Door', async () => {
+    storage.setItem(KEY, JSON.stringify({ gems: 12, lifetimeGems: 40, seenOnboarding: true }))
+    const store = await import('../store.js')
+    const { promoShouldShow } = await import('../ui/PromoPopup.jsx')
+    expect(store.getState().played).toBe(true)
+    expect(promoShouldShow({ ...base, played: store.getState().played })).toBe(true)
+  })
+
+  it('never over the onboarding card', async () => {
+    const { promoShouldShow } = await import('../ui/PromoPopup.jsx')
+    expect(promoShouldShow({ ...base, onboardingOpen: true })).toBe(false)
+  })
+
+  it('never once claimed / out of season (promoOpen false)', async () => {
+    const { promoShouldShow } = await import('../ui/PromoPopup.jsx')
+    expect(promoShouldShow({ ...base, promoOpen: false })).toBe(false)
+  })
+})
