@@ -108,6 +108,64 @@
   transition: opacity 200ms var(--luxiHint-ease), transform 200ms var(--luxiHint-ease);
 }
 .luxiHint-toast[data-soft][data-state='in'] { transform: none; }
+/* swap (job 3: paired ↔ dock): the same fade-through as the pill, in place */
+.luxiHint-toast[data-state='swap'] { opacity: 0; transform: none; transition: opacity 120ms var(--luxiHint-ease); }
+.luxiHint-toast[data-swap][data-state='in'] { transform: none; }
+.luxiHint-toast[data-swap][data-state='shown'] { transition: opacity 200ms var(--luxiHint-ease); }
+
+/* ── Paired pill, job 3 ("sign on a post") ───────────────────────────────── */
+/* The pill rides the arrow's tail side. Linden writes its translate in the
+   same tick as the arrow's (rigid, zero lag). I never animate the positioning
+   element, only .luxiHint-pillMotion inside it. Text never rotates and never
+   bobs: only the glyph taps.
+     arrival   the arrow lands (~120 ms), then the pill UNFOLDS from the arrow-facing
+               edge at +120 ms: fade + scale .96 → 1, 280 ms ("look here", then read)
+     leave     with the arrow, 200 ms, folding back toward it
+     done      shrinks toward the arrow + fades, 200 ms (normally hidden by the GardenBar)
+     swap      side switch / re-anchor / paired↔dock: 120 ms fade out, the host moves
+               it, then a 200 ms fade in, in place with no scale. A crossfade, never a slide.
+   Hooks: data-state in|shown|out|done|swap · data-side top|bottom|left|right
+   (the pill's side relative to the arrow) · [data-swap] on the fade-in after a
+   swap · [data-soft]. Timers: HINT_MOTION.swapOutMs / swapInMs. */
+.luxiHint-pillMotion {
+  --luxiHint-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+  transform-origin: 50% 100%; /* default: pill above a down arrow */
+  will-change: transform, opacity;
+}
+.luxiHint-pillMotion[data-side='bottom'] { transform-origin: 50% 0; }
+.luxiHint-pillMotion[data-side='right']  { transform-origin: 0 50%; }
+.luxiHint-pillMotion[data-side='left']   { transform-origin: 100% 50%; }
+
+.luxiHint-pillMotion[data-state='in'] {
+  opacity: 0;
+  transform: scale(0.96);
+}
+.luxiHint-pillMotion[data-state='shown'] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 280ms var(--luxiHint-ease) 120ms, transform 280ms var(--luxiHint-ease) 120ms;
+}
+.luxiHint-pillMotion[data-state='out'],
+.luxiHint-pillMotion[data-state='done'] {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 200ms var(--luxiHint-ease), transform 200ms var(--luxiHint-ease);
+}
+/* swap: out fast and in place, then back in with no delay and no scale */
+.luxiHint-pillMotion[data-state='swap'] {
+  opacity: 0;
+  transform: none;
+  transition: opacity 120ms var(--luxiHint-ease);
+}
+/* blocked swap (Clover, job 3 QA): if the held spot turns blocked mid-swap, Linden
+   adds data-snap and it's gone in 60 ms instead of riding into the blocked spot. */
+.luxiHint-pillMotion[data-snap][data-state='swap'],
+.luxiHint-toast[data-snap][data-state='swap'] { transition: opacity 60ms var(--luxiHint-ease); }
+.luxiHint-pillMotion[data-swap][data-state='in'],
+.luxiHint-pillMotion[data-soft][data-state='in'] { transform: none; }
+.luxiHint-pillMotion[data-swap][data-state='shown'] {
+  transition: opacity 200ms var(--luxiHint-ease);
+}
 
 /* ── Bolder done (Amy's taste call, OFF by default) ─────────────────────── */
 /* Set data-motion="bold" on .luxiHint-arrow: a bigger swell plus two soft gold
@@ -279,8 +337,14 @@
    state still finishes inside them. */
 @media (prefers-reduced-motion: reduce) {
   .luxiHint-arrowMotion[data-state],
-  .luxiHint-toast[data-state] {
+  .luxiHint-toast[data-state],
+  .luxiHint-pillMotion[data-state] {
     transform: none !important;
+  }
+  .luxiHint-pillMotion[data-state='shown'],
+  .luxiHint-pillMotion[data-state='out'],
+  .luxiHint-pillMotion[data-state='done'] {
+    transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
   }
   .luxiHint-arrowMotion[data-state='shown'],
   .luxiHint-arrowMotion[data-state='out'],

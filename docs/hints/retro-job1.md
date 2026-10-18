@@ -112,3 +112,50 @@ Screenshots are in `scratchpad/guide/qa/`.
 - For any layout bug, run the old commit first (temporary worktree + its own port) before anyone fixes it.
 - QA scripts must make one trusted tap before waiting for a hint: hints now wait for the first walk.
 - Give headless walk routes an alternative path, because daily sparkles can sit on a route.
+
+---
+
+## Addendum: job 3 (the arrow and the pill as one pair), 2026-10-17
+**What shipped to the dev server** (uncommitted):
+- `placePill` (Rowan) puts the pill on the arrow's tail side. If that's blocked it tries right, then left, then **slides along the arrow** (≥16 px overlap), then attaches **corner to corner** (8 px). If none of that fits, it uses the dock.
+- It avoids the HUD, the arrow, the soil and **her silhouette**.
+- Walking rule (Linden, after Fern's push): **hold the side while she walks.** The pill goes home to the dock only if its held spot gets blocked, then re-pairs when she stops.
+- Fern's pair motion: the pill unfolds at +120 ms. A swap is a crossfade (60 ms when the held spot is blocked).
+- No sound changes (Wren).
+
+**Final QA (Clover):** headless, walking past the bed and sampling every 100 ms at 4 sizes, plus the phone pane.
+
+| Check | Result |
+|---|---|
+| Share of time paired while visible | phone **34%** · iPad **76%** · 1024 **80%** · 1280 **92%** (first build: 0% / ~25% at 1280) |
+| Overlaps with HUD, arrow, soil, her or off-screen | **0** at all 4 sizes (earlier builds had 1–2 transient frames; fixed) |
+| Pill hops sides while she walks (pair → pair) | **0** at all sizes. Each walk leg goes pair → dock at most once, then re-pairs on stop. |
+| Arrival sound | hintShow **+2, once,** at all sizes. Follow and flip are silent. |
+| GardenBar open (phone pane, real tap) | pill hidden, arrow stays |
+| Plant | done, hintDone **+4**, all gone |
+| MoveHint first | no hint before her first world tap (via a JS Resume; Rowan's open note says the Door's real Resume tap still counts as that first tap) |
+| Reduced motion | pill: opacity only, transform none |
+| **Phone, standing in front of the bed** | **still DOCKED 100%.** Every spot crosses something protected (minimap, Exit column, soil, label). **Amy's call:** (a) the pill over the bed's far frame, (b) over the "Sunny Town" map label, or (c) accept the dock. The crew's leans differ: Rowan (b), Linden (a), Clover (c) for now. |
+
+**What worked**
+- Linden's throwaway overlay mock on the real game sold the idea before any code.
+- Rowan's pure `placePill` split cleanly from Linden's per-frame lock. Its 500-scene "never overlaps" property held through every change.
+- **Walk traces every 100 ms** found what still screenshots couldn't: the dock being the main path (0% paired on phone), side hops, the pill avoiding its own dock, and 1-frame overlaps. (Linden, Fern, Clover)
+- Sound tied to meaning: three surface changes cost zero sound changes. (Wren)
+- Early QA numbers *changed the design* (soil-only avoid, slide, corner attach) instead of arriving at the end.
+
+**What didn't**
+- Linden's first walking rule cost two swaps per walk. Fern's "hold in place unless blocked" was simpler.
+- The pill avoided its own docked rect, so it could never re-pair.
+- Rowan's corner test used rects ~13 px off the real camera, so it passed in tests and failed in the game.
+- Ambiguous timing references ("+120 ms" from start or landing?) cost Wren a round-trip.
+- Fern falsely reported the pill as unstyled because the harness didn't load `index.css`, then retracted. "It's up" wasn't posted to QA twice.
+- I recorded Fern as dissenting on the walking rule after the build had already changed. Corrected here: Fern backed the hold rule.
+- The pane lost its WebGL context after repeated reloads, so I switched to new tabs and headless runs.
+
+**Change next time**
+1. Whoever builds posts **"it's up" to QA**, every time.
+2. For anything that moves, **measure a trace over time**, not states at rest. Ask "what's the fewest motions?" before adding a rule.
+3. **Build test fixtures from real measured rects** (QA's numbers), not hand-made ones.
+4. Motion specs state every time **from t=0 (onShow)**.
+5. Before reporting a crewmate's dissent, **re-check against the latest build.**

@@ -15,6 +15,7 @@
  *     insets={{ top, right, bottom, left }}         // optional edge-arrow safe rect
  *     dismissLabel="Not now" dismissText="✕" onDismiss={(id) => …}
  *     boldDone={false}  // Amy's taste call: Fern's ground-ripple "you did it"
+ *     getAvoid={() => rect[]} isWalking={() => bool}  // job 3: the pill rides the arrow
  *     arrowStyle="green"  // 'green' (default, Amy) | 'pink' (green ground) | 'iris' (the original)
  *   />
  *
@@ -25,7 +26,7 @@
  * animationend, which stalls in hidden or throttled windows.
  */
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import { placeArrow, domTargetPos, movedEnough, EDGE_HYSTERESIS } from './position.js'
+import { placeArrow, placePill, domTargetPos, movedEnough, EDGE_HYSTERESIS } from './position.js'
 import { HINT_MOTION } from './motion.js'
 import './hints.css'
 import './motion.css'
@@ -34,6 +35,12 @@ const IN_MS = 16 // "in" → "shown" on the next tick, so the arrival transition
 const OUT_MS = HINT_MOTION?.outMs ?? 200
 const DONE_ARROW_MS = HINT_MOTION?.doneArrowMs ?? 700
 const EDGE_REST_MS = (HINT_MOTION?.edgeTapDelayMs ?? 300) + (HINT_MOTION?.edgeTaps ?? 5) * (HINT_MOTION?.edgeTapMs ?? 2400) // a tap run, then rest
+const SWAP_OUT_MS = HINT_MOTION?.swapOutMs ?? 120 // side switch / re-anchor: fade out in place…
+const SWAP_SNAP_MS = HINT_MOTION?.swapSnapMs ?? 60 // …or 60 ms when the held spot is already blocked
+const SWAP_IN_MS = HINT_MOTION?.swapInMs ?? 200 //  …move, fade in on the new side (≈320 ms, never a slide)
+const SWAP_HOLD_MS = 600 // a pill that just moved stays put this long
+const PILL_MAX_H = 72 // 2 lines of 24 + 12 padding top and bottom
+const PILL_PHONE_MAX = 256 // ≤600px wide: the paired pill wraps (2 lines allowed) so it fits beside an edge arrow
 const POLL_MS = 250 // fallback beside rAF: the arrow never freezes in a throttled pane
 
 /** Screen gutter only: the HUD itself is avoided rect by rect (hudRects). */
@@ -42,11 +49,12 @@ const GUTTER = { top: 16, right: 16, bottom: 16, left: 16 }
 /** Layer-relative rects of every visible HUD piece marked [data-hint] (the
  *  host's convention), except the hint's own DOM target. Layout rects for the
  *  pill (offset*), so Fern's rise/sink transform never moves the avoid zone. */
-function hudRects(layer, target) {
+function hudRects(layer, target, skipDock = false) {
   const lr = layer.getBoundingClientRect()
   const out = []
   for (const el of document.querySelectorAll('[data-hint]')) {
     if (target?.dom != null && el.dataset.hint === String(target.dom)) continue
+    if (skipDock && el.dataset.hint === 'hint-dock') continue // the pill never avoids its own docked self
     if (layer.contains(el)) {
       if (el.offsetHeight > 0) out.push({ left: el.offsetLeft, top: el.offsetTop, right: el.offsetLeft + el.offsetWidth, bottom: el.offsetTop + el.offsetHeight })
       continue
@@ -69,6 +77,8 @@ export default function HintLayer({
   onDismiss,
   boldDone = false,
   arrowStyle = 'green',
+  getAvoid, //   () => rect[]: world rects the pill must never cover (her character), layer px
+  isWalking, //  () => bool: the pill only switches sides once she has stopped
 }) {
   const variant = ARROW[arrowStyle] ? arrowStyle : 'green'
   const arrowH = ARROW[variant].h
@@ -91,6 +101,8 @@ export default function HintLayer({
   // StrictMode runs twice) and stepped on plain timers.
   const shownRef = useRef(null)
   const show = (next) => { shownRef.current = next; setShown(next) }
+  const pairRef = useRef({ side: null, off: null, swapping: false, cache: {} }) // per-frame pairing state
+  const resetPair = () => { pairRef.current = { side: null, off: null, swapping: false, cache: {} } }
 
   useEffect(() => {
     const cur = shownRef.current
@@ -101,17 +113,20 @@ export default function HintLayer({
       // already says it): the toast leaves quietly and the arrow stays.
       if (cur && cur.id === hint.id) {
         clearTimers()
+        if (cur.toast === 'swap' || pairRef.current.swapping) resetPair()
         if (nextText) {
           const needIn = !cur.toastText // toast was hidden (arrow-only) → it arrives
-          show({ ...cur, text: nextText, toastText: nextText, target: hint.target, arrow: 'shown', toast: needIn ? 'in' : 'shown' })
+          if (needIn || cur.toastText !== nextText) resetPair() // re-decide the side for the new pill
+          show({ ...cur, text: nextText, toastText: nextText, target: hint.target, arrow: 'shown', toast: needIn ? 'in' : 'shown', swap: false, place: needIn ? undefined : cur.place })
           if (needIn) later(() => { const c = shownRef.current; if (c && c.id === hint.id && c.toast === 'in') show({ ...c, toast: 'shown' }) }, IN_MS)
         } else {
-          show({ ...cur, text: '', target: hint.target, arrow: 'shown', toast: cur.toastText ? 'out' : cur.toast })
+          show({ ...cur, text: '', target: hint.target, arrow: 'shown', toast: cur.toastText ? 'out' : cur.toast, swap: false })
           if (cur.toastText) later(() => { const c = shownRef.current; if (c && c.id === hint.id && !c.text) show({ ...c, toastText: '' }) }, OUT_MS)
         }
         return
       }
       clearTimers()
+      resetPair()
       const soft = lastExit.current?.id === hint.id && lastExit.current?.reason === 'paused'
       show({ id: hint.id, text: nextText, toastText: nextText, target: hint.target, arrow: 'in', toast: 'in', soft })
       later(() => {
@@ -125,7 +140,8 @@ export default function HintLayer({
     clearTimers()
     const done = exitReason === 'done'
     lastExit.current = { id: cur.id, reason: exitReason }
-    show({ ...cur, text: '', arrow: done ? 'done' : 'out', toast: 'out' })
+    pairRef.current.swapping = false
+    show({ ...cur, text: '', arrow: done ? 'done' : 'out', toast: done && cur.place === 'pair' ? 'done' : 'out', swap: false })
     // Done: the arrow swells (DONE_ARROW_MS) while the toast leaves quietly (OUT_MS).
     later(() => show(null), done && cur.target ? Math.max(DONE_ARROW_MS, OUT_MS) : OUT_MS)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -140,11 +156,17 @@ export default function HintLayer({
   const toastRef = useRef(null)
   const hasArrow = !!(shown && shown.target)
   const getPosRef = useRef(getTargetPos)
+  const getAvoidRef = useRef(getAvoid)
+  const isWalkingRef = useRef(isWalking)
+  const pillRef = useRef(null) //     .luxiHint-pill: the positioner, translate only, locked to the arrow
+  const measureRef = useRef(null) //  hidden twin of the pill body, for placePill's measure(maxW)
   const insetsRef = useRef(insets)
   const targetRef = useRef(null)
   const armRef = useRef({ timer: 0, resting: false, at: null }) // edge tap run → rest → re-arm
   useLayoutEffect(() => {
     getPosRef.current = getTargetPos
+    getAvoidRef.current = getAvoid
+    isWalkingRef.current = isWalking
     insetsRef.current = insets
     targetRef.current = shown?.target ?? null
   })
@@ -182,6 +204,7 @@ export default function HintLayer({
       el.style.transform = `translate3d(${Math.round(p.x)}px, ${Math.round(p.y)}px, 0) rotate(${p.angle}deg)`
       if (el.dataset.mode !== mode) el.dataset.mode = mode // mirrored for Fern (no :has())
       if (m && m.dataset.mode !== mode) m.dataset.mode = mode
+      pairPill(layer, p, pt, w, h)
       // Edge re-arm: a tap run, then rest; once rested, a camera move (the
       // clamped placement moved) starts a fresh run by flipping data-arm 1↔2.
       const arm = armRef.current
@@ -193,6 +216,124 @@ export default function HintLayer({
       } else if (arm.resting && movedEnough(arm.at, p)) {
         armStart(p, true)
       }
+    }
+    // ── The pill rides the arrow (job 3, "sign on a post") ──
+    // placePill picks the side (tail → right → left → dock) clear of the HUD,
+    // her character, the bed and the arrow itself. The pill is LOCKED to the
+    // arrow every frame; a side change (or paired ↔ dock) is a fade-through via
+    // Fern's swap states, never a slide across the arrow.
+    const measure = (maxW) => {
+      const el = measureRef.current
+      const layer = layerRef.current
+      if (!el || !layer) return { w: 0, h: 0 }
+      const cap = layer.clientWidth <= 600 ? PILL_PHONE_MAX : Infinity
+      const mw = Math.floor(Math.min(maxW, cap))
+      const pr = pairRef.current
+      const key = mw + '|' + el.textContent
+      if (!pr.cache[key]) {
+        el.style.maxWidth = mw + 'px'
+        const bb = el.getBoundingClientRect() // sub-pixel: offsetWidth rounds down and orphans the emoji (Fern)
+        const m = { w: Math.ceil(bb.width) + 1, h: Math.ceil(bb.height) }
+        // Two lines at most (brief: allowed on phones). A narrower slot that would
+        // wrap to 3+ lines is "doesn't fit", so placePill tries the next side.
+        pr.cache[key] = m.h > PILL_MAX_H ? { w: 1e6, h: 1e6 } : m
+      }
+      return pr.cache[key]
+    }
+    const sideFrom = (r, p) => { // the pill's side relative to the arrow, for Fern's unfold origin
+      const ab = arrowBoxOf(p)
+      const dx = r.x + r.w / 2 - (ab.left + ab.right) / 2, dy = r.y + r.h / 2 - (ab.top + ab.bottom) / 2
+      return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'bottom' : 'top')
+    }
+    const arrowBoxOf = (p) => {
+      const a = ARROW[variantRef.current], r = (p.angle * Math.PI) / 180
+      const bx = p.x + Math.sin(r) * a.h, by = p.y - Math.cos(r) * a.h
+      return { left: Math.min(p.x, bx) - a.w / 2, right: Math.max(p.x, bx) + a.w / 2, top: Math.min(p.y, by), bottom: Math.max(p.y, by) }
+    }
+    const pairPill = (layer, p, pt, w, h) => {
+      const c = shownRef.current
+      const el = pillRef.current
+      const pr = pairRef.current
+      if (!c || !c.toastText || c.toast === 'out' || c.toast === 'done') return
+      const world = typeof getAvoidRef.current === 'function' ? getAvoidRef.current() || [] : []
+      const avoid = [...hudRects(layer, targetRef.current, true), ...world, ...(pt.rect ? [pt.rect] : [])]
+      const walking = typeof isWalkingRef.current === 'function' ? !!isWalkingRef.current() : false
+      const r = placePill(p, measure, { w, h }, avoid, pr.side, { walking, arrowSize: ARROW[variantRef.current] })
+      let want = r.docked ? 'dock' : r.side
+      // Mid-walk calm (Clover's middle follow): while she walks, a blocked pill
+      // goes HOME to the dock instead of hopping sides around her, and a docked
+      // pill waits there until she stops. And no swap within SWAP_HOLD_MS of the
+      // last one (no out-in-out flicker as the camera pans).
+      if (pr.side === 'dock' && walking) want = 'dock' // a docked pill waits until she stops
+      if (pr.side != null && want !== pr.side && performance.now() - (pr.at || 0) < SWAP_HOLD_MS) want = pr.side
+      if (pr.side == null) { // first placement: arrive straight there, no swap
+        pr.side = want
+        if (want === 'dock') { show({ ...c, place: 'dock' }); return }
+        if (c.place !== 'pair') show({ ...shownRef.current, place: 'pair' })
+      }
+      if (pr.swapping) { // fading out in place: stay locked to the arrow by the last offset
+        if (el && pr.off) el.style.transform = `translate3d(${Math.round(p.x + pr.off.x)}px, ${Math.round(p.y + pr.off.y)}px, 0)`
+        return
+      }
+      // Held spot blocked? (Clover LOW / Fern's data-snap: the fade-out is 60 ms then)
+      const heldBlocked = () => {
+        if (!pr.off || !pr.h) return false
+        const b = { left: p.x + pr.off.x, top: p.y + pr.off.y, right: p.x + pr.off.x + pr.w, bottom: p.y + pr.off.y + pr.h }
+        if (b.left < 8 || b.top < 8 || b.right > w - 8 || b.bottom > h - 8) return true // drifted off-screen
+        return [...avoid, arrowBoxOf(p)].some((a) => a && b.left < a.right && b.right > a.left && b.top < a.bottom && b.bottom > a.top) // never on its own arrow either (Clover)
+      }
+      // Hold in place while she walks (Fern): the pill stays on its side, locked
+      // to the arrow, and only goes home to the dock if that spot gets blocked.
+      // Zero swaps on an ordinary walk past the bed.
+      if (walking && pr.side !== 'dock' && pr.off) {
+        if (heldBlocked()) { swapTo('dock', true); return }
+        if (el) el.style.transform = `translate3d(${Math.round(p.x + pr.off.x)}px, ${Math.round(p.y + pr.off.y)}px, 0)`
+        return
+      }
+      if (want !== pr.side) { swapTo(want, heldBlocked()); return }
+      if (want === 'dock' || !el) return
+      if ((r.docked ? 'dock' : r.side) !== want) { // held on its side (walking/hold): stay locked by the last offset
+        if (pr.off) el.style.transform = `translate3d(${Math.round(p.x + pr.off.x)}px, ${Math.round(p.y + pr.off.y)}px, 0)`
+        return
+      }
+      // Fern: the VISUAL side can flip while placePill's side name stays 'tail'
+      // (the arrow hangs, so its tail turns). Crossing the arrow is a swap too.
+      const ds = sideFrom(r, p)
+      const OPP = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' }
+      // Crossing the arrow: a swap. While she walks it goes home to the dock
+      // instead (Clover #3: no pair→pair hops mid-walk when world↔edge turns).
+      if (pr.vis && OPP[pr.vis] === ds && performance.now() - (pr.at || 0) >= SWAP_HOLD_MS) { swapTo(want, heldBlocked()); return }
+      if (pr.vis && OPP[pr.vis] === ds && pr.off) { // crossing, but inside the hold: stay put by the last offset
+        el.style.transform = `translate3d(${Math.round(p.x + pr.off.x)}px, ${Math.round(p.y + pr.off.y)}px, 0)`
+        return
+      }
+      pr.vis = ds // top → right (a slide along the arrow): the origin just follows, no swap
+      el.style.transform = `translate3d(${Math.round(r.x)}px, ${Math.round(r.y)}px, 0)`
+      el.style.visibility = ''
+      if (pr.w !== r.w) { const b = el.querySelector('.luxiHint-pillBody'); if (b) b.style.maxWidth = r.w + 'px'; pr.w = r.w }
+      pr.h = r.h
+      pr.off = { x: r.x - p.x, y: r.y - p.y }
+      const mo = el.querySelector('.luxiHint-pillMotion')
+      if (mo && mo.dataset.side !== ds) mo.dataset.side = ds
+    }
+    const swapTo = (want, snap = false) => {
+      const pr = pairRef.current
+      const c = shownRef.current
+      if (!c) return
+      pr.swapping = true
+      show({ ...c, toast: 'swap', snap })
+      later(() => {
+        pr.swapping = false
+        pr.side = want
+        pr.w = null
+        pr.vis = null
+        pr.at = performance.now()
+        const c2 = shownRef.current
+        if (!c2 || !c2.toastText || c2.toast !== 'swap') return
+        show({ ...c2, place: want === 'dock' ? 'dock' : 'pair', toast: 'in', swap: true, snap: false })
+        later(() => { const c3 = shownRef.current; if (c3 && c3.toast === 'in') show({ ...c3, toast: 'shown' }) }, IN_MS)
+        later(() => { const c4 = shownRef.current; if (c4 && c4.swap) show({ ...c4, swap: false }) }, IN_MS + SWAP_IN_MS)
+      }, snap ? SWAP_SNAP_MS : SWAP_OUT_MS)
     }
     const armStart = (p, flip) => {
       const arm = armRef.current
@@ -215,9 +356,26 @@ export default function HintLayer({
     }
   }, [hasArrow])
 
-  const leaving = shown?.toast === 'out'
+  const leaving = shown?.toast === 'out' || shown?.toast === 'done'
   const liveText = shown?.text ?? ''
   const canDismiss = typeof onDismiss === 'function'
+  const pillContent = shown && shown.toastText ? (
+    <>
+      <span className="luxiHint-toastText" aria-hidden="true">{shown.toastText}</span>
+      {canDismiss && (
+        <button
+          type="button"
+          className="luxiHint-dismiss"
+          aria-label={dismissLabel}
+          disabled={leaving || shown.toast === 'swap'}
+          onPointerDown={(e) => e.stopPropagation() /* never a walk-tap underneath */}
+          onClick={() => onDismiss(shown.id)}
+        >
+          <span aria-hidden="true">{dismissText}</span>
+        </button>
+      )}
+    </>
+  ) : null
 
   return (
     <div className="luxiHint-layer" ref={layerRef} data-arrow={variant}>
@@ -257,28 +415,46 @@ export default function HintLayer({
         </div>
       )}
 
-      {shown && shown.toastText && (
+      {/* The pill rides the arrow (job 3): a translate-only positioner, Fern's
+          motion layer, then the look. Hidden until the first placement. */}
+      {shown && shown.toastText && hasArrow && shown.place !== 'dock' && (
+        <div className="luxiHint-pill" ref={pillRef} style={{ visibility: 'hidden' }}>
+          <div
+            className="luxiHint-pillMotion"
+            data-state={shown.toast}
+            data-side="top"
+            data-swap={shown.swap ? '' : undefined}
+            data-snap={shown.snap ? '' : undefined}
+            data-soft={shown.soft ? '' : undefined}
+          >
+            <div className="luxiHint-pillBody" data-dismissable={canDismiss ? 'true' : 'false'}>
+              {pillContent}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* The dock: arrow-less hints, or when no side beside the arrow is clear. */}
+      {shown && shown.toastText && (!hasArrow || shown.place === 'dock') && (
         <div
           className="luxiHint-toast"
           ref={toastRef}
           data-state={shown.toast}
+          data-swap={shown.swap ? '' : undefined}
+          data-snap={shown.snap ? '' : undefined}
           data-soft={shown.soft ? '' : undefined}
           data-hint="hint-dock"
           data-dismissable={canDismiss ? 'true' : 'false'}
         >
-          <span className="luxiHint-toastText" aria-hidden="true">{shown.toastText}</span>
-          {canDismiss && (
-            <button
-              type="button"
-              className="luxiHint-dismiss"
-              aria-label={dismissLabel}
-              disabled={leaving}
-              onPointerDown={(e) => e.stopPropagation() /* never a walk-tap underneath */}
-              onClick={() => onDismiss(shown.id)}
-            >
-              <span aria-hidden="true">{dismissText}</span>
-            </button>
-          )}
+          {pillContent}
+        </div>
+      )}
+
+      {/* Hidden twin of the pill body: placePill's measure(maxW) reads it. */}
+      {shown && shown.toastText && hasArrow && (
+        <div className="luxiHint-pillBody luxiHint-measure" ref={measureRef} aria-hidden="true" data-dismissable={canDismiss ? 'true' : 'false'}>
+          <span className="luxiHint-toastText">{shown.toastText}</span>
+          {canDismiss && <span className="luxiHint-dismiss" />}
         </div>
       )}
     </div>

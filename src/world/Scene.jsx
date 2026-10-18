@@ -11,7 +11,7 @@ import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
 import Buddy from './Buddy'
 import Neighbour from './Neighbour'
-import GardenPlot from './GardenPlot'
+import GardenPlot, { BED } from './GardenPlot'
 import { Ambient } from './Spooky'
 import { FxProp } from './fx'
 import { WORLD, GEMS, STATION, CHARACTERS, assetScale } from '../config'
@@ -29,6 +29,8 @@ const GARDEN_REACH = 2.4
 const GARDEN_LEAVE = 4
 const GARDEN_PICK_Y = 1.1 // where the picked flowers hang as they pop off (plant + HARVEST.lift)
 const HINT_BED_BACK = 0.4 // …and toward the bed's back half, so the arrow clears her hat when she stands at the front to plant
+const HINT_BED_SOIL = 0.1 // the soil's height, for the bed's screen box (the pill never covers it)
+const HINT_CHAR = { half: 0.5, h: 1.4 } // her silhouette box: ±0.5 covers the staff, 1.4 the Sorcerer's hat tip
 const HINT_BED_Y = 0.3 // the hint arrow's tip: ON the soil (not the 1.1 flower height, which projects up into the toast's band and gets edge-clamped)
 
 /**
@@ -65,7 +67,7 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes, garden, gardenOpen, onGardenNear, onHarvest, hintPosRef }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes, garden, gardenOpen, onGardenNear, onHarvest, hintPosRef, hintAvoidRef }) {
   const marker = useRef() // the ring that pings on tap
   // Grow a Garden (ticket 5): `garden` = { stage, kind, watering } from App (the
   // store's plot). Tapping the bed walks her to its front edge; arriving opens
@@ -243,19 +245,54 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
       return null
     }
     const v = new THREE.Vector3()
-    hintPosRef.current = (t) => {
-      const p = hintPoint(t)
-      if (!p) return null
-      const rect = gl.domElement.getBoundingClientRect()
-      if (!rect.width) return null
-      v.set(p[0], p[1], p[2]).project(camera)
+    const toScreen = (x, y, z, rect) => {
+      v.set(x, y, z).project(camera)
       if (v.z > 1) return null
       return { x: ((v.x + 1) / 2) * rect.width, y: ((1 - v.y) / 2) * rect.height }
     }
-    return () => {
-      if (hintPosRef.current) hintPosRef.current = null
+    // Screen box of a world-space box (its 8 corners projected). null if any corner is behind the camera.
+    const boxToScreen = ([x0, y0, z0], [x1, y1, z1], rect) => {
+      let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity
+      for (const x of [x0, x1]) for (const y of [y0, y1]) for (const z of [z0, z1]) {
+        const p = toScreen(x, y, z, rect)
+        if (!p) return null
+        l = Math.min(l, p.x); r = Math.max(r, p.x); t = Math.min(t, p.y); b = Math.max(b, p.y)
+      }
+      return { left: l, top: t, right: r, bottom: b }
     }
-  }, [hintPosRef, map, camera, gl])
+    const canvasRect = () => {
+      const rect = gl.domElement.getBoundingClientRect()
+      return rect.width ? rect : null
+    }
+    // getTargetPos: the tip point + (job 3) the target's own screen box, so the pill never covers the bed
+    hintPosRef.current = (t) => {
+      const p = hintPoint(t)
+      const rect = canvasRect()
+      if (!p || !rect) return null
+      const pt = toScreen(p[0], p[1], p[2], rect)
+      if (!pt) return null
+      if (t?.world === 'garden-bed') {
+        const [gx, gz] = map.gardenPlot
+        // the SOIL only (no shadow, no frame margin) — Clover's QA: the frame margin was blocking free sides
+        pt.rect = boxToScreen([gx - BED.w / 2, 0, gz - BED.d / 2], [gx + BED.w / 2, HINT_BED_SOIL, gz + BED.d / 2], rect)
+      }
+      return pt
+    }
+    // getAvoid (job 3): her silhouette on screen — feet to hat tip, staff side included — so the pill never sits on her
+    if (hintAvoidRef) {
+      hintAvoidRef.current = () => {
+        const rect = canvasRect()
+        if (!rect) return []
+        const c = charPosRef.current
+        const r = boxToScreen([c.x - HINT_CHAR.half, 0, c.z - HINT_CHAR.half], [c.x + HINT_CHAR.half, HINT_CHAR.h, c.z + HINT_CHAR.half], rect)
+        return r ? [r] : []
+      }
+    }
+    return () => {
+      hintPosRef.current = null
+      if (hintAvoidRef) hintAvoidRef.current = null
+    }
+  }, [hintPosRef, hintAvoidRef, map, camera, gl, charPosRef])
 
   // On entering a map, snap the camera straight to the spawn point — the fade
   // overlay hides the cut; without this it would swoosh across the new map.

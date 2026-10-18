@@ -578,7 +578,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
   // ref it fills with the 3D→screen projection. Declared BELOW worldBusy and all
   // the state calm reads (the TDZ bug class). OFF in prod unless ?hints.
   const hintsRef = useRef(null)
-  const hintPosRef = useRef(null) // Scene fills: (target) => { x, y } | null
+  const hintPosRef = useRef(null) // Scene fills: (target) => { x, y, rect? } | null
+  const hintAvoidRef = useRef(null) // Scene fills: () => rect[] — her silhouette on screen (job 3)
   const [hintView, setHintView] = useState({ hint: null, exitReason: null })
   useEffect(() => {
     if (!HINTS_ON) return
@@ -594,6 +595,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
       window.__hints = () => ({ view: c.view, active: c.activeId, memory: getHintMemory() })
       window.__hintsReset = () => setHintMemory(beginSession({}))
       window.__hintPos = (t = { world: 'garden-bed' }) => hintPosRef.current?.(t) ?? null
+      window.__hintAvoid = () => hintAvoidRef.current?.() ?? []
     }
     return () => {
       c.destroy()
@@ -1064,6 +1066,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
             onGardenNear={setGardenOpen}
             onHarvest={handleHarvest}
             hintPosRef={hintPosRef}
+            hintAvoidRef={hintAvoidRef}
           />
         </Suspense>
       </Canvas>
@@ -1128,6 +1131,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
           exitReason={hintView.exitReason}
           arrowStyle={arrowForMap(MAPS[mapId], HINT_ARROW_OVERRIDE)}
           getTargetPos={(t) => hintPosRef.current?.(t) ?? null}
+          getAvoid={() => hintAvoidRef.current?.() ?? []}
+          isWalking={() => !!targetRef.current}
           dismissLabel={HINT_COPY.dismiss.aria}
           dismissText={HINT_COPY.dismiss.label}
           onDismiss={(id) => hintsRef.current?.dismiss(id)}

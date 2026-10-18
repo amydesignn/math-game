@@ -83,8 +83,12 @@
   left: 0;
   right: 0;
   margin-inline: auto;
-  width: max-content;
   max-width: calc(100% - 32px);
+}
+/* The look, shared by the docked toast and the paired pill body. */
+.luxiHint-toast,
+.luxiHint-pillBody {
+  width: max-content;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -101,12 +105,32 @@
   text-align: left;
   pointer-events: none;
 }
-.luxiHint-toast[data-dismissable='true'] {
+
+/* ── The paired pill (job 3, "sign on a post") ──
+   .luxiHint-pill is a translate-only positioner I move every frame, locked to
+   the arrow (never transitioned). .luxiHint-pillMotion is Fern's. The body
+   carries the look, inside her scale/fade. */
+.luxiHint-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+/* Hidden twin for measure(maxW): same look, never seen, never hit. */
+.luxiHint-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+}
+.luxiHint-toast[data-dismissable='true'],
+.luxiHint-pillBody[data-dismissable='true'] {
   padding: 4px 4px 4px 20px;
 }
 .luxiHint-toastText {
   flex: 1 1 auto;
   min-width: 0;
+  text-wrap: pretty; /* no lone 🌱 on line 2 */
 }
 
 /* ✕ / Not now. 40px visible circle with a 44px hit area (Clover: ≥44 for
@@ -141,7 +165,8 @@
 /* House ring is 1px Iris 700, but on this dark glass that's ~1.3:1. White,
    2px out, keeps WCAG 1.4.11 (≥3:1) on the pill. */
 .luxiHint-dismiss:focus-visible { outline: 1px solid var(--luxiHint-toast-text); outline-offset: 2px; }
-.luxiHint-toast[data-state='out'] .luxiHint-dismiss { pointer-events: none; }
+.luxiHint-toast[data-state='out'] .luxiHint-dismiss,
+.luxiHint-pillMotion:is([data-state='out'], [data-state='done'], [data-state='swap']) .luxiHint-dismiss { pointer-events: none; }
 
 /* ── Green "candy" arrow (Amy's review #1 test, ?arrow=green) ──
    Bigger, glossy, with depth. Iris stays the default for the A/B.

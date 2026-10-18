@@ -21,4 +21,8 @@ export const HINT_MOTION = {
   edgeTapDelayMs: 300, // first tap after entering edge / re-arming
   edgeTapMs: 2400, //    one tap per period (the press is the first ~30%)
   edgeTaps: 5, //        then rest (~12 s in total)
+  // job 3, the paired pill: arrival = toastDelayMs + 280 ms; leave = outMs, together with the arrow.
+  swapOutMs: 120, //     side switch / re-anchor: fade out in place, then move it…
+  swapInMs: 200, //      …and fade in on the new side (no delay, no scale). ≈320 ms total
+  swapSnapMs: 60, //     swap-out when the HELD spot turns blocked (data-snap): gone before it rides in
 }
