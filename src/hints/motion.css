@@ -1,0 +1,366 @@
+/*
+ * Hint motion (Fern, Trail crew job 1). Keyframes, timing and easing ONLY.
+ * Layout and look live in hints.css (Linden). Timings mirror ./motion.js
+ * (HINT_MOTION), so change both together.
+ *
+ * Every motion has a purpose, and anything without one was cut:
+ *   arrival  = "look here"     arrow drops in 280 ms, the dock pill rises +120 ms later
+ *   bob      = "still here"    6 px toward the target, 1.6 s, x3, then it RESTS
+ *   edge     = "over there"    the same bob; Linden's rotate aims it at the bed
+ *   retire   = "ok, gone"      200 ms, faster than the arrival
+ *   done     = "you did it"    a small hop, peak 270 ms (Wren's hintDone note 4), sinks in, gone 600 ms
+ *
+ * Hooks (Linden's HintLayer):
+ *   .luxiHint-arrow         Linden: translate + rotate, written per frame. NOT animated here.
+ *     .luxiHint-arrowMotion data-state in|shown|out|done · data-mode world|edge · [data-soft]
+ *       .luxiHint-arrowBob  the bob loop
+ *         glyph             points DOWN (+Y) in local space, tip at the bottom centre
+ *   .luxiHint-toast         data-state in|shown|out|done · [data-soft]. Centred WITHOUT transform.
+ *
+ * States change on plain setTimeouts (never rAF or animationend, the rAF-starve
+ * lesson). Arrival and retire are TRANSITIONS, so a hint that comes back
+ * mid-retire ("paused", then calm again) retargets from where it is instead of
+ * restarting. Only the bob and the one-shot done swell are keyframes.
+ *
+ * transform + opacity only. Keyframes are luxiHint-prefixed (dv / su / fb history).
+ */
+
+.luxiHint-arrowMotion,
+.luxiHint-toast {
+  --luxiHint-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)); /* Datum's ease-out */
+}
+
+/* ── Arrow: arrival + retire (transitions) ─────────────────────────────── */
+.luxiHint-arrowMotion {
+  transform-origin: 50% 100%; /* the tip: it grows from, and stays on, the bed */
+  will-change: transform, opacity;
+}
+.luxiHint-arrowMotion[data-state='in'] {
+  opacity: 0;
+  transform: translateY(-12px) scale(0.92);
+}
+.luxiHint-arrowMotion[data-state='shown'] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 280ms var(--luxiHint-ease), transform 280ms var(--luxiHint-ease);
+}
+.luxiHint-arrowMotion[data-state='out'] {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  transition: opacity 200ms var(--luxiHint-ease), transform 200ms var(--luxiHint-ease);
+}
+/* soft re-entry after a pause: fade only, no drop */
+.luxiHint-arrowMotion[data-soft][data-state='in'] { transform: none; }
+
+/* ── Arrow: done = one swell from the tip, then gone ────────────────────── */
+.luxiHint-arrowMotion[data-state='done'] {
+  animation: luxiHintPointerDone 600ms var(--luxiHint-ease) both;
+}
+@keyframes luxiHintPointerDone {
+  /* a small hop that PEAKS on hintDone's top note (270 ms; E6 since Amy's cut 04), holds a beat while it
+     rings, then sinks into the bed and fades ("planted"). Segment 1 is
+     ease-in-out so the top lands AT 270 ms, not at 90 ms (the frames showed a
+     plain ease-out plateaus early and the peak doesn't read as a moment). */
+  0%   { opacity: 1; transform: translateY(0) scale(1); animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1); }
+  45%  { opacity: 1; transform: translateY(-4px) scale(1.15); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  60%  { opacity: 1; transform: translateY(-3px) scale(1.12); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  100% { opacity: 0; transform: translateY(4px) scale(0.9); }
+}
+
+/* ── Arrow: bob, on target and at the edge ──────────────────────────────── */
+/* Toward the target along the arrow's own axis (+Y, inside Linden's rotate),
+   then back. It waits for hintShow's tail (700 ms), runs 3 slow cycles, then
+   rests. A still arrow still points, and an endless pulse tires the eye. */
+.luxiHint-arrowBob {
+  animation: luxiHintBob 1600ms cubic-bezier(0.77, 0, 0.175, 1) 700ms 3 both;
+}
+.luxiHint-arrowMotion[data-soft] .luxiHint-arrowBob { animation-iteration-count: 1; }
+.luxiHint-arrowMotion[data-state='out'] .luxiHint-arrowBob,
+.luxiHint-arrowMotion[data-state='done'] .luxiHint-arrowBob { animation: none; }
+@keyframes luxiHintBob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(6px); }
+}
+
+/* ── Toast (the dark pill): arrival + retire (transitions) ──────────────── */
+/* Job 2 (Amy: one consistent position): the pill lives in the BOTTOM DOCK at
+   every size, so it rises 16 px from the dock and sinks back into it. That's the
+   panel contract from proposal-panel.md, proven here on the pill first, so the
+   card inherits it unchanged. It follows the arrow by 120 ms ("look here", then
+   read). Toast-only hints get the same 120 ms, imperceptible after the engine's
+   3 s calm wait. Calm, never springy: it is text being read. */
+.luxiHint-toast {
+  will-change: transform, opacity;
+}
+.luxiHint-toast[data-state='in'] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.luxiHint-toast[data-state='shown'] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 280ms var(--luxiHint-ease) 120ms, transform 280ms var(--luxiHint-ease) 120ms;
+}
+.luxiHint-toast[data-state='out'],
+.luxiHint-toast[data-state='done'] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 200ms var(--luxiHint-ease), transform 200ms var(--luxiHint-ease);
+}
+.luxiHint-toast[data-soft][data-state='in'] { transform: none; }
+/* swap (job 3: paired ↔ dock): the same fade-through as the pill, in place */
+.luxiHint-toast[data-state='swap'] { opacity: 0; transform: none; transition: opacity 120ms var(--luxiHint-ease); }
+.luxiHint-toast[data-swap][data-state='in'] { transform: none; }
+.luxiHint-toast[data-swap][data-state='shown'] { transition: opacity 200ms var(--luxiHint-ease); }
+
+/* ── Paired pill, job 3 ("sign on a post") ───────────────────────────────── */
+/* The pill rides the arrow's tail side. Linden writes its translate in the
+   same tick as the arrow's (rigid, zero lag). I never animate the positioning
+   element, only .luxiHint-pillMotion inside it. Text never rotates and never
+   bobs: only the glyph taps.
+     arrival   the arrow lands (~120 ms), then the pill UNFOLDS from the arrow-facing
+               edge at +120 ms: fade + scale .96 → 1, 280 ms ("look here", then read)
+     leave     with the arrow, 200 ms, folding back toward it
+     done      shrinks toward the arrow + fades, 200 ms (normally hidden by the GardenBar)
+     swap      side switch / re-anchor / paired↔dock: 120 ms fade out, the host moves
+               it, then a 200 ms fade in, in place with no scale. A crossfade, never a slide.
+   Hooks: data-state in|shown|out|done|swap · data-side top|bottom|left|right
+   (the pill's side relative to the arrow) · [data-swap] on the fade-in after a
+   swap · [data-soft]. Timers: HINT_MOTION.swapOutMs / swapInMs. */
+.luxiHint-pillMotion {
+  --luxiHint-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+  transform-origin: 50% 100%; /* default: pill above a down arrow */
+  will-change: transform, opacity;
+}
+.luxiHint-pillMotion[data-side='bottom'] { transform-origin: 50% 0; }
+.luxiHint-pillMotion[data-side='right']  { transform-origin: 0 50%; }
+.luxiHint-pillMotion[data-side='left']   { transform-origin: 100% 50%; }
+
+.luxiHint-pillMotion[data-state='in'] {
+  opacity: 0;
+  transform: scale(0.96);
+}
+.luxiHint-pillMotion[data-state='shown'] {
+  opacity: 1;
+  transform: none;
+  transition: opacity 280ms var(--luxiHint-ease) 120ms, transform 280ms var(--luxiHint-ease) 120ms;
+}
+.luxiHint-pillMotion[data-state='out'],
+.luxiHint-pillMotion[data-state='done'] {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 200ms var(--luxiHint-ease), transform 200ms var(--luxiHint-ease);
+}
+/* swap: out fast and in place, then back in with no delay and no scale */
+.luxiHint-pillMotion[data-state='swap'] {
+  opacity: 0;
+  transform: none;
+  transition: opacity 120ms var(--luxiHint-ease);
+}
+/* blocked swap (Clover, job 3 QA): if the held spot turns blocked mid-swap, Linden
+   adds data-snap and it's gone in 60 ms instead of riding into the blocked spot. */
+.luxiHint-pillMotion[data-snap][data-state='swap'],
+.luxiHint-toast[data-snap][data-state='swap'] { transition: opacity 60ms var(--luxiHint-ease); }
+.luxiHint-pillMotion[data-swap][data-state='in'],
+.luxiHint-pillMotion[data-soft][data-state='in'] { transform: none; }
+.luxiHint-pillMotion[data-swap][data-state='shown'] {
+  transition: opacity 200ms var(--luxiHint-ease);
+}
+
+/* ── Bolder done (Amy's taste call, OFF by default) ─────────────────────── */
+/* Set data-motion="bold" on .luxiHint-arrow: a bigger swell plus two soft gold
+   ripples spreading across the soil from the tip. The ripples are ellipses
+   because the bed is seen from above at an angle. They sit on .luxiHint-arrow
+   (not the fading motion layer) so they outlive the swell, and both finish
+   by 600 ms. */
+.luxiHint-arrow[data-motion='bold'][data-state='done'] .luxiHint-arrowMotion {
+  animation-name: luxiHintPointerDoneBold;
+}
+@keyframes luxiHintPointerDoneBold {
+  0%   { opacity: 1; transform: translateY(0) scale(1); animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1); }
+  45%  { opacity: 1; transform: translateY(-8px) scale(1.25); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  60%  { opacity: 1; transform: translateY(-6px) scale(1.2); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  100% { opacity: 0; transform: translateY(4px) scale(0.9); }
+}
+.luxiHint-arrow[data-motion='bold'][data-state='done']::before,
+.luxiHint-arrow[data-motion='bold'][data-state='done']::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 56px;
+  height: 20px;
+  margin: -10px 0 0 -28px;
+  border-radius: 50%;
+  border: 3px solid rgba(245, 182, 35, 0.85); /* --star-gold, the house reward accent */
+  opacity: 0;
+  pointer-events: none;
+  animation: luxiHintRipple 400ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 200ms forwards; /* forwards, not both: nothing shows during the delay */
+}
+.luxiHint-arrow[data-motion='bold'][data-state='done']::after {
+  border-color: rgba(46, 197, 197, 0.7); /* --gem-cyan */
+  animation-delay: 260ms;
+  animation-duration: 340ms;
+}
+@keyframes luxiHintRipple {
+  0%   { opacity: 0.9; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+
+/* ══ GREEN ARROW TEST (Amy review #1: "more dramatic and noticeable") ══════
+   Scoped to the CANDY arrows: green (now the default) and pink (green-ground
+   maps). Same DOM; only colours differ. Keyed :is([data-candy], green, pink),
+   so a future candy colour only needs data-candy from Linden. The Iris arrow
+   above keeps its job-1 motion. Same timers
+   (motion.js), same transform + opacity only. The drama comes from WEIGHT
+   (a longer drop, a landing squash, a ground shadow the arrow lifts off,
+   taps rather than sine bobs), never from speed or jitter.
+   Layers (Linden, 56×64 glyph, tip at origin):
+     .luxiHint-arrow[data-arrow=green]
+       > .luxiHint-arrowShadow[data-state]   ground ellipse at the tip, stays put
+       > .luxiHint-arrowMotion > .luxiHint-arrowBob > glyph */
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) {
+  --luxiHint-press: cubic-bezier(0.77, 0, 0.175, 1); /* strong ease-in-out: on-screen movement */
+}
+
+/* Arrival: drops from 28 px (vs 12), lands at ~120 ms (hintShow note 2). */
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-state='in'] {
+  transform: translateY(-28px) scale(0.9);
+}
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-soft][data-state='in'] { transform: none; }
+
+/* Landing squash + the tap rhythm both ride the bob layer as ONE animation
+   list, so the in→shown flip never restarts them. The squash peaks as the drop
+   lands (~140 ms) and is settled by 360 ms. The tap starts after the sound tail (700 ms). */
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowBob {
+  animation:
+    luxiHintGreenLand 360ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1)) 0ms 1 none,
+    luxiHintGreenTap 1600ms linear 700ms 4 none;
+}
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-soft] .luxiHint-arrowBob {
+  animation: luxiHintGreenTap 1600ms linear 400ms 1 none;
+}
+@keyframes luxiHintGreenLand {
+  0%, 30% { transform: none; }
+  45%     { transform: scale(1.06, 0.9); } /* squash toward the tip */
+  100%    { transform: none; }
+}
+/* On target, "here, HERE": a press toward the bed with a small squash, a
+   spring back, then a rest. 4 taps, then still (Clover: a still arrow keeps
+   reading). Per-segment curves are set in the keyframes. */
+@keyframes luxiHintGreenTap {
+  0%   { transform: none; animation-timing-function: var(--luxiHint-press); }
+  18%  { transform: translateY(10px) scale(1.04, 0.94); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  40%  { transform: none; }
+  100% { transform: none; }
+}
+
+/* Edge (the arrow kids miss most): a stronger tap toward the off-screen bed,
+   one every 2.4 s, 5 taps (~12 s) then rest (Amy, review 1). The host re-arms it
+   when the camera moves. data-mode flips also restart it. */
+/* Re-arm = Linden flips data-arm 1↔2 (only after a full run has rested AND the
+   camera moved ≥24 px / ≥10°). A changed animation-name restarts the run cleanly
+   with no remount, so A and B are identical. Timing is exported as
+   HINT_MOTION.edgeTap* in motion.js; keep both in step. */
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-mode='edge'] .luxiHint-arrowBob {
+  animation: luxiHintGreenEdgeA 2400ms linear 300ms 5 none;
+}
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-mode='edge'][data-arm='2'] .luxiHint-arrowBob {
+  animation-name: luxiHintGreenEdgeB;
+}
+@keyframes luxiHintGreenEdgeB {
+  0%   { transform: none; animation-timing-function: var(--luxiHint-press); }
+  12%  { transform: translateY(12px) scale(1.04, 0.94); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  30%  { transform: none; }
+  100% { transform: none; }
+}
+@keyframes luxiHintGreenEdgeA {
+  0%   { transform: none; animation-timing-function: var(--luxiHint-press); }
+  12%  { transform: translateY(12px) scale(1.04, 0.94); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  30%  { transform: none; }
+  100% { transform: none; }
+}
+
+/* Stop the tap on retire / done (beats the green rules above on specificity). */
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-state='out'] .luxiHint-arrowBob,
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-state='done'] .luxiHint-arrowBob { animation: none; }
+
+/* Done: an anticipation squash, a bigger hop that peaks at 270 ms (hintDone top note,
+   E6 since cut 04), then it dives into the bed: "planted". Gone by 600 ms. */
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-state='done'],
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink'])[data-motion='bold'][data-state='done'] .luxiHint-arrowMotion {
+  animation: luxiHintGreenDone 600ms linear both;
+}
+@keyframes luxiHintGreenDone {
+  0%   { opacity: 1; transform: none; animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  12%  { opacity: 1; transform: scale(1.05, 0.9); animation-timing-function: var(--luxiHint-press); }
+  45%  { opacity: 1; transform: translateY(-10px) scale(1.25); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  60%  { opacity: 1; transform: translateY(-9px) scale(1.22); animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1); }
+  100% { opacity: 0; transform: translateY(12px) scale(0.7); }
+}
+
+/* The ground shadow: it stays on the bed while the arrow drops, taps and hops
+   above it. It spreads when the arrow comes close and shrinks when it lifts. That's
+   depth, not speed. Hidden at the edge (data-mode mirrored on .luxiHint-arrow), where there is no ground under the arrow. */
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowShadow { transform-origin: 50% 50%; }
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowShadow[data-state='in'] {
+  opacity: 0; transform: scale(0.6);
+}
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowShadow[data-state='shown'] {
+  opacity: 1; transform: none;
+  transition: opacity 280ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1)), transform 280ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
+  animation: luxiHintShadowTap 1600ms linear 700ms 4 none;
+}
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowShadow[data-state='out'] {
+  opacity: 0; transform: scale(0.8);
+  transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1)), transform 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
+}
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowShadow[data-state='done'] {
+  animation: luxiHintShadowDone 600ms linear both;
+}
+.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink'])[data-mode='edge'] .luxiHint-arrowShadow { opacity: 0; transition: none; animation: none; }
+@keyframes luxiHintShadowTap {
+  0%   { transform: none; animation-timing-function: var(--luxiHint-press); }
+  18%  { transform: scale(1.2); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  40%, 100% { transform: none; }
+}
+@keyframes luxiHintShadowDone {
+  0%   { opacity: 1; transform: none; animation-timing-function: var(--luxiHint-press); }
+  45%  { opacity: 0.6; transform: scale(0.75); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); } /* arrow at its highest */
+  80%  { opacity: 0.8; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.1); }
+}
+
+/* ── Reduced motion: calm and static, still communicates ────────────────── */
+/* No drop, bob, swell or ripple. Opacity fades only (200 ms ease), and the
+   arrow sits still, pointing. The timers in motion.js are unchanged: every
+   state still finishes inside them. */
+@media (prefers-reduced-motion: reduce) {
+  .luxiHint-arrowMotion[data-state],
+  .luxiHint-toast[data-state],
+  .luxiHint-pillMotion[data-state] {
+    transform: none !important;
+  }
+  .luxiHint-pillMotion[data-state='shown'],
+  .luxiHint-pillMotion[data-state='out'],
+  .luxiHint-pillMotion[data-state='done'] {
+    transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
+  }
+  .luxiHint-arrowMotion[data-state='shown'],
+  .luxiHint-arrowMotion[data-state='out'],
+  .luxiHint-toast[data-state='shown'],
+  .luxiHint-toast[data-state='out'],
+  .luxiHint-toast[data-state='done'] {
+    transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
+  }
+  .luxiHint-arrowMotion[data-state='done'] {
+    animation: none !important;
+    opacity: 0;
+    transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
+  }
+  .luxiHint-arrowBob { animation: none !important; }
+  .luxiHint-arrowShadow { transform: none !important; animation: none !important; transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1)) !important; }
+  .luxiHint-arrowShadow[data-state='done'] { opacity: 0; }
+  .luxiHint-arrow::before,
+  .luxiHint-arrow::after { animation: none !important; content: none !important; }
+}

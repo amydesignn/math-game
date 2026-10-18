@@ -119,6 +119,24 @@ export const SFX = {
   // three-note chime, 3 times back to back (~2.8 s). One burst of gems = ONE
   // sequence, so the 3 flying gems (and a station's bonus gem) never pile up.
   gem: { gain: 0.1, notes: CHIME, repeat: 3, every: 1.0 },
+
+  // ── In-game hints (Trail crew job 1, 2026-10-17 — Wren). Same E-major family
+  // as the gem chime so the game sounds like one world, and quieter than it.
+  // `yields: true` = a hint cue steps aside: if ANY effect is still ringing
+  // (the 2.8 s gem chime above all) it doesn't play, so it never stacks on gems.
+  // hintShow — the soft "look here" when the arrow arrives: B5 → E6, ~0.7 s,
+  // half the gem's gain. Note 2 at 120 ms = the arrow's landing (Fern's beat).
+  hintShow: { gain: 0.05, notes: [[987.77, 0, 0.4], [1318.51, 0.12, 0.58]], yields: true },
+  // hintDone — the small reward when she plants (the garden hint's cue). Amy's
+  // pick 2026-10-17 ("I love the 4 the most"): the gem's E-major arpeggio an
+  // octave DOWN — E5 → G#5 → B5 → E6, ONCE (~1 s). Earthier, a garden sound, and
+  // it sits under the gem's E6–B6 so the two never sound like the same event.
+  // The top note at 270 ms = the "you did it" peak (Fern's swell).
+  hintDone: { gain: 0.09, notes: [[659.26, 0, 0.5], [830.61, 0.09, 0.5], [987.77, 0.18, 0.5], [1318.51, 0.27, 0.73]], yields: true },
+  // Kept for later hints (Amy: "they can stay"), not wired to anything yet.
+  hintShowSingle: { gain: 0.05, notes: [[1318.51, 0, 0.8]], yields: true }, // one bell, E6
+  hintDoneBloom: { gain: 0.08, notes: [...CHIME.map(([f, at]) => [f, at, 0.5]), [2637.02, 0.27, 0.73]], yields: true }, // the gem's octave + E7 on top — brighter
+  hintDoneLong: { gain: 0.08, notes: [...CHIME.map(([f, at]) => [f, at, 0.5]), [2637.02, 0.27, 0.73]], repeat: 2, every: 1.0, yields: true }, // ×2, ~2 s (over the 1 s rule — Amy's call)
 }
 const lastSfx = {} // name → when its current play finishes (ms) — a burst inside it is skipped
 
@@ -137,6 +155,7 @@ export function playSfx(name) {
   if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return false
   const now = Date.now()
   if (now < (lastSfx[name] || 0)) return false
+  if (r.yields && Object.values(lastSfx).some((until) => now < until)) return false // a hint cue never stacks on another sound
   lastSfx[name] = now + sfxLength(r) * 1000
   const t0 = sfxCtx.currentTime
   for (let k = 0; k < (r.repeat || 1); k++) {

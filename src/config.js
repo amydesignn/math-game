@@ -318,3 +318,26 @@ export const MUSIC_TRACKS = [
   { id: 'soft-focus', label: 'Soft Focus', file: 'bgm-soft-focus.mp3', gain: 0.75 },
 ]
 export const DEFAULT_MUSIC = 'island'
+
+// ── In-game hints flag (Trail crew, job 1) ──
+// ON in dev, OFF in production builds — Amy decides when hints go live, because
+// a garden nudge would change the plant/replant numbers ticket 9's popup needs
+// as its clean baseline. `?hints` turns them on anywhere (a prod preview for
+// Amy); `?hints=0` turns them off in dev (QA of the no-hint game).
+export function hintsEnabled(dev, search = '') {
+  const q = new URLSearchParams(search)
+  if (q.has('hints')) return q.get('hints') !== '0' && q.get('hints') !== 'off'
+  return !!dev
+}
+export const HINTS_ON = hintsEnabled(import.meta.env.DEV, globalThis.location?.search || '')
+
+// Hint arrow colour (Amy, 2026-10-17): GREEN is the default arrow; on green
+// ground (the grass maps) it's PINK so it never melts into the grass. The map
+// is resolved in gameHints.js (arrowForMap) from each map's ground colour.
+// `?arrow=iris|green|pink` overrides it everywhere — dev comparison only.
+export const HINT_ARROW_VARIANTS = ['iris', 'green', 'pink']
+export function hintArrowOverride(search = '') {
+  const v = new URLSearchParams(search).get('arrow')
+  return HINT_ARROW_VARIANTS.includes(v) ? v : null
+}
+export const HINT_ARROW_OVERRIDE = hintArrowOverride(globalThis.location?.search || '')

@@ -1,0 +1,250 @@
+// Pure screen-space maths for the hint arrow. No DOM, no React, no imports.
+//
+// The arrow is drawn POINTING DOWN at rest; `angle` is the CSS rotate (deg)
+// that turns it toward its target. On-screen: angle 0, tip on the point.
+// Off-screen (or inside a HUD band): the tip is clamped onto the edge of the
+// safe rect along the line from the rect's centre, and rotated to point at it.
+
+export const DEFAULT_INSETS = { top: 168, right: 16, bottom: 132, left: 16 } // Linden's measured HUD bands
+export const EDGE_HYSTERESIS = 24 // px a point must be clear inside before an edge arrow returns to world mode
+export const REARM_MOVE_PX = 24 // the edge arrow re-arms its taps after a rest once its spot moves this far…
+export const REARM_TURN_DEG = 10 // …or turns this much (the camera moved)
+export const DEFAULT_ARROW = { w: 56, h: 64 } // the candy arrow's box (tip + body)
+const AVOID_GAP = 4
+
+// ── Avoiding the real HUD (job 2, Clover's root cause) ──
+// Instead of guessing fat HUD bands, the host passes the live rects of what
+// must never be covered (`avoid`). A world arrow whose body would hit one HANGS
+// (tip on the point, body below). An edge arrow slides along its edge until it
+// is clear, then re-aims at the target.
+const okRect = (r) => r && r.right > r.left && r.bottom > r.top
+
+/** Bounding box of an arrow: tip at (x,y), body `h` long behind it, `w` wide. */
+export function arrowBox({ x, y, angle }, arrow = DEFAULT_ARROW) {
+  const r = (angle * Math.PI) / 180
+  const bx = x + Math.sin(r) * arrow.h, by = y - Math.cos(r) * arrow.h // body end (behind the tip)
+  const hw = arrow.w / 2
+  const px = Math.abs(Math.cos(r)) * hw, py = Math.abs(Math.sin(r)) * hw // the arrow's width lies ACROSS its axis
+  return { left: Math.min(x, bx) - px, right: Math.max(x, bx) + px, top: Math.min(y, by) - py, bottom: Math.max(y, by) + py }
+}
+const hits = (b, r) => b.left < r.right + AVOID_GAP && b.right > r.left - AVOID_GAP && b.top < r.bottom + AVOID_GAP && b.bottom > r.top - AVOID_GAP
+const clearOf = (p, rects, arrow) => !rects.some((r) => hits(arrowBox(p, arrow), r))
+
+function hangClear(p, rects, arrow) {
+  if (clearOf(p, rects, arrow)) return p
+  const hang = { ...p, angle: 180 } // tip still ON the point, body below
+  return clearOf(hang, rects, arrow) ? hang : p
+}
+
+function slideClear(p, pt, size, insets, rects, arrow) {
+  if (clearOf(p, rects, arrow)) return p
+  const i = { ...DEFAULT_INSETS, ...insets }
+  const L = i.left, T = i.top, R = Math.max(L, size.w - i.right), B = Math.max(T, size.h - i.bottom)
+  const onX = Math.abs(p.y - T) < 0.5 || Math.abs(p.y - B) < 0.5 // on the top/bottom edge → slide in x
+  const STEP = 4
+  for (let d = STEP; d < Math.max(size.w, size.h); d += STEP) {
+    for (const s of [-1, 1]) {
+      const x = onX ? p.x + s * d : p.x, y = onX ? p.y : p.y + s * d
+      if (x < L || x > R || y < T || y > B) continue
+      const q = { x, y, angle: angleToward(pt.x - x, pt.y - y, pt.x - x, pt.y - y), edge: true }
+      if (clearOf(q, rects, arrow)) return q
+    }
+  }
+  return p // nowhere clear on this edge: keep the honest clamp
+}
+
+/**
+ * @param {{x:number,y:number}} pt   target point, px relative to the layer (may be off-screen)
+ * @param {{w:number,h:number}} size layer size
+ * @param {{top,right,bottom,left}} insets safe rect = size minus these bands
+ * @returns {{x:number,y:number,angle:number,edge:boolean}}
+ */
+export function placeArrow(pt, size, insets = DEFAULT_INSETS, opts = {}) {
+  const p = placeRaw(pt, size, insets, opts)
+  const { avoid = [], arrow = DEFAULT_ARROW } = opts
+  const rects = avoid.filter(okRect)
+  if (!rects.length) return p
+  return p.edge ? slideClear(p, pt, size, insets, rects, arrow) : hangClear(p, rects, arrow)
+}
+
+function placeRaw(pt, size, insets = DEFAULT_INSETS, { wasEdge = false, hysteresis = EDGE_HYSTERESIS } = {}) {
+  const i = { ...DEFAULT_INSETS, ...insets }
+  const L = i.left, T = i.top
+  const R = Math.max(L, size.w - i.right), B = Math.max(T, size.h - i.bottom)
+  if (pt.x >= L && pt.x <= R && pt.y >= T && pt.y <= B) {
+    // Hysteresis (Amy's review): world→edge flips AT the boundary, but edge→world
+    // only once the point is `hysteresis` px clear inside. Without it a bed near a
+    // HUD band flips mode frame to frame and restarts the edge keyframes. Inside
+    // that strip the geometry still follows the point (no jump) — only the MODE
+    // stays edge. Asymmetric on purpose: a world arrow never sits inside a band.
+    const h = Math.max(0, Math.min(hysteresis, (R - L) / 2, (B - T) / 2))
+    const clear = pt.x >= L + h && pt.x <= R - h && pt.y >= T + h && pt.y <= B - h
+    return { x: pt.x, y: pt.y, angle: 0, edge: wasEdge && !clear }
+  }
+  const cx = (L + R) / 2, cy = (T + B) / 2
+  const dx = pt.x - cx, dy = pt.y - cy
+  const hx = (R - L) / 2, hy = (B - T) / 2
+  // smallest t at which the ray centre→pt leaves the rect
+  const tx = dx ? hx / Math.abs(dx) : Infinity
+  const ty = dy ? hy / Math.abs(dy) : Infinity
+  const t = Math.min(tx, ty, 1)
+  const x = cx + dx * t, y = cy + dy * t
+  return { x, y, angle: angleToward(pt.x - x, pt.y - y, dx, dy), edge: true }
+}
+
+/** CSS rotate (deg) that turns a DOWN-pointing arrow along (dx, dy). Screen y is down. */
+export function arrowAngle(dx, dy) {
+  if (!dx && !dy) return 0
+  let a = Math.round(((Math.atan2(-dx, dy) * 180) / Math.PI) * 10) / 10
+  if (a <= -180) a += 360 // range (-180, 180]: straight up is always 180
+  return a + 0 // +0 turns -0 into 0
+}
+
+// Point from the clamped tip toward the target; if they coincide (degenerate rect), use the centre ray.
+function angleToward(ex, ey, dx, dy) {
+  return Math.hypot(ex, ey) > 0.5 ? arrowAngle(ex, ey) : arrowAngle(dx, dy)
+}
+
+/** Top-centre of a [data-hint=key] element, relative to `origin` (a DOMRect-like). null if absent/hidden. */
+export function domTargetPos(key, origin = { left: 0, top: 0 }, doc = globalThis.document) {
+  const el = doc?.querySelector?.(`[data-hint="${key}"]`)
+  if (!el) return null
+  const r = el.getBoundingClientRect()
+  if (!r.width && !r.height) return null
+  return { x: r.left + r.width / 2 - origin.left, y: r.top - origin.top }
+}
+
+/** Has an edge arrow moved enough since its last arm to tap again? (Amy's
+ *  "5 taps, rest, re-arm when the camera moves".) Compares two placements. */
+export function movedEnough(a, b, px = REARM_MOVE_PX, deg = REARM_TURN_DEG) {
+  if (!a || !b) return false
+  if (Math.hypot(a.x - b.x, a.y - b.y) >= px) return true
+  const d = Math.abs((((a.angle - b.angle) % 360) + 540) % 360 - 180)
+  return d >= deg
+}
+
+// ── The pill rides the arrow ("sign on a post", job 3) ──
+// The pill sits on the arrow's TAIL side, `gap` px past the body end; fallbacks
+// right → left of the arrow's box; nothing fits → the bottom dock. Text never
+// rotates (the pill is an axis-aligned box). It is LOCKED to the arrow (x/y
+// follow it every frame) but switches SIDE only when she's stopped walking —
+// unless its side becomes blocked — and a switch needs `buffer` px of room.
+export const PILL_GAP = 8
+export const PILL_BUFFER = 24
+export const PILL_SIDES = ['tail', 'right', 'left']
+const GUTTER = { top: 16, right: 16, bottom: 16, left: 16 }
+
+const grow = (r, pad) => ({ left: r.left - pad, right: r.right + pad, top: r.top - pad, bottom: r.bottom + pad })
+const overlap = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+const clampN = (v, lo, hi) => (hi < lo ? lo : Math.min(Math.max(v, lo), hi))
+
+/**
+ * @param {{x,y,angle,edge}} arrow  placeArrow's result
+ * @param {(maxW:number)=>{w:number,h:number}} measure  the pill's size if it may be at most maxW wide
+ * @param {{w,h}} size  layer size
+ * @param {Array<{left,top,right,bottom}>} avoid  HUD + world rects (her character, the bed) — never covered
+ * @param {null|'tail'|'right'|'left'|'dock'} prevSide  last frame's side
+ * @returns {{x:number|null,y:number|null,w?:number,h?:number,side:string,docked:boolean}}
+ */
+export function placePill(arrow, measure, size, avoid = [], prevSide = null, { walking = false, buffer = PILL_BUFFER, gap = PILL_GAP, insets = GUTTER, arrowSize = DEFAULT_ARROW } = {}) {
+  const i = { ...GUTTER, ...insets }
+  const L = i.left, T = i.top, R = size.w - i.right, B = size.h - i.bottom
+  const ab = arrowBox(arrow, arrowSize)
+  const rects = avoid.filter(okRect)
+  const rad = ((arrow.angle || 0) * Math.PI) / 180
+  const u = { x: Math.sin(rad), y: -Math.cos(rad) } // tip → tail direction
+  const end = { x: arrow.x + u.x * arrowSize.h, y: arrow.y + u.y * arrowSize.h } // body end
+
+  // The pill's box at a side, before any slide (clamped on screen). null = no room on that side.
+  const baseOf = (side) => {
+    let maxW, m, x, y
+    if (side === 'tail') {
+      const horiz = Math.abs(u.x) > Math.abs(u.y)
+      maxW = horiz ? (u.x > 0 ? R - (end.x + gap) : end.x - gap - L) : R - L
+      if (maxW > 0) {
+        m = measure(maxW)
+        const ext = (Math.abs(u.x) * m.w) / 2 + (Math.abs(u.y) * m.h) / 2
+        x = end.x + u.x * (gap + ext) - m.w / 2
+        y = end.y + u.y * (gap + ext) - m.h / 2
+      }
+    } else if (side === 'above' || side === 'below') {
+      // edge arrows only: stacked straight above/below, aligned with the arrow
+      maxW = R - L
+      m = measure(maxW)
+      x = (ab.left + ab.right) / 2 - m.w / 2
+      y = side === 'above' ? ab.top - gap - m.h : ab.bottom + gap
+    } else {
+      maxW = side === 'right' ? R - (ab.right + gap) : ab.left - gap - L
+      if (maxW > 0) {
+        m = measure(maxW)
+        x = side === 'right' ? ab.right + gap : ab.left - gap - m.w
+        y = (ab.top + ab.bottom) / 2 - m.h / 2
+      }
+    }
+    if (!m || !(m.w > 0) || !(m.h > 0)) return null
+    return { x: clampN(x, L, R - m.w), y: clampN(y, T, B - m.h), w: m.w, h: m.h, side, docked: false }
+  }
+  const fits = (c, pad) => {
+    if (!c) return false
+    const b = { left: c.x, top: c.y, right: c.x + c.w, bottom: c.y + c.h }
+    if (b.left < L - 0.5 || b.right > R + 0.5 || b.top < T - 0.5 || b.bottom > B + 0.5) return false
+    if (overlap(b, ab)) return false // never on its own arrow
+    return !rects.some((r) => overlap(b, grow(r, pad)))
+  }
+  // Slide ALONG the arrow (job 3 QA): if a side's centred spot is blocked, the
+  // pill may slide across the arrow's axis to the nearest clear spot, as long as
+  // it still overlaps the arrow by ATTACH px on that axis — so it stays visibly
+  // with the arrow (a sign beside the post, not somewhere else on screen).
+  // Two attachment strengths: first the pill must overlap the arrow by 16px on
+  // the slide axis (beside the body); only if NO side works that way may it sit
+  // corner-to-corner with the arrow, `gap` px off (still touching-close, never
+  // elsewhere) — Clover's phone-in-front-of-the-bed and iPad-arrival cases.
+  let ATTACH = 16
+  const cache = {}
+  const cand = (side, pad) => {
+    const key = side + pad + ':' + ATTACH
+    if (key in cache) return cache[key]
+    const c0 = baseOf(side)
+    if (!c0 || fits(c0, pad)) return (cache[key] = fits(c0, pad) ? c0 : null)
+    const slideX = (side === 'tail' && Math.abs(u.y) >= Math.abs(u.x)) || side === 'above' || side === 'below'
+    const lo = slideX ? Math.max(L, ab.left + ATTACH - c0.w) : Math.max(T, ab.top + ATTACH - c0.h)
+    const hi = slideX ? Math.min(R - c0.w, ab.right - ATTACH) : Math.min(B - c0.h, ab.bottom - ATTACH)
+    const at = slideX ? c0.x : c0.y
+    for (let d = 4; d <= Math.max(at - lo, hi - at); d += 4) {
+      for (const v of [at - d, at + d]) {
+        if (v < lo || v > hi) continue
+        const c = slideX ? { ...c0, x: v } : { ...c0, y: v }
+        if (fits(c, pad)) return (cache[key] = c)
+      }
+    }
+    return (cache[key] = null)
+  }
+  // An EDGE arrow has no target on screen to cover, so it may also carry the pill
+  // stacked straight above/below it (Clover's iPad arrival: her silhouette sat
+  // across the arrow's band). World arrows never do — that's the target's spot.
+  const SIDES = arrow.edge ? [...PILL_SIDES, 'above', 'below'] : PILL_SIDES
+  const rank = (s) => SIDES.indexOf(s)
+  let kept = null
+  if (SIDES.includes(prevSide)) {
+    kept = cand(prevSide, 0)
+    if (!kept) {
+      ATTACH = -gap // it may have been corner-attached last frame: still its side
+      kept = cand(prevSide, 0)
+      ATTACH = 16
+    }
+  }
+  if (kept) {
+    if (walking) return kept // no hopping sides mid-walk
+    const better = SIDES.find((s) => rank(s) < rank(prevSide) && cand(s, buffer))
+    return better ? cand(better, buffer) : kept
+  }
+  // first placement, or its side got blocked: switch now, walking or not
+  for (const attach of [16, -gap]) {
+    ATTACH = attach
+    const roomy = SIDES.find((s) => cand(s, buffer))
+    if (roomy) return cand(roomy, buffer)
+    const tight = SIDES.find((s) => cand(s, 0))
+    if (tight) return cand(tight, 0)
+  }
+  return { x: null, y: null, side: 'dock', docked: true }
+}

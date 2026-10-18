@@ -121,6 +121,7 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
 
   return (
     <canvas
+      data-hint="minimap"
       ref={canvas}
       width={SIZE * 2}
       height={SIZE * 2}

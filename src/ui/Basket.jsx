@@ -17,6 +17,7 @@ export function BasketButton({ total, onTap, className = '', buttonRef }) {
     <button
       ref={buttonRef}
       aria-label={`Open your basket — ${total} harvested`}
+      data-hint="basket"
       className={`hud-basket ${className}`}
       onPointerDown={(e) => e.stopPropagation()}
       onClick={onTap}

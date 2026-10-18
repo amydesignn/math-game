@@ -16,16 +16,20 @@ import { SettingsSheet, ProfilePopover } from './ui/Settings'
 import { Onboarding } from './ui/Onboarding'
 import { FeedbackModal } from './ui/FeedbackModal'
 import PromoPopup, { PROMO, promoActive } from './ui/PromoPopup'
+import HintLayer from './hints/HintLayer'
+import { createHintController, beginSession } from './hints'
+import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, arrowForMap, isWorldTap } from './gameHints'
+import { HINT_COPY } from './gameHintsCopy'
 import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
 import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } from './math'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
 import * as metrics from './metrics'
-import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, buyGear, setGear, buyHero, setCharacter, pendingLevelUps, recordLevelUp, getLevelUps, claimPromo, hasSeenPromo, getGarden, plantSeed, waterPlot, harvest } from './store'
-import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic } from './audio'
+import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, buyGear, setGear, buyHero, setCharacter, pendingLevelUps, recordLevelUp, getLevelUps, claimPromo, hasSeenPromo, getGarden, plantSeed, waterPlot, harvest, getHintMemory, setHintMemory, beginHintSession } from './store'
+import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic, playSfx } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
-import { WORLD, REFRESH, GARDEN, SEED_KINDS } from './config'
+import { WORLD, REFRESH, GARDEN, SEED_KINDS, HINTS_ON, HINT_ARROW_OVERRIDE } from './config'
 import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
@@ -298,8 +302,14 @@ export default function App({ cloud = false, justSignedIn = false }) {
   }
   function handlePlant() {
     const first = getGarden().harvests === 0 // one plot: no harvest yet = her very first seed
+    const hintLive = hintsRef.current?.activeId === GARDEN_HINT_ID // the garden hint is up (shown or paused)
     if (!plantSeed()) return
     metrics.gardenEvent(first ? 'plant_first' : 'replant')
+    if (hintLive) {
+      playSfx('hintDone') // Wren: only the plant that retires a live hint — never on dismiss
+      // flip the hint to 'done' in the SAME tick as the note, so Fern's hop peaks on it
+      hintsRef.current.update(currentHintCtx())
+    }
     syncGarden(false)
   }
   function handleWater() {
@@ -561,6 +571,47 @@ export default function App({ cloud = false, justSignedIn = false }) {
     setLevelPopup({ level: next, message: text, from })
     setLevelQueue(rest)
   }, [levelPopup, worldBusy, levelQueue])
+
+  // ── In-game hints (Trail crew, job 1): the contextual "look here" sign ──
+  // Engine + layer live in src/hints/ (app-agnostic); Luxi's config is
+  // gameHints.js. App only builds the ctx, plays the sounds, and hands Scene a
+  // ref it fills with the 3D→screen projection. Declared BELOW worldBusy and all
+  // the state calm reads (the TDZ bug class). OFF in prod unless ?hints.
+  const hintsRef = useRef(null)
+  const hintPosRef = useRef(null) // Scene fills: (target) => { x, y, rect? } | null
+  const hintAvoidRef = useRef(null) // Scene fills: () => rect[] — her silhouette on screen (job 3)
+  const [hintView, setHintView] = useState({ hint: null, exitReason: null })
+  useEffect(() => {
+    if (!HINTS_ON) return
+    beginHintSession(beginSession) // this boot = one session (memoized: StrictMode-safe)
+    const c = createHintController({
+      hints: GAME_HINTS,
+      memory: { load: getHintMemory, save: setHintMemory },
+      onChange: setHintView,
+      onShow: () => playSfx('hintShow'), // once per showing; a resume after a pause is silent
+    })
+    hintsRef.current = c
+    if (import.meta.env.DEV) {
+      window.__hints = () => ({ view: c.view, active: c.activeId, memory: getHintMemory() })
+      window.__hintsReset = () => setHintMemory(beginSession({}))
+      window.__hintPos = (t = { world: 'garden-bed' }) => hintPosRef.current?.(t) ?? null
+      window.__hintAvoid = () => hintAvoidRef.current?.() ?? []
+    }
+    return () => {
+      c.destroy()
+      hintsRef.current = null
+    }
+  }, [])
+  // A natural pause: in a world, nothing open over it, nothing mid-move — and
+  // she has walked once, so "Tap anywhere to walk" (MoveHint, the first lesson)
+  // always speaks first and the two never share the screen (job 2).
+  // (The GardenBar does NOT break calm — at the bed the hint goes arrow-only.)
+  const hintCalm =
+    moved && !worldBusy && !mathBusyRef.current && !levelPopup && !settingsOpen && !showOnboarding && !promoShowing && !signup && !feedbackOpen && selectedId == null
+  const currentHintCtx = () => hintCtx({ mapId, hasPlot: !!MAPS[mapId]?.gardenPlot, garden: getGarden(), calm: hintCalm, gardenOpen })
+  useEffect(() => {
+    hintsRef.current?.update(currentHintCtx())
+  })
 
   // ── Phase B: entering and leaving the meadow ──
   // Join FIRST (the world stays playable while the channel connects; a
@@ -897,7 +948,10 @@ export default function App({ cloud = false, justSignedIn = false }) {
   const clampZoom = (z) => Math.min(WORLD.zoomMax, Math.max(WORLD.zoomMin, z))
 
   function onPointerDown(e) {
-    setMoved(true)
+    // The walk lesson is learned by a tap IN the world — not the Door's Play /
+    // Resume tap, which also lands in this root div (that bug hid MoveHint).
+    // Once per page session: gate travel and Door round-trips don't re-teach it.
+    if (isWorldTap(view, e.target)) setMoved(true)
     unlockAudio() // browsers only allow sound after a user gesture
 
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
@@ -1014,6 +1068,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
             gardenOpen={gardenOpen}
             onGardenNear={setGardenOpen}
             onHarvest={handleHarvest}
+            hintPosRef={hintPosRef}
+            hintAvoidRef={hintAvoidRef}
           />
         </Suspense>
       </Canvas>
@@ -1036,7 +1092,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
             the level bar (Amy 2026-08-30). enterMeadow stays for the dev hook +
             the Door card. */}
         {!placing && !shopOpen && selectedId == null && !meadow && (
-          <RoundHudButton aria="Open the Gem Shop" emoji="🛍️" onTap={() => setShopOpen(true)} />
+          <RoundHudButton aria="Open the Gem Shop" emoji="🛍️" hintKey="shop-button" onTap={() => setShopOpen(true)} />
         )}
       </div>
 
@@ -1051,6 +1107,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
         <LevelBar points={points} gems={gems} gemRef={hudGemRef} onLevelUp={onLevelUp} onOpen={() => setProgressOpen(true)} />
         {!placing && !shopOpen && selectedId == null && !meadow && (
           <button
+            data-hint="settings-button"
             aria-label="Open Settings"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => setSettingsOpen(true)}
@@ -1068,9 +1125,22 @@ export default function App({ cloud = false, justSignedIn = false }) {
       <Minimap map={MAPS[mapId]} charPosRef={charPosRef} petPosRef={petPosRef} sparklesRef={sparklesRef} stationRef={stationRef} buddiesRef={buddiesRef} placed={placedHere} />
       <MapLabel name={MAPS[mapId].name} />
 
-      {!moved && !meadow && <MoveHint />}
+      {!moved && !meadow && !hintView.hint?.text && <MoveHint />}
       {toast && <MapToast name={toast} />}
       {note && <NoteToast text={note} />}
+      {HINTS_ON && (
+        <HintLayer
+          hint={hintView.hint}
+          exitReason={hintView.exitReason}
+          arrowStyle={arrowForMap(MAPS[mapId], HINT_ARROW_OVERRIDE)}
+          getTargetPos={(t) => hintPosRef.current?.(t) ?? null}
+          getAvoid={() => hintAvoidRef.current?.() ?? []}
+          isWalking={() => !!targetRef.current}
+          dismissLabel={HINT_COPY.dismiss.aria}
+          dismissText={HINT_COPY.dismiss.label}
+          onDismiss={(id) => hintsRef.current?.dismiss(id)}
+        />
+      )}
 
       {/* ── Phase B: the Together Space HUD (meadow only — leave via 🏡, emote) ── */}
       {meadow && (
@@ -1278,6 +1348,7 @@ function DoorExitIcon({ size = 22 }) {
 function ExitButton({ onTap }) {
   return (
     <button
+      data-hint="exit-button"
       aria-label="Exit to the Door"
       className="hud-exit"
       onPointerDown={(e) => e.stopPropagation()}
@@ -1305,9 +1376,10 @@ function ExitButton({ onTap }) {
 }
 
 /** A white round icon chip — the shared shape for the top-left actions (💞 shop). */
-function RoundHudButton({ aria, emoji, onTap }) {
+function RoundHudButton({ aria, emoji, onTap, hintKey }) {
   return (
     <button
+      data-hint={hintKey}
       aria-label={aria}
       className="hud-round"
       onPointerDown={(e) => e.stopPropagation()}
@@ -1460,21 +1532,23 @@ function MapToast({ name }) {
 
 /** The garden's bar: what she can do for her plot right now (one main action). */
 function GardenBar({ garden, gems, onPlant, onWater, onClose }) {
+  const hintKey = 'garden-bar' // data-hint: the hint layer can target / avoid it
   const close = { label: '✕', aria: 'Close', onTap: onClose }
   if (garden.stage == null) {
     return garden.seeds > 0 ? (
-      <ActionBar hint="Your garden 🌱" buttons={[{ label: '🌱 Plant your seed', aria: 'Plant your seed', primary: true, onTap: onPlant }, close]} />
+      <ActionBar hintKey={hintKey} hint="Your garden 🌱" buttons={[{ label: '🌱 Plant your seed', aria: 'Plant your seed', primary: true, onTap: onPlant }, close]} />
     ) : (
-      <ActionBar hint="No seeds right now — more are on the way ✨" buttons={[{ label: 'OK', aria: 'OK', primary: true, onTap: onClose }]} />
+      <ActionBar hintKey={hintKey} hint="No seeds right now — more are on the way ✨" buttons={[{ label: 'OK', aria: 'OK', primary: true, onTap: onClose }]} />
     )
   }
   if (garden.stage >= GARDEN.waterings) {
-    return <ActionBar hint="It bloomed! Tap your flowers to pick them 🌸" buttons={[close]} />
+    return <ActionBar hintKey={hintKey} hint="It bloomed! Tap your flowers to pick them 🌸" buttons={[close]} />
   }
   const cost = GARDEN.waterCost
   const can = gems >= cost
   return (
     <ActionBar
+      hintKey={hintKey}
       hint={can ? 'Water it to help it grow 💧' : `Water costs ${cost} 💎 — solve a problem to earn more!`}
       buttons={[{ label: `💧 Water · ${cost} 💎`, aria: 'Water your plant', primary: true, disabled: !can, onTap: onWater }, close]}
     />
@@ -1482,9 +1556,10 @@ function GardenBar({ garden, gems, onPlant, onWater, onClose }) {
 }
 
 /** Bottom-center pill of big kid-sized buttons (placement + edit modes). */
-function ActionBar({ hint, buttons }) {
+function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
   return (
     <div
+      data-hint={hintKey}
       onPointerDown={(e) => e.stopPropagation()}
       style={{
         position: 'absolute',
@@ -1530,6 +1605,7 @@ function ActionBar({ hint, buttons }) {
 function NoteToast({ text }) {
   return (
     <div
+      data-hint="note-toast"
       style={{
         position: 'absolute',
         top: 'max(120px, calc(env(safe-area-inset-top) + 104px))',
@@ -1553,6 +1629,7 @@ function NoteToast({ text }) {
 function MoveHint() {
   return (
     <div
+      data-hint="move-hint"
       style={{
         position: 'absolute',
         bottom: 'max(28px, env(safe-area-inset-bottom))',
