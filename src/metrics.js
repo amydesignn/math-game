@@ -28,6 +28,12 @@
  *                   harvest) is the whole replant signal, so no column links a
  *                   plant to its harvest. garden_water, garden_harvest.
  *                   Replant rate ≈ COUNT(garden_replant) ÷ COUNT(garden_harvest).
+ *   lucky_seen / gift_* — the lucky station (2026-10-18): one bare row each.
+ *                   lucky_seen = a new player was shown the lucky station (at
+ *                   most once a session); gift_lucky | gift_sparkle |
+ *                   gift_station = where her first right answer (the welcome
+ *                   gift) happened. Funnel: session_start(new) → lucky_seen →
+ *                   gift_* → garden_plant_first.
  * minutes/problems/solved/quests are DELTAS since the session's last row — no
  * id links rows, so the honest total is SUM(...) over progress + session_end.
  * A session that comes back to the foreground starts a fresh tally.
@@ -177,6 +183,19 @@ const GARDEN_EVENTS = new Set(['plant_first', 'replant', 'water', 'harvest'])
 export function gardenEvent(kind) {
   if (!tally || !GARDEN_EVENTS.has(kind)) return
   send({ event: `garden_${kind}` })
+}
+
+const WELCOME_EVENTS = new Set(['lucky_seen', 'gift_lucky', 'gift_sparkle', 'gift_station'])
+let luckySeenSent = false
+
+/** The lucky station: 'lucky_seen' (once a session) | 'gift_lucky' | 'gift_sparkle' | 'gift_station'. */
+export function welcomeEvent(kind) {
+  if (!tally || !WELCOME_EVENTS.has(kind)) return
+  if (kind === 'lucky_seen') {
+    if (luckySeenSent) return
+    luckySeenSent = true
+  }
+  send({ event: kind })
 }
 
 export function questDone() {

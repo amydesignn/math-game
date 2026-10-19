@@ -145,4 +145,17 @@ describe('a whole session', () => {
     m.gardenEvent('water')
     expect(sent.length).toBe(n)
   })
+
+  it('lucky station rows: bare, whitelisted, lucky_seen at most once a session', async () => {
+    const { sent } = stubBrowser()
+    const m = await import('../metrics')
+    m.startMetrics({ player: 'guest', appVersion: 'abc1234' })
+    m.welcomeEvent('lucky_seen')
+    m.welcomeEvent('lucky_seen') // a second showing this session → nothing
+    m.welcomeEvent('gift_sparkle')
+    m.welcomeEvent('gift_free') // not a welcome event → nothing
+    const rows = sent.filter((r) => r.event === 'lucky_seen' || r.event.startsWith('gift_'))
+    expect(rows.map((r) => r.event)).toEqual(['lucky_seen', 'gift_sparkle'])
+    for (const row of rows) expect(Object.keys(row).sort()).toEqual(['app_version', 'event', 'player'])
+  })
 })

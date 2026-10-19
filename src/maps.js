@@ -7,7 +7,7 @@
 // leads to, and walking into it travels there.
 
 import { useGLTF } from '@react-three/drei'
-import { modelUrl } from './config'
+import { modelUrl, WORLD, WELCOME } from './config'
 import { currentSeason } from './season'
 
 // Building-kit pieces are authored on a 2-unit grid, 2.4 tall — at full size a
@@ -689,6 +689,33 @@ export function resumePoint(map, pos) {
     z *= 1 - pull
   }
   return [x, z]
+}
+
+/** Where the lucky station stands (2026-10-18): WELCOME.ahead from where she
+ *  enters, BESIDE her and a little up the screen (the follow-cam looks toward
+ *  −z) — not straight ahead, which puts it at the top edge where the hint arrow
+ *  has no room above it. Tries the right, then the left, then fans round her
+ *  until a spot is clear of the gates, the scenery and `avoid` ([x, z, r] —
+ *  today's station, her placed things). Always in bounds. Pure, so it's tested. */
+const LUCKY_TURNS = [70, -70, 50, -50, 90, -90, 30, -30, 110, -110, 0, 130, -130, 150, -150, 180]
+export function luckySpot(map, spawn, avoid = []) {
+  const [sx, sz] = spawn
+  const B = WORLD.bounds - 2
+  const blk = [...blockers(map), ...avoid]
+  const clear = (x, z) =>
+    Math.abs(x) <= B && Math.abs(z) <= B &&
+    !map.gates.some((g) => Math.hypot(x - g.position[0], z - g.position[2]) < 4) &&
+    !blk.some(([bx, bz, r]) => Math.hypot(x - bx, z - bz) < 1.4 + r)
+  for (const d of [WELCOME.ahead, WELCOME.ahead + 1.2, WELCOME.ahead + 2.4]) {
+    for (const deg of LUCKY_TURNS) {
+      const turn = (deg * Math.PI) / 180 // 0 = straight up the screen, +90 = to her right
+      const x = sx + Math.sin(turn) * d
+      const z = sz - Math.cos(turn) * d
+      if (clear(x, z)) return [Math.round(x * 100) / 100, Math.round(z * 100) / 100]
+    }
+  }
+  // nothing clear (a very crowded corner): to her right, pulled into bounds
+  return [Math.max(-B, Math.min(B, sx + WELCOME.ahead)), Math.max(-B, Math.min(B, sz))]
 }
 
 /** Preload every model a map uses (called for the current map at startup,
