@@ -219,6 +219,7 @@ describe('the store deals colours at plant time (ticket 10)', () => {
   it('a brand-new player: an empty bag, and their first seed can be any colour', async () => {
     const store = await fresh()
     expect(store.getGarden().bag).toEqual({ left: [], last: null })
+    store.claimWelcomeGift() // a new player's first seed is the welcome gift
     store.plantSeed(() => 0)
     expect(store.getGarden().plot.seed.kind).toBe(Object.keys(SEED_KINDS)[0])
   })

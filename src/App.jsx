@@ -18,18 +18,20 @@ import { FeedbackModal } from './ui/FeedbackModal'
 import PromoPopup, { PROMO, promoActive, promoShouldShow } from './ui/PromoPopup'
 import HintLayer from './hints/HintLayer'
 import { createHintController, beginSession } from './hints'
-import { GAME_HINTS, GARDEN_HINT_ID, hintCtx, arrowForMap, isWorldTap } from './gameHints'
+import { GAME_HINTS, GARDEN_HINT_ID, LUCKY_HINT_ID, hintCtx, arrowForMap, isWorldTap } from './gameHints'
 import { HINT_COPY } from './gameHintsCopy'
 import { buildFeedbackRow, submitFeedback, retryFeedbackOnce } from './feedback'
-import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult } from './math'
+import { nextProblem, maybeLevelUp, TOPICS, levelOfLongMult, similarLongMult, luckyProblem } from './math'
+import { LUCKY_SKIN } from './ui/skins'
+import { Modal, GiftWin } from './ui/mathkit'
 import { levelOf, pickLevelMessage } from './levels'
 import { stationFor, currentWindow, ensureStations } from './stations'
 import * as metrics from './metrics'
-import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, buyGear, setGear, buyHero, setCharacter, pendingLevelUps, recordLevelUp, getLevelUps, claimPromo, hasSeenPromo, getGarden, plantSeed, waterPlot, harvest, getHintMemory, setHintMemory, beginHintSession } from './store'
-import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic, playSfx } from './audio'
+import { getState, setMap, setPos, markPlayed, markOnboardingSeen, addGems, setSoundOn, setMusicTrack, setAvatar, clearAvatar, recordAnswer, setStationSolved, completeStation, buyAsset, placeAsset, moveAsset, rotateAsset, pickupAsset, getActiveSparkle, buySparkle, giftSparkle, buyPet, setPet, buyGear, setGear, buyHero, setCharacter, pendingLevelUps, recordLevelUp, getLevelUps, claimPromo, hasSeenPromo, getGarden, plantSeed, waterPlot, harvest, getHintMemory, setHintMemory, beginHintSession, claimWelcomeGift, welcomeGiftOwed } from './store'
+import { setupAudio, unlockAudio, setAudioEnabled, setFocusMode, setMusic, playSfx, sfxLength, SFX } from './audio'
 import { joinMeadow, EMOTES, labelFor } from './together'
 import { sessionCache, signOut, sendMagicLink } from './auth'
-import { WORLD, REFRESH, GARDEN, SEED_KINDS, HINTS_ON, HINT_ARROW_OVERRIDE } from './config'
+import { WORLD, REFRESH, GARDEN, SEED_KINDS, HINTS_ON, HINT_ARROW_OVERRIDE, WELCOME } from './config'
 import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
 const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
@@ -186,13 +188,53 @@ export default function App({ cloud = false, justSignedIn = false }) {
     if (mathBusyRef.current) return
     mathBusyRef.current = true
     setFocusMode(true) // Ivy's research: the meow holds during a problem
+    giftSourceRef.current = 'sparkle'
     setMath({ sparkleId, problem: nextProblem(), skin: SKINS.feedPet })
   }
 
+  // ── The lucky station: a NEW player's welcome gift (2026-10-18, Amy) ──
+  // While it's owed, a rainbow station stands near her in every world she enters.
+  // Her FIRST right answer anywhere — there, a sparkle or a daily quest — pays
+  // WELCOME.gems + her first seed INSTEAD of its usual pay (store.claimWelcomeGift),
+  // then the station says goodbye. `luckyOwed` mirrors the store for rendering.
+  const [luckyOwed, setLuckyOwed] = useState(welcomeGiftOwed)
+  const [luckyFarewell, setLuckyFarewell] = useState(false)
+  const [giftCard, setGiftCard] = useState(false) // the gift card, after a quest (a sparkle/lucky popup shows it inline)
+  const giftSourceRef = useRef('sparkle') // where the open problem came from: 'lucky' | 'sparkle' | 'station'
+  const giftInQuest = useRef(false) // the gift landed inside a quest → its card waits for the quest to close
+  const luckyTimer = useRef()
+
+  function onLuckyReached() {
+    if (mathBusyRef.current || !welcomeGiftOwed()) return
+    mathBusyRef.current = true
+    setFocusMode(true)
+    giftSourceRef.current = 'lucky'
+    setMath({ lucky: true, problem: luckyProblem(), skin: LUCKY_SKIN })
+  }
+
   function onMathAward(n) {
-    setGems(addGems(n)) // every correct answer pays, always
+    const gift = claimWelcomeGift() // her first right answer ever → the welcome gift REPLACES n
+    if (gift) {
+      setGems(getState().gems)
+      setLuckyOwed(false)
+      metrics.welcomeEvent(`gift_${giftSourceRef.current}`)
+      if (giftSourceRef.current === 'station') giftInQuest.current = true
+      // the lucky station says goodbye wherever it stands (Fern)
+      setLuckyFarewell(true)
+      clearTimeout(luckyTimer.current)
+      luckyTimer.current = setTimeout(() => setLuckyFarewell(false), 1750)
+      // Wren: the seed's own cue, AFTER the gem chime (a hint cue never stacks)
+      setTimeout(() => playSfx('hintDoneBloom'), sfxLength(SFX.gem) * 1000 + 150)
+    } else setGems(addGems(n)) // every correct answer pays, always
     setPoints(getState().lifetimeGems) // …and the same answer moves her level bar
     syncGarden(false) // …and may have earned a seed (every GARDEN.seedEveryGems lifetime gems)
+  }
+
+  /** A quest's completion bonus: always its own plain pay, never the gift. */
+  function onStationBonus(n) {
+    setGems(addGems(n))
+    setPoints(getState().lifetimeGems)
+    syncGarden(false)
   }
 
   /** The bar finished its theatre and handed us a new level — queue the applause. */
@@ -210,7 +252,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   }
 
   function onMathClose(solved) {
-    if (solved && math) collectFnRef.current?.(math.sparkleId) // burst — the gem is hers
+    if (solved && math && !math.lucky) collectFnRef.current?.(math.sparkleId) // burst — the gem is hers
     setMath(null)
     mathBusyRef.current = false
     setFocusMode(false)
@@ -241,6 +283,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
     if (!st) return
     mathBusyRef.current = true // shares the sparkle lock — one problem UI at a time
     setFocusMode(true)
+    giftSourceRef.current = 'station'
     setStation({ skinId: st.skinId, bonus: st.bonus, problems: st.problems, resumeAt: st.solvedCount, mapId })
   }
 
@@ -253,6 +296,10 @@ export default function App({ cloud = false, justSignedIn = false }) {
   function onStationClose({ completed, solvedCount }) {
     const mid = station?.mapId
     setStation(null)
+    if (giftInQuest.current) {
+      giftInQuest.current = false
+      setGiftCard(true) // the welcome gift landed in this quest — its card now
+    }
     mathBusyRef.current = false
     setFocusMode(false)
     if (!mid) return
@@ -563,7 +610,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
   // The hub counts as busy too — a signed congratulations card is meant to be
   // read in the quiet of the world, not layered over the Door on boot; the
   // retroactive queue simply waits until she enters a world.
-  const worldBusy = view !== 'world' || !!(math || station || farewellMap || placing || shopOpen || fading || meadow || progressOpen)
+  const worldBusy = view !== 'world' || !!(math || station || farewellMap || placing || shopOpen || fading || meadow || progressOpen || giftCard)
   useEffect(() => {
     if (levelPopup || worldBusy || !levelQueue.length) return
     const [next, ...rest] = levelQueue
@@ -587,13 +634,17 @@ export default function App({ cloud = false, justSignedIn = false }) {
   const hintAvoidRef = useRef(null) // Scene fills: () => rect[] — her silhouette on screen (job 3)
   const [hintView, setHintView] = useState({ hint: null, exitReason: null })
   useEffect(() => {
-    if (!HINTS_ON) return
     beginHintSession(beginSession) // this boot = one session (memoized: StrictMode-safe)
     const c = createHintController({
-      hints: GAME_HINTS,
+      // HINTS_ON off (production today) → only the `live` hints: the lucky
+      // station's arrow ships to everyone, the garden hint waits for Amy.
+      hints: HINTS_ON ? GAME_HINTS : GAME_HINTS.filter((h) => h.live),
       memory: { load: getHintMemory, save: setHintMemory },
       onChange: setHintView,
-      onShow: () => playSfx('hintShow'), // once per showing; a resume after a pause is silent
+      onShow: (h) => {
+        playSfx('hintShow') // once per showing; a resume after a pause is silent
+        if (h.id === LUCKY_HINT_ID) metrics.welcomeEvent('lucky_seen')
+      },
     })
     hintsRef.current = c
     if (import.meta.env.DEV) {
@@ -613,7 +664,8 @@ export default function App({ cloud = false, justSignedIn = false }) {
   // (The GardenBar does NOT break calm — at the bed the hint goes arrow-only.)
   const hintCalm =
     moved && !worldBusy && !mathBusyRef.current && !levelPopup && !settingsOpen && !showOnboarding && !promoShowing && !signup && !feedbackOpen && selectedId == null
-  const currentHintCtx = () => hintCtx({ mapId, hasPlot: !!MAPS[mapId]?.gardenPlot, garden: getGarden(), calm: hintCalm, gardenOpen })
+  const luckyHere = luckyOwed && view === 'world' && !MAPS[mapId]?.together
+  const currentHintCtx = () => hintCtx({ mapId, hasPlot: !!MAPS[mapId]?.gardenPlot, garden: getGarden(), calm: hintCalm, gardenOpen, luckyHere })
   useEffect(() => {
     hintsRef.current?.update(currentHintCtx())
   })
@@ -1075,6 +1127,9 @@ export default function App({ cloud = false, justSignedIn = false }) {
             onHarvest={handleHarvest}
             hintPosRef={hintPosRef}
             hintAvoidRef={hintAvoidRef}
+            lucky={luckyOwed}
+            luckyFarewell={luckyFarewell}
+            onLuckyReached={onLuckyReached}
           />
         </Suspense>
       </Canvas>
@@ -1133,7 +1188,9 @@ export default function App({ cloud = false, justSignedIn = false }) {
       {!moved && !meadow && !hintView.hint?.text && <MoveHint />}
       {toast && <MapToast name={toast} />}
       {note && <NoteToast text={note} />}
-      {HINTS_ON && (
+      {/* Always mounted (its live region must exist first). With HINTS_ON off,
+          only the lucky station's hint ever reaches it. */}
+      {(
         <HintLayer
           hint={hintView.hint}
           exitReason={hintView.exitReason}
@@ -1208,6 +1265,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
           problem={math.problem}
           skin={math.skin}
           hudGemRef={hudGemRef}
+          giftGems={luckyOwed ? WELCOME.gems : null}
           onAward={onMathAward}
           onPetReact={onPetReact}
           onResult={(correct) => {
@@ -1231,13 +1289,21 @@ export default function App({ cloud = false, justSignedIn = false }) {
           quest={station}
           resumeAt={station.resumeAt}
           hudGemRef={hudGemRef}
+          giftGems={luckyOwed ? WELCOME.gems : null}
           onAward={onMathAward}
-          onBonusAward={onMathAward}
+          onBonusAward={onStationBonus}
           onPetReact={onPetReact}
           onWorldReact={onPetReact}
           onResult={onStationResult}
           onClose={onStationClose}
         />
+      )}
+
+      {/* ── the welcome gift's card, when it landed inside a quest ── */}
+      {giftCard && (
+        <Modal label={HINT_COPY.lucky.title} cardStyle={{ padding: '24px 26px 26px' }}>
+          <GiftWin copy={HINT_COPY.lucky} gems={WELCOME.gems} onNext={() => setGiftCard(false)} />
+        </Modal>
       )}
 
       {/* ── Phase 5-A: the congratulations, from the team to Ivy ── */}

@@ -19,6 +19,8 @@
  * To add a skin later: drop one entry here — nothing else changes.
  */
 
+import { HINT_COPY } from '../gameHintsCopy'
+
 const teal = '#00BBA7'
 
 export const SKINS = {
@@ -92,3 +94,14 @@ export const SKINS = {
 
 /** The station skin ids, in a stable order (the daily plan picks from these). */
 export const STATION_SKIN_IDS = Object.keys(SKINS)
+
+/** The lucky station's skin (2026-10-18) — a new player's welcome gift. Kept
+ *  OUT of SKINS on purpose, so the daily plan can never deal it as a quest. It
+ *  wears gold (Datum's "new" badge ink, amber-800, 7:1 on white) — reward
+ *  colour, unlike any daily skin. Copy lives with the hint copy (Clover). */
+export const LUCKY_SKIN = {
+  id: 'lucky', tag: HINT_COPY.lucky.tag, paw: '🎁', marker: '🎁',
+  accent: '#FE9A00', accentInk: 'var(--color-component-badge-new-text)', glow: '#FFE08A',
+  ask: HINT_COPY.lucky.ask,
+  win: HINT_COPY.lucky.title,
+}

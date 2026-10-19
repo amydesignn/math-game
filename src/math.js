@@ -312,6 +312,26 @@ function pickTopic(start) {
   return roll < 0.35 ? 'long-mult' : roll < 0.7 ? 'long-div' : CONFIDENCE()
 }
 
+/* ── The lucky station's question (2026-10-18, Amy) ──
+   A NEW player's very first problem: "we want her to like math first". A fixed
+   small pool — addition, a teen + one digit, NO carrying, answers ≤ 20 (Clover:
+   no +0/+1, no 10+10, nothing that crosses ten). Used ONLY at the lucky station;
+   nothing else in the game changes. Its `type` is NOT a TOPICS id on purpose, so
+   it never moves her topic ladder (App guards on TOPICS[type]). A wrong answer
+   recovers through the shared column-addition worked example on another item
+   from the same pool. */
+export const LUCKY_POOL = [
+  [11, 2], [12, 3], [10, 5], [13, 4], [14, 2], [15, 3],
+  [11, 6], [12, 7], [16, 2], [10, 8], [13, 5], [14, 4],
+]
+
+export function luckyProblem(pick = Math.random) {
+  const i = Math.floor(pick() * LUCKY_POOL.length) % LUCKY_POOL.length
+  const [a, b] = LUCKY_POOL[i]
+  const [sa, sb] = LUCKY_POOL[(i + 1 + Math.floor(pick() * (LUCKY_POOL.length - 1))) % LUCKY_POOL.length]
+  return { type: 'lucky-add', level: 1, op: '+', a, b, similar: { a: sa, b: sb }, gems: 1, lucky: true }
+}
+
 /** The topic's current ladder rung (diagnostic sets the start; store persists). */
 export function currentLevel(topicId) {
   const t = getState().topicProgress[topicId]

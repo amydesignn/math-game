@@ -7,6 +7,7 @@ import Prop from './Prop'
 import Gate from './Gate'
 import Sparkle from './Sparkle'
 import Station from './Station'
+import LuckyStation from './LuckyStation'
 import SparkleTrail from './SparkleTrail'
 import Ghost from './Ghost'
 import Buddy from './Buddy'
@@ -15,7 +16,7 @@ import GardenPlot, { BED } from './GardenPlot'
 import { Ambient } from './Spooky'
 import { FxProp } from './fx'
 import { WORLD, GEMS, STATION, CHARACTERS, assetScale } from '../config'
-import { MAPS, blockers } from '../maps'
+import { MAPS, blockers, luckySpot } from '../maps'
 import { stationFor } from '../stations'
 import { SKINS } from '../ui/skins'
 import { worldToScreen } from '../ui/BasketFlight'
@@ -31,6 +32,7 @@ const GARDEN_PICK_Y = 1.1 // where the picked flowers hang as they pop off (plan
 const HINT_BED_BACK = 0.4 // …and toward the bed's back half, so the arrow clears her hat when she stands at the front to plant
 const HINT_BED_SOIL = 0.1 // the soil's height, for the bed's screen box (the pill never covers it)
 const HINT_CHAR = { half: 0.5, h: 1.4 } // her silhouette box: ±0.5 covers the staff, 1.4 the Sorcerer's hat tip
+const HINT_LUCKY_Y = 2.35 // the arrow's tip: over the 🎁 (1.85) that floats over the orb
 const HINT_BED_Y = 0.3 // the hint arrow's tip: ON the soil (not the 1.1 flower height, which projects up into the toast's band and gets edge-clamped)
 
 /**
@@ -38,7 +40,7 @@ const HINT_BED_Y = 0.3 // the hint arrow's tip: ON the soil (not the 1.1 flower 
  * the spawn point, the gates (a sparkle luring her into a gate would teleport
  * her), the scenery, and each other. Count respects the remaining beta cap.
  */
-function spawnSparkles(map, spawn, placed = []) {
+function spawnSparkles(map, spawn, placed = [], avoid = []) {
   // Full scatter every visit — the balance is uncapped since the beta cap
   // retired, so gems-to-find are never rationed by how many she already holds.
   const count = GEMS.perMap
@@ -53,6 +55,7 @@ function spawnSparkles(map, spawn, placed = []) {
     if (map.gates.some((g) => Math.hypot(x - g.position[0], z - g.position[2]) < 4.5)) continue
     if (blk.some(([bx, bz, r]) => Math.hypot(x - bx, z - bz) < 1.8 + r)) continue
     if (placed.some((w) => Math.hypot(x - w.x, z - w.z) < 1.8)) continue
+    if (avoid.some(([ax, az]) => Math.hypot(x - ax, z - az) < 3)) continue // the lucky station
     if (pts.some((p) => Math.hypot(x - p.x, z - p.z) < 5)) continue
     pts.push({ id: pts.length, x, z, collected: false })
   }
@@ -67,7 +70,7 @@ function spawnSparkles(map, spawn, placed = []) {
  * two fingers are down (taps ignored). `spawn` = [x,z] where this visit starts
  * (map centre on first load, just inside the gate after travelling).
  */
-export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes, garden, gardenOpen, onGardenNear, onHarvest, hintPosRef, hintAvoidRef }) {
+export default function Scene({ map, spawn, onTravel, onSparkleReached, onStationReached, farewellActive, stationRef, refreshKey, sparkle, onSparkleExpire, mathBusyRef, collectFnRef, reactUntilRef, sparklesRef, placing, ghostPosRef, ghostRot, placed, hiddenId, selectedId, onSelectPlaced, characterId, gear, petId, targetRef, charPosRef, petPosRef, zoomRef, gestureRef, buddies = [], buddyEmotes, garden, gardenOpen, onGardenNear, onHarvest, hintPosRef, hintAvoidRef, lucky = false, luckyFarewell = false, onLuckyReached }) {
   const marker = useRef() // the ring that pings on tap
   // Grow a Garden (ticket 5): `garden` = { stage, kind, watering } from App (the
   // store's plot). Tapping the bed walks her to its front edge; arriving opens
@@ -88,17 +91,26 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
   const markerLife = useRef(0) // 1 → 0 fade
   const traveled = useRef(false) // one travel per visit — App swaps the scene
 
-  // ── Phase 2/4: this visit's gem sparkles (Phase 4: walking up opens MATH) ──
-  // The Together meadow deliberately has none — no earning in the shared
-  // space (Phase B design rule), so nothing spawns and nothing can open.
-  const [sparkles, setSparkles] = useState(() => (map.together ? [] : spawnSparkles(map, spawn, placed)))
-  const taken = useRef(new Set()) // same-frame double-fire guard
-  const cooling = useRef(new Set()) // unsolved popups re-arm only after she walks away
-
   // ── Phase 5: the current window's station for this map (or null) ──
   const [station, setStation] = useState(() => (map.together ? null : stationFor(map.id)))
   const stationSkin = station ? SKINS[station.skinId] : null
   const stationCooling = useRef(false) // unfinished close re-arms only after she walks off
+
+  // ── The lucky station (2026-10-18): a new player's welcome gift, near where
+  // she enters THIS visit — every world, every visit, until her first right
+  // answer (App's `lucky`). The spot is picked once per visit, clear of today's
+  // station + her placed things; sparkles then keep clear of it. ──
+  const [luckyAt] = useState(() =>
+    map.together ? null : luckySpot(map, spawn, [...(station ? [[station.x, station.z, 2]] : []), ...placed.map((w) => [w.x, w.z, 0.6])]),
+  )
+  const luckyCooling = useRef(false)
+
+  // ── Phase 2/4: this visit's gem sparkles (Phase 4: walking up opens MATH) ──
+  // The Together meadow deliberately has none — no earning in the shared
+  // space (Phase B design rule), so nothing spawns and nothing can open.
+  const [sparkles, setSparkles] = useState(() => (map.together ? [] : spawnSparkles(map, spawn, placed, lucky && luckyAt ? [luckyAt] : [])))
+  const taken = useRef(new Set()) // same-frame double-fire guard
+  const cooling = useRef(new Set()) // unsolved popups re-arm only after she walks away
 
   // ── Content refresh: when the window rolls over, re-scatter this map's gems
   // and reload its station in place (no remount, no camera snap). Deferred while
@@ -111,7 +123,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
     if ((mathBusyRef && mathBusyRef.current) || placing) return
     taken.current.clear()
     cooling.current.clear()
-    setSparkles(spawnSparkles(map, spawn, placed))
+    setSparkles(spawnSparkles(map, spawn, placed, lucky && luckyAt ? [luckyAt] : []))
     stationCooling.current = false
     setStation(stationFor(map.id))
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,6 +145,17 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
     targetRef.current = new THREE.Vector3(station.x, 0, station.z)
     if (marker.current) {
       marker.current.position.set(station.x, 0.03, station.z)
+      markerLife.current = 1
+    }
+  }
+
+  // tapping the lucky station walks her to it — proximity opens the question
+  function walkToLucky(e) {
+    if (gestureRef.current.pinching || placing || !luckyAt) return
+    e.stopPropagation()
+    targetRef.current = new THREE.Vector3(luckyAt[0], 0, luckyAt[1])
+    if (marker.current) {
+      marker.current.position.set(luckyAt[0], 0.03, luckyAt[1])
       markerLife.current = 1
     }
   }
@@ -242,6 +265,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
     if (!hintPosRef) return
     const hintPoint = (t) => {
       if (t?.world === 'garden-bed' && map.gardenPlot) return [map.gardenPlot[0], HINT_BED_Y, map.gardenPlot[1] - HINT_BED_BACK]
+      if (t?.world === 'lucky' && luckyAt) return [luckyAt[0], HINT_LUCKY_Y, luckyAt[1]]
       return null
     }
     const v = new THREE.Vector3()
@@ -276,6 +300,10 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
         // the SOIL only (no shadow, no frame margin) — Clover's QA: the frame margin was blocking free sides
         pt.rect = boxToScreen([gx - BED.w / 2, 0, gz - BED.d / 2], [gx + BED.w / 2, HINT_BED_SOIL, gz + BED.d / 2], rect)
       }
+      if (t?.world === 'lucky' && luckyAt) {
+        // the ring + orb, so the pill never covers the station
+        pt.rect = boxToScreen([luckyAt[0] - 1, 0, luckyAt[1] - 1], [luckyAt[0] + 1, 1.5, luckyAt[1] + 1], rect)
+      }
       return pt
     }
     // getAvoid (job 3): her silhouette on screen — feet to hat tip, staff side included — so the pill never sits on her
@@ -292,7 +320,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
       hintPosRef.current = null
       if (hintAvoidRef) hintAvoidRef.current = null
     }
-  }, [hintPosRef, hintAvoidRef, map, camera, gl, charPosRef])
+  }, [hintPosRef, hintAvoidRef, map, camera, gl, charPosRef, luckyAt])
 
   // On entering a map, snap the camera straight to the spawn point — the fade
   // overlay hides the cut; without this it would swoosh across the new map.
@@ -367,6 +395,19 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
         stationCooling.current = true
         targetRef.current = null // she stops for the quest
         onStationReached()
+      }
+    }
+
+    // lucky station check — walking into its ring opens the welcome question.
+    // Same kindness as a station: re-arms only after she walks off.
+    if (lucky && luckyAt && !luckyFarewell && !(mathBusyRef && mathBusyRef.current) && !placing) {
+      const ld2 = (desired.x - luckyAt[0]) ** 2 + (desired.z - luckyAt[1]) ** 2
+      if (luckyCooling.current) {
+        if (ld2 > STATION.rearm * STATION.rearm) luckyCooling.current = false
+      } else if (ld2 < STATION.reach * STATION.reach) {
+        luckyCooling.current = true
+        targetRef.current = null // she stops for the question
+        onLuckyReached?.()
       }
     }
 
@@ -455,6 +496,11 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
       {/* ── Phase 5: today's station (stays visible through its farewell) ── */}
       {station && (!station.completed || farewellActive) && (
         <Station x={station.x} z={station.z} skin={stationSkin} resume={station.solvedCount} farewell={farewellActive} onTap={walkToStation} />
+      )}
+
+      {/* ── the lucky station: a new player's welcome gift (stays through its farewell) ── */}
+      {luckyAt && (lucky || luckyFarewell) && (
+        <LuckyStation x={luckyAt[0]} z={luckyAt[1]} farewell={luckyFarewell} onTap={walkToLucky} />
       )}
 
       {/* ── Phase 3: assets Ivy has placed in THIS map ── */}

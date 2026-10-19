@@ -285,6 +285,20 @@ export const GARDEN = {
   waterings: 3,
 }
 
+// ── The lucky station: a new player's welcome gift (2026-10-18, Amy) ──
+// A first-time player meets a rainbow "lucky station" near where she enters
+// every world, every visit, until she solves ONE problem (anywhere). That first
+// solve pays `gems` + her first seed, INSTEAD of its usual pay. Old saves never
+// see it (store.js migrate). Live for everyone — no switch (Amy).
+//   gems  — the gift's gems (3 total, not usual pay + 3)
+//   ahead — how far from her it stands when she arrives (beside her, a little
+//           up the screen — maps.js luckySpot): past STATION.reach/rearm so it
+//           never opens on the spot, close enough to be the first thing she sees
+export const WELCOME = {
+  gems: 3,
+  ahead: 3.6,
+}
+
 // Seed kinds — each seed's bloom COLOUR (ticket 10) and how its harvest is
 // named in the 🧺 Basket (ticket 8). A new kind = one entry here: the Basket
 // gives it its own line and the shuffle bag (gardenBag.js) starts dealing it.

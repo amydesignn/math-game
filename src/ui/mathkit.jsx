@@ -606,3 +606,39 @@ export function FlyGem({ from, to, delay, bonus }) {
     </div>
   )
 }
+
+/* ---- The lucky station's welcome gift — the win card (2026-10-18). Shared by
+   MathPopup (lucky station + sparkles) and App's after-a-quest card, so the gift
+   reads the same wherever her first answer lands. Three beats, one idea each
+   (Clover): the title, what she got, where the seed goes. A slow pastel rainbow
+   turns behind the gem; the seed pops in after the gems (Fern). Motion is CSS
+   (`lk*` keyframes in index.css), switched off under reduced motion. ---- */
+export function GiftWin({ copy, gems, onNext }) {
+  return (
+    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+      padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
+      <Sparkles colors={['#fff', '#FFB3C7', '#FFE08A', '#9BE7C4', '#A9C7FF', '#D3B5FF']} n={22} />
+      <div style={{ position: 'relative', width: 144, height: 112, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+        <div aria-hidden className="lkHalo" />
+        <Gem size={68} style={{ position: 'relative', animation: 'gemSpin .5s ease-out both', filter: 'drop-shadow(0 6px 14px rgba(46,197,197,.4))' }} />
+        <span aria-hidden className="lkSeed" style={{ position: 'relative', fontSize: 52, lineHeight: 1 }}>🌱</span>
+      </div>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>{copy.title}</div>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12 }}>
+          <span style={giftChip}>+{gems} <Gem size={18} /></span>
+          <span className="lkSeedChip" style={giftChip}>+1 🌱</span>
+        </div>
+        <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 12 }}>{copy.got}</div>
+        <div style={{ fontSize: 'var(--text-base)', color: T.textSecondary, marginTop: 4 }}>{copy.next}</div>
+      </div>
+      <BigButton tone="primary" onClick={onNext} style={{ marginTop: 4, minWidth: 180 }}>{copy.ok}</BigButton>
+    </div>
+  )
+}
+const giftChip = {
+  display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px', borderRadius: 20,
+  // Datum's "new" badge (amber 50/200/800) — gold = reward, 7:1 text
+  background: 'var(--color-component-badge-new-background)', border: '1.5px solid var(--color-component-badge-new-border)',
+  fontWeight: 700, fontSize: 'var(--text-base)', color: 'var(--color-component-badge-new-text)',
+}

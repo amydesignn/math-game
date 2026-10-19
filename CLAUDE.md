@@ -220,6 +220,51 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## The lucky station 🎁 — a new player's welcome gift (2026-10-18, branch `claude/lucky-station-8c939e`)
+Backlog item 10 ("First station, guided"). Rules locked by Amy; Trail crew briefed
+(notes: side-session-notes …/lucky-station-brief.md). The cold playtest found the
+first gem by accident ~3 min in, and the first problem was 32 × 20.
+- **Who:** NEW saves only. `store.welcomeGift` is `false` on a fresh save; migrate()
+  marks any save without the field as claimed (Ivy, Amy, every guest who played).
+- **The gift (once):** her FIRST right answer ANYWHERE (lucky station, sparkle,
+  daily quest) pays `WELCOME.gems` (3) + her first seed INSTEAD of its usual pay —
+  `claimWelcomeGift()` (one save; returns null once claimed → never twice). App's
+  `onMathAward` calls it first; the quest BONUS goes through `onStationBonus` (plain
+  pay, never the gift). Popups take `giftGems`, latched at open.
+- **The free starter seed is RETIRED for new saves:** `garden.starter` (0|1)
+  replaces the `1 +` in the conservation law (`seeds + planted + harvests = starter
+  + seedsGranted`). Fresh = 0; a missing field (old save) = 1; the gift sets 1.
+  NOT booked in `seedsGranted` (that would eat her 20-gem seed — test-guarded).
+  `migrate` normalizes `parsed.garden`, not the freshState-merged one.
+- **Cloud:** claimed on either copy = claimed (`adoptReadResult` folds it; sabotage-
+  proven by the "owed cloud copy wins" fixture). mergeGarden takes max(starter).
+- **The station:** `src/world/LuckyStation.jsx` — pastel rainbow ring turning
+  1/8s (steady brightness), breathing glow 1/4s, rising specks, hue-drifting orb,
+  🎁 marker, NO nameplate; reveal 400ms after landing; white farewell + rainbow
+  shockwave (also plays when the gift lands elsewhere). Reduced motion = still.
+  Spot = `luckySpot()` (maps.js): WELCOME.ahead (3.6) BESIDE her (70° first — straight
+  ahead put it at the screen's top edge, where the arrow flipped onto the orb),
+  clear of gates/decor/today's station/placed things. Follows her into EVERY world
+  until the gift is claimed (Amy: "push them a little").
+- **The question:** `LUCKY_POOL` / `luckyProblem()` in math.js — 12 teen + digit
+  sums, no carry, ≤ 20; `type: 'lucky-add'` is NOT a TOPICS id, so her ladder
+  never moves. Wrong → the shared column-addition worked example on another pool item.
+- **Hint:** `lucky-station` in GAME_HINTS, FIRST, `budget: 'reward'`, `tone: 'lucky'`
+  (gold pill — `.luxiHint-layer[data-tone='lucky']` in index.css; the engine passes
+  `tone` through), `live: true` → it ships while HINTS_ON is OFF (App filters
+  GAME_HINTS to `live` ones; the HintLayer is always mounted now). The garden hint
+  waits for `seeds > 0 && !luckyHere`. Copy in gameHintsCopy.js `lucky` (Amy: say
+  "Welcome gift" clearly; the seed grows FLOWERS, not a crop).
+- **Win:** `GiftWin` (mathkit) — rainbow halo, +3 💎 / +1 🌱 chips, three beats.
+  Inline in MathPopup; after a quest, App shows it in its own Modal once the quest
+  closes. Seed cue = `hintDoneBloom` after the gem chime (Wren), from App only.
+- **Metrics:** `welcomeEvent`: `lucky_seen` (once/session), `gift_lucky|sparkle|
+  station`. Migration `play_events_welcome_gift_events` applied 2026-10-18.
+- Tests `welcome-gift.test.js` (+18) → 437 green. Verified in the pane: fresh save
+  → station beside her + pink arrow + gold pill → 14+4 wrong → 11+2 worked example
+  → 18 → gift card, gems +3, seed 1, ladder untouched, hint retired, zero console
+  errors; a quest-first solve pays the gift (no extra gem) and the card follows the quest.
+
 ## Grow a Garden — ticket 6: the plot + 4 stage models 🌱 (2026-10-15, branch `feat/garden-plot`)
 Spec + tickets: Notion "🌱 Luxi Math — Grow a Garden (Spec + Tickets)". This
 ticket is ART ONLY — no store, no growth motion (ticket 7), no harvest.

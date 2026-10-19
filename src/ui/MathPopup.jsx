@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react'
 import { solve } from '../math'
 import { SKINS } from './skins'
-import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk } from './mathkit'
+import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk, GiftWin } from './mathkit'
+import { HINT_COPY } from '../gameHintsCopy'
 import DivisionWalkthrough from './DivisionWalkthrough'
 
 /*
@@ -21,12 +22,17 @@ import DivisionWalkthrough from './DivisionWalkthrough'
  *   onClose(solved)   -> dismiss; solved=true collects the sparkle
  *   onResult(correct) -> topicProgress bookkeeping
  *   hudGemRef         -> the HUD counter, target of the gem flight
+ *   giftGems          -> the welcome gift is still owed (2026-10-18): this
+ *                        answer, if right, pays THIS instead of problem.gems and
+ *                        wins with the gift card. Latched at open, so the card
+ *                        can't flip back once App marks the gift claimed.
  */
 
 export { SKINS } // App still imports SKINS from here for the sparkle popup
 
 /* ============================ MATH POPUP ============================= */
-export default function MathPopup({ problem, skin, onAward, onPetReact, onClose, onResult, hudGemRef }) {
+export default function MathPopup({ problem, skin, onAward, onPetReact, onClose, onResult, hudGemRef, giftGems = null }) {
+  const [gift] = useState(giftGems)
   const [phase, setPhase] = useState('ask') // ask | correct | recover
   const [entry, setEntry] = useState('')
   const [shake, setShake] = useState(false)
@@ -34,7 +40,8 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
   const cardRef = useRef(null)
   const answer = solve(problem.op, problem.a, problem.b)
   // what this problem is worth: her ladder level (Finn's C1 spec L1=1/L2=2/L3=3)
-  const pay = problem.gems || 1
+  // …unless this is her first-ever right answer: the welcome gift replaces it
+  const pay = gift || problem.gems || 1
   // division (C2) recovers into Oscar's full walkthrough, not the inline grid
   const divRecover = phase === 'recover' && problem.op === '÷'
 
@@ -123,7 +130,9 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
             {phase === 'ask' && (problem.op === '÷'
               ? <DivisionAsk problem={problem} skin={skin} onSolved={win} onResult={onResult} onWalkthrough={() => setPhase('recover')} />
               : <AskState skin={skin} problem={problem} entry={entry} onKey={onKey} />)}
-            {phase === 'correct' && <CorrectState skin={skin} pay={pay} onNext={() => onClose(true)} />}
+            {phase === 'correct' && (gift
+              ? <GiftWin copy={HINT_COPY.lucky} gems={pay} onNext={() => onClose(true)} />
+              : <CorrectState skin={skin} pay={pay} onNext={() => onClose(true)} />)}
             {phase === 'recover' && (
               <div style={{ paddingBottom: 6 }}>
                 <div style={{ textAlign: 'center', marginBottom: 14 }}>

@@ -49,7 +49,12 @@ function QuestSlots({ skin, total, done }) {
   )
 }
 
-export default function StationPopup({ quest, onAward, onBonusAward, onPetReact, onWorldReact, onResult, onClose, hudGemRef, resumeAt = 0 }) {
+export default function StationPopup({ quest, onAward, onBonusAward, onPetReact, onWorldReact, onResult, onClose, hudGemRef, resumeAt = 0, giftGems = null }) {
+  // The welcome gift (2026-10-18): if it's still owed when the quest opens, the
+  // FIRST right answer here pays giftGems instead of its own gems (App claims it
+  // and shows the gift card after the quest). Used once; the bonus is unchanged.
+  const giftLeft = useRef(giftGems)
+  const [gift, setGift] = useState(null) // { step, gems } — where the gift landed (latched: App stops passing giftGems once it's claimed)
   const skin = SKINS[quest.skinId]
   const total = quest.problems.length
   const [step, setStep] = useState(resumeAt)
@@ -83,7 +88,11 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
   // completion bonus or the next step). Shared by the single-answer check AND the
   // division ask's onSolved, so both encounters pay + progress identically.
   const succeed = () => {
-    const pay = problem.gems || 1
+    const pay = giftLeft.current || problem.gems || 1
+    if (giftLeft.current) {
+      setGift({ step, gems: giftLeft.current })
+      giftLeft.current = null
+    }
     setEarned((g) => g + pay)
     onPetReact?.()
     const lastOne = step + 1 >= total
@@ -196,7 +205,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>{skin.stepWin(step + 1, total)}</div>
                 <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
-                  +{problem.gems || 1} <Gem size={17} /> · {total - (step + 1)} {total - (step + 1) > 1 ? skin.stepPlural : skin.stepNoun} to go
+                  +{gift?.step === step ? gift.gems : problem.gems || 1} <Gem size={17} />{gift?.step === step && ' +1 🌱'} · {total - (step + 1)} {total - (step + 1) > 1 ? skin.stepPlural : skin.stepNoun} to go
                 </div>
               </div>
               <BigButton tone="primary" onClick={nextProblem} style={{ marginTop: 4, minWidth: 200 }}>Next {skin.stepNoun} ▸</BigButton>

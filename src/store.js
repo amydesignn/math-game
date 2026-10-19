@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR, HEROES, GARDEN, SEED_KINDS } from './config'
+import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR, HEROES, GARDEN, SEED_KINDS, WELCOME } from './config'
 import { localBackend } from './backend'
 import { drawKind, normalizeBag } from './gardenBag'
 
@@ -45,6 +45,12 @@ function freshState() {
     // it); migrate() seeds existing saves true so returning players (Ivy, Amy)
     // are never re-onboarded. Still re-openable any time from the gear menu.
     seenOnboarding: false,
+    // The lucky station's WELCOME GIFT (2026-10-18, Amy): false = owed. Her
+    // FIRST correct answer anywhere pays WELCOME.gems + 1 seed instead of its
+    // usual pay, once. Only saves created after it shipped start false —
+    // migrate() marks older saves (Ivy, Amy, any guest who has played) as
+    // claimed, so the gift and the 0-seed start only ever reach new players.
+    welcomeGift: false,
     // Seasonal one-time popups (e.g. 'halloween-2026') she has already been
     // shown AND paid for. One id = one popup + its gift, once per player. Old
     // saves get [] from the freshState merge, so returning players see new ones.
@@ -90,11 +96,14 @@ function freshState() {
     stations: { window: null, byMap: {} },
     // Grow a Garden (2026-10-15): her one plot in Sunny Town. plot.seed is null
     // (empty) or { kind, stage } (kind = a SEED_KINDS id, e.g. 'starter') — stage 0 mound → 1 sprout → 2 bud →
-    // 3 bloom (= GARDEN.waterings). seeds = held, not yet planted; everyone
-    // starts with ONE starter seed. seedsGranted = how many lifetime-gem seeds
+    // 3 bloom (= GARDEN.waterings). seeds = held, not yet planted. starter = the
+    // ONE first seed (0|1): a new save starts at 0 and the lucky station's
+    // welcome gift sets it to 1 (2026-10-18 — the free starting seed retired);
+    // saves from before keep their free one (normalizeGarden: missing → 1).
+    // seedsGranted = how many lifetime-gem seeds
     // have been handed out, so grants from lifetimeGems are idempotent (see
     // seedsOwed). harvests = blooms she has picked and kept. Conservation law
-    // the cloud merge relies on: seeds + (planted ? 1 : 0) + harvests = 1 + seedsGranted.
+    // the cloud merge relies on: seeds + (planted ? 1 : 0) + harvests = starter + seedsGranted.
     // basket = the same harvests broken down by seed kind ({ starter: 3 }) for
     // the 🧺 Basket panel (ticket 8); its counts always add up to harvests.
     // Like the ledger, neither ever goes down.
@@ -108,7 +117,7 @@ function freshState() {
 }
 
 function freshGarden() {
-  return { plot: { seed: null }, seeds: 1, seedsGranted: 0, harvests: 0, basket: {}, bag: { left: [], last: null } }
+  return { plot: { seed: null }, seeds: 0, starter: 0, seedsGranted: 0, harvests: 0, basket: {}, bag: { left: [], last: null } }
 }
 
 const seedKinds = () => Object.keys(SEED_KINDS)
@@ -187,6 +196,8 @@ function adoptReadResult(remote, { allowAdopt }) {
     // or a harvest the winner doesn't. Fold it in rather than lose it.
     const before = JSON.stringify(state.garden)
     state.garden = mergeGarden(state.garden, local.garden)
+    // the welcome gift is paid once per player: claimed on either copy = claimed
+    if (local.welcomeGift !== false) state.welcomeGift = true
     writeLocal()
     if (JSON.stringify(state.garden) !== before) scheduleCloudPush() // the cloud lacks what we kept
     else dirty = false // the pre-boot local copy lost the merge; nothing of hers is in it
@@ -214,13 +225,14 @@ export function mergeGarden(a, b) {
   for (const k of new Set([...Object.keys(a.basket), ...Object.keys(b.basket)])) basket[k] = Math.max(a.basket[k] || 0, b.basket[k] || 0)
   const harvests = Math.max(a.harvests, b.harvests, basketTotal(basket))
   const seedsGranted = Math.max(a.seedsGranted, b.seedsGranted)
+  const starter = Math.max(a.starter ?? 1, b.starter ?? 1) // the first seed — once given, never taken back
   // Ahead on harvests wins the plot outright; on a tie, the further-grown plot.
   const lead = a.harvests !== b.harvests ? (a.harvests > b.harvests ? a : b) : progress(b) > progress(a) ? b : a
   const plot = { seed: lead.plot.seed ? { ...lead.plot.seed } : null }
-  const seeds = Math.max(0, 1 + seedsGranted - harvests - (plot.seed ? 1 : 0))
+  const seeds = Math.max(0, starter + seedsGranted - harvests - (plot.seed ? 1 : 0))
   // the colour bag travels with the plot it dealt (outside the conservation law)
   const bag = lead.bag ? { left: [...lead.bag.left], last: lead.bag.last } : { left: [], last: null }
-  return { plot, seeds, seedsGranted, harvests, basket, bag }
+  return { plot, seeds, starter, seedsGranted, harvests, basket, bag }
 }
 
 /** The merge rule: the monotonic ledger picks the winner, not the clock —
@@ -363,6 +375,11 @@ function migrate(parsed) {
   // keep seenOnboarding=false, so exactly the brand-new player sees it.
   if (parsed.seenOnboarding === undefined) merged.seenOnboarding = true
 
+  // The welcome gift (2026-10-18) is for NEW players only: a save from before
+  // it has no flag, so it counts as already claimed — she keeps her free
+  // starter seed and never sees the lucky station. (Same pattern as above.)
+  if (parsed.welcomeGift === undefined) merged.welcomeGift = true
+
   // Music picker (2026-10-04): saves from before it get the new default via the
   // freshState merge above; an id we no longer ship falls back to it too.
   if (!MUSIC_TRACKS.some((t) => t.id === merged.musicTrack)) merged.musicTrack = DEFAULT_MUSIC
@@ -394,7 +411,9 @@ function migrate(parsed) {
   // Grow a Garden (2026-10-15): saves from before it get a fresh garden (one
   // starter seed, empty plot) via normalizeGarden; a partial or edited one is
   // repaired field by field, never reset.
-  merged.garden = normalizeGarden(merged.garden)
+  // (parsed, not merged: the freshState merge would hand a pre-garden save a NEW
+  // player's 0-seed garden.)
+  merged.garden = normalizeGarden(parsed.garden)
   // Ticket 4 (Amy 2026-10-15: "pay them all is fair"): a save that earned
   // lifetime gems before the garden existed is owed every seed now, at once.
   grantOwedSeeds(merged)
@@ -415,9 +434,14 @@ function migrate(parsed) {
 
 function normalizeGarden(g) {
   const out = freshGarden()
+  // A save from before the garden, or before the welcome gift, was given the
+  // free starter seed — it keeps it (only a new save starts at 0).
+  out.seeds = 1
+  out.starter = 1
   if (!g || typeof g !== 'object') return out
   const count = (v, d) => (Number.isInteger(v) && v >= 0 ? v : d)
-  out.seeds = count(g.seeds, out.seeds)
+  out.starter = Math.min(1, count(g.starter, 1))
+  out.seeds = count(g.seeds, out.starter)
   out.seedsGranted = count(g.seedsGranted, 0)
   out.harvests = count(g.harvests, 0)
   if (g.basket && typeof g.basket === 'object') {
@@ -755,6 +779,33 @@ function grantOwedSeeds(s) {
     s.garden.seedsGranted += owed
   }
   return owed
+}
+
+// ── The lucky station's welcome gift (2026-10-18, Amy) ──
+/** Is the welcome gift still owed? True only for a new player who has not yet
+ *  solved her first problem. */
+export function welcomeGiftOwed() {
+  return state.welcomeGift === false
+}
+
+/** Pay the welcome gift: WELCOME.gems + her first seed, ONCE, in one save. It
+ *  REPLACES the pay of the problem that earned it (App calls this instead of
+ *  addGems). Returns { gems, seeds } when paid, null if already claimed — so a
+ *  second tab, a double tap or a replayed timer can never pay it twice. */
+export function claimWelcomeGift() {
+  if (state.welcomeGift !== false) return null
+  state.welcomeGift = true
+  state.lifetimeGems = (state.lifetimeGems || 0) + WELCOME.gems
+  state.gems = Math.max(0, state.gems + WELCOME.gems)
+  // her first seed: `starter` (not seedsGranted — that counts the 20-gem seeds,
+  // and booking it there would silently swallow the one she earns at 20)
+  if (!state.garden.starter) {
+    state.garden.starter = 1
+    state.garden.seeds += 1
+  }
+  grantOwedSeeds(state)
+  save()
+  return { gems: WELCOME.gems, seeds: 1 }
 }
 
 export function getGarden() {

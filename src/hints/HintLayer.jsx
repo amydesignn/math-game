@@ -18,6 +18,8 @@
  *     getAvoid={() => rect[]} isWalking={() => bool}  // job 3: the pill rides the arrow
  *     arrowStyle="green"  // 'green' (default, Amy) | 'pink' (green ground) | 'iris' (the original)
  *   />
+ *   hint.tone (optional) → data-tone on the layer for as long as that hint is on
+ *   screen, exit included — the host's CSS gives a tone its own pill colour.
  *
  * Mount it ALWAYS (hint may be null). The polite live region has to exist before
  * the text arrives, or screen readers skip it. Motion belongs to Fern
@@ -128,7 +130,7 @@ export default function HintLayer({
       clearTimers()
       resetPair()
       const soft = lastExit.current?.id === hint.id && lastExit.current?.reason === 'paused'
-      show({ id: hint.id, text: nextText, toastText: nextText, target: hint.target, arrow: 'in', toast: 'in', soft })
+      show({ id: hint.id, text: nextText, toastText: nextText, target: hint.target, tone: hint.tone, arrow: 'in', toast: 'in', soft })
       later(() => {
         const c = shownRef.current
         if (c && c.id === hint.id && c.arrow === 'in') show({ ...c, arrow: 'shown', toast: c.toastText ? 'shown' : c.toast })
@@ -378,7 +380,7 @@ export default function HintLayer({
   ) : null
 
   return (
-    <div className="luxiHint-layer" ref={layerRef} data-arrow={variant}>
+    <div className="luxiHint-layer" ref={layerRef} data-arrow={variant} data-tone={shown?.tone || undefined}>
       {/* Always mounted, always the same node: the polite announcement. The visible
           toast text below is aria-hidden so it isn't read twice. */}
       <div className="luxiHint-live" role="status" aria-live="polite" aria-atomic="true">
