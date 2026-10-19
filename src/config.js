@@ -38,6 +38,12 @@ export const COMPANIONS = [
 // two empty nodes, socket_head + socket_hand_R; Gear.jsx mounts the equipped
 // piece on each. No skeleton — Character.jsx bounces her in code.
 export const PLAYER = 'sorcerer'
+
+// Who a NEW player starts as (Amy, 2026-10-19): Sunny — a neutral, all-year
+// default that matches the marketing. The Sorcerer stays free in the Gem Shop
+// (Ivy's favourite; best fit for Halloween), and a save already playing her
+// keeps her.
+export const DEFAULT_HERO = 'character-female-b'
 export const GEAR_SOCKETS = { hat: 'socket_head', staff: 'socket_hand_R' }
 
 // Wardrobe (Gem Shop). One mesh per slot; colours are repainted textures
@@ -56,13 +62,13 @@ export const GEAR = [
 export const DEFAULT_GEAR = { hat: 'hat-blue', staff: 'staff-purple' }
 
 // Heroes (Gem Shop, 2026-10-15): the player swaps who she plays as. The
-// Sorcerer + two Kenney minis are free; the rest unlock with gems, ONCE. Only
+// Sunny (the default), the Sorcerer + one more Kenney mini are free; the rest unlock with gems, ONCE. Only
 // the Sorcerer has gear sockets, so the hat/staff shelves are hers alone.
 // Names + the 💎50 price are placeholders until Amy sets them.
 const hero = (id, name, price) => ({ id, name, price, thumb: `thumbs/hero-${id.replace('character-', '')}.png` })
 export const HEROES = [
+  hero(DEFAULT_HERO, 'Sunny', 0),
   hero(PLAYER, 'Sorcerer', 0),
-  hero('character-female-b', 'Sunny', 0),
   hero('character-male-a', 'Bookworm', 0),
   hero('character-female-a', 'Champ', 50),
   hero('character-female-c', 'Bluebell', 50),

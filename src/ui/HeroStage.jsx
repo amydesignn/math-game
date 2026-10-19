@@ -4,7 +4,7 @@
  * card's lavender gradient shows through.
  *
  * ONE build for everyone (Amy, 2026-07-31): the character is the player's —
- * the Sorcerer since 2026-10-14, wearing whatever she has on (wardrobe). The companion is HERS: the cat
+ * Sunny by default (2026-10-19), or whoever she picked — the Sorcerer wears whatever she has on (wardrobe). The companion is HERS: the cat
  * until she buys another in the Gem Shop (2026-10-14). Models + animations are the SAME assets the world uses (already
  * preloaded there), so it paints instantly and can never drift from in-game.
  */

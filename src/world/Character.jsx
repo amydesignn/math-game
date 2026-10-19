@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF, useAnimations } from '@react-three/drei'
 import { SkeletonUtils } from 'three-stdlib'
-import { modelUrl, WORLD, PLAYER } from '../config'
+import { modelUrl, WORLD, PLAYER, DEFAULT_HERO } from '../config'
 import BlobShadow from './BlobShadow'
 import Gear from './Gear'
 
@@ -123,5 +123,6 @@ function dampAngle(a, b, lambda, dt) {
   return a + diff * (1 - Math.exp(-lambda * dt))
 }
 
-// preload the default so the first paint isn't empty
+// preload the default (and the Sorcerer, a common pick) so the first paint isn't empty
+useGLTF.preload(modelUrl('characters', DEFAULT_HERO))
 useGLTF.preload(modelUrl('characters', PLAYER))

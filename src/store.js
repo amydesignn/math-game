@@ -10,7 +10,7 @@
  * per Amy — so this file is deliberately the only thing that will change.
  */
 
-import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, PLAYER, GEAR, DEFAULT_GEAR, HEROES, GARDEN, SEED_KINDS, WELCOME } from './config'
+import { SHOP, SPARKLE, MUSIC_TRACKS, DEFAULT_MUSIC, COMPANIONS, PET_IDS, DEFAULT_HERO, GEAR, DEFAULT_GEAR, HEROES, GARDEN, SEED_KINDS, WELCOME } from './config'
 import { localBackend } from './backend'
 import { drawKind, normalizeBag } from './gardenBag'
 
@@ -19,7 +19,7 @@ const KEY = 'math_world_v1'
 /** The complete game state. Add fields here as stages land; keep it flat + serialisable. */
 function freshState() {
   return {
-    character: PLAYER, // who she plays as — the Sorcerer by default (2026-10-14)
+    character: DEFAULT_HERO, // who she plays as — Sunny by default (2026-10-19; was the Sorcerer from 10-14)
     ownedHeroes: [], // heroes she's unlocked with gems (free ones are always hers)
     // What she's wearing (slot → GEAR id, or null = bare) and what she owns.
     // Free pieces (price 0) are always hers; ownedGear lists bought ones.
@@ -392,12 +392,12 @@ function migrate(parsed) {
   if (!merged.ownedPets.includes(merged.pet)) merged.pet = 'animal-cat'
 
   // Heroes (2026-10-15): she plays as a hero she owns (free, or unlocked).
-  // Anything else — the old Kenney default from before the Sorcerer, a hero we
-  // no longer ship, an edited save — falls back to the Sorcerer. Wardrobe: keep
+  // Anything else — a hero we no longer ship, an edited save — falls back to
+  // Sunny, the default (2026-10-19). Wardrobe: keep
   // only pieces we ship, in the right slot, that she owns.
   if (!Array.isArray(merged.ownedHeroes)) merged.ownedHeroes = []
   merged.ownedHeroes = merged.ownedHeroes.filter((id) => HEROES.some((h) => h.id === id))
-  if (!ownsHero(merged, merged.character)) merged.character = PLAYER
+  if (!ownsHero(merged, merged.character)) merged.character = DEFAULT_HERO
   if (!Array.isArray(merged.ownedGear)) merged.ownedGear = []
   merged.ownedGear = merged.ownedGear.filter((id) => GEAR.some((g) => g.id === id))
   const gear = { ...DEFAULT_GEAR, ...(merged.gear && typeof merged.gear === 'object' ? merged.gear : {}) }
