@@ -220,6 +220,44 @@ The rest of C2: how Ivy is *asked* division and how the problems are *generated*
   (random generator) / `__divRecover(a,b)`; `/?divdemo` for the standalone
   walkthrough. **148 tests green** (26 division), oxlint clean, build clean.
 
+## Onboarding + How to Play rewrite 🧭 (2026-10-19, branch `claude/onboarding-how-to-play-ef9825`)
+Trail crew job (Clover facilitated; Linden UI, Fern motion, Wren sound, Rowan
+wiring/tests; Kestrel + Heron for Marketing). Every decision + voice:
+`docs/onboarding/` (brief → proposal → decisions → round2-consensus → qa).
+- **Definitions (Amy):** Onboarding = an "About" cover + How to Play, shown ONCE
+  on first run (`onboarding: 'first'`). Settings → How to Play = the 3 steps
+  only (`'howto'`). Same card, `<Onboarding entry onClose>`.
+- **ONE copy source, built from config:** `src/onboardingCopy.js` (ABOUT, STEPS,
+  `gradeRange()` = min–max of the live topics' `grade` tags → "4–5" today, "4–6"
+  by itself after DIV_PHASE 2; seed rate, Sunny Town, free-hero count). Heron
+  (Marketing) leads in-game wording: no "gym for your brain" in the game, no
+  comparisons, no age, no "coming soon" (test-banned), step bodies ≤ 22 words.
+  Step 1 is HERO-NEUTRAL on purpose (the default hero will change from the
+  Sorcerer); step 3 says "a seed" (new saves get their first seed from the lucky
+  station's gift).
+- **Card:** first run closes with the ✕ ONLY (kids mis-tap the scrim; howto =
+  scrim closes too). All media mounted in one fixed 16:9 box (`data-active` /
+  `data-prev` / `data-empty`), card height constant so Next never moves.
+  Phone landscape = max-height + inner scroll. Silent (no cue — Wren; the card's
+  taps never reach unlockAudio, kept on purpose).
+- **Clips:** Amy's in-game recordings, cut to ~10s muted loops
+  (`public/onboarding/{hero,gems,garden}.{webm,mp4,jpg}`, README has the ffmpeg
+  recipe). `StepClip` plays only while active, restarts on arrival; reduced
+  motion = the poster. Sources: luxi-marketing/recordings/Recording Sun Oct 18.
+- **Motion (Fern):** 280ms entry, no overshoot; 160ms crossfade; About gem bobs
+  twice then RESTS; 200ms exit on a plain timer (`OB_EXIT_MS`).
+- **Halloween waits** until after her first world visit: `promoShouldShow()`
+  (PromoPopup.jsx) needs `played`. Old saves unchanged.
+- **Easy start:** `startingPool()` (math.js) = 'easy' until ANY answer is recorded
+  → the confidence pool for BOTH nextProblem and generateStation (a new kid's
+  whole first station window is easy). This is the seam a future grade setting
+  plugs into. Open for Finn/Amy: "easy until her first CORRECT answer" (Clover).
+- Settings sheet now scrolls on a sideways phone (How to Play was unreachable).
+- **Parked follow-up:** a wider start camera on tall screens — measured in
+  `docs/onboarding/camera-measure.md` (phone 8% → 40% of arrivals show a gem at
+  1.8×; iPad portrait 13% → 64%); Clover's idea = one gem spawned inside the
+  first view. Amy sees the screenshots before any change.
+
 ## The lucky station 🎁 — a new player's welcome gift (2026-10-18, branch `claude/lucky-station-8c939e`)
 Backlog item 10 ("First station, guided"). Rules locked by Amy; Trail crew briefed
 (notes: side-session-notes …/lucky-station-brief.md). The cold playtest found the
