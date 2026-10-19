@@ -8,7 +8,7 @@
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { existsSync } from 'node:fs'
-import { HEROES, PLAYER, CHARACTERS } from '../config.js'
+import { HEROES, PLAYER, DEFAULT_HERO, CHARACTERS } from '../config.js'
 
 const KEY = 'math_world_v1'
 
@@ -35,9 +35,11 @@ const FREE = HEROES.filter((h) => h.price === 0)
 const LOCKED = HEROES.filter((h) => h.price > 0)
 
 describe('heroes catalogue', () => {
-  it('three free heroes, the Sorcerer first; the rest locked', () => {
+  it('three free heroes, Sunny (the default) first, the Sorcerer among them; the rest locked', () => {
     expect(FREE.map((h) => h.id)).toHaveLength(3)
-    expect(HEROES[0].id).toBe(PLAYER)
+    expect(HEROES[0].id).toBe(DEFAULT_HERO)
+    expect(HEROES[0].name).toBe('Sunny')
+    expect(FREE.map((h) => h.id)).toContain(PLAYER)
     expect(LOCKED.length).toBeGreaterThan(0)
   })
 
@@ -52,9 +54,9 @@ describe('heroes catalogue', () => {
 })
 
 describe('swapping heroes', () => {
-  it('a fresh save plays the Sorcerer and owns no locked heroes', async () => {
+  it('a fresh save plays Sunny and owns no locked heroes', async () => {
     const store = await import('../store.js')
-    expect(store.getState().character).toBe(PLAYER)
+    expect(store.getState().character).toBe(DEFAULT_HERO)
     expect(store.getState().ownedHeroes).toEqual([])
   })
 
@@ -68,7 +70,7 @@ describe('swapping heroes', () => {
     seed({ gems: 999 })
     const store = await import('../store.js')
     expect(store.setCharacter(LOCKED[0].id)).toBe(false)
-    expect(store.getState().character).toBe(PLAYER)
+    expect(store.getState().character).toBe(DEFAULT_HERO)
     expect(store.getState().gems).toBe(999) // a swap never spends
   })
 
@@ -102,7 +104,7 @@ describe('unlocking — pay once, play freely', () => {
     const store = await import('../store.js')
     expect(store.buyHero(h.id)).toBe(null)
     expect(store.getState().gems).toBe(h.price - 1)
-    expect(store.getState().character).toBe(PLAYER)
+    expect(store.getState().character).toBe(DEFAULT_HERO)
     expect(store.getState().ownedHeroes).toEqual([])
   })
 
@@ -123,11 +125,17 @@ describe('migration', () => {
     expect(store.getState().character).toBe(h.id)
   })
 
-  it('a save playing an unowned / unshipped hero falls back to the Sorcerer; unknown owned ids drop', async () => {
+  it('a save playing an unowned / unshipped hero falls back to Sunny; unknown owned ids drop', async () => {
     seed({ character: LOCKED[0].id, ownedHeroes: ['character-dragon'] })
     const store = await import('../store.js')
-    expect(store.getState().character).toBe(PLAYER)
+    expect(store.getState().character).toBe(DEFAULT_HERO)
     expect(store.getState().ownedHeroes).toEqual([])
+  })
+
+  it('a save already playing the Sorcerer keeps her (Ivy) — only NEW players start as Sunny', async () => {
+    seed({ character: PLAYER, gear: { hat: 'hat-blue', staff: 'staff-purple' } })
+    const store = await import('../store.js')
+    expect(store.getState().character).toBe(PLAYER)
   })
 
   it('a save from before heroes (no ownedHeroes) keeps a free hero', async () => {

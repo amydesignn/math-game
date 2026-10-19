@@ -8,7 +8,7 @@
  * Same harness as companions.test.js: fresh store module per test.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { GEAR, GEAR_SOCKETS, DEFAULT_GEAR, PLAYER } from '../config.js'
+import { GEAR, GEAR_SOCKETS, DEFAULT_GEAR, DEFAULT_HERO } from '../config.js'
 
 const KEY = 'math_world_v1'
 
@@ -32,18 +32,18 @@ beforeEach(() => {
 const saved = () => JSON.parse(storage.getItem(KEY))
 const seed = (s) => storage.setItem(KEY, JSON.stringify({ seenOnboarding: true, capRetiredAt: 'x', ...s }))
 
-describe('the Sorcerer — the player character', () => {
-  it('a fresh save plays as the Sorcerer in her blue hat + purple staff', async () => {
+describe('the Sorcerer — a free hero with a wardrobe', () => {
+  it('a fresh save starts as Sunny, with the Sorcerer\'s blue hat + purple staff ready for when she picks her', async () => {
     const store = await import('../store.js')
-    expect(store.getState().character).toBe(PLAYER)
+    expect(store.getState().character).toBe(DEFAULT_HERO)
     expect(store.getState().gear).toEqual({ hat: 'hat-blue', staff: 'staff-purple' })
     expect(store.getState().ownedGear).toEqual([])
   })
 
-  it('an old save (the Kenney default, no wardrobe) migrates to the Sorcerer, dressed', async () => {
+  it('an old save (a locked Kenney hero, no wardrobe) falls back to Sunny, wardrobe defaulted', async () => {
     seed({ gems: 5, character: 'character-female-a' })
     const store = await import('../store.js')
-    expect(store.getState().character).toBe(PLAYER)
+    expect(store.getState().character).toBe(DEFAULT_HERO)
     expect(store.getState().gear).toEqual(DEFAULT_GEAR)
   })
 })
