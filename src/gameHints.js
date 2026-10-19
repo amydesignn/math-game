@@ -42,12 +42,14 @@ export function everPlanted(g) {
  * @param {object} s.garden     store.getGarden()
  * @param {boolean} s.calm      a natural pause: nothing is open, nothing is moving between screens
  * @param {boolean} s.gardenOpen the GardenBar is up (she's at the bed)
+ * @param {boolean} s.luckyHere  the lucky station stands in this world (welcome gift still owed)
  */
-export function hintCtx({ mapId, hasPlot, garden, calm, gardenOpen }) {
+export function hintCtx({ mapId, hasPlot, garden, calm, gardenOpen, luckyHere }) {
   return {
     mapId,
     hasPlot: !!hasPlot,
     gardenOpen: !!gardenOpen,
+    luckyHere: !!luckyHere,
     seeds: garden?.seeds ?? 0,
     everPlanted: everPlanted(garden),
     calm: !!calm,
@@ -66,14 +68,35 @@ export function isWorldTap(view, target) {
 }
 
 export const GARDEN_HINT_ID = 'garden-first-plant'
+export const LUCKY_HINT_ID = 'lucky-station'
 
 export const GAME_HINTS = [
+  {
+    // The lucky station (2026-10-18, Amy): a NEW player's welcome gift. Our arrow
+    // on the station + a GOLD pill, in every world she enters, every visit, until
+    // her first right answer anywhere ("follow her — teach them, push a little").
+    // FIRST in the list, so it always beats the garden hint. A 'reward', not a
+    // nudge: no once-per-session budget, and a ✕ only hides it until the next
+    // calm moment. `live`: shown in production even while HINTS_ON is off.
+    id: LUCKY_HINT_ID,
+    live: true,
+    tone: 'lucky',
+    budget: 'reward',
+    target: { world: 'lucky' },
+    when: (c) => c.luckyHere,
+    say: () => HINT_COPY.lucky.pill,
+    retire: (c) => !c.luckyHere,
+    delayMs: 1200, // Fern: the station reveals first, then the arrow, then the pill
+    exitMs: 700,
+  },
   {
     // Amy: in a scene where she can grow a garden, an arrow on the garden,
     // and a toast if she hasn't grown any crop. Retires on her first planting.
     id: GARDEN_HINT_ID,
     target: { world: 'garden-bed' },
-    when: (c) => c.mapId === 'town' && c.hasPlot,
+    // Waits for her first seed (a new player's comes from the welcome gift), and
+    // never shares the screen with the lucky station.
+    when: (c) => c.mapId === 'town' && c.hasPlot && c.seeds > 0 && !c.luckyHere,
     // At the bed the GardenBar already says "Plant your seed" → arrow only, no
     // toast. The arrow STAYS so her plant (always from the bar) lands the
     // 'done' beat on a visible arrow.

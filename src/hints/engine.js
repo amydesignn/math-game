@@ -9,6 +9,7 @@
 //   say     the toast line ('' = arrow only)
 //   retire  derived from the host's saved state — true = never again on this save
 //   budget  'nudge' (default) | 'tip' (once per device) | 'reward' (not a nudge)
+//   tone    optional look name the layer wears while it shows (e.g. 'lucky')
 //
 // Quiet budget (shared by every nudge, incl. the planned garden popup):
 //   · at most one hint on screen (also: none while another is still leaving)
@@ -90,7 +91,7 @@ export function createHintController({ hints, memory, onChange, onShow, onDone, 
     if (!same) onChange?.(view)
   }
 
-  const shownView = (h) => ({ hint: { id: h.id, text: safe(h.say, ctx, '') || '', target: h.target }, exitReason: null })
+  const shownView = (h) => ({ hint: { id: h.id, text: safe(h.say, ctx, '') || '', target: h.target, tone: h.tone }, exitReason: null })
 
   function end(reason) {
     const h = active.hint

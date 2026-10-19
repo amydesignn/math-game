@@ -43,6 +43,7 @@ const oldSave = (over = {}) => ({
 const garden = (over = {}) => ({
   plot: { seed: null },
   seeds: 1,
+  starter: 1,
   seedsGranted: 0,
   harvests: 0,
   basket: over.harvests ? { starter: over.harvests } : {},
@@ -124,9 +125,10 @@ describe('seedsOwed (pure)', () => {
 })
 
 describe('the plot: plant → water ×3 → harvest', () => {
-  it('a brand-new player starts with one starter seed and an empty plot', async () => {
+  it('a brand-new player starts with NO seed and an empty plot — the welcome gift is her first (2026-10-18)', async () => {
     const store = await fresh()
-    expect(store.getGarden()).toEqual(garden())
+    expect(store.getGarden()).toEqual(garden({ seeds: 0, starter: 0 }))
+    expect(store.welcomeGiftOwed()).toBe(true)
   })
 
   it('the whole loop, gems spent but level (lifetimeGems) untouched', async () => {
@@ -213,6 +215,7 @@ describe('migration (saves from before the garden — Ivy\'s)', () => {
     expect(store.getGarden()).toEqual({
       plot: { seed: { kind: 'starter', stage: GARDEN.waterings } }, // clamped to bloom
       seeds: 27, // bad count → default (1), then the 26 owed seeds paid
+      starter: 1, // a save from before the welcome gift keeps its free seed
       seedsGranted: 26,
       harvests: 4, // kept
       basket: { starter: 4 }, // filed as starter blooms
