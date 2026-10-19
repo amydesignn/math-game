@@ -291,7 +291,11 @@ export function Onboarding({ entry = 'first', onClose }) {
       className="luxiOb-scrim"
       data-state={state}
       data-entry={entry}
-      // never let a tap fall through to the R3F canvas and walk her
+      // never let a tap fall through to the R3F canvas and walk her.
+      // DECIDED SILENCE (Wren, 2026-10-18): this also keeps first-run taps from
+      // reaching unlockAudio(), so the music starts on her first tap AFTER the
+      // card, never under the About page. The card has no cue of its own. Keep
+      // it that way unless the crew decides otherwise (docs/onboarding/retro).
       onPointerDown={(e) => e.stopPropagation()}
       onClick={dismissable ? close : undefined}
     >

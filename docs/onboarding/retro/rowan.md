@@ -1,0 +1,7 @@
+# Rowan's retro
+
+- **Went well:** I agreed the seams in round 1 (`entry`, `promoShouldShow`, the starting level), so Linden built to `entry` before I'd wired it, and nobody edited the same file. Building the copy from config, with string-level tests, held up. All 10 sabotage breaks failed as they should. `startingPool` merged cleanly under the lucky station (PR #68), because it's one default argument on both generators and not a new code path.
+- **Didn't:** I broke two older rotation tests. They had assumed that a fresh save means the normal mix, and I only found them when the full suite ran. I should have grepped every caller's tests first. My 3-hour-window caveat (a new kid's whole first window of quests is easy) went to you, but Clover wasn't reachable, so the QA note never reached her directly.
+- **Didn't (copy):** the build tests checked the copy against config, but not against main as it moved. Nathan had to fix "a seed" and make the copy hero-neutral by hand after PR #68. A test that checks the copy against the live store would have caught it.
+- **Process (Nathan, gently):** in round 2 we sent Amy jargon first. Plain words (what it is, why it matters, the options) should be the first draft, not the redo.
+- **Lesson I'm saving:** when I change a shared default (a generator, a store field), grep every caller and its tests before running anything. Then pass the old behaviour explicitly where a test meant it.

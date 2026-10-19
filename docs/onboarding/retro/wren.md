@@ -1,0 +1,7 @@
+# Wren (sound)
+
+- **Went well:** "no cue" was the right job for sound here, and the team let silence be a real decision instead of a gap. Clover *measured* it rather than trusting my code-read: 0 oscillators, 0 buffer sources and 0 media plays across the whole first run. From Settings the bgm kept playing, untouched. Amy's clips shipped muted, so the one new media element agrees with the rule.
+- **Went well:** I read the wiring before voting. That's how I found the scrim's `stopPropagation` was already keeping first-run taps from unlocking audio. A rule we could point at in the code beat a taste argument.
+- **What didn't:** I said "write it down as a choice" and then didn't make sure it happened. The shipped comment on the scrim's `stopPropagation` only says it keeps taps off the canvas. If someone moves `unlockAudio` to a capture listener, or drops that line, the first run quietly gets music under slide 1, and nothing flags it. It's a one-line comment, or a QA row that names the cause. Small follow-up; Rowan or I can add it.
+- **What I'd do differently:** my voice was short and plain, which helped, but "oscillators" is still our word, not Amy's. Next time I'll lead with what she'd hear ("nothing until she taps Play").
+- **My lesson:** when silence is the decision, put it in the code next to the line that causes it, and ask QA to measure the silence. A silence nobody wrote down is just an accident.
