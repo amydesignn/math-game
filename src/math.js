@@ -273,15 +273,43 @@ export function similarLongMult(a, b, _level) {
  * provisional stand-in for the session-mix rule (the full 30%-confidence /
  * 75–85%-band scheduler is Layer-2 work with its own phase).
  */
-export function nextProblem() {
+export function nextProblem(start = startingPool()) {
+  const topicId = pickTopic(start)
+  return TOPICS[topicId].generate(currentLevel(topicId))
+}
+
+/**
+ * THE STARTING-LEVEL SEAM (onboarding decision #7, Amy 2026-10-18): where a
+ * player begins before the game knows her. ONE knob for both encounters — the
+ * sparkle (nextProblem) and the station quest (generateStation) both default to
+ * it, so they can't drift apart (the station-division lesson).
+ *   'easy' → the confidence pool only (mult-2x1 / add-2x2, Grade 4) — never a
+ *            32 × 20 as a brand-new kid's very first problem.
+ *   null   → the normal frontier mix.
+ * Rule today: brand-new = NO checked answer recorded in any topic (every
+ * byLevel `seen` is 0). Derived from the save, nothing new stored — so Ivy and
+ * every old save with answers are unchanged, and a kid who closes her first
+ * problem unanswered still gets an easy one next time.
+ * A future grade setting (backlog #5) returns its band from HERE — same knob.
+ */
+export function startingPool(progress = getState().topicProgress) {
+  const answered = Object.values(progress || {}).some((t) =>
+    Object.values(t?.byLevel || {}).some((l) => (l?.seen || 0) > 0),
+  )
+  return answered ? null : 'easy'
+}
+
+const CONFIDENCE = () => (Math.random() < 0.6 ? 'mult-2x1' : 'add-2x2')
+
+/** Which topic serves the next problem, given the starting pool. */
+function pickTopic(start) {
+  if (start === 'easy') return CONFIDENCE()
   // TWO frontier topics now: multiplication (C1, retained via spacing) and
   // division (C2, her new school focus). Even frontier split; the pre-C1 shapes
   // stay the confidence pool. FINN-SPEC: the 35/35/30 mix is a provisional
   // one-line tune (division-first weighting is a knob if Finn wants it).
   const roll = Math.random()
-  if (roll < 0.35) return TOPICS['long-mult'].generate(currentLevel('long-mult'))
-  if (roll < 0.7) return TOPICS['long-div'].generate()
-  return TOPICS[Math.random() < 0.6 ? 'mult-2x1' : 'add-2x2'].generate()
+  return roll < 0.35 ? 'long-mult' : roll < 0.7 ? 'long-div' : CONFIDENCE()
 }
 
 /* ── The lucky station's question (2026-10-18, Amy) ──
@@ -316,10 +344,12 @@ export function currentLevel(topicId) {
  * a SINGLE topic, chosen frontier-weighted like the sparkle mix, at her current
  * ladder level. Each problem's `gems` payout = the level she solved it at
  * (L1=1 … L3=3), per the economy spec. Length is data — 2 today, 3 later.
+ * `start` = the starting-level seam (see startingPool). NOTE: stations are
+ * planned once per refresh window (stations.js), so a brand-new player's whole
+ * first window of quests comes from the easy pool, not just the first one.
  */
-export function generateStation(count = 2) {
-  const roll = Math.random()
-  const topicId = roll < 0.35 ? 'long-mult' : roll < 0.7 ? 'long-div' : Math.random() < 0.6 ? 'mult-2x1' : 'add-2x2'
+export function generateStation(count = 2, start = startingPool()) {
+  const topicId = pickTopic(start)
   const level = currentLevel(topicId)
   const problems = []
   let guard = 0

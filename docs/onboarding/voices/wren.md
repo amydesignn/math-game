@@ -1,0 +1,9 @@
+# Wren (sound)
+
+- **No cue. The onboarding stays silent: no slide sound, no Next tick, no "Let's play" chime.** It's reading time, and a sound per tap would start a click family the game doesn't have (one sound = one meaning).
+- **Something I found in the code (read, not measured yet):** the onboarding *can't* make a sound today, even if we wanted one. The scrim does `onPointerDown → stopPropagation` (Onboarding.jsx), and `unlockAudio()` lives on App's root `onPointerDown`. Taps inside the onboarding never reach it. A new kid can tap through all the slides, and the music only starts on her first tap *after* it closes. I think that's the right result, but by accident. If we keep it, we should write it down as a choice.
+- **Pushback on the obvious fix:** don't "fix" the unlock so the bgm starts on her first Next tap. Music swelling under slide 1 competes with the reading. The first sound she hears should be the world: the music on Play, then the gem chime on her first solve. That's the welcome.
+- **One exception to weigh:** if Amy wants a welcome sound, the only honest spot is on "Let's play" (a real act, like hintDone on plant). It would reuse an existing recipe, never a new one, and it needs the unlock moved so it fires. My vote is still no. "Let's play" is a door, not a reward.
+- **From Settings → How to Play:** the audio is already unlocked and the music is playing. It should keep playing quietly under the card. Don't duck it or pause it. Silent card, same rule.
+- **Halloween (Q3):** that popup has its own video sound and `holdMusic`. Holding it until after her first world visit also means her first audio isn't a promo clip. I agree with Nathan: hold it.
+- For Clover's QA: expect 0 oscillators across the whole onboarding on both entry points, with the bgm paused during first run and unchanged from Settings.

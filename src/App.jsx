@@ -15,7 +15,7 @@ import SignupModal, { SavedToast } from './ui/SignupModal'
 import { SettingsSheet, ProfilePopover } from './ui/Settings'
 import { Onboarding } from './ui/Onboarding'
 import { FeedbackModal } from './ui/FeedbackModal'
-import PromoPopup, { PROMO, promoActive } from './ui/PromoPopup'
+import PromoPopup, { PROMO, promoActive, promoShouldShow } from './ui/PromoPopup'
 import HintLayer from './hints/HintLayer'
 import { createHintController, beginSession } from './hints'
 import { GAME_HINTS, GARDEN_HINT_ID, LUCKY_HINT_ID, hintCtx, arrowForMap, isWorldTap } from './gameHints'
@@ -83,16 +83,20 @@ export default function App({ cloud = false, justSignedIn = false }) {
     setAvatarState(null)
   }
   // First-run onboarding: auto-shows once for a brand-new player (over the Door),
-  // and re-openable any time from the gear's "How to Play". One flag, two entries.
-  const [showOnboarding, setShowOnboarding] = useState(!state.seenOnboarding)
+  // and re-openable any time from the gear's "How to Play". One state, two
+  // entries: 'first' = About + the 3 steps, 'howto' = the 3 steps only
+  // (src/onboardingCopy.js onboardingPages). null = closed.
+  const [onboarding, setOnboarding] = useState(state.seenOnboarding ? null : 'first')
+  const showOnboarding = onboarding !== null
   // Seen = SHOWN, not dismissed (Finn 2026-10-10: it appeared twice). Marking
   // only on close meant leaving with it open — back button, closed tab, iOS
   // reloading a backgrounded tab — never saved the flag, so it auto-showed
   // again on return. Mark the moment the first-run auto-show mounts.
+  // 'first' only — opening How to Play from Settings is already a seen player.
   useEffect(() => {
-    if (showOnboarding) markOnboardingSeen()
-  }, [showOnboarding])
-  const closeOnboarding = () => setShowOnboarding(false)
+    if (onboarding === 'first') markOnboardingSeen()
+  }, [onboarding])
+  const closeOnboarding = () => setOnboarding(null)
   const [signup, setSignup] = useState(null) // null | 'form' | 'guest'
   // Feedback Flow (Oscar's comp, lifted 2026-09-19) — gear → Send Feedback.
   // Silent context is attached HERE, never asked of the child (COPPA): the
@@ -141,10 +145,11 @@ export default function App({ cloud = false, justSignedIn = false }) {
   const [gems, setGems] = useState(state.gems)
   // Seasonal popup (Halloween 2026: the clip + trick-or-treat, 3 gems). Shows
   // ONCE over the Door, only in its season, and never on top of first-run
-  // onboarding — a brand-new player gets it right after that closes. Claimed
+  // onboarding — a brand-new player gets it after her first world visit. Claimed
   // (seen + paid, one save) the moment it shows: see store.claimPromo.
   const [promoOpen, setPromoOpen] = useState(() => promoActive() && !hasSeenPromo(PROMO.id))
-  const promoShowing = promoOpen && view === 'door' && !showOnboarding
+  // …and only after her first world visit (decision #6) — see promoShouldShow.
+  const promoShowing = promoShouldShow({ promoOpen, played, view, onboardingOpen: showOnboarding })
   useEffect(() => {
     if (!promoShowing) return
     const g = claimPromo(PROMO.id, PROMO.gems)
@@ -1339,7 +1344,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
           }}
           onOpenHowTo={() => {
             setSettingsOpen(false)
-            setShowOnboarding(true)
+            setOnboarding('howto')
           }}
           onOpenFeedback={() => setFeedbackOpen(true)}
           onSignOut={onSignOut}
@@ -1350,7 +1355,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
       {signup && <SignupModal entry={signup} onSend={onSignupSend} onClose={() => setSignup(null)} />}
       {savedToast && <SavedToast onDone={() => setSavedToast(false)} />}
       {/* First-run walkthrough / gear → How to Play — over the Door and the world */}
-      {showOnboarding && <Onboarding onClose={closeOnboarding} />}
+      {showOnboarding && <Onboarding entry={onboarding} onClose={closeOnboarding} />}
       {/* Seasonal one-time popup — over the Door only, after onboarding */}
       {promoShowing && <PromoPopup onClose={() => setPromoOpen(false)} />}
       {/* Feedback Flow — gear → Send Feedback, over the Door and the world */}

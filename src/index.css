@@ -453,29 +453,110 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
    style overrides a CSS :hover, so a hovered/pressed button can't be styled
    inline (same lesson as .luxiFooter / su* / dv*). The buttons' base look also
    lives here so :hover/:active can win over it. Static geometry stays inline. */
+/* Layout (Linden, rebuilt 2026-10-18). The card rules are scoped to .luxiOb-frame so the Halloween promo (which reuses .luxiOb-card) keeps its own layout. Static only: NO transition or
+   animation in this block — motion on these hooks is Fern's (see the header of
+   Onboarding.jsx for the data-attr contract). */
+.luxiOb-scrim { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(29,23,48,.5); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+.luxiOb-scrim[data-state="closing"] { pointer-events: none; }
+.luxiOb-frame { width: 100%; max-width: 440px; }
+.luxiOb-frame > .luxiOb-card { display: flex; flex-direction: column; width: 100%; max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 24px 60px rgba(74,54,110,.22), inset 0 0 0 1px rgba(255,255,255,.6); font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+.luxiOb-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 16px 16px 24px; background: linear-gradient(180deg,#E9E2FA,#F8F5FE); border-bottom: 1px solid #E7E0F3; }
+/* the only part that scrolls (phone landscape): header + footer stay put */
+.luxiOb-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.luxiOb-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px 24px; }
+/* ONE fixed 16:9 box; its lilac IS the calm placeholder for a media:null step */
+.luxiOb-mediaBox { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: linear-gradient(150deg,#EDE7FB,#E3DBF7); box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
+.luxiOb-media { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+.luxiOb-media[data-active="true"] { opacity: 1; }
+.luxiOb-stage { display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 100% at 50% 30%, #F6F1FF 0%, #ECE4FB 62%, #E4D9F6 100%); }
+/* every page's text stacked in one cell → the block is as tall as the tallest */
+.luxiOb-pages { display: grid; padding: 24px 24px 0; }
+.luxiOb-page { grid-area: 1 / 1; opacity: 0; }
+.luxiOb-page[data-active="true"] { opacity: 1; }
+.luxiOb-num { width: 48px; height: 48px; border-radius: 50%; background: #EDE7FC; color: #5B4B9E; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; }
+/* About: the 3 kid lines (body 16) + the parent small print (supporting 14) */
+.luxiOb-lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.luxiOb-lines li { font-size: 16px; font-weight: 600; color: #262626; line-height: 1.5; text-wrap: pretty; }
+.luxiOb-small { margin: 16px 0 0; font-size: 14px; font-weight: 400; color: #6E6685; line-height: 1.5; text-wrap: pretty; }
+/* dots: the slot keeps its 8px height on About (no dots) so nothing moves */
+.luxiOb-dots { display: flex; gap: 8px; align-items: center; justify-content: center; height: 8px; padding: 24px 24px 0; box-sizing: content-box; }
+.luxiOb-dot { height: 8px; width: 8px; border-radius: 99px; background: #EDE7FC; }
+.luxiOb-dot[data-state="current"] { width: 24px; background: #4B54DD; }
+.luxiOb-dot[data-state="past"] { background: #C6B4F0; }
+/* Short screens (phone landscape 812×375): a 230-tall image would fill the whole
+   scroll area and hide the words, so the box shrinks to 96 tall (still 16:9,
+   centred) and the title starts in view; the rest scrolls under a fixed ✕. */
+@media (max-height: 480px) {
+  .luxiOb-mediaBox { width: auto; height: 96px; margin: 0 auto; }
+  .luxiOb-pages { padding-top: 16px; }
+  .luxiOb-dots { padding-top: 16px; }
+}
 @keyframes obScrimIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 @keyframes obCardIn { 0% { transform: translateY(12px) scale(.96); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 .luxiOb-scrim { animation: obScrimIn .2s ease-out both; }
 .luxiOb-card { animation: obCardIn .28s cubic-bezier(.2,.9,.3,1.1) both; }
-/* Step 0 logo stage (Amy 2026-10-10). First-run only = the delight budget.
-   CSS keyframes, not JS: the Door's R3F hero is loading underneath, and CSS
-   animation stays smooth off the main thread. transform + opacity only.
-   1. gemIn — the gem rises in just after the card lands (.12s delay), strong
-      ease-out, from scale(.9) never 0.
-   2. gemFloat — then a slow 3.2s bob (on-screen movement → ease-in-out); its
-      shadow narrows as the gem rises so it stays grounded.
-   3. twinkle — three sparkles pulse in turn, staggered in the JSX. */
-@keyframes obGemIn { 0% { transform: translateY(16px) scale(.9); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
-@keyframes obGemFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-@keyframes obGemShadow { 0%, 100% { transform: scaleX(1); opacity: .5; } 50% { transform: scaleX(.8); opacity: .3; } }
-@keyframes obTwinkle { 0%, 100% { transform: scale(.6) rotate(0deg); opacity: 0; } 40% { transform: scale(1) rotate(20deg); opacity: 1; } 70% { transform: scale(.85) rotate(30deg); opacity: .7; } }
-.luxiOb-gemIn { display: flex; flex-direction: column; align-items: center; gap: 8px; animation: obGemIn .5s var(--ease-out) .12s both; }
-.luxiOb-gemFloat { display: flex; animation: obGemFloat 3.2s ease-in-out .62s infinite; }
-.luxiOb-gemShadow { width: 64px; height: 8px; border-radius: 50%; background: rgba(74,54,110,.28); animation: obGemShadow 3.2s ease-in-out .62s infinite; }
-.luxiOb-twinkle { opacity: 0; animation: obTwinkle 2.4s var(--ease-out) infinite; }
+/* ── Onboarding motion (Fern, 2026-10-18 — docs/onboarding/proposal.md).
+   SCOPED: every rule below keys on Onboarding-only hooks (.luxiOb-scrim[data-entry],
+   .luxiOb-frame > .luxiOb-card, the media/page/dot/gem classes). The Halloween
+   promo reuses .luxiOb-scrim/-card WITHOUT those hooks, so it keeps the global
+   obScrimIn/obCardIn lines above untouched. Keyframes are luxiOb*-namespaced.
+   One curve family (house rule, no built-in ease): --ease-out for in/out,
+   cubic-bezier(0.77,0,0.175,1) for the on-screen bob. transform + opacity only
+   (the dots' width is the one agreed exception: an 8→24px pill, no transform
+   equivalent that keeps the round ends).
+   · enter: scrim fade 200ms; card rises 12px + .96→1, 280ms, NO overshoot.
+   · exit: scrim fade + card sinks 8px and fades, 200ms. Unmount rides a plain
+     setTimeout(OB_EXIT_MS = 200) in Onboarding.jsx, never animationend.
+   · page change: images = the incoming layer jumps on top (z-index) and fades in
+     160ms over the page just left, which holds and only drops after 160ms;
+     older layers drop at once. A media:null page fades the old one to lilac. Text =
+     outgoing at once, incoming 160ms in (two texts never overlap).
+   · About gem: rises in, bobs TWICE, then rests at its baseline. The twinkles
+     sparkle twice and are gone. No infinite motion (Amy's rule).
+   · reduced motion: opacity only, static gem, same timers. */
+@keyframes luxiObFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes luxiObFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes luxiObCardIn { from { transform: translateY(12px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes luxiObCardOut { from { transform: none; opacity: 1; } to { transform: translateY(8px); opacity: 0; } }
+.luxiOb-scrim[data-entry] { animation: luxiObFadeIn 200ms var(--ease-out) both; }
+.luxiOb-scrim[data-entry][data-state="closing"] { animation: luxiObFadeOut 200ms var(--ease-out) forwards; }
+.luxiOb-frame > .luxiOb-card { animation: luxiObCardIn 280ms var(--ease-out) both; }
+.luxiOb-scrim[data-state="closing"] .luxiOb-frame > .luxiOb-card { animation: luxiObCardOut 200ms var(--ease-out) forwards; }
+/* crossfade — media layers. Incoming (active) on top fades in; the page just
+   left (data-prev) holds its CURRENT opacity under it, then drops after 160ms;
+   any older layer drops at once (no picture from two pages back on a fast Next). */
+.luxiOb-frame .luxiOb-media { z-index: 0; transition: none; }
+.luxiOb-frame .luxiOb-media[data-prev="true"] { z-index: 1; transition: opacity 0ms linear 160ms; }
+.luxiOb-frame .luxiOb-media[data-active="true"] { z-index: 2; transition: opacity 160ms var(--ease-out); }
+/* a media:null page has no layer to fade in over the old one, so the old one
+   fades out to the box's lilac instead of cutting */
+.luxiOb-frame .luxiOb-mediaBox[data-empty="true"] > .luxiOb-media[data-prev="true"] { transition: opacity 160ms var(--ease-out); }
+/* crossfade — text layers: the old text goes at once, the new one fades in
+   (two texts at half opacity on top of each other read as a smudge) */
+.luxiOb-frame .luxiOb-page { transition: none; }
+.luxiOb-frame .luxiOb-page[data-active="true"] { transition: opacity 160ms var(--ease-out); }
+/* dots */
+.luxiOb-dot { transition: width 200ms var(--ease-out), background-color 200ms var(--ease-out); }
+/* buttons: same timings, house curve (the base rules are shared with the promo) */
+.luxiOb-frame .luxiOb-close { transition: background-color 150ms var(--ease-out); }
+.luxiOb-frame .luxiOb-back { transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out); }
+.luxiOb-frame .luxiOb-cta { transition: transform 80ms var(--ease-out), box-shadow 80ms var(--ease-out), filter 80ms var(--ease-out); }
+/* About gem stage (first-run only = the delight budget, but it sits next to the
+   one sentence we most want read, so it settles fast and then stays still) */
+@keyframes luxiObGemIn { from { transform: translateY(16px) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes luxiObGemBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes luxiObGemShadow { 0%, 100% { transform: scaleX(1); opacity: .5; } 50% { transform: scaleX(.8); opacity: .3; } }
+@keyframes luxiObTwinkle { 0%, 100% { transform: scale(.6) rotate(0deg); opacity: 0; } 40% { transform: scale(1) rotate(20deg); opacity: 1; } 70% { transform: scale(.85) rotate(30deg); opacity: .7; } }
+.luxiOb-gemIn { display: flex; flex-direction: column; align-items: center; gap: 8px; animation: luxiObGemIn 400ms var(--ease-out) 120ms both; }
+.luxiOb-gemFloat { display: flex; animation: luxiObGemBob 2400ms cubic-bezier(0.77, 0, 0.175, 1) 520ms 2; }
+.luxiOb-gemShadow { width: 64px; height: 8px; border-radius: 50%; background: rgba(74,54,110,.28); opacity: .5; animation: luxiObGemShadow 2400ms cubic-bezier(0.77, 0, 0.175, 1) 520ms 2; }
+.luxiOb-twinkle { opacity: 0; animation: luxiObTwinkle 2400ms var(--ease-out) 2; }
 @media (prefers-reduced-motion: reduce) {
-  /* gentler, not zero: the gem still fades in; no bobbing, sparkles sit still */
-  .luxiOb-gemIn { animation: obScrimIn .3s ease-out .12s both; }
+  /* gentler, not zero: every fade stays, nothing moves or scales */
+  .luxiOb-frame > .luxiOb-card { animation: luxiObFadeIn 200ms var(--ease-out) both; }
+  .luxiOb-scrim[data-state="closing"] .luxiOb-frame > .luxiOb-card { animation: luxiObFadeOut 200ms var(--ease-out) forwards; }
+  .luxiOb-dot { transition: background-color 200ms var(--ease-out); }
+  .luxiOb-gemIn { animation: luxiObFadeIn 200ms var(--ease-out) 120ms both; }
   .luxiOb-gemFloat, .luxiOb-gemShadow { animation: none; }
   .luxiOb-twinkle { animation: none; opacity: .8; }
 }
@@ -483,11 +564,12 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
 .luxiOb-close { width: 40px; height: 40px; border: 0; border-radius: 50%; background: #ECEAF1; color: #6E6685; display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none; transition: background .15s ease; }
 .luxiOb-close:hover { background: #E1DEEA; }
 /* footer "Back" (ghost button) */
-.luxiOb-back { background: transparent; color: #6E6685; font-size: 15px; font-weight: 600; padding: 12px 16px; border: 0; border-radius: 12px; cursor: pointer; transition: background .15s ease, color .15s ease; }
+.luxiOb-back { background: transparent; color: #6E6685; font-size: 15px; font-weight: 600; line-height: 24px; padding: 12px 16px; border: 0; border-radius: 12px; cursor: pointer; transition: background .15s ease, color .15s ease; }
 .luxiOb-back:hover { background: #F1EEF9; color: #262626; }
 /* footer primary — "Next" and the final CTA share this look (padding set inline) */
-.luxiOb-cta { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #6169E0; color: #fff; font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 #3D43BE; cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
+.luxiOb-cta { padding: 12px 24px; line-height: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #6169E0; color: #fff; font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 #3D43BE; cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
 .luxiOb-cta:hover { filter: brightness(1.04); }
+.luxiOb-close:focus-visible, .luxiOb-back:focus-visible, .luxiOb-cta:focus-visible { outline: 2px solid #6169E0; outline-offset: 2px; }
 .luxiOb-cta:active { transform: translateY(4px); box-shadow: 0 0 0 #3D43BE; }
 
 /* ── Seasonal promo popup (src/ui/PromoPopup.jsx, 2026-10-15) ──

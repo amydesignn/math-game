@@ -133,7 +133,9 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
   return (
     <>
       <div style={scrimStyle} onClick={close} />
-      <div role="dialog" aria-label="Settings" style={{ position: 'fixed', top: 72, right: 16, width: 320, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <div role="dialog" aria-label="Settings" // maxHeight + scroll: a phone held sideways (812×375) ran the sheet off the
+      // bottom, so How to Play was unreachable (onboarding QA, 2026-10-18).
+      style={{ position: 'fixed', top: 72, right: 16, width: 320, maxWidth: 'calc(100vw - 32px)', maxHeight: 'calc(100dvh - 88px)', overflowY: 'auto', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
         <div
           style={{
             background: WHITE,
