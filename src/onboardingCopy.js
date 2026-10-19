@@ -45,28 +45,35 @@ export const ABOUT = {
   small: `× ÷ + practice for grades ${gradeRange()} · teaches the method, step by step · no account needed`,
 }
 
-// `media` = a 16:9 still or clip in public/onboarding/. Steps 1 + 3 wait on
-// Amy's recordings (docs/onboarding/recording-brief.md); until then step 1
-// keeps its old still and step 3 has none (the old one was Merry Market —
-// not her garden, so it would teach the wrong place).
+// `clip` = a short muted loop Amy recorded in the real game (2026-10-18, cut
+// to ~10s: public/onboarding/<id>.webm + .mp4); `media` = its still poster,
+// shown first and kept for reduced motion. Recording brief:
+// docs/onboarding/recording-brief.md.
 export const STEPS = [
   {
     id: 'hero',
     title: 'Meet your hero',
-    body: `You start as the Sorcerer, with your cat. Swap heroes in the 🛍️ shop. ${FREE_HEROES} are free.`,
-    media: '/onboarding/step-1.jpg',
+    // Hero-neutral on purpose: the default hero will change (Amy 2026-10-19 —
+    // the Sorcerer is Ivy's pick; the clip plays as Sunny).
+    body: `Play as your hero, with your cat. Swap heroes in the 🛍️ shop. ${FREE_HEROES} are free.`,
+    media: '/onboarding/hero.jpg',
+    clip: '/onboarding/hero',
   },
   {
     id: 'gems',
     title: 'Earn gems, then build',
     body: 'Tap a glowing gem 💎 to solve a problem. Spend gems in the 🛍️ shop to build.',
-    media: '/onboarding/step-2.jpg',
+    media: '/onboarding/gems.jpg',
+    clip: '/onboarding/gems',
   },
   {
     id: 'garden',
     title: 'Grow a garden 🌱',
-    body: `Plant your seed in ${GARDEN_TOWN}. Water it with gems, then pick your flowers 🧺. You earn a new seed every ${GARDEN.seedEveryGems} gems.`,
-    media: null,
+    // "a seed", not "your seed": a new save starts with none — her first seed
+    // comes with the lucky station's welcome gift (PR #68).
+    body: `Plant a seed in ${GARDEN_TOWN}. Water it with gems, then pick your flowers 🧺. You earn a new seed every ${GARDEN.seedEveryGems} gems.`,
+    media: '/onboarding/garden.jpg',
+    clip: '/onboarding/garden',
   },
 ]
 

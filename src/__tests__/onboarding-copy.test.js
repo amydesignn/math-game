@@ -83,6 +83,10 @@ describe('onboarding copy — truth rules', () => {
     const media = copy.STEPS.map((s) => s.media).filter(Boolean)
     expect(media.length).toBeGreaterThan(0)
     for (const m of media) expect(existsSync(resolve(__dirname, '../../public', `.${m}`)), m).toBe(true)
+    // every clip ships in both formats (WebM first, MP4 for Safari)
+    for (const c of copy.STEPS.map((s) => s.clip).filter(Boolean)) {
+      for (const ext of ['webm', 'mp4']) expect(existsSync(resolve(__dirname, '../../public', `.${c}.${ext}`)), `${c}.${ext}`).toBe(true)
+    }
   })
 })
 

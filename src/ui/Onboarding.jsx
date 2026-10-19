@@ -86,6 +86,48 @@ function GemStage({ active, prev }) {
   )
 }
 
+// Reduced motion = the still poster, never a moving clip (read once per mount).
+const prefersReducedMotion = () =>
+  typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/**
+ * A step's clip (Amy's in-game recordings, 2026-10-18): muted, looping, inline —
+ * the only way browsers autoplay. It plays only while its page is active and
+ * restarts from the top each time she arrives, so every kid sees the whole
+ * action. The poster is the still `media`, painted until the first frame.
+ */
+function StepClip({ page, active, prev }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    const v = ref.current
+    if (!v) return
+    if (active) {
+      v.currentTime = 0
+      v.play?.()?.catch?.(() => {}) // a blocked play just leaves the poster up
+    } else {
+      v.pause?.()
+    }
+  }, [active])
+  return (
+    <video
+      ref={ref}
+      className="luxiOb-media"
+      data-active={active}
+      data-prev={prev}
+      poster={page.media}
+      muted
+      loop
+      playsInline
+      preload="auto"
+      aria-hidden="true"
+      disablePictureInPicture
+    >
+      <source src={`${page.clip}.webm`} type="video/webm" />
+      <source src={`${page.clip}.mp4`} type="video/mp4" />
+    </video>
+  )
+}
+
 function PageText({ page, stepNum }) {
   if (page.kind === 'about') {
     return (
@@ -124,6 +166,7 @@ export function OnboardingCard({ entry = 'first', onClose }) {
   const stepIdx = steps.indexOf(page) // -1 on About
   const isLast = i === pages.length - 1
   const titleId = `luxiOb-title-${entry}`
+  const [still] = useState(prefersReducedMotion)
 
   // Preload + decode every step image the moment the card opens (~50KB, during
   // the seconds she spends on the first page), so a fast Next never paints a
@@ -170,6 +213,8 @@ export function OnboardingCard({ entry = 'first', onClose }) {
             {pages.map((p, n) =>
               p.kind === 'about' ? (
                 <GemStage key={p.id} active={p === page} prev={n === prev} />
+              ) : p.clip && !still ? (
+                <StepClip key={p.id} page={p} active={p === page} prev={n === prev} />
               ) : p.media ? (
                 <img key={p.id} className="luxiOb-media" data-active={p === page} data-prev={n === prev} src={p.media} alt="" decoding="async" draggable={false} />
               ) : null,
