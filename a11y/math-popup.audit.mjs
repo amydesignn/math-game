@@ -19,14 +19,20 @@ export default {
     { id: 'long-mult', name: 'Long multiplication', url: `${BASE}&topic=long-mult&sim=95x85`, steps: 8 },
     { id: 'add-2x2', name: '2-digit addition', url: `${BASE}&topic=add-2x2&sim=58x57`, steps: 4, interactions: false },
     { id: 'long-div', name: 'Long division', url: `${BASE}&topic=long-div`, division: true },
+    // The lucky station (PR #68): a new player's welcome gift — LUCKY_SKIN's gold
+    // banner, a no-carry teen sum, and GiftWin on a solve (its "Yay!" button is
+    // checked default · hover · pressed · focus by the interactions pass).
+    { id: 'lucky', name: 'Lucky station', url: `${BASE}&lucky`, steps: 4, lucky: true },
   ],
   states: [
     { name: 'ask' },
     {
       name: 'correct', skip: (v) => v.division,
-      run: async (page, { answers }) => {
+      run: async (page, { answers, variant: v }) => {
         await answer(page, answers[0])
-        await page.getByText('Nice work!').waitFor()
+        if (!v.lucky) return page.getByText('Nice work!').waitFor()
+        await page.getByText('Welcome gift! 🎉').waitFor()
+        await page.waitForTimeout(1700) // the seed + its chip pop in last (lkSeedPop, 1.05s + .45s)
       },
     },
     {

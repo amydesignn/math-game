@@ -15,8 +15,9 @@ import MathPopup from './ui/MathPopup.jsx'
 import ProgressPopup from './ui/ProgressPopup.jsx'
 import Shop from './ui/Shop.jsx'
 import LevelBar, { LevelUpPopup } from './ui/LevelBar.jsx'
-import { SKINS } from './ui/skins.js'
-import { TOPICS, solve } from './math.js'
+import { SKINS, LUCKY_SKIN } from './ui/skins.js'
+import { TOPICS, solve, luckyProblem } from './math.js'
+import { WELCOME } from './config.js'
 import './index.css'
 
 /*
@@ -504,17 +505,20 @@ function StationAudit() {
 }
 /*
  * Dev-only audit harness for the sparkle popup: `/?a11y=math&topic=mult-2x1`
- * (topics: mult-2x1 · long-mult · add-2x2 · long-div; optional `&sim=95x85`). The real <MathPopup> in the
+ * (topics: mult-2x1 · long-mult · add-2x2 · long-div; optional `&sim=95x85`; `&lucky` = the lucky station). The real <MathPopup> in the
  * Snack time skin it always wears in the game; answer on `window.__audit`.
  */
 function MathAudit() {
   const t = new URLSearchParams(window.location.search).get('topic')
   const topic = TOPICS[t] ? t : 'mult-2x1'
+  // `&lucky` = the lucky station exactly as App opens it (onLuckyReached): its
+  // teen-sum question, LUCKY_SKIN, and the welcome gift owed → GiftWin on a solve.
+  const lucky = new URLSearchParams(window.location.search).has('lucky')
   // `&sim=95x85` pins the worked example's similar problem, so the audit sees
   // a fixed, worst-case walkthrough (carries, the longest step count).
   const sim = new URLSearchParams(window.location.search).get('sim')?.split('x').map(Number)
   const [problem] = React.useState(() => {
-    const p = TOPICS[topic].generate(1)
+    const p = lucky ? luckyProblem() : TOPICS[topic].generate(1)
     return sim?.length === 2 ? { ...p, similar: { a: sim[0], b: sim[1] } } : p
   })
   window.__audit = {
@@ -522,7 +526,7 @@ function MathAudit() {
   }
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
-      <MathPopup problem={problem} skin={SKINS.feedPet} onClose={() => {}} />
+      <MathPopup problem={problem} skin={lucky ? LUCKY_SKIN : SKINS.feedPet} giftGems={lucky ? WELCOME.gems : null} onClose={() => {}} />
     </div>
   )
 }
