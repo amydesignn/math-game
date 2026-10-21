@@ -1647,9 +1647,9 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
         gap: 8,
       }}
     >
-      {/* the hint: a Datum tooltip on the type ladder (was 13.5px on raw rgba(43,32,90,.82) — Amy, 2026-10-20) */}
-      <div style={{ padding: '6px 14px', background: 'var(--color-component-tooltip-background)', color: 'var(--color-component-tooltip-text)', borderRadius: 999, fontWeight: 600, fontSize: 14 }}>{hint}</div>
-      <div style={{ display: 'flex', gap: 10, background: 'var(--color-background-base)', borderRadius: 999, padding: 8, boxShadow: '0 4px 14px rgba(43,32,90,0.2)' }}>
+      {/* the hint: Luxi's own action-bar-hint tokens on the type ladder (was 13.5px on raw rgba(43,32,90,.82) — Amy, 2026-10-20) */}
+      <div style={{ padding: '6px 14px', background: 'var(--luxi-color-component-action-bar-hint-background)', color: 'var(--luxi-color-component-action-bar-hint-text)', borderRadius: 999, fontWeight: 600, fontSize: 14 }}>{hint}</div>
+      <div style={{ display: 'flex', gap: 10, background: 'var(--color-background-base)', borderRadius: 999, padding: 8, boxShadow: 'var(--luxi-shadow-action-bar)' }}>
         {buttons.map((b) => (
           <button
             key={b.aria}
@@ -1663,8 +1663,8 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
               borderRadius: 999,
               border: 'none',
               // disabled (Water she can't afford yet) = Datum's disabled tokens, not a faded CTA (Amy, 2026-10-20)
-              background: b.disabled ? 'var(--color-background-interactive-disabled)' : b.primary ? 'var(--brand-iris-600)' : 'var(--color-component-button-secondary-background-default)',
-              color: b.disabled ? 'var(--color-text-disabled)' : b.primary ? 'var(--color-text-on-brand)' : 'var(--brand-lilac-900)',
+              background: b.disabled ? 'var(--color-background-interactive-disabled)' : b.primary ? 'var(--luxi-color-component-action-bar-button-primary-background)' : 'var(--luxi-color-component-action-bar-button-secondary-background)',
+              color: b.disabled ? 'var(--color-text-disabled)' : b.primary ? 'var(--luxi-color-component-action-bar-button-primary-text)' : 'var(--luxi-color-component-action-bar-button-secondary-text)',
               fontSize: 16,
               fontWeight: 700,
               cursor: b.disabled ? 'default' : 'pointer',
