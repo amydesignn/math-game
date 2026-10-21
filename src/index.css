@@ -226,6 +226,16 @@
   --luxi-color-component-division-button-secondary-border: #DDD1F7; /* brand-lilac-200 */
   --luxi-color-component-division-button-secondary-shadow: #DDD1F7; /* brand-lilac-200 */
   --luxi-color-component-division-button-back-shadow: #E5E5E5; /* neutral-200 */
+  /* final confetti: dividend-accent · divisor-ring · answer-border (above) + these two */
+  --luxi-color-component-division-confetti-lilac: #8570D2; /* brand-lilac-600 */
+  --luxi-color-component-division-confetti-blue: #2D6DF6; /* off-brand blue, retired 10-04 — Amy to decide */
+  /* reward sparkles (Sparkles default + GiftWin's pastel rainbow); 1 = the white star */
+  --luxi-color-component-reward-sparkle-1: #FFFFFF; /* white */
+  --luxi-color-component-reward-sparkle-2: #FFB3C7; /* off-ramp pastel pink */
+  --luxi-color-component-reward-sparkle-3: #FFE08A; /* off-ramp pastel yellow */
+  --luxi-color-component-reward-sparkle-4: #9BE7C4; /* off-ramp pastel mint */
+  --luxi-color-component-reward-sparkle-5: #A9C7FF; /* off-ramp pastel blue */
+  --luxi-color-component-reward-sparkle-6: #D3B5FF; /* off-ramp pastel violet */
 
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */

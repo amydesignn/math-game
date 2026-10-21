@@ -288,7 +288,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     )
   }
   if (snap.final) {
-    const cols = ['#E60076', '#009689', '#F0B100', '#8570D2', '#2D6DF6']
+    const cols = [P.berry, P.teal, P.answerLine, 'var(--luxi-color-component-division-confetti-lilac)', 'var(--luxi-color-component-division-confetti-blue)']
     for (let j = 0; j < 15; j++) {
       els.push(
         <div key={'cf' + j} style={{ position: 'absolute', left: W * 0.5 + Math.sin(j * 1.8) * W * 0.4, top: 0, width: 8, height: 12, borderRadius: 2, background: cols[j % cols.length], zIndex: 5, opacity: 0, animation: `dvConfetti ${1.7 + (j % 5) * 0.25}s ${0.05 * j}s ease-in both` }} />,

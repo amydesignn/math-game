@@ -126,7 +126,7 @@ export function Modal({ children, onScrim, cardRef, cardClass, cardStyle, overla
 }
 
 /* ---- a scatter of twinkling stars (reward moments) ---- */
-export function Sparkles({ colors = ['#fff', T.tealLt, T.irisSoft], n = 14 }) {
+export function Sparkles({ colors = ['var(--luxi-color-component-reward-sparkle-1)', T.tealLt, T.irisSoft], n = 14 }) {
   const items = useRef(
     [...Array(n)].map((_, i) => ({
       left: 8 + Math.random() * 84 + '%',
@@ -618,7 +618,7 @@ export function GiftWin({ copy, gems, onNext }) {
   return (
     <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
       padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
-      <Sparkles colors={['#fff', '#FFB3C7', '#FFE08A', '#9BE7C4', '#A9C7FF', '#D3B5FF']} n={22} />
+      <Sparkles colors={GIFT_SPARKLES} n={22} />
       <div style={{ position: 'relative', width: 144, height: 112, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
         <div aria-hidden className="lkHalo" />
         <Gem size={68} style={{ position: 'relative', animation: 'gemSpin .5s ease-out both', filter: 'drop-shadow(0 6px 14px rgba(46,197,197,.4))' }} />
@@ -637,6 +637,11 @@ export function GiftWin({ copy, gems, onNext }) {
     </div>
   )
 }
+// white + the pastel rainbow (index.css reward-sparkle-1..6, same values as before)
+const GIFT_SPARKLES = [
+  'var(--luxi-color-component-reward-sparkle-1)', 'var(--luxi-color-component-reward-sparkle-2)', 'var(--luxi-color-component-reward-sparkle-3)',
+  'var(--luxi-color-component-reward-sparkle-4)', 'var(--luxi-color-component-reward-sparkle-5)', 'var(--luxi-color-component-reward-sparkle-6)',
+]
 const giftChip = {
   display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px', borderRadius: 20,
   // amber 50/200/800 (the values of Datum's "new" badge) — gold = reward, 7:1 text

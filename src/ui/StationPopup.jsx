@@ -147,7 +147,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
 
         {/* quest banner — skin banner + a QUEST badge so it reads as the bigger encounter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
-          background: `linear-gradient(180deg,${skin.accent}14,#fff)`, borderBottom: `1px solid ${T.line}` }}>
+          background: `linear-gradient(180deg,${skin.accent}14,var(--color-background-base))`, borderBottom: `1px solid ${T.line}` }}>
           <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
           <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
           <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--color-text-inverse)',
@@ -200,7 +200,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           {phase === 'stepdone' && (
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
               padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
-              <Sparkles colors={['#fff', skin.accent, T.irisSoft, T.tealLt]} n={14} />
+              <Sparkles colors={['var(--luxi-color-component-reward-sparkle-1)', skin.accent, T.irisSoft, T.tealLt]} n={14} />
               <QuestSlots skin={skin} total={total} done={step + 1} />
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>{skin.stepWin(step + 1, total)}</div>
@@ -235,7 +235,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           {phase === 'complete' && (
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
               padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
-              <Sparkles colors={['#fff', skin.accent, T.amber, T.tealLt]} n={20} />
+              <Sparkles colors={['var(--luxi-color-component-reward-sparkle-1)', skin.accent, T.amber, T.tealLt]} n={20} />
               <QuestSlots skin={skin} total={total} done={total} />
               {/* the bonus moment — amber, ringed, visibly NOT the ordinary gem beat */}
               <div style={{ position: 'relative', width: 104, height: 104, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
