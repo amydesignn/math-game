@@ -10,7 +10,7 @@ export default {
   file: 'src/ui/Shop.jsx',
   root: '[role="dialog"]',
   decorative: ['[aria-hidden="true"]'],
-  viewport: { width: 1280, height: 2400 }, // tall enough that the sheet (72%) shows every shelf without scrolling — focus checks photograph the element
+  viewport: { width: 1280, height: 3400 }, // (was 2400 until the Heroes shelf, #53, made the sheet taller) tall enough that the sheet (72%) shows every shelf without scrolling — focus checks photograph the element
   variants: [
     { id: 'mixed', name: '4 gems · your things · sparkle on', url: `${BASE}&gems=4&owned&sparkle` },
     { id: 'broke', name: '0 gems (nothing affordable)', url: `${BASE}&gems=0`, interactions: false },
@@ -20,6 +20,11 @@ export default {
     {
       name: 'selected', skip: (v) => v.id === 'broke',
       run: async (page) => { await page.getByRole('button', { name: /^🌳\s*Tree/ }).last().click() },
+    },
+    {
+      // a sparkle tile selected: the inset Iris ring + the Buy pill (keyboard Enter buys — a11y 2026-10-20)
+      name: 'magic-selected', skip: (v) => v.id === 'broke',
+      run: async (page) => { await page.getByRole('button', { name: /^Pink/ }).click() },
     },
     {
       name: 'big', skip: (v) => v.id === 'broke', interactions: false,

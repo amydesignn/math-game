@@ -1647,8 +1647,9 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
         gap: 8,
       }}
     >
-      <div style={{ padding: '6px 14px', background: 'rgba(43,32,90,0.82)', color: '#fff', borderRadius: 999, fontWeight: 600, fontSize: 13.5 }}>{hint}</div>
-      <div style={{ display: 'flex', gap: 10, background: '#ffffff', borderRadius: 999, padding: 8, boxShadow: '0 4px 14px rgba(43,32,90,0.2)' }}>
+      {/* the hint: a Datum tooltip on the type ladder (was 13.5px on raw rgba(43,32,90,.82) — Amy, 2026-10-20) */}
+      <div style={{ padding: '6px 14px', background: 'var(--color-component-tooltip-background)', color: 'var(--color-component-tooltip-text)', borderRadius: 999, fontWeight: 600, fontSize: 14 }}>{hint}</div>
+      <div style={{ display: 'flex', gap: 10, background: 'var(--color-background-base)', borderRadius: 999, padding: 8, boxShadow: '0 4px 14px rgba(43,32,90,0.2)' }}>
         {buttons.map((b) => (
           <button
             key={b.aria}
@@ -1661,8 +1662,8 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
               padding: '0 16px',
               borderRadius: 999,
               border: 'none',
-              background: b.primary ? 'var(--brand-iris-600)' : 'var(--brand-lilac-100)',
-              color: b.primary ? '#ffffff' : 'var(--brand-lilac-900)',
+              background: b.primary ? 'var(--brand-iris-600)' : 'var(--color-component-button-secondary-background-default)',
+              color: b.primary ? 'var(--color-text-on-brand)' : 'var(--brand-lilac-900)',
               fontSize: 16,
               fontWeight: 700,
               cursor: b.disabled ? 'default' : 'pointer',

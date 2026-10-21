@@ -1,6 +1,6 @@
 # Contrast audit — Heroes picker (Gem Shop)
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Shop.jsx` · **Run:** 2026-10-21 00:07 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Shop.jsx` · **Run:** 2026-10-21 01:04 UTC  
 **Variants:** 60 gems · playing Sunny · Champ unlocked, 4 gems · playing the Sorcerer (every locked hero unaffordable) · **Phases:** default → unlock-asked
 
 > **165 unique checks · 153 pass · 0 fail · 12 exempt (disabled) · 0 need review**
@@ -55,7 +55,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Mayor, locked, 50 gems | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, unlock-asked |
 | Builder, locked, 50 gems | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, unlock-asked |
 | Gardener, locked, 50 gems | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, unlock-asked |
-| Unlock Bluebell for 50 gems | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 7.65:1 · 89% of edge | unlock-asked |
+| Unlock Bluebell for 50 gems | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 7.65:1 · 93% of edge | unlock-asked |
 
 ## 4 gems · playing the Sorcerer (every locked hero unaffordable)
 

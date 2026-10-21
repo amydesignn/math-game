@@ -1,6 +1,6 @@
 # Contrast audit — Garden overlays (Basket + GardenBar)
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Basket.jsx · src/App.jsx (GardenBar/ActionBar)` · **Run:** 2026-10-21 00:10 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Basket.jsx · src/App.jsx (GardenBar/ActionBar)` · **Run:** 2026-10-21 01:09 UTC  
 **Variants:** A seed to plant · basket empty, Growing, can water (12 💎) · basket full, Growing, can’t afford water (2 💎) · basket full, Bloomed · basket full, No seeds yet · basket empty · **Phases:** closed → basket-open
 
 > **98 unique checks · 92 pass · 0 fail · 1 exempt (disabled) · 0 need review**
@@ -22,8 +22,8 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
+| Your garden 🌱 | `#FFFFFF` on `#171717` | 14px | 17.92:1 | 4.50:1 | ✅ | closed, basket-open |
 | 🌱 Plant your seed | `#FFFFFF` on `#4B54DD` | 16px bold | 5.81:1 | 4.50:1 | ✅ | closed, basket-open |
-| Your garden 🌱 | `#FFFFFF` on `#453F69` ᵖ | 13.5px | 9.69:1 | 4.50:1 | ✅ | closed, basket-open |
 | YOUR BASKET | `#3D43BE` on `#FFFFFF` | 12px bold | 7.65:1 | 4.50:1 | ✅ | basket-open |
 | 0 | `#2C3379` on `#FFFFFF` | 40px bold (large) | 11.31:1 | 3.00:1 | ✅ | basket-open |
 | Empty for now. Grow flowers in Sunny Town and pick them to f | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | basket-open |
@@ -44,8 +44,8 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
 | 9 | `#FFFFFF` on `#4B54DD` | 12px bold | 5.81:1 | 4.50:1 | ✅ | closed, basket-open |
+| Water it to help it grow 💧 | `#FFFFFF` on `#171717` | 14px | 17.92:1 | 4.50:1 | ✅ | closed, basket-open |
 | 💧 Water · 5 💎 | `#FFFFFF` on `#4B54DD` | 16px bold | 5.81:1 | 4.50:1 | ✅ | closed, basket-open |
-| Water it to help it grow 💧 | `#FFFFFF` on `#453F69` ᵖ | 13.5px | 9.69:1 | 4.50:1 | ✅ | closed, basket-open |
 | YOUR BASKET | `#3D43BE` on `#FFFFFF` | 12px bold | 7.65:1 | 4.50:1 | ✅ | basket-open |
 | 9 | `#2C3379` on `#FFFFFF` | 40px bold (large) | 11.31:1 | 3.00:1 | ✅ | basket-open |
 | Red flowers | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | basket-open |
@@ -71,7 +71,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
 | 9 | `#FFFFFF` on `#4B54DD` | 12px bold | 5.81:1 | 4.50:1 | ✅ | closed, basket-open |
-| Water costs 5 💎 — solve a problem to earn more! | `#FFFFFF` on `#453F69` ᵖ | 13.5px | 9.69:1 | 4.50:1 | ✅ | closed, basket-open |
+| Water costs 5 💎 — solve a problem to earn more! | `#FFFFFF` on `#171717` | 14px | 17.92:1 | 4.50:1 | ✅ | closed, basket-open |
 | YOUR BASKET | `#3D43BE` on `#FFFFFF` | 12px bold | 7.65:1 | 4.50:1 | ✅ | basket-open |
 | 9 | `#2C3379` on `#FFFFFF` | 40px bold (large) | 11.31:1 | 3.00:1 | ✅ | basket-open |
 | Red flowers | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | basket-open |
@@ -87,7 +87,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 |---|---|---|---|---|---|---|
 | Open your basket — 9 harvested | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 3.57:1 · 57% of edge | closed, basket-open |
 | Water your plant | ⚪ disabled 1.40:1 — exempt (WCAG 1.4.3) | | | | | closed, basket-open |
-| Close | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 4.35:1 · 71% of edge | closed, basket-open |
+| Close | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 4.29:1 · 71% of edge | closed, basket-open |
 | Close your basket | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 4.04:1 · 80% of edge | basket-open |
 
 ## Bloomed · basket full
@@ -97,7 +97,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
 | 9 | `#FFFFFF` on `#4B54DD` | 12px bold | 5.81:1 | 4.50:1 | ✅ | closed, basket-open |
-| It bloomed! Tap your flowers to pick them 🌸 | `#FFFFFF` on `#453F69` ᵖ | 13.5px | 9.69:1 | 4.50:1 | ✅ | closed, basket-open |
+| It bloomed! Tap your flowers to pick them 🌸 | `#FFFFFF` on `#171717` | 14px | 17.92:1 | 4.50:1 | ✅ | closed, basket-open |
 | YOUR BASKET | `#3D43BE` on `#FFFFFF` | 12px bold | 7.65:1 | 4.50:1 | ✅ | basket-open |
 | 9 | `#2C3379` on `#FFFFFF` | 40px bold (large) | 11.31:1 | 3.00:1 | ✅ | basket-open |
 | Red flowers | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | basket-open |
@@ -113,8 +113,8 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
+| No seeds right now — more are on the way ✨ | `#FFFFFF` on `#171717` | 14px | 17.92:1 | 4.50:1 | ✅ | closed, basket-open |
 | OK | `#FFFFFF` on `#4B54DD` | 16px bold | 5.81:1 | 4.50:1 | ✅ | closed, basket-open |
-| No seeds right now — more are on the way ✨ | `#FFFFFF` on `#453F69` ᵖ | 13.5px | 9.69:1 | 4.50:1 | ✅ | closed, basket-open |
 | YOUR BASKET | `#3D43BE` on `#FFFFFF` | 12px bold | 7.65:1 | 4.50:1 | ✅ | basket-open |
 | 0 | `#2C3379` on `#FFFFFF` | 40px bold (large) | 11.31:1 | 3.00:1 | ✅ | basket-open |
 | Empty for now. Grow flowers in Sunny Town and pick them to f | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | basket-open |
