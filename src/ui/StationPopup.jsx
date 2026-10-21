@@ -37,7 +37,7 @@ function QuestSlots({ skin, total, done }) {
           <div key={i} style={{ width: 46, height: 46, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 24, lineHeight: 1,
             background: filled ? `${skin.accent}1e` : 'var(--color-background-subtle)',
-            border: filled ? `2px solid ${skin.accent}` : active ? `2px solid ${skin.accent}` : `2px dashed var(--neutral-300)`,
+            border: filled ? `2px solid ${skin.accent}` : active ? `2px solid ${skin.accent}` : `2px dashed var(--luxi-color-component-station-slot-border)`,
             boxShadow: active ? `0 0 0 5px ${skin.accent}22` : 'none',
             transition: 'all .25s' }}>
             {filled ? <span style={{ animation: 'slotFill .45s ease-out both' }}>{skin.marker}</span>
@@ -147,7 +147,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
 
         {/* quest banner — skin banner + a QUEST badge so it reads as the bigger encounter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
-          background: `linear-gradient(180deg,${skin.accent}14,#fff)`, borderBottom: `1px solid ${T.line}` }}>
+          background: `linear-gradient(180deg,${skin.accent}14,var(--color-background-base))`, borderBottom: `1px solid ${T.line}` }}>
           <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
           <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
           <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--color-text-inverse)',
@@ -200,7 +200,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           {phase === 'stepdone' && (
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
               padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
-              <Sparkles colors={['#fff', skin.accent, T.irisSoft, T.tealLt]} n={14} />
+              <Sparkles colors={['var(--luxi-color-component-reward-sparkle-1)', skin.accent, T.irisSoft, T.tealLt]} n={14} />
               <QuestSlots skin={skin} total={total} done={step + 1} />
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>{skin.stepWin(step + 1, total)}</div>
@@ -235,12 +235,12 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           {phase === 'complete' && (
             <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
               padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
-              <Sparkles colors={['#fff', skin.accent, T.amber, T.tealLt]} n={20} />
+              <Sparkles colors={['var(--luxi-color-component-reward-sparkle-1)', skin.accent, T.amber, T.tealLt]} n={20} />
               <QuestSlots skin={skin} total={total} done={total} />
               {/* the bonus moment — amber, ringed, visibly NOT the ordinary gem beat */}
               <div style={{ position: 'relative', width: 104, height: 104, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `3px solid ${T.amber}`, animation: 'bonusRing 1.1s ease-out .9s infinite' }} />
-                <div style={{ position: 'absolute', inset: 8, borderRadius: '50%', background: `${T.amber}1f` }} />
+                <div style={{ position: 'absolute', inset: 8, borderRadius: '50%', background: 'var(--luxi-color-component-station-bonus-halo)' }} />
                 <Gem size={76} style={{ animation: 'gemSpin .5s ease-out both', filter: `drop-shadow(0 0 14px ${T.amber}) drop-shadow(0 6px 14px rgba(217,119,6,.45))` }} />
               </div>
               <div style={{ textAlign: 'center' }}>
@@ -249,8 +249,8 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10 }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', fontWeight: 500, color: T.textPrimary,
                     background: 'var(--color-background-subtle)', border: `1px solid ${T.line}`, borderRadius: 12, padding: '7px 13px' }}>+{earned} <Gem size={16} /> earned</span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--amber-700)' /* amber-700 · AA on the cream chip */,
-                    background: '#FEF3E2', border: `1px solid #FDE0B8`, borderRadius: 12, padding: '7px 13px' }}>+{quest.bonus} <Gem size={16} /> bonus!</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--luxi-color-component-station-bonus-chip-text)' /* amber-700 · AA on the cream chip */,
+                    background: 'var(--luxi-color-component-station-bonus-chip-background)', border: '1px solid var(--luxi-color-component-station-bonus-chip-border)', borderRadius: 12, padding: '7px 13px' }}>+{quest.bonus} <Gem size={16} /> bonus!</span>
                 </div>
               </div>
               <BigButton tone="primary" onClick={() => close(true)} style={{ marginTop: 6, minWidth: 200 }}>Back to your world ✨</BigButton>

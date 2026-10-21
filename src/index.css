@@ -217,6 +217,96 @@
   --luxi-color-component-signup-link-background-pressed: #DDD1F7; /* brand-lilac-200 */
   --luxi-color-component-signup-link-focus-ring: #333A98; /* brand-iris-800 */
 
+  /* ---- luxi sweep 10-21: mathkit + division ---- */
+  /* the shared math surface (mathkit's T + LVL maps) — keys unchanged, values = these */
+  --luxi-color-component-math-accent: #4B54DD; /* brand-iris-600 — T.iris: entry, result digits, caret, active field */
+  --luxi-color-component-math-accent-soft: #E4E5FA; /* brand-iris-100 — T.irisSoft: resting field border, focus halo */
+  --luxi-color-component-math-accent-tint: #F1F1FD; /* brand-iris-50 — T.irisTint: filled field, hot cell, caption */
+  --luxi-color-component-math-amber: #FE9A00; /* amber-500 — T.amber: carry border, bonus ring, sparkles */
+  --luxi-color-component-math-lilac: #8570D2; /* brand-lilac-600 — T.lilac (no caller today) */
+  --luxi-color-component-math-lilac-deep: #473B7C; /* brand-lilac-900 — T.lilacDeep (no caller today) */
+  --luxi-color-component-math-violet: #7F22FE; /* violet-600 — T.violet (no caller today) */
+  --luxi-color-component-sparkle-teal: #46ECD5; /* teal-300 — T.tealLt, reward sparkles */
+  --luxi-color-component-column-math-row-ring: #00BBA7; /* teal-500 — T.teal */
+  --luxi-color-component-column-math-row-tag-background: #00786F; /* teal-700 — T.tealInk, under white text */
+  --luxi-color-component-column-math-carry-text: #BB4D00; /* amber-700 — T.amberInk: carries, the written zero (5.0 on white) */
+  --luxi-color-component-column-math-carry-background: #FEF9C3; /* off-ramp, ≈ yellow-100 */
+  --luxi-color-component-level-fill: #6169E0; /* brand-iris-500 — LVL.main / LVL.grad */
+  --luxi-color-component-level-track: #E4E5FA; /* brand-iris-100 — LVL.soft / LVL.softLine */
+  /* BigButton — primary reads button3d-primary-* (above); ghost + amber tones */
+  --luxi-color-component-button3d-ghost-background: #FFFFFF; /* white */
+  --luxi-color-component-button3d-ghost-text: #4B54DD; /* brand-iris-600 */
+  --luxi-color-component-button3d-ghost-border: #E4E5FA; /* brand-iris-100 */
+  --luxi-color-component-button3d-ghost-shadow: #C9CBF5; /* brand-iris-200 */
+  --luxi-color-component-button3d-amber-background: #FE9A00; /* amber-500 */
+  --luxi-color-component-button3d-amber-text: #FFFFFF; /* white (2.1:1 on amber-500 — no caller uses this tone today) */
+  --luxi-color-component-button3d-amber-shadow: #D97706; /* off-ramp, ≈ amber-600 */
+  --luxi-color-component-keypad-key-shadow: #D4D4D4; /* neutral-300 — the key's 3D edge */
+  --luxi-color-component-gift-chip-background: #FFFBEB; /* amber-50 — was Datum badge-new */
+  --luxi-color-component-gift-chip-border: #FEE685; /* amber-200 */
+  --luxi-color-component-gift-chip-text: #973C00; /* amber-800 */
+  --luxi-color-component-division-ask-nudge-background: #FFF7ED; /* orange-50 */
+  --luxi-color-component-division-ask-nudge-border: #FED7AA; /* off-ramp, ≈ orange-200 */
+  --luxi-color-component-division-ask-nudge-text: #9A3412; /* off-ramp, ≈ orange-800 */
+  --luxi-color-component-division-ask-link-text: #4B54DD; /* brand-iris-600 — "Show me how" (was Datum button-link) */
+  /* StationPopup */
+  --luxi-color-component-station-slot-border: #D4D4D4; /* neutral-300 — the empty quest slot, dashed */
+  --luxi-color-component-station-bonus-chip-text: #BB4D00; /* amber-700 — AA on the cream chip */
+  --luxi-color-component-station-bonus-chip-background: #FEF3E2; /* off-ramp, ≈ amber-50 */
+  --luxi-color-component-station-bonus-chip-border: #FDE0B8; /* off-ramp, ≈ amber-200 */
+  --luxi-color-component-station-bonus-halo: #FE9A001F; /* amber-500 @ 12% (was `${T.amber}1f`) */
+  /* DivisionWalkthrough — the division comp's own look ("Let's share the candy") */
+  --luxi-color-component-division-dividend-accent: #E60076; /* pink-600 — P.berry (no caller today) */
+  --luxi-color-component-division-dividend-text: #C6005C; /* pink-700 — P.berryInk, the AA shade */
+  --luxi-color-component-division-dividend-background: #FDF2F8; /* pink-50 — DIVIDEND badge */
+  --luxi-color-component-division-divisor-ring: #009689; /* teal-600 — also the final burst */
+  --luxi-color-component-division-divisor-text: #00786F; /* teal-700 (5.36) */
+  --luxi-color-component-division-divisor-background: #F0FDFA; /* teal-50 */
+  --luxi-color-component-division-table-border: #90A1B9; /* slate-400 — the Sharing Table */
+  --luxi-color-component-division-table-background: rgba(98,116,142,.10); /* slate-500 @ 10% */
+  --luxi-color-component-division-table-tag-background: #62748E; /* slate-500 */
+  --luxi-color-component-division-answer-background: #FEF9C2; /* yellow-100 — the Answer Box */
+  --luxi-color-component-division-answer-border: #F0B100; /* yellow-500 — dashed */
+  --luxi-color-component-division-answer-border-sealed: #D08700; /* yellow-600 — solid once sealed */
+  --luxi-color-component-division-quotient-text: #BB4D00; /* amber-700 */
+  --luxi-color-component-division-sneaky-zero-accent: #C2410C; /* off-ramp, ≈ orange-700 — P.goldB: tag, "leftover", burst */
+  --luxi-color-component-division-move-divide-accent: #1447E6; /* blue-700 */
+  --luxi-color-component-division-move-divide-tint: #DCE9FF; /* off-ramp, ≈ blue-100 */
+  --luxi-color-component-division-move-multiply-accent: #CA3500; /* orange-700 */
+  --luxi-color-component-division-move-multiply-tint: #FFE7D6; /* off-ramp, ≈ orange-100 */
+  --luxi-color-component-division-move-subtract-accent: #C10007; /* red-700 */
+  --luxi-color-component-division-move-subtract-tint: #FFDEDE; /* off-ramp, ≈ red-100 */
+  --luxi-color-component-division-move-bringdown-accent: #008236; /* green-700 */
+  --luxi-color-component-division-move-bringdown-tint: #D6F5E1; /* off-ramp, ≈ green-100 */
+  --luxi-color-component-division-move-dot-border: #D4D4D4; /* neutral-300 — a move not yet reached */
+  --luxi-color-component-division-bring-down-arrow: #A1A1A1; /* neutral-400 */
+  --luxi-color-component-division-intro-card-border: #F0F0F0; /* off-ramp, between neutral-100 and -200 */
+  --luxi-color-component-division-intro-candy-start: #FCECF4; /* off-ramp, ≈ pink-50 */
+  --luxi-color-component-division-intro-candy-mid: #F5E6FA; /* off-ramp, ≈ purple-50 */
+  --luxi-color-component-division-intro-candy-end: #F0E8FD; /* off-ramp, ≈ violet-50 */
+  --luxi-color-component-division-round-pill-background: #F5F5F5; /* neutral-100 */
+  --luxi-color-component-division-caption-border: #EBEBEB; /* off-ramp, between neutral-100 and -200 */
+  --luxi-color-component-division-progress-dot-current: #262626; /* neutral-800 */
+  --luxi-color-component-division-progress-dot-done: #B3B3B3; /* off-ramp, between neutral-300 and -400 */
+  --luxi-color-component-division-progress-dot-upcoming: #E6E6E6; /* off-ramp, ≈ neutral-200 */
+  --luxi-color-component-division-button-primary-background: #6169E0; /* brand-iris-500 — same values as button3d-primary, kept apart (the comp's own button, L70) */
+  --luxi-color-component-division-button-primary-text: #FFFFFF; /* white */
+  --luxi-color-component-division-button-primary-shadow: #3D43BE; /* brand-iris-700 */
+  --luxi-color-component-division-button-secondary-text: #3D43BE; /* brand-iris-700 */
+  --luxi-color-component-division-button-secondary-border: #DDD1F7; /* brand-lilac-200 */
+  --luxi-color-component-division-button-secondary-shadow: #DDD1F7; /* brand-lilac-200 */
+  --luxi-color-component-division-button-back-shadow: #E5E5E5; /* neutral-200 */
+  /* final confetti: dividend-accent · divisor-ring · answer-border (above) + these two */
+  --luxi-color-component-division-confetti-lilac: #8570D2; /* brand-lilac-600 */
+  --luxi-color-component-division-confetti-blue: #2D6DF6; /* off-brand blue, retired 10-04 — Amy to decide */
+  /* reward sparkles (Sparkles default + GiftWin's pastel rainbow); 1 = the white star */
+  --luxi-color-component-reward-sparkle-1: #FFFFFF; /* white */
+  --luxi-color-component-reward-sparkle-2: #FFB3C7; /* off-ramp pastel pink */
+  --luxi-color-component-reward-sparkle-3: #FFE08A; /* off-ramp pastel yellow */
+  --luxi-color-component-reward-sparkle-4: #9BE7C4; /* off-ramp pastel mint */
+  --luxi-color-component-reward-sparkle-5: #A9C7FF; /* off-ramp pastel blue */
+  --luxi-color-component-reward-sparkle-6: #D3B5FF; /* off-ramp pastel violet */
+
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */
   --color-background-subtle: #FAFAFA; /* neutral-50 */

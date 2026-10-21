@@ -16,15 +16,15 @@ import { playSfx } from '../audio'
 /* ---- house tokens (Oscar styling reference · Iris controls per Amy) ---- */
 export const T = {
   // Brand Iris — actions + focus: 600 face · 700 deep (shadow + text) · 100 soft · 50 tint.
-  // Replaced the off-brand blue #2D6DF6 (Amy 2026-10-04).
-  irisFace: 'var(--brand-iris-500)', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
-  iris: 'var(--brand-iris-600)', irisDeep: 'var(--brand-iris-700)', irisSoft: 'var(--brand-iris-100)', irisTint: 'var(--brand-iris-50)', // Datum names (was raw hex, same values)
-  teal: '#00BBA7', tealLt: '#46ECD5', tealInk: '#00786F', // tealInk = teal-700, for text on/in teal (AA)
+  // Replaced the off-brand blue #2D6DF6 (Amy 2026-10-04). Luxi tokens since 10-21 (index.css, same values).
+  irisFace: 'var(--luxi-color-component-button3d-primary-background)', // Iris 500 — 3D primary button face only (softer; 700 shadow = 2-step edge). Amy 2026-10-04
+  iris: 'var(--luxi-color-component-math-accent)', irisDeep: 'var(--color-text-brand)', irisSoft: 'var(--luxi-color-component-math-accent-soft)', irisTint: 'var(--luxi-color-component-math-accent-tint)', // Iris 600 · 700 · 100 · 50
+  teal: 'var(--luxi-color-component-column-math-row-ring)', tealLt: 'var(--luxi-color-component-sparkle-teal)', tealInk: 'var(--luxi-color-component-column-math-row-tag-background)', // teal 500 · 300 · 700 (tealInk = AA under white text)
   textPrimary: 'var(--color-text-primary)', textSecondary: 'var(--color-text-secondary)', textTertiary: 'var(--color-text-tertiary)', // Datum text tiers by name
   line: 'var(--color-border-default)', surface: 'var(--color-background-base)', // was #E6E6E6 (one off neutral-200) / #FFFFFF
-  lilac: 'var(--brand-lilac-600)', lilacDeep: 'var(--brand-lilac-900)', // Lilac 600 / 900
-  violet: '#7F22FE', amber: '#FE9A00', amberDeep: '#D97706',
-  amberInk: 'var(--amber-700)', // amber as TEXT (carries, the written zero): amber-500 is 2.1 on white → Datum amber-700, 5.0
+  lilac: 'var(--luxi-color-component-math-lilac)', lilacDeep: 'var(--luxi-color-component-math-lilac-deep)', // Lilac 600 / 900
+  violet: 'var(--luxi-color-component-math-violet)', amber: 'var(--luxi-color-component-math-amber)', amberDeep: 'var(--luxi-color-component-button3d-amber-shadow)',
+  amberInk: 'var(--luxi-color-component-column-math-carry-text)', // amber as TEXT (carries, the written zero): amber-500 is 2.1 on white → Datum amber-700, 5.0
   radius: 26, radiusSm: 16,
 }
 
@@ -72,12 +72,12 @@ export const LVL = {
    * where it belongs: decoration (the header wash, confetti, stage pips).
    * One declaration, read by the HUD bar, the congratulations card AND the
    * record book — never copy it per file (that's how they drifted before). */
-  main: 'var(--brand-iris-500)', // the fill identity
+  main: 'var(--luxi-color-component-level-fill)', // the fill identity (Iris 500)
   ink: 'var(--color-text-brand)', // Iris 700 — coloured accent TEXT (7.7 on white)
-  soft: 'var(--brand-iris-100)', // light Iris surface (topic icons, the bar's track)
+  soft: 'var(--luxi-color-component-level-track)', // light Iris surface (Iris 100) (topic icons, the bar's track)
   deep: 'var(--color-text-brand)', // Iris 700 — counts, labels, the total
-  softLine: 'var(--brand-iris-100)',
-  grad: 'var(--brand-iris-500)', // flat, like the button face (was a Lilac gradient)
+  softLine: 'var(--luxi-color-component-level-track)',
+  grad: 'var(--luxi-color-component-level-fill)', // flat, like the button face (was a Lilac gradient)
   glow: '97,105,224', // Iris 500 as an rgb triplet for the soft shadows/halos
 
   /* The level NUMERAL on `grad` — medallion, reached ladder nodes, the
@@ -126,7 +126,7 @@ export function Modal({ children, onScrim, cardRef, cardClass, cardStyle, overla
 }
 
 /* ---- a scatter of twinkling stars (reward moments) ---- */
-export function Sparkles({ colors = ['#fff', T.tealLt, T.irisSoft], n = 14 }) {
+export function Sparkles({ colors = ['var(--luxi-color-component-reward-sparkle-1)', T.tealLt, T.irisSoft], n = 14 }) {
   const items = useRef(
     [...Array(n)].map((_, i) => ({
       left: 8 + Math.random() * 84 + '%',
@@ -154,15 +154,16 @@ export function Sparkles({ colors = ['#fff', T.tealLt, T.irisSoft], n = 14 }) {
 export function BigButton({ children, onClick, tone = 'primary', style }) {
   const [down, setDown] = useState(false)
   const tones = {
-    primary: { bg: T.irisFace, fg: 'var(--color-text-on-brand)', sh: T.irisDeep },
-    ghost: { bg: 'var(--color-background-base)', fg: T.iris, sh: 'var(--brand-iris-200)' },
-    amber: { bg: T.amber, fg: '#fff', sh: T.amberDeep },
+    // one button3d family (index.css) drives this AND the onboarding/promo CTA
+    primary: { bg: 'var(--luxi-color-component-button3d-primary-background)', fg: 'var(--luxi-color-component-button3d-primary-text)', sh: 'var(--luxi-color-component-button3d-primary-shadow)' },
+    ghost: { bg: 'var(--luxi-color-component-button3d-ghost-background)', fg: 'var(--luxi-color-component-button3d-ghost-text)', sh: 'var(--luxi-color-component-button3d-ghost-shadow)', line: 'var(--luxi-color-component-button3d-ghost-border)' },
+    amber: { bg: 'var(--luxi-color-component-button3d-amber-background)', fg: 'var(--luxi-color-component-button3d-amber-text)', sh: 'var(--luxi-color-component-button3d-amber-shadow)' },
   }
   const c = tones[tone]
   return (
     <button onClick={onClick}
       onPointerDown={() => setDown(true)} onPointerUp={() => setDown(false)} onPointerLeave={() => setDown(false)}
-      style={{ border: tone === 'ghost' ? `2px solid ${T.irisSoft}` : 'none', background: c.bg, color: c.fg,
+      style={{ border: c.line ? `2px solid ${c.line}` : 'none', background: c.bg, color: c.fg,
         fontWeight: 500, fontSize: 'var(--text-base)', /* Datum button 16/500 (was 17/700) */ borderRadius: 16, padding: '15px 26px', cursor: 'pointer', minHeight: 54,
         boxShadow: down ? `0 1px 0 ${c.sh}` : `0 4px 0 ${c.sh}`, transform: down ? 'translateY(3px)' : 'none',
         transition: 'transform .07s, box-shadow .07s', ...style }}>
@@ -203,7 +204,7 @@ export function ColumnMath({ snap, big = false }) {
   }
   return (
     <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch',
-      background: '#fff', border: `1.5px solid ${T.line}`, borderRadius: 18, padding: '12px 16px 14px' }}>
+      background: 'var(--color-background-base)', border: `1.5px solid ${T.line}`, borderRadius: 18, padding: '12px 16px 14px' }}>
       {snap.rows.map((r, ri) => {
         if (r.rule) return <div key={ri} style={{ height: 0, borderTop: `3px solid ${T.textPrimary}`, margin: '6px 0' }} />
         if (r.style === 'carry')
@@ -270,7 +271,7 @@ export function MultiColumnMath({ snap }) {
 
   const hasCarry = snap.carry.some((x) => x !== '')
   return (
-    <div style={{ display: 'inline-flex', flexDirection: 'column', background: '#fff',
+    <div style={{ display: 'inline-flex', flexDirection: 'column', background: 'var(--color-background-base)',
       border: `1.5px solid ${T.line}`, borderRadius: 18, padding: '14px 18px 16px' }}>
       {hasCarry && (
         <div style={{ display: 'flex', alignItems: 'flex-end', height: 34, marginBottom: 16 }}>
@@ -279,7 +280,7 @@ export function MultiColumnMath({ snap }) {
             <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
               {snap.carry[i] !== '' && (
                 <div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 17, fontWeight: 700, color: T.amberInk, background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  fontSize: 17, fontWeight: 700, color: T.amberInk, background: 'var(--luxi-color-component-column-math-carry-background)', border: `2px solid ${T.amber}`,
                   animation: snap.carryHot ? 'spotIn .35s ease-out both' : 'none' /* no .75 fade on a used carry — it took the digit under AA */ }}>{snap.carry[i]}</div>
               )}
             </div>
@@ -297,7 +298,7 @@ export function MultiColumnMath({ snap }) {
                 <div style={{ position: 'absolute', inset: -3, borderRadius: 16, border: `2.5px solid ${T.teal}`,
                   background: 'rgba(0,187,167,.06)', pointerEvents: 'none' }} />
                 <span style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', fontSize: 10.5, fontWeight: 700,
-                  letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff', background: T.tealInk, borderRadius: 8,
+                  letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--color-text-inverse)', background: T.tealInk, borderRadius: 8,
                   padding: '2px 8px', whiteSpace: 'nowrap' }}>whole</span>
                 {cols.slice(firstIdx).map((i) => numCell(snap.top[i], { hot: false, key: i }))}
               </div>
@@ -321,7 +322,7 @@ export function MultiColumnMath({ snap }) {
             <div key={i} style={{ width: cell, display: 'flex', justifyContent: 'center' }}>
               {snap.addCarry[i] !== '' && (
                 <div style={{ width: 24, height: 24, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 14, fontWeight: 700, color: T.amberInk, background: '#FEF9C3', border: `2px solid ${T.amber}`,
+                  fontSize: 14, fontWeight: 700, color: T.amberInk, background: 'var(--luxi-color-component-column-math-carry-background)', border: `2px solid ${T.amber}`,
                   animation: snap.hiRow === 'sum' ? 'spotIn .35s ease-out both' : 'none' }}>{snap.addCarry[i]}</div>
               )}
             </div>
@@ -372,14 +373,14 @@ export function Keypad({ onKey, okDisabled = false }) {
     </div>
   )
 }
-const KEY_BG = 'var(--color-background-interactive-default)', KEY_EDGE = 'var(--neutral-300)' // edge was #d9d9d9 (off-palette)
+const KEY_BG = 'var(--color-background-interactive-default)', KEY_EDGE = 'var(--luxi-color-component-keypad-key-shadow)' // neutral-300 (was #d9d9d9, off-palette)
 function KeypadKey({ k, isOk, isDel, onKey, disabled = false }) {
   const [down, setDown] = useState(false)
   const base = { height: 58, borderRadius: 14, border: 'none', fontWeight: 700, fontSize: 'var(--text-2xl)', /* 22→24 (Datum 2xl) */ cursor: disabled ? 'default' : 'pointer',
     fontVariantNumeric: 'tabular-nums', transition: 'transform .06s, box-shadow .06s' }
   let sty
   if (isOk && disabled) sty = { ...base, background: 'var(--color-background-interactive-disabled)', color: 'var(--color-text-disabled)', boxShadow: '0 4px 0 var(--color-border-disabled)', fontSize: 'var(--text-base)', fontWeight: 500 } // Datum disabled (was Oscar's #EDEBF2/#b5aec4/#dcd8e4)
-  else if (isOk) sty = { ...base, background: T.irisFace, color: 'var(--color-text-on-brand)', boxShadow: down ? `0 1px 0 ${T.irisDeep}` : `0 4px 0 ${T.irisDeep}`, fontSize: 'var(--text-base)', fontWeight: 500 } // Datum button: 16 / 500
+  else if (isOk) sty = { ...base, background: 'var(--luxi-color-component-button3d-primary-background)', color: 'var(--luxi-color-component-button3d-primary-text)', boxShadow: down ? '0 1px 0 var(--luxi-color-component-button3d-primary-shadow)' : '0 4px 0 var(--luxi-color-component-button3d-primary-shadow)', fontSize: 'var(--text-base)', fontWeight: 500 } // Datum button: 16 / 500
   else if (isDel) sty = { ...base, background: KEY_BG, color: 'var(--color-icon-tertiary)', boxShadow: down ? `0 1px 0 ${KEY_EDGE}` : `0 4px 0 ${KEY_EDGE}` }
   else sty = { ...base, background: KEY_BG, color: T.textPrimary, boxShadow: down ? `0 1px 0 ${KEY_EDGE}` : `0 4px 0 ${KEY_EDGE}` }
   return (
@@ -523,9 +524,9 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
       </div>
 
       {nudge && (
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: '#FFF7ED', border: '1px solid #FED7AA', borderRadius: 14, padding: '11px 14px', animation: 'dvFadeSlide .3s ease-out both' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 9, background: 'var(--luxi-color-component-division-ask-nudge-background)', border: '1px solid var(--luxi-color-component-division-ask-nudge-border)', borderRadius: 14, padding: '11px 14px', animation: 'dvFadeSlide .3s ease-out both' }}>
           <span style={{ fontSize: 16, lineHeight: 1.35 }}>🍬</span>
-          <span style={{ fontSize: 'var(--text-base)', fontWeight: 400, color: '#9A3412', lineHeight: 1.4 }}>The share is right! Now look again at what&apos;s <strong style={{ fontWeight: 700 }}>left over</strong>.</span>
+          <span style={{ fontSize: 'var(--text-base)', fontWeight: 400, color: 'var(--luxi-color-component-division-ask-nudge-text)', lineHeight: 1.4 }}>The share is right! Now look again at what&apos;s <strong style={{ fontWeight: 700 }}>left over</strong>.</span>
         </div>
       )}
 
@@ -535,7 +536,7 @@ export function DivisionAsk({ problem, skin, onSolved, onResult, onWalkthrough }
         {/* same hint role as the ask screen: 14/400 secondary, 24 above */}
         <div style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 400 }}>{hint}</div>
         <button onClick={onWalkthrough}
-          style={{ border: 'none', background: 'transparent', color: 'var(--color-component-button-link-text-default)', fontWeight: 500, fontSize: 'var(--text-sm)', cursor: 'pointer', /* was Lilac 700 text — Lilac is decoration only; text = Iris (Datum link) */ padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
+          style={{ border: 'none', background: 'transparent', color: 'var(--luxi-color-component-division-ask-link-text)', fontWeight: 500, fontSize: 'var(--text-sm)', cursor: 'pointer', /* was Lilac 700 text — Lilac is decoration only; text = Iris (Datum link) */ padding: '5px 12px', borderRadius: 10, textDecoration: 'underline', textUnderlineOffset: 3 }}>Show me how 🔎</button>
       </div>
     </div>
   )
@@ -617,7 +618,7 @@ export function GiftWin({ copy, gems, onNext }) {
   return (
     <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
       padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
-      <Sparkles colors={['#fff', '#FFB3C7', '#FFE08A', '#9BE7C4', '#A9C7FF', '#D3B5FF']} n={22} />
+      <Sparkles colors={GIFT_SPARKLES} n={22} />
       <div style={{ position: 'relative', width: 144, height: 112, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
         <div aria-hidden className="lkHalo" />
         <Gem size={68} style={{ position: 'relative', animation: 'gemSpin .5s ease-out both', filter: 'drop-shadow(0 6px 14px rgba(46,197,197,.4))' }} />
@@ -636,9 +637,14 @@ export function GiftWin({ copy, gems, onNext }) {
     </div>
   )
 }
+// white + the pastel rainbow (index.css reward-sparkle-1..6, same values as before)
+const GIFT_SPARKLES = [
+  'var(--luxi-color-component-reward-sparkle-1)', 'var(--luxi-color-component-reward-sparkle-2)', 'var(--luxi-color-component-reward-sparkle-3)',
+  'var(--luxi-color-component-reward-sparkle-4)', 'var(--luxi-color-component-reward-sparkle-5)', 'var(--luxi-color-component-reward-sparkle-6)',
+]
 const giftChip = {
   display: 'inline-flex', alignItems: 'center', gap: 4, padding: '4px 12px', borderRadius: 20,
-  // Datum's "new" badge (amber 50/200/800) — gold = reward, 7:1 text
-  background: 'var(--color-component-badge-new-background)', border: '1.5px solid var(--color-component-badge-new-border)',
-  fontWeight: 700, fontSize: 'var(--text-base)', color: 'var(--color-component-badge-new-text)',
+  // amber 50/200/800 (the values of Datum's "new" badge) — gold = reward, 7:1 text
+  background: 'var(--luxi-color-component-gift-chip-background)', border: '1.5px solid var(--luxi-color-component-gift-chip-border)',
+  fontWeight: 700, fontSize: 'var(--text-base)', color: 'var(--luxi-color-component-gift-chip-text)',
 }

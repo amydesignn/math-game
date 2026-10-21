@@ -37,17 +37,19 @@ import { buildDivisionStages } from '../math'
    Table = slate, quotient = the yellow Answer Box), meaningful only here. */
 const P = {
   textPrimary: 'var(--color-text-primary)', textTertiary: 'var(--color-text-tertiary)', // Datum text tiers by name
-  berry: '#E60076', berryInk: 'var(--pink-700)', /* berryInk = the AA text shade */
-  teal: 'var(--teal-600)', tealInk: 'var(--teal-700)', tealTint: 'var(--teal-50)', /* teal = ring · tealInk = text (5.36) */
-  slate: '#62748E', slate400: '#90A1B9', slateTint: 'rgba(98,116,142,.10)',
-  answerFill: '#FEF9C2', answerLine: '#F0B100', answerLineSolid: '#D08700',
-  goldB: '#C2410C',
+  /* values live in index.css as --luxi-color-component-division-* (10-21, same hexes) */
+  berry: 'var(--luxi-color-component-division-dividend-accent)', berryInk: 'var(--luxi-color-component-division-dividend-text)', /* berryInk = the AA text shade */
+  teal: 'var(--luxi-color-component-division-divisor-ring)', tealInk: 'var(--luxi-color-component-division-divisor-text)', tealTint: 'var(--luxi-color-component-division-divisor-background)', /* teal = ring · tealInk = text (5.36) */
+  slate: 'var(--luxi-color-component-division-table-tag-background)', slate400: 'var(--luxi-color-component-division-table-border)', slateTint: 'var(--luxi-color-component-division-table-background)',
+  answerFill: 'var(--luxi-color-component-division-answer-background)', answerLine: 'var(--luxi-color-component-division-answer-border)', answerLineSolid: 'var(--luxi-color-component-division-answer-border-sealed)',
+  goldB: 'var(--luxi-color-component-division-sneaky-zero-accent)',
+  quotient: 'var(--luxi-color-component-division-quotient-text)', /* quotient = dark orange */
 }
 const MOVES = [
-  { key: 'DIVIDE', label: 'Divide', color: 'var(--blue-700)', tint: '#DCE9FF' },
-  { key: 'MULTIPLY', label: 'Multiply', color: 'var(--orange-700)', tint: '#FFE7D6' },
-  { key: 'SUBTRACT', label: 'Subtract', color: 'var(--red-700)', tint: '#FFDEDE' },
-  { key: 'BRINGDOWN', label: 'Bring down', color: 'var(--green-700)', tint: '#D6F5E1' },
+  { key: 'DIVIDE', label: 'Divide', color: 'var(--luxi-color-component-division-move-divide-accent)', tint: 'var(--luxi-color-component-division-move-divide-tint)' },
+  { key: 'MULTIPLY', label: 'Multiply', color: 'var(--luxi-color-component-division-move-multiply-accent)', tint: 'var(--luxi-color-component-division-move-multiply-tint)' },
+  { key: 'SUBTRACT', label: 'Subtract', color: 'var(--luxi-color-component-division-move-subtract-accent)', tint: 'var(--luxi-color-component-division-move-subtract-tint)' },
+  { key: 'BRINGDOWN', label: 'Bring down', color: 'var(--luxi-color-component-division-move-bringdown-accent)', tint: 'var(--luxi-color-component-division-move-bringdown-tint)' },
 ]
 /* Diagram labels (Amy 2026-10-05): the math TERM leads (12/700 caps, the part's colour),
    the friendly explanation sits under it as secondary text (12/400). */
@@ -71,9 +73,9 @@ const RW = 37 // "R3" beside the Answer Box: 8px gap + glyphs (measured: DIVIDEN
 function PressBtn({ children, onClick, variant = 'primary' }) {
   const [down, setDown] = useState(false)
   const V = {
-    primary: { bg: 'var(--brand-iris-500)' /* Luxi 3D button face (Iris 500 / 700 shadow), like every Luxi primary */, color: '#fff', border: 'none', shadow: 'var(--brand-iris-700)', pad: '13px 24px', fs: 'var(--text-base)' },
-    secondary: { bg: '#fff', color: 'var(--brand-iris-700)', border: '2px solid var(--brand-lilac-200)', shadow: 'var(--brand-lilac-200)', pad: '12px 20px', fs: 'var(--text-base)' },
-    back: { bg: '#fff', color: 'var(--color-text-secondary)', border: '2px solid #E5E5E5', shadow: '#E5E5E5', pad: '12px 20px', fs: 'var(--text-base)' },
+    primary: { bg: 'var(--luxi-color-component-division-button-primary-background)' /* Iris 500 / 700 shadow, like every Luxi primary */, color: 'var(--luxi-color-component-division-button-primary-text)', border: 'none', shadow: 'var(--luxi-color-component-division-button-primary-shadow)', pad: '13px 24px', fs: 'var(--text-base)' },
+    secondary: { bg: 'var(--color-background-base)', color: 'var(--luxi-color-component-division-button-secondary-text)', border: '2px solid var(--luxi-color-component-division-button-secondary-border)', shadow: 'var(--luxi-color-component-division-button-secondary-shadow)', pad: '12px 20px', fs: 'var(--text-base)' },
+    back: { bg: 'var(--color-background-base)', color: 'var(--color-text-secondary)', border: '2px solid var(--color-border-default)', shadow: 'var(--luxi-color-component-division-button-back-shadow)', pad: '12px 20px', fs: 'var(--text-base)' },
   }[variant]
   return (
     <button
@@ -115,7 +117,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
       }}>
         <span style={{
           position: 'absolute', bottom: -13, left: 11, fontSize: 'var(--text-xs)' /* bottom edge: on top it hid under the Answer Box in round 1 */, lineHeight: 1.2, fontWeight: 700, letterSpacing: '.05em',
-          textTransform: 'uppercase', color: '#fff', background: P.slate, borderRadius: 7, padding: '2px 7px', whiteSpace: 'nowrap',
+          textTransform: 'uppercase', color: 'var(--color-text-inverse)', background: P.slate, borderRadius: 7, padding: '2px 7px', whiteSpace: 'nowrap',
         }}>Sharing Table</span>
       </div>,
     )
@@ -132,7 +134,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   )
   els.push(
     <div key="ql" style={{ position: 'absolute', left: xL(0) - 7, top: yT(0) - 48, /* text ends LABELGAP above the Answer Box */ width: n * CELL + 14, textAlign: 'center', zIndex: 2 }}>
-      {showTerms && <span style={term('var(--amber-700)')}>Quotient</span>}
+      {showTerms && <span style={term(P.quotient)}>Quotient</span>}
       <span style={{ ...explain, whiteSpace: 'nowrap' }}>Each friend&apos;s share</span>
     </div>,
   )
@@ -140,7 +142,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     els.push(
       <div key="qmark" style={{
         position: 'absolute', left: xL(0) - 7, top: yT(0) + 1, width: n * CELL + 14, height: ROWH - 4,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: FS, fontWeight: 800, color: 'var(--amber-700)', zIndex: 2,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: FS, fontWeight: 800, color: P.quotient, zIndex: 2,
       }}>?</div>,
     )
   }
@@ -189,7 +191,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     els.push(
       <div key={'q' + c} style={{
         position: 'absolute', left: xL(c), top: yT(0), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: 'var(--amber-700)', zIndex: 3, /* quotient = dark orange */
+        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: P.quotient, zIndex: 3,
         animation: hot ? (sneaky ? 'dvShimmer .6s ease-out both' : 'dvQuoUp .5s cubic-bezier(.2,.8,.3,1.2) both') : 'none',
       }}>{String(built.q[c])}</div>,
     )
@@ -197,7 +199,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
       els.push(
         <span key={'qz' + c} style={{
           position: 'absolute', left: xL(0) + n * CELL + 15, top: yT(0) + ROWH / 2 - 11, fontSize: 'var(--text-xs)' /* beside the Answer Box: at 12px it covered QUOTIENT */, lineHeight: 1.2, fontWeight: 700, letterSpacing: '.02em',
-          color: '#fff', background: P.goldB, borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap', zIndex: 4,
+          color: 'var(--color-text-inverse)', background: P.goldB, borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap', zIndex: 4,
           animation: 'dvFadeSlide .5s .15s both', boxShadow: '0 2px 5px rgba(0,0,0,.12)',
         }}>keeps the line!</span>,
       )
@@ -256,8 +258,8 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
       if (snap.hot.bd === si) {
         els.push(
           <svg key={'bda' + si} width={CELL + 8} height={dist} viewBox={`0 0 ${CELL + 8} ${dist}`} style={{ position: 'absolute', left: xL(nextCol) - 4, top: yT(1), zIndex: 2, overflow: 'visible', animation: 'dvArrowInOut 1s ease-out both' }}>
-            <path d={`M ${(CELL + 8) / 2} 10 C ${(CELL + 8) / 2 + 11} ${dist * 0.42}, ${(CELL + 8) / 2 - 7} ${dist * 0.72}, ${(CELL + 8) / 2} ${dist - 14}`} fill="none" stroke="#A1A1A1" strokeWidth={2.5} strokeLinecap="round" />
-            <path d={`M ${(CELL + 8) / 2 - 6} ${dist - 20} L ${(CELL + 8) / 2} ${dist - 9} L ${(CELL + 8) / 2 + 6} ${dist - 20}`} fill="none" stroke="#A1A1A1" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
+            <path d={`M ${(CELL + 8) / 2} 10 C ${(CELL + 8) / 2 + 11} ${dist * 0.42}, ${(CELL + 8) / 2 - 7} ${dist * 0.72}, ${(CELL + 8) / 2} ${dist - 14}`} fill="none" style={{ stroke: 'var(--luxi-color-component-division-bring-down-arrow)' }} /* style: var() never resolves in an SVG attribute */ strokeWidth={2.5} strokeLinecap="round" />
+            <path d={`M ${(CELL + 8) / 2 - 6} ${dist - 20} L ${(CELL + 8) / 2} ${dist - 9} L ${(CELL + 8) / 2 + 6} ${dist - 20}`} fill="none" style={{ stroke: 'var(--luxi-color-component-division-bring-down-arrow)' }} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
           </svg>,
         )
         els.push(
@@ -286,7 +288,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     )
   }
   if (snap.final) {
-    const cols = ['#E60076', '#009689', '#F0B100', '#8570D2', '#2D6DF6']
+    const cols = [P.berry, P.teal, P.answerLine, 'var(--luxi-color-component-division-confetti-lilac)', 'var(--luxi-color-component-division-confetti-blue)']
     for (let j = 0; j < 15; j++) {
       els.push(
         <div key={'cf' + j} style={{ position: 'absolute', left: W * 0.5 + Math.sin(j * 1.8) * W * 0.4, top: 0, width: 8, height: 12, borderRadius: 2, background: cols[j % cols.length], zIndex: 5, opacity: 0, animation: `dvConfetti ${1.7 + (j % 5) * 0.25}s ${0.05 * j}s ease-in both` }} />,
@@ -392,7 +394,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
   // intro concept-card style (staggered reveal at index `idx`)
   const cardStyle = (n2) => ({
     display: 'flex', alignItems: 'center', gap: 14, padding: '15px 16px', minHeight: 157,
-    background: '#FAFAFA', border: '1px solid #F0F0F0', borderRadius: 16,
+    background: 'var(--color-background-subtle)', border: '1px solid var(--luxi-color-component-division-intro-card-border)', borderRadius: 16,
     opacity: reveal >= n2 ? 1 : 0, transform: reveal >= n2 ? 'translateY(0)' : 'translateY(12px)',
     transition: 'opacity .55s ease, transform .55s cubic-bezier(.2,.8,.3,1.2)',
   })
@@ -410,14 +412,14 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
           // closeGutter: only the sparkle popup floats its ✕ (40px at right:14) in this
           // corner, so only there does the pill reserve 44px (Amy 2026-08-31). Everywhere
           // else it aligns with the bubble's right edge (Amy 2026-10-05).
-          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)', background: '#F5F5F5', borderRadius: 999, padding: '6px 13px', whiteSpace: 'nowrap', marginRight: closeGutter ? 44 : 0 }}>{roundLabel}</span>
+          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)', background: 'var(--luxi-color-component-division-round-pill-background)', borderRadius: 999, padding: '6px 13px', whiteSpace: 'nowrap', marginRight: closeGutter ? 44 : 0 }}>{roundLabel}</span>
         )}
       </div>
 
       {phase === 'intro' ? (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 120 }}>
-            <div style={{ width: 128, height: 128, borderRadius: '50%', background: 'radial-gradient(circle at 50% 44%, #FCECF4 0%, #F5E6FA 64%, #F0E8FD 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 24px rgba(120,80,150,.15)' }}>
+            <div style={{ width: 128, height: 128, borderRadius: '50%', background: 'radial-gradient(circle at 50% 44%, var(--luxi-color-component-division-intro-candy-start) 0%, var(--luxi-color-component-division-intro-candy-mid) 64%, var(--luxi-color-component-division-intro-candy-end) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 24px rgba(120,80,150,.15)' }}>
               <img src={CANDY} alt="candy bag" style={{ width: 92, height: 92, objectFit: 'contain', filter: 'drop-shadow(0 5px 10px rgba(90,60,120,.24))' }} />
             </div>
           </div>
@@ -427,7 +429,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
               <div style={{ ...totemCol, gap: 5 }}>
                 <img src={CANDY} alt="candy bag" style={{ width: 40, height: 40, objectFit: 'contain', filter: 'drop-shadow(0 3px 6px rgba(90,60,120,.20))' }} />
                 <div style={{ fontSize: 40, fontWeight: 800, color: P.berryInk, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{a}</div>
-                {showMathTerms && <span style={badge(P.berryInk, '#FDF2F8')}>DIVIDEND</span>}
+                {showMathTerms && <span style={badge(P.berryInk, 'var(--luxi-color-component-division-dividend-background)')}>DIVIDEND</span>}
               </div>
               <div style={copyStyle}>You have {a} candies to share.</div>
             </div>
@@ -445,8 +447,8 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
             {/* Card 3 — Quotient / QUOTIENT */}
             <div style={cardStyle(3)}>
               <div style={{ ...totemCol, gap: 5 }}>
-                <div style={{ width: 62, height: 50, border: '2.5px dashed #F0B100', background: '#FEF9C2', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: 800, color: 'var(--amber-700)' }}>?</div>
-                {showMathTerms && <span style={badge('var(--amber-700)', '#FEF9C2')}>QUOTIENT</span>}
+                <div style={{ width: 62, height: 50, border: `2.5px dashed ${P.answerLine}`, background: P.answerFill, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: 800, color: P.quotient }}>?</div>
+                {showMathTerms && <span style={badge(P.quotient, P.answerFill)}>QUOTIENT</span>}
               </div>
               <div style={copyStyle}>How many does each friend get?</div>
             </div>
@@ -458,9 +460,9 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
       ) : (
         <>
           {/* speech-bubble caption card with a 45° tail bottom-left */}
-          <div style={{ position: 'relative', minHeight: 72, background: '#fff', border: '1px solid #EBEBEB', borderRadius: 16, boxShadow: '0 5px 16px rgba(40,30,70,.07)', padding: '14px 18px', margin: '14px 0', display: 'flex', alignItems: 'center', fontSize: 16, lineHeight: 1.5, color: P.textPrimary, fontWeight: 500, textWrap: 'pretty' }}>
+          <div style={{ position: 'relative', minHeight: 72, background: 'var(--color-background-base)', border: '1px solid var(--luxi-color-component-division-caption-border)', borderRadius: 16, boxShadow: '0 5px 16px rgba(40,30,70,.07)', padding: '14px 18px', margin: '14px 0', display: 'flex', alignItems: 'center', fontSize: 16, lineHeight: 1.5, color: P.textPrimary, fontWeight: 500, textWrap: 'pretty' }}>
             {snap.caption}
-            <span style={{ content: '""', position: 'absolute', left: 38, bottom: -9, width: 17, height: 17, background: '#fff', borderRight: '1px solid #EBEBEB', borderBottom: '1px solid #EBEBEB', transform: 'rotate(45deg)' }} />
+            <span style={{ content: '""', position: 'absolute', left: 38, bottom: -9, width: 17, height: 17, background: 'var(--color-background-base)', borderRight: '1px solid var(--luxi-color-component-division-caption-border)', borderBottom: '1px solid var(--luxi-color-component-division-caption-border)', transform: 'rotate(45deg)' }} />
           </div>
 
           {/* four move chips — active lights to its move colour */}
@@ -469,7 +471,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
               const on = mi === activeMoveIdx
               return (
                 <div key={m.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 11, height: 11, borderRadius: '50%', flexShrink: 0, background: on ? m.color : '#fff', border: on ? `2px solid ${m.color}` : '2px solid #D4D4D4', boxShadow: on ? `0 0 0 3px ${m.tint}` : 'none', transition: 'all .25s' }} />
+                  <span style={{ width: 11, height: 11, borderRadius: '50%', flexShrink: 0, background: on ? m.color : 'var(--color-background-base)', border: on ? `2px solid ${m.color}` : '2px solid var(--luxi-color-component-division-move-dot-border)', boxShadow: on ? `0 0 0 3px ${m.tint}` : 'none', transition: 'all .25s' }} />
                   <span style={{ fontSize: 'var(--text-sm)', fontWeight: on ? 700 : 500, color: on ? m.color : P.textTertiary, whiteSpace: 'nowrap', transition: 'color .25s' }}>{m.label}</span>
                 </div>
               )
@@ -483,7 +485,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
           {/* progress dots (active = wide pill) */}
           <div style={{ display: 'flex', gap: 6, justifyContent: 'center', alignItems: 'center', margin: '8px 0 12px', flexWrap: 'wrap' }}>
             {stages.map((_, j) => (
-              <span key={j} style={{ width: j === idx ? 18 : 7, height: 7, borderRadius: 5, background: j === idx ? '#262626' : j < idx ? '#B3B3B3' : '#E6E6E6', transition: 'all .2s' }} />
+              <span key={j} style={{ width: j === idx ? 18 : 7, height: 7, borderRadius: 5, background: j === idx ? 'var(--luxi-color-component-division-progress-dot-current)' : j < idx ? 'var(--luxi-color-component-division-progress-dot-done)' : 'var(--luxi-color-component-division-progress-dot-upcoming)', transition: 'all .2s' }} />
             ))}
           </div>
 
