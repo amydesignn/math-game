@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { solve } from '../math'
-import { SKINS } from './skins'
+import { SKINS, skinTint } from './skins'
 import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk } from './mathkit'
 import DivisionWalkthrough from './DivisionWalkthrough'
 
@@ -36,9 +36,9 @@ function QuestSlots({ skin, total, done }) {
         return (
           <div key={i} style={{ width: 46, height: 46, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 24, lineHeight: 1,
-            background: filled ? `${skin.accent}1e` : 'var(--color-background-subtle)',
+            background: filled ? skinTint(skin.accent, '1e') : 'var(--color-background-subtle)',
             border: filled ? `2px solid ${skin.accent}` : active ? `2px solid ${skin.accent}` : `2px dashed var(--luxi-color-component-station-slot-border)`,
-            boxShadow: active ? `0 0 0 5px ${skin.accent}22` : 'none',
+            boxShadow: active ? `0 0 0 5px ${skinTint(skin.accent, '22')}` : 'none',
             transition: 'all .25s' }}>
             {filled ? <span style={{ animation: 'slotFill .45s ease-out both' }}>{skin.marker}</span>
               : <span style={{ opacity: active ? 0.45 : 0.2 }}>{skin.marker}</span>}
@@ -147,7 +147,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
 
         {/* quest banner — skin banner + a QUEST badge so it reads as the bigger encounter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
-          background: `linear-gradient(180deg,${skin.accent}14,var(--color-background-base))`, borderBottom: `1px solid ${T.line}` }}>
+          background: `linear-gradient(180deg in srgb,${skinTint(skin.accent, '14')},var(--color-background-base))`, borderBottom: `1px solid ${T.line}` }}>
           <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
           <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
           <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--color-text-inverse)',

@@ -18,7 +18,7 @@ import { FxProp } from './fx'
 import { WORLD, GEMS, STATION, CHARACTERS, assetScale } from '../config'
 import { MAPS, blockers, luckySpot } from '../maps'
 import { stationFor } from '../stations'
-import { SKINS } from '../ui/skins'
+import { SKINS, skinColor } from '../ui/skins'
 import { worldToScreen } from '../ui/BasketFlight'
 
 const GATE_RADIUS = 1.7 // walk this close to a gate's glow → travel (forgiving: tap-walks stop at the ring's edge)
@@ -131,7 +131,7 @@ export default function Scene({ map, spawn, onTravel, onSparkleReached, onStatio
 
   // let the minimap draw a dot where the station stands (world presence)
   useEffect(() => {
-    if (stationRef) stationRef.current = station && !station.completed ? { x: station.x, z: station.z, color: stationSkin.accent } : null
+    if (stationRef) stationRef.current = station && !station.completed ? { x: station.x, z: station.z, color: skinColor(stationSkin.accent) } : null
     return () => {
       if (stationRef) stationRef.current = null
     }
