@@ -2,7 +2,7 @@
   "component": "Onboarding",
   "file": "src/ui/Onboarding.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-21T00:59:03.177Z",
+  "ranAt": "2026-10-21T03:00:24.773Z",
   "variants": [
     "First run (About + steps)",
     "Settings → How to Play"
