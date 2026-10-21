@@ -30,15 +30,17 @@ import { MUSIC_TRACKS } from '../config'
 
 // Datum tokens by name (2026-10-04 binding + WCAG AA pass, Amy's calls; text tiers by
 // name since 2026-10-05): text = primary · secondary (subtitles, section labels) ·
-// tertiary (Luxi Math, ✕) · resting control = interactive-default · icons = Lilac 800
-const IRIS = 'var(--brand-iris-600)',
-  LILAC800 = 'var(--brand-lilac-800)',
-  TEXT = 'var(--color-text-primary)',
+// tertiary (Luxi Math, ✕) · resting control = interactive-default. No raw primitives
+// here (luxi sweep 10-21): Datum semantic tokens, else the --luxi-*-settings-* block in index.css.
+const TEXT = 'var(--color-text-primary)',
   TEXT2 = 'var(--color-text-secondary)',
   META = 'var(--color-text-tertiary)',
   CONTROL = 'var(--color-border-interactive-default)',
-  WHITE = 'var(--brand-neutral-00)',
-  LINE = 'var(--brand-lilac-100)'
+  SURFACE = 'var(--color-background-base)',
+  ON_BRAND = 'var(--color-text-on-brand)',
+  BORDER = 'var(--luxi-color-component-settings-sheet-border)',
+  DIVIDER = 'var(--luxi-color-component-settings-divider)',
+  AVATAR_BG = 'linear-gradient(160deg, var(--luxi-color-component-settings-avatar-background-start), var(--luxi-color-component-settings-avatar-background-end))'
 
 // ── Oscar's line-icons (kept for the sheet's internal rows) ────────────────
 const strokeBase = { fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }
@@ -79,7 +81,7 @@ function MessageBubble() {
 }
 function ChevronR() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand-lilac-700)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--luxi-color-component-settings-account-chevron)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M9 6l6 6-6 6" />
     </svg>
   )
@@ -97,7 +99,7 @@ function UploadIcon() {
 const scrimStyle = {
   position: 'fixed',
   inset: 0,
-  background: 'rgba(47,38,83,.28)',
+  background: 'var(--luxi-color-component-settings-scrim)',
   animation: 'scrimIn .2s ease-out both',
   zIndex: 55,
 }
@@ -106,7 +108,7 @@ const closeBtn = {
   height: 36,
   borderRadius: '50%',
   border: 'none',
-  background: LINE,
+  background: 'var(--luxi-color-component-modal-close-background-default)',
   cursor: 'pointer',
   color: META,
   fontSize: 16,
@@ -119,7 +121,7 @@ const sectionLabel = {
   textTransform: 'uppercase',
   padding: '0 4px 8px',
 }
-const rowIcon = { color: LILAC800, display: 'flex' }
+const rowIcon = { color: 'var(--luxi-color-component-settings-row-icon)', display: 'flex' }
 
 /**
  * The shared settings sheet. surface: 'door' | 'game' (anchor + animation only).
@@ -138,10 +140,10 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
       style={{ position: 'fixed', top: 72, right: 16, width: 320, maxWidth: 'calc(100vw - 32px)', maxHeight: 'calc(100dvh - 88px)', overflowY: 'auto', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
         <div
           style={{
-            background: WHITE,
+            background: SURFACE,
             borderRadius: 20,
-            border: '1px solid ' + LINE,
-            boxShadow: '0 24px 60px rgba(50,38,80,.30), 0 4px 16px rgba(50,38,80,.12)',
+            border: '1px solid ' + BORDER,
+            boxShadow: 'var(--luxi-shadow-settings-sheet)',
             overflow: 'hidden',
             animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both',
           }}
@@ -167,15 +169,15 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                       display: 'flex',
                       alignItems: 'center',
                       gap: 12,
-                      background: 'var(--brand-lilac-50)',
-                      border: '1.5px solid ' + LINE,
+                      background: 'var(--luxi-color-component-settings-account-card-background)',
+                      border: '1.5px solid var(--luxi-color-component-settings-account-card-border)',
                       borderRadius: 12,
                       padding: '12px 16px',
                       cursor: 'pointer',
                       textAlign: 'left',
                     }}
                   >
-                    <span style={{ width: 36, height: 36, borderRadius: 10, background: WHITE, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ width: 36, height: 36, borderRadius: 10, background: SURFACE, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <GemIcon size={20} />
                     </span>
                     <span style={{ flex: 1, minWidth: 0 }}>
@@ -185,8 +187,8 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                     <ChevronR />
                   </button>
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--brand-lilac-50)', border: '1.5px solid ' + LINE, borderRadius: 12, padding: '12px 16px' }}>
-                    <span style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: 'linear-gradient(160deg, var(--brand-lilac-700), var(--brand-lilac-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: WHITE, fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--luxi-color-component-settings-account-card-background)', border: '1.5px solid var(--luxi-color-component-settings-account-card-border)', borderRadius: 12, padding: '12px 16px' }}>
+                    <span style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: AVATAR_BG, display: 'flex', alignItems: 'center', justifyContent: 'center', color: ON_BRAND, fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
                       {avatar ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : auth.initial || '★'}
                     </span>
                     <span style={{ flex: 1, minWidth: 0 }}>
@@ -201,7 +203,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                 )}
               </div>
 
-              <div style={{ height: 1, background: LINE, margin: '0 16px' }} />
+              <div style={{ height: 1, background: DIVIDER, margin: '0 16px' }} />
 
               {/* PREFERENCES */}
               <div style={{ padding: '12px 16px 4px' }}>
@@ -216,11 +218,11 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                     aria-checked={sound}
                     aria-label="Sound"
                     onClick={() => onToggleSound?.(!sound)}
-                    style={{ width: 48, height: 28, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', padding: 0, transition: 'background .18s', background: sound ? IRIS : CONTROL }}
+                    style={{ width: 48, height: 28, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', padding: 0, transition: 'background .18s', background: sound ? 'var(--luxi-color-component-settings-toggle-background-on)' : CONTROL }}
                   >
                     {/* OFF = unchecked, not disabled, so it holds 3:1 (WCAG 1.4.11) — Amy 2026-10-05,
                         option A: solid neutral-500 track (4.74 vs the sheet), white knob on it (4.74). */}
-                    <span style={{ position: 'absolute', top: 2, left: 2, width: 24, height: 24, borderRadius: '50%', background: WHITE, boxShadow: '0 2px 5px rgba(0,0,0,.2)', transition: 'transform .18s', transform: 'translateX(' + (sound ? '20px' : '0px') + ')' }} />
+                    <span style={{ position: 'absolute', top: 2, left: 2, width: 24, height: 24, borderRadius: '50%', background: 'var(--luxi-color-component-settings-toggle-thumb)', boxShadow: 'var(--luxi-shadow-settings-toggle-thumb)', transition: 'transform .18s', transform: 'translateX(' + (sound ? '20px' : '0px') + ')' }} />
                   </button>
                 </div>
                 {/* Music picker (2026-10-04): Island = the default, Soft Focus = the
@@ -230,7 +232,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                     <MusicNote />
                   </span>
                   <span id="music-label" style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>Music</span>
-                  <div role="radiogroup" aria-labelledby="music-label" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: LINE }}>
+                  <div role="radiogroup" aria-labelledby="music-label" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: 'var(--luxi-color-component-settings-music-track-background)' }}>
                     {MUSIC_TRACKS.map((t) => {
                       const on = music === t.id
                       return (
@@ -239,7 +241,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                           role="radio"
                           aria-checked={on}
                           onClick={() => onChooseMusic?.(t.id)}
-                          style={{ height: 28, padding: '0 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, transition: 'background .18s, color .18s', background: on ? IRIS : 'transparent', color: on ? WHITE : LILAC800 }}
+                          style={{ height: 28, padding: '0 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, transition: 'background .18s, color .18s', background: on ? 'var(--luxi-color-component-settings-music-option-background-selected)' : 'transparent', color: on ? ON_BRAND : 'var(--luxi-color-component-settings-music-option-text)' }}
                         >
                           {t.label}
                         </button>
@@ -249,7 +251,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                 </div>
               </div>
 
-              <div style={{ height: 1, background: LINE, margin: '8px 16px 0' }} />
+              <div style={{ height: 1, background: DIVIDER, margin: '8px 16px 0' }} />
 
               {/* HELP — Send Feedback went LIVE 2026-09-19 (Oscar's Feedback Flow
                   lifted; the row returns exactly where the SOON row once sat).
@@ -281,7 +283,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                 </button>
               </div>
 
-              <div style={{ padding: '12px 20px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid ' + LINE }}>
+              <div style={{ padding: '12px 20px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid ' + DIVIDER }}>
                 {/* Datum Button link — it opens another page (Datum: navigation = link). Its 4px
                     padding is why the footer's left pad is 16: the text still lines up at 20. */}
                 <a href={privacyHref} target="_blank" rel="noopener noreferrer" className="luxiSet-link" style={{ fontSize: 14, fontWeight: 500, padding: '0 4px', borderRadius: 4 }}>
@@ -346,7 +348,7 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
           title 16/700 · button 16/500 · link 14/500 · caption 14 supporting. Was: caption #9a92ac 12px (2.9:1),
           Remove photo #8A7FB8 13px (3.6:1). Audit: a11y/profile-popover.audit.mjs. */}
       <div role="dialog" aria-label="Profile" style={{ position: 'fixed', top: 72, right: 60, width: 288, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
-        <div style={{ background: 'var(--color-background-base)', borderRadius: 20, border: '1px solid ' + LINE, boxShadow: '0 24px 60px rgba(50,38,80,.30)', overflow: 'hidden', animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both' }}>
+        <div style={{ background: 'var(--color-background-base)', borderRadius: 20, border: '1px solid ' + BORDER, boxShadow: 'var(--luxi-shadow-profile-popover)', overflow: 'hidden', animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 12px' }}>
             <span style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>Profile</span>
             <button aria-label="Close" onClick={close} style={closeBtn}>
@@ -354,11 +356,11 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
             </button>
           </div>
           <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'var(--brand-lilac-100)', boxShadow: '0 0 0 3px var(--color-background-base), 0 0 0 5px var(--brand-lilac-200)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, overflow: 'hidden' }}>
+            <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'var(--luxi-color-component-profile-avatar-background)', boxShadow: '0 0 0 3px var(--color-background-base), 0 0 0 5px var(--luxi-color-component-profile-avatar-ring)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, overflow: 'hidden' }}>
               {avatar ? (
                 <img src={avatar} alt="Your avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               ) : auth.signedIn ? (
-                <span style={{ width: '100%', height: '100%', background: 'linear-gradient(160deg, var(--brand-lilac-700), var(--brand-lilac-800))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-on-brand)', fontWeight: 'var(--font-weight-bold)', fontSize: 38 }}>
+                <span style={{ width: '100%', height: '100%', background: AVATAR_BG, display: 'flex', alignItems: 'center', justifyContent: 'center', color: ON_BRAND, fontWeight: 'var(--font-weight-bold)', fontSize: 38 }}>
                   {auth.initial || '★'}
                 </span>
               ) : (
