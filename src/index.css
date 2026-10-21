@@ -146,6 +146,29 @@
   --luxi-shadow-action-bar: 0 4px 14px rgba(43, 32, 90, 0.2);
   --luxi-shadow-shop-sheet: 0 -8px 30px rgba(43, 32, 90, 0.25);
   --luxi-shadow-shop-swatch: 0 1px 4px rgba(40, 30, 70, 0.25), inset 0 0 0 1.5px rgba(255, 255, 255, 0.6);
+  /* ---- luxi sweep 10-21: settings ---- */
+  /* Settings sheet + Profile popover (Settings.jsx). Same values as before — renamed only.
+     Reused as-is: --luxi-color-component-modal-close-background-default (both ✕),
+     --color-background-base (sheet, gem tile), --color-text-on-brand (initial, selected music). */
+  --luxi-color-component-settings-scrim: rgba(47,38,83,.28); /* off-ramp ink #2F2653 @ 28% */
+  --luxi-color-component-settings-sheet-border: #EDE7FC; /* brand-lilac-100 — sheet + popover edge */
+  --luxi-color-component-settings-divider: #EDE7FC; /* brand-lilac-100 — section rules + footer top border */
+  --luxi-color-component-settings-account-card-background: #F6F2FF; /* brand-lilac-50 */
+  --luxi-color-component-settings-account-card-border: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-settings-account-chevron: #6E5BC0; /* brand-lilac-700 — decoration */
+  --luxi-color-component-settings-row-icon: #5B4B9E; /* brand-lilac-800 — Sound / Music / How to Play / Feedback glyphs */
+  --luxi-color-component-settings-toggle-background-on: #4B54DD; /* brand-iris-600 (off = --color-border-interactive-default) */
+  --luxi-color-component-settings-toggle-thumb: #FFFFFF; /* brand-neutral-00 */
+  --luxi-color-component-settings-music-track-background: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-settings-music-option-background-selected: #4B54DD; /* brand-iris-600 */
+  --luxi-color-component-settings-music-option-text: #5B4B9E; /* brand-lilac-800 — unselected (Lilac on text: flagged, kept) */
+  --luxi-color-component-settings-avatar-background-start: #6E5BC0; /* brand-lilac-700 — initial disc gradient */
+  --luxi-color-component-settings-avatar-background-end: #5B4B9E; /* brand-lilac-800 */
+  --luxi-color-component-profile-avatar-background: #EDE7FC; /* brand-lilac-100 — 96px photo circle */
+  --luxi-color-component-profile-avatar-ring: #DDD1F7; /* brand-lilac-200 — outer ring */
+  --luxi-shadow-settings-sheet: 0 24px 60px rgba(50,38,80,.30), 0 4px 16px rgba(50,38,80,.12);
+  --luxi-shadow-profile-popover: 0 24px 60px rgba(50,38,80,.30);
+  --luxi-shadow-settings-toggle-thumb: 0 2px 5px rgba(0,0,0,.2);
 
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */
