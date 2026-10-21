@@ -250,9 +250,9 @@
   --luxi-color-component-button3d-ghost-text: #4B54DD; /* brand-iris-600 */
   --luxi-color-component-button3d-ghost-border: #E4E5FA; /* brand-iris-100 */
   --luxi-color-component-button3d-ghost-shadow: #C9CBF5; /* brand-iris-200 */
-  --luxi-color-component-button3d-amber-background: #FE9A00; /* amber-500 */
-  --luxi-color-component-button3d-amber-text: #FFFFFF; /* white (2.1:1 on amber-500 — no caller uses this tone today) */
-  --luxi-color-component-button3d-amber-shadow: #D97706; /* off-ramp, ≈ amber-600 */
+  --luxi-color-component-button3d-amber-background: oklch(55.5% 0.163 48.998); /* amber-700 — same primitive as skin-bakery-ink (Amy 10-21) */
+  --luxi-color-component-button3d-amber-text: #FFFFFF; /* white — 5.03:1 on amber-700 (was 2.13 on amber-500) */
+  --luxi-color-component-button3d-amber-shadow: #973C00; /* amber-800 — one step under the face */
   --luxi-color-component-keypad-key-shadow: #D4D4D4; /* neutral-300 — the key's 3D edge */
   --luxi-color-component-gift-chip-background: #FFFBEB; /* amber-50 — was Datum badge-new */
   --luxi-color-component-gift-chip-border: #FEE685; /* amber-200 */
