@@ -16,6 +16,8 @@ import ProgressPopup from './ui/ProgressPopup.jsx'
 import Shop from './ui/Shop.jsx'
 import Basket from './ui/Basket.jsx'
 import LevelBar, { LevelUpPopup } from './ui/LevelBar.jsx'
+import Onboarding from './ui/Onboarding.jsx'
+import PromoPopup from './ui/PromoPopup.jsx'
 import { SKINS, LUCKY_SKIN } from './ui/skins.js'
 import { TOPICS, solve, luckyProblem } from './math.js'
 import { WELCOME } from './config.js'
@@ -602,6 +604,31 @@ function LevelAudit() {
     </div>
   )
 }
+/*
+ * `/?a11y=onboarding[&entry=howto]` — the real <Onboarding> card on the Door's
+ * backdrop ('first' = About cover → 3 steps; 'howto' = the 3 steps only).
+ * `/?a11y=promo` — the Halloween <PromoPopup> (pick → Trick/Treat reveal). The
+ * harness never claims the promo, so no gems move. Closing remounts the card.
+ */
+function OnboardingAudit() {
+  const [n, setN] = React.useState(0)
+  const entry = AUDIT_Q.get('entry') === 'howto' ? 'howto' : 'first'
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(180deg,#F6F2FF,#EDE7FC)' }}>
+      <Onboarding key={n} entry={entry} onClose={() => setN((k) => k + 1)} />
+    </div>
+  )
+}
+function PromoAudit() {
+  const [n, setN] = React.useState(0)
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(180deg,#F6F2FF,#EDE7FC)' }}>
+      <PromoPopup key={n} onClose={() => setN((k) => k + 1)} />
+    </div>
+  )
+}
+const ONBOARDING_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'onboarding'
+const PROMO_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'promo'
 const MATH_AUDIT =
   import.meta.env.DEV && new URLSearchParams(window.location.search).get('a11y') === 'math'
 const PROGRESS_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'progress'
@@ -614,7 +641,7 @@ const STATION_AUDIT =
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      {GARDEN_AUDIT ? <GardenAudit /> : LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
+      {ONBOARDING_AUDIT ? <OnboardingAudit /> : PROMO_AUDIT ? <PromoAudit /> : GARDEN_AUDIT ? <GardenAudit /> : LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
     </Oops>
     {/* Cookieless, privacy-friendly traffic counting (no personal data, no
       * consent banner needed) — the whole point of moving to a real domain. */}
