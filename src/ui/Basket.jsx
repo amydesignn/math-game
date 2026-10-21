@@ -56,7 +56,7 @@ export function BasketButton({ total, onTap, className = '', buttonRef, open = f
             background: 'var(--brand-iris-600)',
             color: 'var(--color-text-on-brand)',
             fontSize: 12,
-            fontWeight: 800,
+            fontWeight: 700, // the 12 is a badge exception; house weight 700 (Amy, 2026-10-20)
             lineHeight: '24px',
             boxSizing: 'border-box',
             animation: 'gempop 0.45s ease-out',
@@ -127,7 +127,7 @@ export function BasketCard({ total, basket, onClose }) {
 
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
           {/* one generic unit, no label (spec: the basket IS the currency icon — "5 🧺") */}
-          <span style={{ fontSize: 40, fontWeight: 800, lineHeight: 1, color: 'var(--brand-iris-900)' }}>{total}</span>
+          <span style={{ fontSize: 40, fontWeight: 800, lineHeight: 1, color: 'var(--color-text-brand)' }}>{total}</span>
           <span style={{ fontSize: 28, lineHeight: 1 }} aria-hidden>🧺</span>
         </div>
 
@@ -139,7 +139,7 @@ export function BasketCard({ total, basket, onClose }) {
                 <li key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 16, color: 'var(--color-text-primary)' }}>
                   <span style={{ fontSize: 20 }} aria-hidden>{k.emoji}</span>
                   <span style={{ flex: 1, fontWeight: 600 }}>{k.name}</span>
-                  <span style={{ fontWeight: 800, color: 'var(--brand-iris-900)' }}>× {n}</span>
+                  <span style={{ fontWeight: 800, color: 'var(--color-text-brand)' }}>× {n}</span>
                 </li>
               )
             })}

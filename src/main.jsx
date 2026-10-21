@@ -582,26 +582,12 @@ function GardenAudit() {
     seeds: stage === 'noseed' ? 0 : 1,
   }
   // `&bg=world` = a real capture of Sunny Town (a11y-reports/garden/world-backdrop.png, HUD hidden)
-  // instead of the flat green. `&opt=a,b` = the eye-sheet options Amy hasn't decided (2026-10-20):
-  //   ring-700 · ring-outset2   basket focus ring (default = inset Iris 800)
-  //   badge-14                   the 🧺 count chip at 14/700 (default 12/800)
-  //   disabled-datum             Water-can't-afford on Datum disabled tokens (default opacity .45)
-  //   count-primary · count-brand  basket total + row counts (default raw --brand-iris-900)
-  const opts = new Set((AUDIT_Q.get('opt') || '').split(',').filter(Boolean))
-  const optCss = [
-    opts.has('ring-700') && '.hud-basket:focus-visible{outline-color:var(--brand-iris-700)!important}',
-    opts.has('ring-outset2') && '.hud-basket:focus-visible{outline:2px solid var(--brand-iris-700)!important;outline-offset:2px!important}',
-    opts.has('badge-14') && '.hud-basket>span{font-size:14px!important;font-weight:700!important;min-width:28px!important;height:28px!important;line-height:28px!important;top:-6px!important;right:-6px!important}',
-    opts.has('disabled-datum') && '[data-hint="garden-bar"] button:disabled{opacity:1!important;background:var(--color-background-interactive-disabled)!important;color:var(--color-text-disabled)!important}',
-    opts.has('count-primary') && '.basket-card [style*="--brand-iris-900"]{color:var(--color-text-primary)!important}',
-    opts.has('count-brand') && '.basket-card [style*="--brand-iris-900"]{color:var(--color-text-brand)!important}',
-  ].filter(Boolean).join('\n')
+  // instead of the flat green. (The eye sheet's `&opt=` overrides were retired once Amy picked, 2026-10-20.)
   const bg = AUDIT_Q.get('bg') === 'world'
     ? 'url(/a11y-reports/garden/world-backdrop.png) center / cover'
     : 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)'
   return (
     <div data-audit-root style={{ position: 'fixed', inset: 0, background: bg }}>
-      {optCss && <style>{optCss}</style>}
       <Basket total={full ? 9 : 0} basket={full ? { starter: 4, pink: 3, yellow: 2 } : {}} />
       <GardenBar garden={garden} gems={Number(AUDIT_Q.get('gems') ?? 12)} onPlant={() => {}} onWater={() => {}} onClose={() => {}} />
     </div>

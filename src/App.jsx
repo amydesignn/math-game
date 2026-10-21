@@ -1662,12 +1662,12 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
               padding: '0 16px',
               borderRadius: 999,
               border: 'none',
-              background: b.primary ? 'var(--brand-iris-600)' : 'var(--color-component-button-secondary-background-default)',
-              color: b.primary ? 'var(--color-text-on-brand)' : 'var(--brand-lilac-900)',
+              // disabled (Water she can't afford yet) = Datum's disabled tokens, not a faded CTA (Amy, 2026-10-20)
+              background: b.disabled ? 'var(--color-background-interactive-disabled)' : b.primary ? 'var(--brand-iris-600)' : 'var(--color-component-button-secondary-background-default)',
+              color: b.disabled ? 'var(--color-text-disabled)' : b.primary ? 'var(--color-text-on-brand)' : 'var(--brand-lilac-900)',
               fontSize: 16,
               fontWeight: 700,
               cursor: b.disabled ? 'default' : 'pointer',
-              opacity: b.disabled ? 0.45 : 1,
             }}
           >
             {b.label}

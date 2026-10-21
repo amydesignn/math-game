@@ -715,11 +715,10 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
    so they had the browser's default ring (a11y/garden.audit.mjs, 2026-10-20). The bar's
    buttons sit on its white pill → the house ring as-is. The Basket button floats on the 3D
    world: outside it, the ring sat on grass + its own drop shadow and measured 2.69:1 (Iris 700)
-   / 2.74:1 (Iris 800) — so it goes INSIDE the white button instead (like .doorNew-slide),
-   where it reads whatever the world behind. Inset, Iris 700 only just cleared (3.24:1 on 50%
-   of a 1px circle's edge) → one step UP to Iris 800 (= Datum's button focus-ring tokens): 3.57:1 · 57%. */
+   / 2.74:1 (Iris 800). Amy's pick from the eye sheet (a11y-reports/garden/eye-sheet.png,
+   2026-10-20): a 2px outset ring in Iris 700 — 3.21:1 over 92% of the edge on Sunny Town. */
 [data-hint="garden-bar"] button:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
-.hud-basket:focus-visible { outline: 1px solid var(--brand-iris-800); outline-offset: -2px; }
+.hud-basket:focus-visible { outline: var(--border-stroke-2) solid var(--brand-iris-700); outline-offset: 2px; }
 
 /* ── 🧺 Basket (Grow a Garden ticket 8) ──
    The card grows up out of the bottom-left button. On phones the garden bar
