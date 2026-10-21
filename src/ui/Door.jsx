@@ -259,7 +259,7 @@ const newS = {
   sTitle: { fontSize: 'var(--text-sm)', lineHeight: 'var(--text-sm--line-height)', fontWeight: 'var(--font-weight-medium)', color: T.textPrimary },
   sLine: { fontSize: 'var(--text-sm)', lineHeight: 'var(--text-sm--line-height)', fontWeight: 'var(--font-weight-normal)', color: T.textSecondary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   // arrows sit on the image's vertical centre (148 / 2 − 16), outside the track so they don't scroll
-  arrow: { position: 'absolute', top: 58, zIndex: 2, width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,.94)', color: 'var(--brand-iris-700)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0, boxShadow: '0 2px 8px rgba(74,54,110,.18)' },
+  arrow: { position: 'absolute', top: 58, zIndex: 2, width: 32, height: 32, borderRadius: '50%', border: 'none', background: 'rgba(255,255,255,.94)', color: 'var(--luxi-color-component-door-carousel-arrow-icon)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: 0, boxShadow: '0 2px 8px rgba(74,54,110,.18)' },
 }
 function Chevron({ left }) {
   return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={left ? 'm15 18-6-6 6-6' : 'm9 18 6-6-6-6'} /></svg>

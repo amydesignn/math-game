@@ -120,7 +120,7 @@ function Boot() {
   if (phase === 'ready') return <App cloud={CLOUD} justSignedIn={REDEEMING} />
   if (phase === 'signin') return <SignIn />
   return (
-    <div style={{ position: 'fixed', inset: 0, background: 'var(--lilac-50)' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'var(--luxi-color-component-boot-background)' }}>
       <span
         style={{
           position: 'absolute',
@@ -152,7 +152,7 @@ const si = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'var(--lilac-50)',
+    background: 'var(--luxi-color-component-signin-background)',
     padding: 20,
   },
   card: {
@@ -166,7 +166,7 @@ const si = {
   },
   big: { fontSize: 44, lineHeight: 1 },
   head: { margin: '12px 0 6px', fontSize: 21, fontWeight: 800, color: '#262626' },
-  sub: { margin: 0, fontSize: 14.5, fontWeight: 600, color: 'var(--brand-lilac-900)', lineHeight: 1.45 },
+  sub: { margin: 0, fontSize: 14.5, fontWeight: 600, color: 'var(--luxi-color-component-signin-subtitle-text)', lineHeight: 1.45 },
   input: {
     width: '100%',
     marginTop: 18,
@@ -199,7 +199,7 @@ const si = {
     display: 'inline-block',
     fontSize: 13.5,
     fontWeight: 700,
-    color: 'var(--brand-iris-600)',
+    color: 'var(--luxi-color-component-signin-retry-text)',
     cursor: 'pointer',
     textDecoration: 'underline',
   },
@@ -282,8 +282,8 @@ class Oops extends React.Component {
           alignItems: 'center',
           justifyContent: 'center',
           gap: 10,
-          background: 'var(--lilac-50)',
-          color: 'var(--brand-iris-900)',
+          background: 'var(--luxi-color-component-crash-background)',
+          color: 'var(--luxi-color-component-crash-text)',
           fontWeight: 700,
           fontSize: 20,
           cursor: 'pointer',
@@ -291,7 +291,7 @@ class Oops extends React.Component {
       >
         <span style={{ fontSize: 44 }}>🙀</span>
         Oops, the world hiccupped!
-        <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--brand-lilac-900)' }}>
+        <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--luxi-color-component-crash-subtitle-text)' }}>
           Tap anywhere to reload — your world is safe ✨
         </span>
       </div>
