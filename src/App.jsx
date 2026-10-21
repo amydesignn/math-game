@@ -1434,7 +1434,7 @@ function ExitButton({ onTap }) {
         border: 'none',
         background: '#ffffff',
         boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
-        color: 'var(--brand-iris-900)',
+        color: 'var(--luxi-color-component-exit-pill-text)',
         fontWeight: 800,
         fontSize: 15,
         cursor: 'pointer',
@@ -1520,7 +1520,7 @@ function MapLabel({ name }) {
         style={{
           padding: '4px 12px',
           background: 'rgba(255,255,255,0.94)',
-          color: 'var(--brand-iris-900)',
+          color: 'var(--luxi-color-component-map-label-text)',
           borderRadius: 999,
           fontWeight: 700,
           fontSize: 12.5,
@@ -1563,7 +1563,7 @@ function EmoteBar({ onEmote }) {
             height: 46,
             borderRadius: 999,
             border: 'none',
-            background: 'var(--brand-lilac-100)',
+            background: 'var(--color-background-brand-subtle)',
             fontSize: 22,
             cursor: 'pointer',
           }}

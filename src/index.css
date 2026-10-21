@@ -147,6 +147,22 @@
   --luxi-shadow-shop-sheet: 0 -8px 30px rgba(43, 32, 90, 0.25);
   --luxi-shadow-shop-swatch: 0 1px 4px rgba(40, 30, 70, 0.25), inset 0 0 0 1.5px rgba(255, 255, 255, 0.6);
 
+  /* ---- luxi sweep 10-21: chrome (App HUD · Door · boot / sign-in / crash screens) ---- */
+  /* focus rings → --luxi-color-focus-ring (shared, above). Meadow emote chips → --color-background-brand-subtle (Datum semantic, same #EDE7FC). */
+  --luxi-color-component-app-background: #F6F4FD; /* lilac-50 (house) — html/body/#root, behind everything */
+  --luxi-color-component-boot-background: #F6F4FD; /* lilac-50 (house) — the boot cover (✨ shimmer) */
+  --luxi-color-component-signin-background: #F6F4FD; /* lilac-50 (house) — the ?account sign-in cover */
+  --luxi-color-component-signin-subtitle-text: #473B7C; /* brand-lilac-900 (Lilac on text: flagged, kept) */
+  --luxi-color-component-signin-retry-text: #4B54DD; /* brand-iris-600 — "Send it again" link */
+  --luxi-color-component-crash-background: #F6F4FD; /* lilac-50 (house) — the <Oops> tap-to-reload card */
+  --luxi-color-component-crash-text: #2C3379; /* brand-iris-900 */
+  --luxi-color-component-crash-subtitle-text: #473B7C; /* brand-lilac-900 (Lilac on text: flagged, kept) */
+  --luxi-color-component-exit-pill-text: #2C3379; /* brand-iris-900 — ‹ Exit */
+  --luxi-color-component-map-label-text: #2C3379; /* brand-iris-900 — the map name under the minimap */
+  --luxi-color-component-door-app-text-hover: #4B54DD; /* brand-iris-600 — Door app nav link, hover + focus */
+  --luxi-color-component-door-app-text-pressed: #3D43BE; /* brand-iris-700 — Door app nav link, :active */
+  --luxi-color-component-door-carousel-arrow-icon: #3D43BE; /* brand-iris-700 — What's new ‹ › */
+
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */
   --color-background-subtle: #FAFAFA; /* neutral-50 */
@@ -227,7 +243,7 @@ html, body, #root {
   user-select: none;
   -webkit-tap-highlight-color: transparent;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--lilac-50);
+  background: var(--luxi-color-component-app-background);
 }
 
 /* touch-action none on the canvas so tap-to-move doesn't scroll the page */
@@ -291,13 +307,13 @@ canvas { touch-action: none; display: block; }
 .doorApp .hgM { fill: #C4C4C4; }
 .doorApp .hgD { fill: #A1A1A1; }
 .doorApp .doorAppIcon path { transition: fill .12s ease, stroke .12s ease; }
-a.doorApp:hover, a.doorApp:focus-visible { color: var(--brand-iris-600); }
+a.doorApp:hover, a.doorApp:focus-visible { color: var(--luxi-color-component-door-app-text-hover); }
 a.doorApp:hover .hgHook, a.doorApp:focus-visible .hgHook { stroke: #BE185D; }
 a.doorApp:hover .hgL, a.doorApp:focus-visible .hgL { fill: #FBCFE8; }
 a.doorApp:hover .hgM, a.doorApp:focus-visible .hgM { fill: #F472B6; }
 a.doorApp:hover .hgD, a.doorApp:focus-visible .hgD { fill: #BE185D; }
-a.doorApp:active { color: var(--brand-iris-700); }
-a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+a.doorApp:active { color: var(--luxi-color-component-door-app-text-pressed); }
+a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; }
 @media (max-width: 600px) {
   .doorHdrIn { gap: 8px; }
   .doorApp { font-size: 17px; padding: 4px; gap: 6px; color: var(--color-text-tertiary); }
@@ -363,8 +379,8 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
 .doorNew-slide:hover img { transform: scale(1.03); }
 .doorNew-slide img { transition: transform .3s ease; }
 @media (prefers-reduced-motion: reduce) { .doorNew-slide:hover img { transform: none; } }
-.doorNew-slide:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: -2px; border-radius: 24px; } /* inset: the card clips overflow */
-.doorNew-arrow:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+.doorNew-slide:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: -2px; border-radius: 24px; } /* inset: the card clips overflow */
+.doorNew-arrow:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; }
 .doorNew-arrow:hover { background: #FFFFFF !important; }
 /* Datum motion-pulse (styling-v0.21, datum-motion.css): a live dot breathes — a soft
    ring grows out and fades every 2s (0.5 Hz, far under WCAG 2.3.1's 3 flashes/s).
@@ -780,7 +796,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
 /* HUD level pill — keyboard focus. It sits outside any dialog, so it never got
    the house ring and fell back to a faint browser default (1.24:1). Same 1px
    Iris 700 ring, 2px out, as every other Luxi control. */
-.lvlbar-pill:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+.lvlbar-pill:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; }
 /* Grow a Garden HUD — the 🧺 Basket button and the plot's bar sat outside any dialog,
    so they had the browser's default ring (a11y/garden.audit.mjs, 2026-10-20). The bar's
    buttons sit on its white pill → the house ring as-is. The Basket button floats on the 3D
