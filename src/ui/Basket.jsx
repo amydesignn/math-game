@@ -32,7 +32,7 @@ export function BasketButton({ total, onTap, className = '', buttonRef, open = f
         borderRadius: 999,
         border: 'none',
         background: 'var(--color-background-base)',
-        boxShadow: '0 4px 14px rgba(43,32,90,0.18)',
+        boxShadow: 'var(--luxi-shadow-basket-button)',
         fontSize: 24,
         cursor: 'pointer',
         display: 'flex',
@@ -104,7 +104,7 @@ export function BasketCard({ total, basket, onClose }) {
           padding: 20,
           borderRadius: 24,
           background: 'var(--color-background-base)',
-          boxShadow: '0 12px 32px rgba(43,32,90,0.22)',
+          boxShadow: 'var(--luxi-shadow-basket-card)',
           transformOrigin: 'bottom left',
           // above the GardenBar: on an iPad held upright (768px) the bar's hint pill
           // reached in over the card's last row. The card is what she just opened.
@@ -132,7 +132,7 @@ export function BasketCard({ total, basket, onClose }) {
         </div>
 
         {rows.length > 0 ? (
-          <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: '12px 0 0', borderTop: '1px solid var(--brand-lilac-100)', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <ul style={{ listStyle: 'none', margin: '16px 0 0', padding: '12px 0 0', borderTop: '1px solid var(--luxi-color-component-basket-divider)', display: 'flex', flexDirection: 'column', gap: 8 }}>
             {rows.map(([id, n]) => {
               const k = kindOf(id)
               return (

@@ -38,7 +38,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
     maxHeight: '72%',
     background: 'var(--color-background-base)',
     borderRadius: '22px 22px 0 0',
-    boxShadow: '0 -8px 30px rgba(43,32,90,0.25)',
+    boxShadow: 'var(--luxi-shadow-shop-sheet)',
     display: 'flex',
     flexDirection: 'column',
     paddingBottom: 'env(safe-area-inset-bottom)',
@@ -47,7 +47,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
   return (
     <>
       {/* scrim — tap outside to close */}
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(43,32,90,0.25)' }} onPointerDown={(e) => { e.stopPropagation(); onClose() }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'var(--luxi-color-component-shop-scrim)' }} onPointerDown={(e) => { e.stopPropagation(); onClose() }} />
 
       <div style={sheet} role="dialog" aria-modal="true" aria-label="Gem Shop" onPointerDown={(e) => e.stopPropagation()}>
         {/* header */}
@@ -74,7 +74,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                         {item?.name ?? o.asset}
                         {o.size > 1 && <span style={{ color: 'var(--color-text-brand)', fontWeight: 800 }}> ×{o.size}</span>}
                       </span>
-                      <span style={{ ...tilePrice, color: 'var(--color-component-button-link-text-default)' }}>place ✥</span>
+                      <span style={{ ...tilePrice, color: 'var(--luxi-color-component-shop-tile-action-text)' }}>place ✥</span>
                     </button>
                   )
                 })}
@@ -117,7 +117,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   {isOn ? (
                     <span style={{ ...tilePrice, color: 'var(--color-text-brand)' }}>Playing 💜</span>
                   ) : isHers ? (
-                    <span style={{ ...tilePrice, color: 'var(--color-component-button-link-text-default)' }}>Play</span>
+                    <span style={{ ...tilePrice, color: 'var(--luxi-color-component-shop-tile-action-text)' }}>Play</span>
                   ) : isSel ? (
                     <span
                       onClick={(e) => { e.stopPropagation(); onBuyHero(h.id); setHeroSel(null) }}
@@ -170,7 +170,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                       {isOn ? (
                         <span style={{ ...tilePrice, color: 'var(--color-text-brand)' }}>Wearing 💜</span>
                       ) : isHers ? (
-                        <span style={{ ...tilePrice, color: 'var(--color-component-button-link-text-default)' }}>Wear</span>
+                        <span style={{ ...tilePrice, color: 'var(--luxi-color-component-shop-tile-action-text)' }}>Wear</span>
                       ) : isSel ? (
                         <span
                           onClick={(e) => { e.stopPropagation(); onBuyGear(g.id); setGearSel(null) }}
@@ -191,7 +191,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                 >
                   <span style={{ fontSize: 30, lineHeight: '48px' }}>🚫</span>
                   <span style={tileName(true)}>{bare}</span>
-                  <span style={{ ...tilePrice, color: gear[slot] === null ? 'var(--color-text-brand)' : 'var(--color-component-button-link-text-default)' }}>
+                  <span style={{ ...tilePrice, color: gear[slot] === null ? 'var(--color-text-brand)' : 'var(--luxi-color-component-shop-tile-action-text)' }}>
                     {gear[slot] === null ? 'Wearing 💜' : 'Take off'}
                   </span>
                 </button>
@@ -232,7 +232,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   {isActive ? (
                     <span style={{ ...tilePrice, color: 'var(--color-text-brand)' }}>With you 💜</span>
                   ) : isHers ? (
-                    <span style={{ ...tilePrice, color: 'var(--color-component-button-link-text-default)' }}>Choose</span>
+                    <span style={{ ...tilePrice, color: 'var(--luxi-color-component-shop-tile-action-text)' }}>Choose</span>
                   ) : isSel ? (
                     <span
                       onClick={(e) => { e.stopPropagation(); onBuyPet(c.id); setPetSel(null) }}
@@ -272,7 +272,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   style={{ ...tile(affordable), ...selRing(isSel) }}
                 >
                   <span style={{ width: 34, height: 34, borderRadius: '50%', background: SWATCH_BG[id],
-                    boxShadow: '0 1px 4px rgba(40,30,70,0.25), inset 0 0 0 1.5px rgba(255,255,255,0.6)',
+                    boxShadow: 'var(--luxi-shadow-shop-swatch)',
                     filter: affordable ? 'none' : 'grayscale(0.7)', opacity: affordable ? 1 : 0.5 }} />
                   <span style={tileName(affordable)}>{c.label}</span>
                   {isSel ? (
@@ -301,9 +301,9 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   onClick={() => { setSize(s.size); setSelected(null) }}
                   style={{
                     flex: 1, padding: '9px 6px', borderRadius: 14, cursor: 'pointer', fontFamily: 'inherit',
-                    border: `2px solid ${on ? 'var(--brand-iris-600)' : 'var(--color-component-button-secondary-background-default)'}`,
-                    background: on ? 'var(--brand-iris-600)' : 'var(--color-component-button-secondary-background-default)',
-                    color: on ? 'var(--color-text-on-brand)' : 'var(--color-component-button-secondary-text-default)',
+                    border: `2px solid ${on ? 'var(--luxi-color-component-shop-size-button-background-selected)' : 'var(--luxi-color-component-shop-size-button-background)'}`,
+                    background: on ? 'var(--luxi-color-component-shop-size-button-background-selected)' : 'var(--luxi-color-component-shop-size-button-background)',
+                    color: on ? 'var(--color-text-on-brand)' : 'var(--luxi-color-component-shop-size-button-text)',
                     fontWeight: on ? 800 : 600, fontSize: 14,
                   }}
                 >
@@ -384,8 +384,8 @@ const tile = (enabled) => ({
   alignItems: 'center',
   gap: 4,
   padding: '12px 6px 10px',
-  background: enabled ? 'var(--lilac-50)' : 'var(--color-background-subtle)',
-  border: `2px solid ${enabled ? 'var(--brand-lilac-100)' : 'var(--color-border-default)'}`,
+  background: enabled ? 'var(--luxi-color-component-shop-tile-background)' : 'var(--color-background-subtle)',
+  border: `2px solid ${enabled ? 'var(--luxi-color-component-shop-tile-border)' : 'var(--color-border-default)'}`,
   borderRadius: 16,
   cursor: enabled ? 'pointer' : 'default',
   // no whole-tile opacity: it took the name + price under AA, and she needs to
@@ -402,9 +402,9 @@ const tile = (enabled) => ({
 const byKeyboard = (e) => e.detail === 0
 // Selected / on = an INSET Iris ring (border + inset shadow), never an outline — the
 // outline stays free for the 1px Iris 700 focus ring (a selected tile used to hide it).
-const selRing = (on) => (on ? { borderColor: 'var(--brand-iris-600)', boxShadow: 'inset 0 0 0 1px var(--brand-iris-600)' } : null)
+const selRing = (on) => (on ? { borderColor: 'var(--luxi-color-component-shop-tile-border-selected)', boxShadow: 'inset 0 0 0 1px var(--luxi-color-component-shop-tile-border-selected)' } : null)
 // The Buy/Unlock pill — 8px sides so "Unlock 💎50" fits a 3-up tile on a 375 phone
-const buyPill = { background: 'var(--brand-iris-600)', color: 'var(--color-text-on-brand)', borderRadius: 999, padding: '4px 8px', fontWeight: 800, whiteSpace: 'nowrap' }
+const buyPill = { background: 'var(--luxi-color-component-shop-buy-pill-background)', color: 'var(--luxi-color-component-shop-buy-pill-text)', borderRadius: 999, padding: '4px 8px', fontWeight: 800, whiteSpace: 'nowrap' }
 
 const tileName = (enabled) => ({ fontSize: 14, fontWeight: 500, color: enabled ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' })
 const tilePrice = { fontSize: 14, fontWeight: 700 }

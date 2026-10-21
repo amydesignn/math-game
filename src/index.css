@@ -77,9 +77,6 @@
 
   --color-text-brand: #3D43BE; /* brand-iris-700 — Datum styling-v0.19 (was iris-600) */
   --color-text-on-brand: #FFFFFF; /* white */
-  /* Datum tooltip (styling-v0.35, verbatim) — the ActionBar's hint pill (garden + placement bars) */
-  --color-component-tooltip-background: #171717; /* neutral-900 */
-  --color-component-tooltip-text: #FFFFFF; /* white */
   --color-text-inverse: #FFFFFF; /* white */
   /* Luxi Math OWN component tokens (Amy, 2026-10-20) — the 🧺 basket count chip.
      Luxi only, NOT Datum: Datum's Badge stays 12/500 (text-xs font-medium); this
@@ -121,6 +118,34 @@
   --luxi-color-component-video-letterbox: #2A2140; /* off-ramp, ≈ brand-lilac-950 */
   --luxi-color-component-media-button-background: rgba(29,23,48,.6); /* off-ramp ink #1D1730 @ 60% — the sound button on the clip */
   --luxi-color-component-media-button-background-hover: rgba(29,23,48,.8); /* off-ramp ink #1D1730 @ 80% */
+
+  /* Luxi Math OWN tokens — basket, action bar, gem shop (Amy 2026-10-20) */
+  /* Rule: Datum SEMANTIC tokens are used directly; Datum COMPONENT tokens never sit on a
+     Luxi element, and raw primitives live only inside a token definition, here. */
+  /* --luxi-color-focus-ring: shared — defined once in the onboarding block below (garden bar 1px ring + 🧺 2px outset ring) */
+  --luxi-color-component-basket-divider: #EDE7FC; /* brand-lilac-100 — decoration */
+  --luxi-color-component-action-bar-button-primary-background: #4B54DD; /* brand-iris-600 — Plant / Water / Place */
+  --luxi-color-component-action-bar-button-primary-text: #FFFFFF; /* white, 5.81:1 */
+  --luxi-color-component-action-bar-button-secondary-background: #EDE7FC; /* brand-lilac-100 — ✕ / Move / Rotate */
+  --luxi-color-component-action-bar-button-secondary-text: #473B7C; /* brand-lilac-900 — 7.98:1 (Lilac on a glyph: flagged, kept) */
+  --luxi-color-component-action-bar-hint-background: #171717; /* neutral-900 — was Datum tooltip */
+  --luxi-color-component-action-bar-hint-text: #FFFFFF; /* white, 17.92:1 */
+  --luxi-color-component-shop-buy-pill-background: #4B54DD; /* brand-iris-600 — Buy / Unlock, every shelf */
+  --luxi-color-component-shop-buy-pill-text: #FFFFFF; /* white, 5.81:1 */
+  --luxi-color-component-shop-tile-background: #F6F4FD; /* lilac-50 */
+  --luxi-color-component-shop-tile-border: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-shop-tile-border-selected: #4B54DD; /* brand-iris-600 — selRing() */
+  --luxi-color-component-shop-tile-action-text: #4B54DD; /* brand-iris-600 — Play / Wear / Choose / Take off / place ✥ (was Datum button-link) */
+  --luxi-color-component-shop-size-button-background: #EDE7FC; /* brand-lilac-100 — "How big?" (was Datum button-secondary) */
+  --luxi-color-component-shop-size-button-text: #333A98; /* brand-iris-800 (was Datum button-secondary text) */
+  --luxi-color-component-shop-size-button-background-selected: #4B54DD; /* brand-iris-600 */
+  --luxi-color-component-shop-scrim: rgba(43, 32, 90, 0.25); /* brand ink #2B205A @ 25% */
+  /* shadows (Datum has no shadow tokens in the app subset) — same brand ink, by surface */
+  --luxi-shadow-basket-button: 0 4px 14px rgba(43, 32, 90, 0.18);
+  --luxi-shadow-basket-card: 0 12px 32px rgba(43, 32, 90, 0.22);
+  --luxi-shadow-action-bar: 0 4px 14px rgba(43, 32, 90, 0.2);
+  --luxi-shadow-shop-sheet: 0 -8px 30px rgba(43, 32, 90, 0.25);
+  --luxi-shadow-shop-swatch: 0 1px 4px rgba(40, 30, 70, 0.25), inset 0 0 0 1.5px rgba(255, 255, 255, 0.6);
 
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */
@@ -762,8 +787,8 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
    world: outside it, the ring sat on grass + its own drop shadow and measured 2.69:1 (Iris 700)
    / 2.74:1 (Iris 800). Amy's pick from the eye sheet (a11y-reports/garden/eye-sheet.png,
    2026-10-20): a 2px outset ring in Iris 700 — 3.21:1 over 92% of the edge on Sunny Town. */
-[data-hint="garden-bar"] button:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
-.hud-basket:focus-visible { outline: var(--border-stroke-2) solid var(--brand-iris-700); outline-offset: 2px; }
+[data-hint="garden-bar"] button:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; }
+.hud-basket:focus-visible { outline: var(--border-stroke-2) solid var(--luxi-color-focus-ring); outline-offset: 2px; }
 
 /* ── 🧺 Basket (Grow a Garden ticket 8) ──
    The card grows up out of the bottom-left button. On phones the garden bar
