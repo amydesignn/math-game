@@ -186,6 +186,18 @@
   --luxi-color-component-door-app-text-pressed: #3D43BE; /* brand-iris-700 — Door app nav link, :active */
   --luxi-color-component-door-carousel-arrow-icon: #3D43BE; /* brand-iris-700 — What's new ‹ › */
 
+  /* ---- luxi door 10-21: What's new focus rings + Door badges (WCAG pass for the awards) ---- */
+  --luxi-color-focus-ring-halo: #FFFFFF; /* white — the band between the 1px ring and a photo, so the ring reads on any image */
+  --luxi-color-component-door-carousel-arrow-background-focus: #3D43BE; /* brand-iris-700 — the ‹ › disc fills on keyboard focus */
+  --luxi-color-component-door-carousel-arrow-icon-focus: #FFFFFF; /* white, 8.6:1 on iris-700 */
+  --luxi-color-component-door-badge-new-background: #FFFBEB; /* amber-50 — "New" badge (was Datum badge-new) */
+  --luxi-color-component-door-badge-new-border: #FEE685; /* amber-200 */
+  --luxi-color-component-door-badge-new-text: #973C00; /* amber-800, 6.84:1 on amber-50 */
+  --luxi-color-component-door-status-indicator-background: #FFFFFF; /* white — "Last played" (was Datum status-indicator) */
+  --luxi-color-component-door-status-indicator-border: #E5E5E5; /* neutral-200 */
+  --luxi-color-component-door-status-indicator-text: #404040; /* neutral-700, 10.37:1 */
+  --luxi-color-component-door-status-indicator-live-dot: #00A63E; /* green-600 */
+
   /* ---- luxi sweep 10-21: feedback + sign-up modals ---- */
   /* Reused, not redefined: modal-header-border · modal-close-background-* · button3d-primary-*.
      The two translucent values keep the exact color-mix they rendered with. */
@@ -523,8 +535,15 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 .doorNew-slide:hover img { transform: scale(1.03); }
 .doorNew-slide img { transition: transform .3s ease; }
 @media (prefers-reduced-motion: reduce) { .doorNew-slide:hover img { transform: none; } }
-.doorNew-slide:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: -2px; border-radius: 24px; } /* inset: the card clips overflow */
-.doorNew-arrow:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; }
+/* focus over a photo: the 1px house ring + a white halo band, so the ring has a known
+   background whatever the image is (a bare 1px ring measured 1.14:1 on the Spooky Arcade
+   dusk). Slide = drawn inside on ::after (the card clips overflow; an inset box-shadow
+   would sit under the image). Arrow = the whole disc fills Iris 700 (the photo around a 32px disc is too mixed for a
+   ring alone) + the same ring outside. */
+.doorNew-slide { position: relative; }
+.doorNew-slide:focus-visible { outline: none; }
+.doorNew-slide:focus-visible::after { content: ''; position: absolute; inset: 0; z-index: 3; border-radius: 24px; pointer-events: none; box-shadow: inset 0 0 0 1px var(--luxi-color-focus-ring), inset 0 0 0 3px var(--luxi-color-focus-ring-halo); }
+.doorNew-arrow:focus-visible { outline: none; background: var(--luxi-color-component-door-carousel-arrow-background-focus) !important; color: var(--luxi-color-component-door-carousel-arrow-icon-focus) !important; box-shadow: 0 0 0 2px var(--luxi-color-focus-ring-halo), 0 0 0 3px var(--luxi-color-focus-ring) !important; }
 .doorNew-arrow:hover { background: #FFFFFF !important; }
 /* Datum motion-pulse (styling-v0.21, datum-motion.css): a live dot breathes — a soft
    ring grows out and fades every 2s (0.5 Hz, far under WCAG 2.3.1's 3 flashes/s).

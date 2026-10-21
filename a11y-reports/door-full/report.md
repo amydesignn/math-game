@@ -1,0 +1,86 @@
+# Contrast audit — Door
+
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-21 17:35 UTC  
+**Variants:** Returning player · **Phases:** idle
+
+> **101 unique checks · 89 pass · 0 fail · 0 exempt (disabled) · 12 need review**
+
+**Rules applied**
+
+- **1.4.3 Text contrast:** 4.5:1 for body text · 3:1 for large text (≥ 24px, or ≥ 18.66px bold).
+- **1.4.11 Non-text contrast / 2.4.7 Focus visible:** a focus indicator must be visible, and its strongest ring covering half the control’s perimeter must reach 3:1 against the colours it replaces (AA asks for a visible 3:1 change; an unbroken ring is AAA 2.4.13). Coverage = share of the edge at ≥ 3:1. Icon-only glyphs (✕, ⌫) are graphics: 3:1.
+- **Disabled is exempt:** WCAG 1.4.3 exempts text in inactive UI components. Disabled controls are measured and listed for transparency, never counted as failures.
+- Every interactive element is checked in **default · hover · pressed · focus**, driven with real mouse/keyboard input. Gradients and images are scored pixel by pixel (worst 5% of the background wins).
+
+## Failures to fix (0)
+
+None — every check passes WCAG 2.2 AA. 🎉
+
+## Returning player
+
+### Text
+
+| Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
+|---|---|---|---|---|---|---|
+| Luxi Math | `#4B54DD` on `#FFFFFF` | 24px (large) | 5.81:1 | 3.00:1 | ✅ | idle |
+| Luxi Cozy Closet | `#8C8C8C` on `#FFFFFF` | 24px (large) | 3.36:1 | 3.00:1 | ✅ | idle |
+| Level 2 | `#262626` on `#FFFFFF` | 20px | 15.13:1 | 4.50:1 | ✅ | idle |
+| 71 | `#262626` on `#FFFFFF` | 14px bold | 15.13:1 | 4.50:1 | ✅ | idle |
+| 29 points to Level 3 | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| 71 points | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| Saved on this device | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| What’s new | `#262626` on `#FFFFFF` | 14px | 15.13:1 | 4.50:1 | ✅ | idle |
+| Spooky Arcade for Halloween | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| Today’s Quest | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
+| · Refreshes in 1h | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
+| Visit Sunny Town to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
+| +1 | `#8A5300` on `#FFEFCF` | 14px bold | 5.57:1 | 4.50:1 | ✅ | idle |
+| Forest Clearing | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
+| Where every journey begins | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| Play | `#FFFFFF` on `#6169E0` | 15px bold | 4.55:1 | 4.50:1 | ✅ | idle |
+| Last played | `#404040` on `#FFFFFF` | 12px | 10.36:1 | 4.50:1 | ✅ | idle |
+| Sunny Town | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
+| Warm streets, friendly faces | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| Resume | `#FFFFFF` on `#6169E0` | 15px bold | 4.55:1 | 4.50:1 | ✅ | idle |
+| Rosy Garden | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
+| Petal paths and quiet corners | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| Merry Market | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
+| Stalls, treats, and trinkets | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| Star Arcade | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
+| Bright lights, big scores | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| The Meadow | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
+| Play together | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
+| Welcome, player! | `#262626` on `#F5F1FC` ᵖ | 24px (large) | 13.60:1 | 3.00:1 | ✅ | idle |
+| Choose your world | `#262626` on `#F5F1FC` ᵖ | 24px (large) | 13.60:1 | 3.00:1 | ✅ | idle |
+| 5 worlds | `#525252` on `#F5F1FC` ᵖ | 14px | 7.02:1 | 4.50:1 | ✅ | idle |
+| Coming soon | `#3D43BE` on `#E4DBF8` ᵖ | 13px bold | 5.75:1 | 4.50:1 | ✅ | idle |
+
+### Interactive elements — every state
+
+| Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
+|---|---|---|---|---|---|---|
+| Luxi Cozy Closet | ✅ 3.36:1 | ✅ 5.81:1 | ✅ 7.65:1 | ✅ 5.81:1 | ✅ 7.65:1 · 95% of edge | idle |
+| Settings | — | — | — | — | ✅ 5.29:1 · 100% of edge | idle |
+| Profile | — | — | — | — | ✅ 4.61:1 · 100% of edge | idle |
+| What's new, 1 of 4: Spooky Arcade for Ha | ✅ 7.81:1 | ✅ 7.81:1 | ✅ 7.81:1 | ✅ 7.81:1 | ✅ 3.59:1 · 94% of edge | idle |
+| Previous | — | — | — | — | ✅ 7.35:1 · 100% of edge | idle |
+| Next | — | — | — | — | ✅ 7.35:1 · 100% of edge | idle |
+| Play | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.98:1 · 95% of edge | idle |
+| Resume | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.98:1 · 95% of edge | idle |
+| hello@luxi.land | — | — | — | ✅ 10.08:1 | 🟡 review none visible | idle |
+| Luxi Land on Instagram | — | — | — | — | 🟡 review none visible | idle |
+| Luxi Land on LinkedIn | — | — | — | — | 🟡 review none visible | idle |
+| Luxi Land on YouTube | — | — | — | — | 🟡 review none visible | idle |
+| Luxi Land on X | — | — | — | — | 🟡 review none visible | idle |
+| Worlds | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
+| Luxi Land | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
+| Send feedback | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
+| Privacy Policy | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
+| COPPA Compliance | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
+| Kenney | ✅ 5.74:1 | ✅ 5.74:1 | ✅ 5.74:1 | ✅ 5.74:1 | 🟡 review none visible | idle |
+
+---
+
+ᵖ = measured by pixel sampling (gradient or image behind the text). Screenshots of every phase sit next to this report.
+
+_Generated by Datum `tooling/contrast-audit` — axe-core engine + real-input state driving + pixel fallback._
