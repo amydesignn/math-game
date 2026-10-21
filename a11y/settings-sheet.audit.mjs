@@ -1,8 +1,8 @@
 // Contrast-audit scenario for <SettingsSheet> — run with Datum's checker:
 //   node ~/projects/nathan-mcp-codebase-01/tooling/contrast-audit/audit.mjs a11y/settings-sheet.audit.mjs
-// Needs the dev server (:5180) — drives the DEV-only `?settingsdemo` harness in src/main.jsx,
+// Needs the dev server (:5180; AUDIT_BASE overrides) — drives the DEV-only `?settingsdemo` harness in src/main.jsx,
 // pre-opened via `&open=settings` (+ `&account` signed in, `&soundoff` toggle off).
-const BASE = 'http://localhost:5180/?settingsdemo&open=settings'
+const BASE = (process.env.AUDIT_BASE || 'http://localhost:5180/') + '?settingsdemo&open=settings'
 
 export default {
   component: 'SettingsSheet',

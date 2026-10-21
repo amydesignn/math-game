@@ -1,6 +1,6 @@
 # Contrast audit — SettingsSheet
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-05 04:38 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-21 17:34 UTC  
 **Variants:** Guest · sound on, Guest · sound off, Signed in · **Phases:** open
 
 > **160 unique checks · 157 pass · 0 fail · 0 exempt (disabled) · 0 need review**
@@ -29,7 +29,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Sound | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Music | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Island | `#FFFFFF` on `#4B54DD` | 14px | 5.81:1 | 4.50:1 | ✅ | open |
-| Soft Focus | `#5B4B9E` on `#EDE7FC` | 14px | 5.92:1 | 4.50:1 | ✅ | open |
+| Soft Focus | `#3D43BE` on `#EDE7FC` | 14px | 6.35:1 | 4.50:1 | ✅ | open |
 | HELP | `#525252` on `#FFFFFF` | 11px | 7.81:1 | 4.50:1 | ✅ | open |
 | How to Play | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Send Feedback | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
@@ -44,7 +44,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Save your progress Sign up or sign in | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.65:1 · 96% of edge | open |
 | Sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
 | Island | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.61:1 · 85% of edge | open |
-| Soft Focus | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 6.35:1 · 89% of edge | open |
+| Soft Focus | ✅ 6.35:1 | ✅ 6.35:1 | ✅ 6.35:1 | ✅ 6.35:1 | ✅ 6.35:1 · 89% of edge | open |
 | How to Play | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
 | Send Feedback | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
 | Privacy Policy | ✅ 5.81:1 | ✅ 6.35:1 | ✅ 6.60:1 | ✅ 5.81:1 | ✅ 9.55:1 · 98% of edge | open |
@@ -62,7 +62,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Sound | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Music | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Island | `#FFFFFF` on `#4B54DD` | 14px | 5.81:1 | 4.50:1 | ✅ | open |
-| Soft Focus | `#5B4B9E` on `#EDE7FC` | 14px | 5.92:1 | 4.50:1 | ✅ | open |
+| Soft Focus | `#3D43BE` on `#EDE7FC` | 14px | 6.35:1 | 4.50:1 | ✅ | open |
 | HELP | `#525252` on `#FFFFFF` | 11px | 7.81:1 | 4.50:1 | ✅ | open |
 | How to Play | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Send Feedback | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
@@ -77,7 +77,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Save your progress Sign up or sign in | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.09:1 | ✅ 7.65:1 · 96% of edge | open |
 | Sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
 | Island | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.61:1 · 85% of edge | open |
-| Soft Focus | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 6.35:1 · 89% of edge | open |
+| Soft Focus | ✅ 6.35:1 | ✅ 6.35:1 | ✅ 6.35:1 | ✅ 6.35:1 | ✅ 6.35:1 · 89% of edge | open |
 | How to Play | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
 | Send Feedback | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
 | Privacy Policy | ✅ 5.81:1 | ✅ 6.35:1 | ✅ 6.60:1 | ✅ 5.81:1 | ✅ 9.55:1 · 98% of edge | open |
@@ -96,7 +96,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Sound | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Music | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Island | `#FFFFFF` on `#4B54DD` | 14px | 5.81:1 | 4.50:1 | ✅ | open |
-| Soft Focus | `#5B4B9E` on `#EDE7FC` | 14px | 5.92:1 | 4.50:1 | ✅ | open |
+| Soft Focus | `#3D43BE` on `#EDE7FC` | 14px | 6.35:1 | 4.50:1 | ✅ | open |
 | HELP | `#525252` on `#FFFFFF` | 11px | 7.81:1 | 4.50:1 | ✅ | open |
 | How to Play | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
 | Send Feedback | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | open |
@@ -112,7 +112,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Sign out | ✅ 5.27:1 | ✅ 4.82:1 | ✅ 6.06:1 | ✅ 5.27:1 | ✅ 6.95:1 · 98% of edge | open |
 | Sound | — | — | — | — | ✅ 4.99:1 · 87% of edge | open |
 | Island | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.61:1 · 85% of edge | open |
-| Soft Focus | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 5.92:1 | ✅ 6.35:1 · 89% of edge | open |
+| Soft Focus | ✅ 6.35:1 | ✅ 6.35:1 | ✅ 6.35:1 | ✅ 6.35:1 | ✅ 6.35:1 · 89% of edge | open |
 | How to Play | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
 | Send Feedback | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 7.65:1 · 98% of edge | open |
 | Privacy Policy | ✅ 5.81:1 | ✅ 6.35:1 | ✅ 6.60:1 | ✅ 5.81:1 | ✅ 9.55:1 · 98% of edge | open |

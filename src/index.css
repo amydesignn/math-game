@@ -161,7 +161,7 @@
   --luxi-color-component-settings-toggle-thumb: #FFFFFF; /* brand-neutral-00 */
   --luxi-color-component-settings-music-track-background: #EDE7FC; /* brand-lilac-100 */
   --luxi-color-component-settings-music-option-background-selected: #4B54DD; /* brand-iris-600 */
-  --luxi-color-component-settings-music-option-text: #5B4B9E; /* brand-lilac-800 — unselected (Lilac on text: flagged, kept) */
+  --luxi-color-component-settings-music-option-text: #3D43BE; /* brand-iris-700 — unselected, 6.35:1 on the lilac-100 track (was brand-lilac-800 #5B4B9E; Iris = text, Amy 10-21) */
   --luxi-color-component-settings-avatar-background-start: #6E5BC0; /* brand-lilac-700 — initial disc gradient */
   --luxi-color-component-settings-avatar-background-end: #5B4B9E; /* brand-lilac-800 */
   --luxi-color-component-profile-avatar-background: #EDE7FC; /* brand-lilac-100 — 96px photo circle */
@@ -175,11 +175,11 @@
   --luxi-color-component-app-background: #F6F4FD; /* lilac-50 (house) — html/body/#root, behind everything */
   --luxi-color-component-boot-background: #F6F4FD; /* lilac-50 (house) — the boot cover (✨ shimmer) */
   --luxi-color-component-signin-background: #F6F4FD; /* lilac-50 (house) — the ?account sign-in cover */
-  --luxi-color-component-signin-subtitle-text: #473B7C; /* brand-lilac-900 (Lilac on text: flagged, kept) */
+  --luxi-color-component-signin-subtitle-text: #3D43BE; /* brand-iris-700 — 7.65:1 on the white card (was brand-lilac-900 #473B7C; Iris = text, Amy 10-21) */
   --luxi-color-component-signin-retry-text: #4B54DD; /* brand-iris-600 — "Send it again" link */
   --luxi-color-component-crash-background: #F6F4FD; /* lilac-50 (house) — the <Oops> tap-to-reload card */
   --luxi-color-component-crash-text: #2C3379; /* brand-iris-900 */
-  --luxi-color-component-crash-subtitle-text: #473B7C; /* brand-lilac-900 (Lilac on text: flagged, kept) */
+  --luxi-color-component-crash-subtitle-text: #3D43BE; /* brand-iris-700 — 7.02:1 on lilac-50 (was brand-lilac-900 #473B7C; Iris = text, Amy 10-21) */
   --luxi-color-component-exit-pill-text: #2C3379; /* brand-iris-900 — ‹ Exit */
   --luxi-color-component-map-label-text: #2C3379; /* brand-iris-900 — the map name under the minimap */
   --luxi-color-component-door-app-text-hover: #4B54DD; /* brand-iris-600 — Door app nav link, hover + focus */
@@ -298,7 +298,7 @@
   --luxi-color-component-division-button-back-shadow: #E5E5E5; /* neutral-200 */
   /* final confetti: dividend-accent · divisor-ring · answer-border (above) + these two */
   --luxi-color-component-division-confetti-lilac: #8570D2; /* brand-lilac-600 */
-  --luxi-color-component-division-confetti-blue: #2D6DF6; /* off-brand blue, retired 10-04 — Amy to decide */
+  --luxi-color-component-division-confetti-iris: #6169E0; /* brand-iris-500 — was off-brand blue #2D6DF6 (confetti-blue); Amy 10-21 */
   /* reward sparkles (Sparkles default + GiftWin's pastel rainbow); 1 = the white star */
   --luxi-color-component-reward-sparkle-1: #FFFFFF; /* white */
   --luxi-color-component-reward-sparkle-2: #FFB3C7; /* off-ramp pastel pink */
@@ -306,6 +306,28 @@
   --luxi-color-component-reward-sparkle-4: #9BE7C4; /* off-ramp pastel mint */
   --luxi-color-component-reward-sparkle-5: #A9C7FF; /* off-ramp pastel blue */
   --luxi-color-component-reward-sparkle-6: #D3B5FF; /* off-ramp pastel violet */
+
+  /* luxi sweep-2 10-21 */
+  /* Settings + Profile buttons and the lucky hint pill had been reading Datum COMPONENT
+     tokens (button-ghost / button-link / button-secondary / badge-new-text). Same hexes,
+     now Luxi's own. */
+  --luxi-color-component-settings-sign-out-text-default: #4B54DD; /* brand-iris-600 — .luxiSet-ghost (was Datum button-ghost) */
+  --luxi-color-component-settings-sign-out-text-pressed: #333A98; /* brand-iris-800 */
+  --luxi-color-component-settings-sign-out-background-hover: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-settings-sign-out-background-pressed: #C9CBF5; /* brand-iris-200 */
+  --luxi-color-component-settings-link-text-default: #4B54DD; /* brand-iris-600 — .luxiSet-link: Privacy Policy · Remove photo (was Datum button-link) */
+  --luxi-color-component-settings-link-text-hover: #3D43BE; /* brand-iris-700 */
+  --luxi-color-component-settings-link-text-pressed: #333A98; /* brand-iris-800 */
+  --luxi-color-component-settings-link-background-hover: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-settings-link-background-pressed: #DDD1F7; /* brand-lilac-200 */
+  --luxi-color-component-settings-link-focus-ring: #333A98; /* brand-iris-800 */
+  --luxi-color-component-profile-upload-button-background-default: #EDE7FC; /* brand-lilac-100 — .luxiPf-secondary (was Datum button-secondary) */
+  --luxi-color-component-profile-upload-button-background-hover: #DDD1F7; /* brand-lilac-200 */
+  --luxi-color-component-profile-upload-button-background-pressed: #C6B4F0; /* brand-lilac-300 */
+  --luxi-color-component-profile-upload-button-text: #333A98; /* brand-iris-800 — 7.93:1 on lilac-100 */
+  --luxi-color-component-profile-upload-button-focus-ring: #333A98; /* brand-iris-800 */
+  --luxi-color-component-hint-toast-lucky-background-start: #973C00; /* amber-800 — the lucky pill (was Datum badge-new-text) */
+  --luxi-color-component-hint-toast-lucky-background-end: color-mix(in srgb, #973C00 82%, #000); /* amber-800 darkened 18% */
 
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */
@@ -918,18 +940,18 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    ghost (Sign out): Iris 600 text · hover Lilac 100 · pressed Iris 200 + Iris 800 text · press scale .97.
    link (Privacy Policy): underlined Iris 600 · hover Iris 700 on Lilac 100 · pressed Iris 800 on Lilac 200 ·
    colour only, never scales (text under the finger shouldn't shrink). Hover/press in CSS — inline beats :hover. */
-.luxiSet-ghost { background: transparent; color: var(--color-component-button-ghost-text-default); transition: scale .1s cubic-bezier(.23,1,.32,1), color .15s, background-color .15s; }
-.luxiSet-ghost:hover { background: var(--color-component-button-ghost-background-hover); }
-.luxiSet-ghost:active { background: var(--color-component-button-ghost-background-pressed); color: var(--color-component-button-ghost-text-pressed); scale: .97; }
-.luxiSet-link { color: var(--color-component-button-link-text-default); text-decoration: underline; text-underline-offset: 4px; transition: color .15s, background-color .15s; }
-.luxiSet-link:hover { color: var(--color-component-button-link-text-hover); background: var(--color-component-button-link-background-hover); }
-.luxiSet-link:active { color: var(--color-component-button-link-text-pressed); background: var(--color-component-button-link-background-pressed); }
-.luxiSet-link:focus-visible { outline: 1px solid var(--color-component-button-link-focus-ring); outline-offset: 2px; }
+.luxiSet-ghost { background: transparent; color: var(--luxi-color-component-settings-sign-out-text-default); transition: scale .1s cubic-bezier(.23,1,.32,1), color .15s, background-color .15s; }
+.luxiSet-ghost:hover { background: var(--luxi-color-component-settings-sign-out-background-hover); }
+.luxiSet-ghost:active { background: var(--luxi-color-component-settings-sign-out-background-pressed); color: var(--luxi-color-component-settings-sign-out-text-pressed); scale: .97; }
+.luxiSet-link { color: var(--luxi-color-component-settings-link-text-default); text-decoration: underline; text-underline-offset: 4px; transition: color .15s, background-color .15s; }
+.luxiSet-link:hover { color: var(--luxi-color-component-settings-link-text-hover); background: var(--luxi-color-component-settings-link-background-hover); }
+.luxiSet-link:active { color: var(--luxi-color-component-settings-link-text-pressed); background: var(--luxi-color-component-settings-link-background-pressed); }
+.luxiSet-link:focus-visible { outline: 1px solid var(--luxi-color-component-settings-link-focus-ring); outline-offset: 2px; }
 /* Profile popover photo button = Datum Button secondary (component tokens copied below in :root) */
-.luxiPf-secondary { background: var(--color-component-button-secondary-background-default); color: var(--color-component-button-secondary-text-default); transition: scale .1s cubic-bezier(.23,1,.32,1), background-color .15s; }
-.luxiPf-secondary:hover:not(:disabled) { background: var(--color-component-button-secondary-background-hover); }
-.luxiPf-secondary:active:not(:disabled) { background: var(--color-component-button-secondary-background-pressed); scale: .97; }
-.luxiPf-secondary:focus-visible { outline: 1px solid var(--color-component-button-secondary-focus-ring); outline-offset: 2px; }
+.luxiPf-secondary { background: var(--luxi-color-component-profile-upload-button-background-default); color: var(--luxi-color-component-profile-upload-button-text); transition: scale .1s cubic-bezier(.23,1,.32,1), background-color .15s; }
+.luxiPf-secondary:hover:not(:disabled) { background: var(--luxi-color-component-profile-upload-button-background-hover); }
+.luxiPf-secondary:active:not(:disabled) { background: var(--luxi-color-component-profile-upload-button-background-pressed); scale: .97; }
+.luxiPf-secondary:focus-visible { outline: 1px solid var(--luxi-color-component-profile-upload-button-focus-ring); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .luxiPf-secondary:active { scale: none; } }
 @media (prefers-reduced-motion: reduce) { .luxiSet-ghost:active { scale: none; } }
 
@@ -985,7 +1007,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    Datum's "new" badge ink (amber-800) fading only darker, white text ≥ 7:1.
    A thin pastel-rainbow rim ties it to the station's halo. */
 .luxiHint-layer[data-tone='lucky'] {
-  --luxiHint-toast-bg: linear-gradient(180deg, var(--color-component-badge-new-text), color-mix(in srgb, var(--color-component-badge-new-text) 82%, #000));
+  --luxiHint-toast-bg: linear-gradient(180deg, var(--luxi-color-component-hint-toast-lucky-background-start), var(--luxi-color-component-hint-toast-lucky-background-end));
 }
 .luxiHint-layer[data-tone='lucky'] .luxiHint-pillBody {
   box-shadow: 0 0 0 2px #fff, 0 0 0 4px #FFE08A, 0 6px 18px rgba(151, 60, 0, .35);
