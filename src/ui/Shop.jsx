@@ -36,7 +36,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
     right: 0,
     bottom: 0,
     maxHeight: '72%',
-    background: '#ffffff',
+    background: 'var(--color-background-base)',
     borderRadius: '22px 22px 0 0',
     boxShadow: '0 -8px 30px rgba(43,32,90,0.25)',
     display: 'flex',
@@ -86,7 +86,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
               unlocks with gems ONCE (tap → Unlock pill, the same two-tap buy as
               every shelf) and she plays as them right away. */}
           <SectionLabel>🦸 Heroes</SectionLabel>
-          <div style={{ ...grid, marginBottom: 6 }}>
+          <div role="group" aria-label="Heroes" style={{ ...grid, marginBottom: 6 }}>
             {HEROES.map((h) => {
               const isHers = h.price === 0 || ownedHeroes.includes(h.id)
               const isOn = character === h.id
@@ -95,15 +95,16 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
               return (
                 <button
                   key={h.id}
-                  onClick={() => {
+                  onClick={(e) => {
                     if (isOn) return
                     if (isHers) onChooseHero(h.id)
+                    else if (isSel && byKeyboard(e)) { onBuyHero(h.id); setHeroSel(null) }
                     else if (affordable) setHeroSel(isSel ? null : h.id)
                   }}
                   aria-disabled={(!affordable || isOn) || undefined}
                   aria-pressed={isOn}
-                  aria-label={isHers ? h.name : `${h.name}, locked, ${h.price} gems`}
-                  style={{ ...tile(affordable), outline: isSel || isOn ? '3px solid var(--brand-iris-600)' : undefined }}
+                  aria-label={isHers ? h.name : isSel ? `Unlock ${h.name} for ${h.price} gems` : `${h.name}, locked, ${h.price} gems`}
+                  style={{ ...tile(affordable), ...selRing(isSel || isOn) }}
                 >
                   <img
                     src={import.meta.env.BASE_URL + h.thumb}
@@ -120,7 +121,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   ) : isSel ? (
                     <span
                       onClick={(e) => { e.stopPropagation(); onBuyHero(h.id); setHeroSel(null) }}
-                      style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '4px 12px', fontWeight: 800, whiteSpace: 'nowrap' }}
+                      style={{ ...tilePrice, ...buyPill }}
                     >
                       Unlock 💎{h.price}
                     </span>
@@ -147,14 +148,16 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   return (
                     <button
                       key={g.id}
-                      onClick={() => {
+                      onClick={(e) => {
                         if (isOn) return
                         if (isHers) onWearGear(slot, g.id)
+                        else if (isSel && byKeyboard(e)) { onBuyGear(g.id); setGearSel(null) }
                         else if (affordable) setGearSel(isSel ? null : g.id)
                       }}
                       aria-disabled={(!affordable || isOn) || undefined}
                       aria-pressed={isOn}
-                      style={{ ...tile(affordable), outline: isSel || isOn ? '3px solid var(--brand-iris-600)' : undefined }}
+                      aria-label={isSel ? `Buy ${g.name} for ${g.price} gems` : undefined}
+                      style={{ ...tile(affordable), ...selRing(isSel || isOn) }}
                     >
                       <img
                         src={import.meta.env.BASE_URL + g.thumb}
@@ -171,7 +174,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                       ) : isSel ? (
                         <span
                           onClick={(e) => { e.stopPropagation(); onBuyGear(g.id); setGearSel(null) }}
-                          style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '4px 12px', fontWeight: 800 }}
+                          style={{ ...tilePrice, ...buyPill }}
                         >
                           Buy 💎{g.price}
                         </span>
@@ -184,7 +187,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                 <button
                   onClick={() => gear[slot] !== null && onWearGear(slot, null)}
                   aria-pressed={gear[slot] === null}
-                  style={{ ...tile(true), outline: gear[slot] === null ? '3px solid var(--brand-iris-600)' : undefined }}
+                  style={{ ...tile(true), ...selRing(gear[slot] === null) }}
                 >
                   <span style={{ fontSize: 30, lineHeight: '48px' }}>🚫</span>
                   <span style={tileName(true)}>{bare}</span>
@@ -207,14 +210,16 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
               return (
                 <button
                   key={c.id}
-                  onClick={() => {
+                  onClick={(e) => {
                     if (isActive) return
                     if (isHers) onChoosePet(c.id)
+                    else if (isSel && byKeyboard(e)) { onBuyPet(c.id); setPetSel(null) }
                     else if (affordable) setPetSel(isSel ? null : c.id)
                   }}
                   aria-disabled={(!affordable || isActive) || undefined}
                   aria-pressed={isActive}
-                  style={{ ...tile(affordable), outline: isSel || isActive ? '3px solid var(--brand-iris-600)' : undefined }}
+                  aria-label={isSel ? `Buy ${c.name} for ${c.price} gems` : undefined}
+                  style={{ ...tile(affordable), ...selRing(isSel || isActive) }}
                 >
                   <img
                     src={import.meta.env.BASE_URL + c.thumb}
@@ -231,7 +236,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   ) : isSel ? (
                     <span
                       onClick={(e) => { e.stopPropagation(); onBuyPet(c.id); setPetSel(null) }}
-                      style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '4px 12px', fontWeight: 800 }}
+                      style={{ ...tilePrice, ...buyPill }}
                     >
                       Buy 💎{c.price}
                     </span>
@@ -258,9 +263,13 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
               return (
                 <button
                   key={id}
-                  onClick={() => affordable && setMagicSel(isSel ? null : id)}
+                  onClick={(e) => {
+                    if (isSel && byKeyboard(e)) { onBuySparkle(id); setMagicSel(null) }
+                    else if (affordable) setMagicSel(isSel ? null : id)
+                  }}
                   aria-disabled={!affordable || undefined}
-                  style={{ ...tile(affordable), outline: isSel ? '3px solid var(--brand-iris-600)' : undefined /* undefined, not 'none' — lets the dialog focus ring show */ }}
+                  aria-label={isSel ? `Buy ${c.label} sparkle for ${c.price} gems` : undefined}
+                  style={{ ...tile(affordable), ...selRing(isSel) }}
                 >
                   <span style={{ width: 34, height: 34, borderRadius: '50%', background: SWATCH_BG[id],
                     boxShadow: '0 1px 4px rgba(40,30,70,0.25), inset 0 0 0 1.5px rgba(255,255,255,0.6)',
@@ -269,7 +278,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   {isSel ? (
                     <span
                       onClick={(e) => { e.stopPropagation(); onBuySparkle(id); setMagicSel(null) }}
-                      style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '3px 12px', fontWeight: 800 }}
+                      style={{ ...tilePrice, ...buyPill }}
                     >
                       Buy 💎{c.price}
                     </span>
@@ -325,16 +334,20 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                     return (
                       <button
                         key={key}
-                        onClick={() => affordable && setSelected(isSel ? null : key)}
+                        onClick={(e) => {
+                          if (isSel && byKeyboard(e)) { onBuy(item, size); setSelected(null) }
+                          else if (affordable) setSelected(isSel ? null : key)
+                        }}
                         aria-disabled={!affordable || undefined}
-                        style={{ ...tile(affordable), outline: isSel ? '3px solid var(--brand-iris-600)' : undefined /* undefined, not 'none' — lets the dialog focus ring show */ }}
+                        aria-label={isSel ? `Buy ${item.name}${size > 1 ? ` ×${size}` : ''} for ${cost} gems` : undefined}
+                        style={{ ...tile(affordable), ...selRing(isSel) }}
                       >
                         <span style={{ fontSize: 30, filter: affordable ? 'none' : 'grayscale(1)', opacity: affordable ? 1 : 0.5 }}>{item.emoji}</span>
                         <span style={tileName(affordable)}>{item.name}</span>
                         {isSel ? (
                           <span
                             onClick={(e) => { e.stopPropagation(); onBuy(item, size); setSelected(null) }}
-                            style={{ ...tilePrice, background: 'var(--brand-iris-600)', color: '#fff', borderRadius: 999, padding: '3px 12px', fontWeight: 800 }}
+                            style={{ ...tilePrice, ...buyPill }}
                           >
                             Buy 💎{cost}
                           </span>
@@ -379,6 +392,19 @@ const tile = (enabled) => ({
   // read what she's saving toward. Not-yet-affordable = neutral surface + grey emoji.
   fontFamily: 'inherit',
 })
+
+/*
+ * Every shelf's two-tap buy (a11y, 2026-10-20): tap a tile → it's selected and shows the
+ * Buy/Unlock pill. The pill is a <span> inside the tile's <button> (a button can't nest a
+ * button), so the keyboard can't reach it: Enter/Space on a SELECTED tile is the pill
+ * (a keyboard click has detail 0). A tap off the pill still un-selects, as before.
+ */
+const byKeyboard = (e) => e.detail === 0
+// Selected / on = an INSET Iris ring (border + inset shadow), never an outline — the
+// outline stays free for the 1px Iris 700 focus ring (a selected tile used to hide it).
+const selRing = (on) => (on ? { borderColor: 'var(--brand-iris-600)', boxShadow: 'inset 0 0 0 1px var(--brand-iris-600)' } : null)
+// The Buy/Unlock pill — 8px sides so "Unlock 💎50" fits a 3-up tile on a 375 phone
+const buyPill = { background: 'var(--brand-iris-600)', color: 'var(--color-text-on-brand)', borderRadius: 999, padding: '4px 8px', fontWeight: 800, whiteSpace: 'nowrap' }
 
 const tileName = (enabled) => ({ fontSize: 14, fontWeight: 500, color: enabled ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' })
 const tilePrice = { fontSize: 14, fontWeight: 700 }

@@ -77,7 +77,17 @@
 
   --color-text-brand: #3D43BE; /* brand-iris-700 — Datum styling-v0.19 (was iris-600) */
   --color-text-on-brand: #FFFFFF; /* white */
+  /* Datum tooltip (styling-v0.35, verbatim) — the ActionBar's hint pill (garden + placement bars) */
+  --color-component-tooltip-background: #171717; /* neutral-900 */
+  --color-component-tooltip-text: #FFFFFF; /* white */
   --color-text-inverse: #FFFFFF; /* white */
+  /* Luxi Math OWN component tokens (Amy, 2026-10-20) — the 🧺 basket count chip.
+     Luxi only, NOT Datum: Datum's Badge stays 12/500 (text-xs font-medium); this
+     chip is 12/700 for this one use, so the two never share a token. */
+  --luxi-component-basket-count-font-size: 12px;
+  --luxi-component-basket-count-font-weight: 700;
+  --luxi-color-component-basket-count-text: #FFFFFF; /* white, on brand-iris-600 = 5.81:1 */
+  --luxi-color-component-basket-count-background: #4B54DD; /* brand-iris-600 */
 
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */
@@ -713,6 +723,14 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
    the house ring and fell back to a faint browser default (1.24:1). Same 1px
    Iris 700 ring, 2px out, as every other Luxi control. */
 .lvlbar-pill:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+/* Grow a Garden HUD — the 🧺 Basket button and the plot's bar sat outside any dialog,
+   so they had the browser's default ring (a11y/garden.audit.mjs, 2026-10-20). The bar's
+   buttons sit on its white pill → the house ring as-is. The Basket button floats on the 3D
+   world: outside it, the ring sat on grass + its own drop shadow and measured 2.69:1 (Iris 700)
+   / 2.74:1 (Iris 800). Amy's pick from the eye sheet (a11y-reports/garden/eye-sheet.png,
+   2026-10-20): a 2px outset ring in Iris 700 — 3.21:1 over 92% of the edge on Sunny Town. */
+[data-hint="garden-bar"] button:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+.hud-basket:focus-visible { outline: var(--border-stroke-2) solid var(--brand-iris-700); outline-offset: 2px; }
 
 /* ── 🧺 Basket (Grow a Garden ticket 8) ──
    The card grows up out of the bottom-left button. On phones the garden bar

@@ -1602,7 +1602,7 @@ function MapToast({ name }) {
    sheet (the gear absorbed the standalone speaker on both the Door and the rail). */
 
 /** The garden's bar: what she can do for her plot right now (one main action). */
-function GardenBar({ garden, gems, onPlant, onWater, onClose }) {
+export function GardenBar({ garden, gems, onPlant, onWater, onClose }) {
   const hintKey = 'garden-bar' // data-hint: the hint layer can target / avoid it
   const close = { label: '✕', aria: 'Close', onTap: onClose }
   if (garden.stage == null) {
@@ -1637,14 +1637,19 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
         bottom: 'max(20px, env(safe-area-inset-bottom))',
         left: '50%',
         transform: 'translateX(-50%)',
+        // max-content: `left: 50%` alone capped the bar at half the screen, so on a phone
+        // "🌱 Plant your seed" wrapped out of its 46px pill (a11y/garden.audit.mjs, 2026-10-20)
+        width: 'max-content',
+        maxWidth: 'calc(100vw - 32px)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: 8,
       }}
     >
-      <div style={{ padding: '6px 14px', background: 'rgba(43,32,90,0.82)', color: '#fff', borderRadius: 999, fontWeight: 600, fontSize: 13.5 }}>{hint}</div>
-      <div style={{ display: 'flex', gap: 10, background: '#ffffff', borderRadius: 999, padding: 8, boxShadow: '0 4px 14px rgba(43,32,90,0.2)' }}>
+      {/* the hint: a Datum tooltip on the type ladder (was 13.5px on raw rgba(43,32,90,.82) — Amy, 2026-10-20) */}
+      <div style={{ padding: '6px 14px', background: 'var(--color-component-tooltip-background)', color: 'var(--color-component-tooltip-text)', borderRadius: 999, fontWeight: 600, fontSize: 14 }}>{hint}</div>
+      <div style={{ display: 'flex', gap: 10, background: 'var(--color-background-base)', borderRadius: 999, padding: 8, boxShadow: '0 4px 14px rgba(43,32,90,0.2)' }}>
         {buttons.map((b) => (
           <button
             key={b.aria}
@@ -1657,12 +1662,12 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
               padding: '0 16px',
               borderRadius: 999,
               border: 'none',
-              background: b.primary ? 'var(--brand-iris-600)' : 'var(--brand-lilac-100)',
-              color: b.primary ? '#ffffff' : 'var(--brand-lilac-900)',
+              // disabled (Water she can't afford yet) = Datum's disabled tokens, not a faded CTA (Amy, 2026-10-20)
+              background: b.disabled ? 'var(--color-background-interactive-disabled)' : b.primary ? 'var(--brand-iris-600)' : 'var(--color-component-button-secondary-background-default)',
+              color: b.disabled ? 'var(--color-text-disabled)' : b.primary ? 'var(--color-text-on-brand)' : 'var(--brand-lilac-900)',
               fontSize: 16,
               fontWeight: 700,
               cursor: b.disabled ? 'default' : 'pointer',
-              opacity: b.disabled ? 0.45 : 1,
             }}
           >
             {b.label}
