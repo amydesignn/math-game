@@ -1,6 +1,6 @@
 # Contrast audit — ProgressPopup
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/ProgressPopup.jsx` · **Run:** 2026-10-06 21:59 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/ProgressPopup.jsx` · **Run:** 2026-10-21 22:56 UTC  
 **Variants:** Record (Level 2, three subjects), Empty (new player) · **Phases:** default
 
 > **44 unique checks · 37 pass · 0 fail · 5 exempt (disabled) · 0 need review**

@@ -1,6 +1,6 @@
 # Contrast audit — Door
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-21 17:35 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-21 22:52 UTC  
 **Variants:** Returning player · **Phases:** idle
 
 > **101 unique checks · 89 pass · 0 fail · 0 exempt (disabled) · 12 need review**
@@ -32,8 +32,8 @@ None — every check passes WCAG 2.2 AA. 🎉
 | What’s new | `#262626` on `#FFFFFF` | 14px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Spooky Arcade for Halloween | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
 | Today’s Quest | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
-| · Refreshes in 1h | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
-| Visit Sunny Town to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
+| · Refreshes in 2h | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
+| Visit Rosy Garden to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
 | +1 | `#8A5300` on `#FFEFCF` | 14px bold | 5.57:1 | 4.50:1 | ✅ | idle |
 | Forest Clearing | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Where every journey begins | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
@@ -67,17 +67,17 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Next | — | — | — | — | ✅ 7.35:1 · 100% of edge | idle |
 | Play | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.98:1 · 95% of edge | idle |
 | Resume | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.98:1 · 95% of edge | idle |
-| hello@luxi.land | — | — | — | ✅ 10.08:1 | 🟡 review none visible | idle |
+| hello@luxi.land | — | — | — | ✅ 17.24:1 | 🟡 review none visible | idle |
 | Luxi Land on Instagram | — | — | — | — | 🟡 review none visible | idle |
 | Luxi Land on LinkedIn | — | — | — | — | 🟡 review none visible | idle |
 | Luxi Land on YouTube | — | — | — | — | 🟡 review none visible | idle |
 | Luxi Land on X | — | — | — | — | 🟡 review none visible | idle |
-| Worlds | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
-| Luxi Land | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
-| Send feedback | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
-| Privacy Policy | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
-| COPPA Compliance | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | 🟡 review none visible | idle |
-| Kenney | ✅ 5.74:1 | ✅ 5.74:1 | ✅ 5.74:1 | ✅ 5.74:1 | 🟡 review none visible | idle |
+| Worlds | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 17.24:1 | 🟡 review none visible | idle |
+| Luxi Land | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 17.24:1 | 🟡 review none visible | idle |
+| Send feedback | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 17.24:1 | 🟡 review none visible | idle |
+| Privacy Policy | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 17.24:1 | 🟡 review none visible | idle |
+| COPPA Compliance | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 10.08:1 | ✅ 17.24:1 | 🟡 review none visible | idle |
+| Kenney | ✅ 5.74:1 | ✅ 5.74:1 | ✅ 5.74:1 | ✅ 17.24:1 | 🟡 review none visible | idle |
 
 ---
 
