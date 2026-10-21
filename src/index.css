@@ -147,6 +147,37 @@
   --luxi-shadow-shop-sheet: 0 -8px 30px rgba(43, 32, 90, 0.25);
   --luxi-shadow-shop-swatch: 0 1px 4px rgba(40, 30, 70, 0.25), inset 0 0 0 1.5px rgba(255, 255, 255, 0.6);
 
+  /* ---- luxi sweep 10-21: feedback + sign-up modals ---- */
+  /* Reused, not redefined: modal-header-border · modal-close-background-* · button3d-primary-*.
+     The two translucent values keep the exact color-mix they rendered with. */
+  --luxi-color-component-form-modal-scrim: color-mix(in srgb, #2F2653 50%, transparent); /* brand-lilac-950 @ 50% */
+  --luxi-color-component-form-modal-border: color-mix(in srgb, #2F2653 10%, transparent); /* brand-lilac-950 @ 10% */
+  --luxi-color-component-form-modal-header-background-start: #F6F2FF; /* brand-lilac-50 — fades to --color-background-base */
+  --luxi-color-component-feedback-star-1: #FB2C36; /* red-500 — 3.8:1 on white */
+  --luxi-color-component-feedback-star-2: #F54A00; /* orange-600 — 3.6:1 (oklch renders #F54A00, not the published #F54900) */
+  --luxi-color-component-feedback-star-3: #E17100; /* amber-600 — 3.2:1 */
+  --luxi-color-component-feedback-star-4: #BB4D00; /* amber-700 — 5.0:1 */
+  --luxi-color-component-feedback-star-5: #6169E0; /* brand-iris-500 — 4.6:1 */
+  --luxi-color-component-feedback-caption-text-empty: #6169E0; /* brand-iris-500 — "Tap the stars!" before a rating */
+  --luxi-color-component-feedback-divider: #EDE7FC; /* brand-lilac-100 — decoration */
+  --luxi-color-component-feedback-counter-text-warning: #BB4D00; /* amber-700 — ≤ 40 characters left */
+  --luxi-color-component-feedback-thanks-badge-background-start: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-feedback-thanks-badge-background-end: #DDD1F7; /* brand-lilac-200 */
+  --luxi-color-component-feedback-error-badge-background: #FFF7ED; /* orange-50 */
+  --luxi-color-component-feedback-not-now-background-hover: #F6F2FF; /* brand-lilac-50 */
+  --luxi-color-component-signup-badge-background-start: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-signup-badge-background-end: #E4E5FA; /* brand-iris-100 */
+  --luxi-color-component-signup-inbox-badge-background: #F6F2FF; /* brand-lilac-50 — 📬 */
+  --luxi-color-component-signup-resend-divider: #EDE7FC; /* brand-lilac-100 — decoration */
+  --luxi-color-component-signup-not-now-background-hover: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-signup-toast-border: color-mix(in srgb, #2F2653 10%, transparent); /* brand-lilac-950 @ 10% */
+  --luxi-color-component-signup-link-text-default: #4B54DD; /* brand-iris-600 (was Datum button-link) */
+  --luxi-color-component-signup-link-text-hover: #3D43BE; /* brand-iris-700 */
+  --luxi-color-component-signup-link-text-pressed: #333A98; /* brand-iris-800 */
+  --luxi-color-component-signup-link-background-hover: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-signup-link-background-pressed: #DDD1F7; /* brand-lilac-200 */
+  --luxi-color-component-signup-link-focus-ring: #333A98; /* brand-iris-800 */
+
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */
   --color-background-subtle: #FAFAFA; /* neutral-50 */
@@ -720,39 +751,39 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
    (same 4px press as .luxiOb-cta); Oscar's comp had 3px/1px pre-snap. */
 @keyframes fbPopIn { 0% { transform: scale(.94) translateY(16px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 @keyframes fbPop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
-.luxiFb-close { background: var(--brand-lilac-100); transition: background .15s; }
-.luxiFb-close:hover { background: var(--brand-lilac-200); }
+.luxiFb-close { background: var(--luxi-color-component-modal-close-background-default); transition: background .15s; }
+.luxiFb-close:hover { background: var(--luxi-color-component-modal-close-background-hover); }
 .luxiFb-star:hover { transform: scale(1.22) rotate(-6deg) !important; } /* !important: the on/off scale is inline */
 .luxiFb-ta { border: 1.5px solid var(--color-border-interactive-default); outline: none; transition: border-color .15s; }
 .luxiFb-ta:hover { border-color: var(--color-border-interactive-hover); }
 .luxiFb-ta:focus { border-color: var(--color-border-interactive-focus); outline: var(--border-stroke-2) solid var(--color-border-interactive-focus); outline-offset: calc(-1 * var(--border-stroke-2)); } /* after :hover so focus wins. Field focus = a 2px Iris 600 stroke (--border-stroke-2, Amy 2026-10-17), drawn as an inset outline over the 1.5px border so nothing shifts. The colour swap alone (neutral-500 → iris-600) is 1.23:1, too faint to be a focus indicator. */
 .luxiFb-press { transition: transform .07s, box-shadow .07s, background .15s; }
-.luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
+.luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--luxi-color-component-button3d-primary-shadow) !important; } /* !important: base shadow is inline */
 
 /* ── Save Your Progress (SignupModal.jsx) → Datum, 2026-10-05 ──
    Same recipe as .luxiFb-: interactive states here because an inline style beats
    :hover. Primary = the Luxi 3D button (4px press, shadow to 0). Input = Datum's
    interactive border trio (neutral-500 rest 4.74:1 · 600 hover · iris-600 focus).
    Not now = quiet secondary text (Feedback's "Not now"); links = Datum link tokens. */
-.luxiSu-close { background: var(--brand-lilac-100); transition: background .15s; }
-.luxiSu-close:hover { background: var(--brand-lilac-200); }
+.luxiSu-close { background: var(--luxi-color-component-modal-close-background-default); transition: background .15s; }
+.luxiSu-close:hover { background: var(--luxi-color-component-modal-close-background-hover); }
 .luxiSu-primary { transition: transform .07s, box-shadow .07s, filter .15s; }
 .luxiSu-primary:hover:not(:disabled):not([aria-busy]) { filter: brightness(1.04); }
-.luxiSu-primary:active:not(:disabled):not([aria-busy]) { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700) !important; } /* !important: base shadow is inline */
+.luxiSu-primary:active:not(:disabled):not([aria-busy]) { transform: translateY(4px); box-shadow: 0 0 0 var(--luxi-color-component-button3d-primary-shadow) !important; } /* !important: base shadow is inline */
 .luxiSu-input { border: 1.5px solid var(--color-border-interactive-default); background: var(--color-background-interactive-default); outline: none; transition: border-color .15s; }
 .luxiSu-input:hover { border-color: var(--color-border-interactive-hover); }
 .luxiSu-input:focus { border-color: var(--color-border-interactive-focus); outline: var(--border-stroke-2) solid var(--color-border-interactive-focus); outline-offset: calc(-1 * var(--border-stroke-2)); } /* after :hover so focus wins. Same field-focus rule as .luxiFb-ta: a 2px Iris 600 stroke (--border-stroke-2, Amy 2026-10-17), replacing the old 1px Iris 700 ring. */
 .luxiSu-input::placeholder { color: var(--color-text-placeholder); }
 .luxiSu-input:disabled { background: var(--color-background-interactive-disabled); }
 .luxiSu-notnow { transition: background .15s, color .15s; }
-.luxiSu-notnow:hover { background: var(--brand-lilac-100); color: var(--color-text-primary); }
-.luxiSu-link { color: var(--color-component-button-link-text-default); text-decoration: underline; text-underline-offset: 4px; border-radius: 4px; transition: color .15s, background-color .15s; }
-.luxiSu-link:hover:not(:disabled) { color: var(--color-component-button-link-text-hover); background: var(--color-component-button-link-background-hover); }
-.luxiSu-link:active:not(:disabled) { color: var(--color-component-button-link-text-pressed); background: var(--color-component-button-link-background-pressed); }
-.luxiSu-link:focus-visible { outline: 1px solid var(--color-component-button-link-focus-ring); outline-offset: 2px; }
+.luxiSu-notnow:hover { background: var(--luxi-color-component-signup-not-now-background-hover); color: var(--color-text-primary); }
+.luxiSu-link { color: var(--luxi-color-component-signup-link-text-default); text-decoration: underline; text-underline-offset: 4px; border-radius: 4px; transition: color .15s, background-color .15s; }
+.luxiSu-link:hover:not(:disabled) { color: var(--luxi-color-component-signup-link-text-hover); background: var(--luxi-color-component-signup-link-background-hover); }
+.luxiSu-link:active:not(:disabled) { color: var(--luxi-color-component-signup-link-text-pressed); background: var(--luxi-color-component-signup-link-background-pressed); }
+.luxiSu-link:focus-visible { outline: 1px solid var(--luxi-color-component-signup-link-focus-ring); outline-offset: 2px; }
 .luxiSu-link:disabled { color: var(--color-text-secondary); text-decoration: none; } /* the countdown ("Resend in 30s") is information the parent reads, so it stays legible (7.81:1) rather than disabled grey (2.6:1, exempt but reads as a fail) */
 .luxiFb-notnow { transition: background .15s; }
-.luxiFb-notnow:hover { background: var(--brand-lilac-50); }
+.luxiFb-notnow:hover { background: var(--luxi-color-component-feedback-not-now-background-hover); }
 
 /* Settings sheet buttons = Datum Button variants (button.tsx), values by token name.
    ghost (Sign out): Iris 600 text · hover Lilac 100 · pressed Iris 200 + Iris 800 text · press scale .97.

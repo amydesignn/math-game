@@ -32,8 +32,8 @@
  */
 import { useState, useEffect, useRef } from 'react'
 
-const FACE = 'var(--brand-iris-500)', // Luxi 3D button face (white 4.56:1)
-  SHADOW = 'var(--brand-iris-700)'
+const FACE = 'var(--luxi-color-component-button3d-primary-background)', // Luxi 3D button face (white 4.56:1)
+  SHADOW = 'var(--luxi-color-component-button3d-primary-shadow)'
 const TYPE = {
   xs: { fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)' },
   sm: { fontSize: 'var(--text-sm)', lineHeight: 'var(--text-sm--line-height)' },
@@ -76,7 +76,7 @@ const S = {
   scrim: {
     position: 'absolute',
     inset: 0,
-    background: 'color-mix(in srgb, var(--brand-lilac-950) 50%, transparent)',
+    background: 'var(--luxi-color-component-form-modal-scrim)',
     backdropFilter: 'blur(6px)',
     WebkitBackdropFilter: 'blur(6px)',
     animation: 'scrimIn .25s ease-out both',
@@ -85,7 +85,7 @@ const S = {
     position: 'relative',
     width: '100%',
     background: 'var(--color-background-base)',
-    border: '1.5px solid color-mix(in srgb, var(--brand-lilac-950) 10%, transparent)',
+    border: '1.5px solid var(--luxi-color-component-form-modal-border)',
     borderRadius: 24,
     boxShadow: '0 24px 60px rgba(50,38,80,.32), 0 4px 16px rgba(50,38,80,.14)',
     overflow: 'hidden',
@@ -96,8 +96,8 @@ const S = {
     alignItems: 'center',
     gap: 8,
     padding: '16px 24px',
-    background: 'linear-gradient(180deg, var(--brand-lilac-50), var(--color-background-base))',
-    borderBottom: '1px solid var(--brand-lilac-100)',
+    background: 'linear-gradient(180deg, var(--luxi-color-component-form-modal-header-background-start), var(--color-background-base))',
+    borderBottom: '1px solid var(--luxi-color-component-modal-header-border)',
   },
   headerLabel: {
     ...TYPE.xs,
@@ -240,7 +240,7 @@ export default function SignupModal({
                 width: 64,
                 height: 64,
                 borderRadius: '50%',
-                background: 'linear-gradient(160deg, var(--brand-lilac-100), var(--brand-iris-100))',
+                background: 'linear-gradient(160deg, var(--luxi-color-component-signup-badge-background-start), var(--luxi-color-component-signup-badge-background-end))',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -381,7 +381,7 @@ export default function SignupModal({
                   width: 64,
                   height: 64,
                   borderRadius: '50%',
-                  background: 'var(--brand-lilac-50)',
+                  background: 'var(--luxi-color-component-signup-inbox-badge-background)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -408,7 +408,7 @@ export default function SignupModal({
                   gap: 8,
                   marginTop: 8,
                   paddingTop: 16,
-                  borderTop: '1px solid var(--brand-lilac-100)',
+                  borderTop: '1px solid var(--luxi-color-component-signup-resend-divider)',
                 }}
               >
                 <span style={{ ...TYPE.sm, color: 'var(--color-text-secondary)', fontWeight: W.normal }}>Didn&rsquo;t get the email?</span>
@@ -465,7 +465,7 @@ export function SavedToast({ onDone, duration = 3200 }) {
           alignItems: 'center',
           gap: 12,
           background: 'var(--color-background-base)',
-          border: '1.5px solid color-mix(in srgb, var(--brand-lilac-950) 10%, transparent)',
+          border: '1.5px solid var(--luxi-color-component-signup-toast-border)',
           borderRadius: 16,
           boxShadow: '0 16px 40px rgba(50,38,80,.24)',
           padding: '12px 20px 12px 16px',
