@@ -473,16 +473,16 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
 .luxiOb-pages { display: grid; padding: 24px 24px 0; }
 .luxiOb-page { grid-area: 1 / 1; opacity: 0; }
 .luxiOb-page[data-active="true"] { opacity: 1; }
-.luxiOb-num { width: 48px; height: 48px; border-radius: 50%; background: #EDE7FC; color: #5B4B9E; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; }
+.luxiOb-num { width: 48px; height: 48px; border-radius: 50%; background: var(--brand-lilac-100); color: var(--brand-lilac-800); font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex: none; }
 /* About: the 3 kid lines (body 16) + the parent small print (supporting 14) */
 .luxiOb-lines { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
-.luxiOb-lines li { font-size: 16px; font-weight: 600; color: #262626; line-height: 1.5; text-wrap: pretty; }
+.luxiOb-lines li { font-size: 16px; font-weight: 600; color: var(--color-text-primary); line-height: 1.5; text-wrap: pretty; }
 .luxiOb-small { margin: 16px 0 0; font-size: 14px; font-weight: 400; color: #6E6685; line-height: 1.5; text-wrap: pretty; }
 /* dots: the slot keeps its 8px height on About (no dots) so nothing moves */
 .luxiOb-dots { display: flex; gap: 8px; align-items: center; justify-content: center; height: 8px; padding: 24px 24px 0; box-sizing: content-box; }
-.luxiOb-dot { height: 8px; width: 8px; border-radius: 99px; background: #EDE7FC; }
-.luxiOb-dot[data-state="current"] { width: 24px; background: #4B54DD; }
-.luxiOb-dot[data-state="past"] { background: #C6B4F0; }
+.luxiOb-dot { height: 8px; width: 8px; border-radius: 99px; background: var(--brand-lilac-100); }
+.luxiOb-dot[data-state="current"] { width: 24px; background: var(--brand-iris-600); }
+.luxiOb-dot[data-state="past"] { background: var(--brand-lilac-300); }
 /* Short screens (phone landscape 812×375): a 230-tall image would fill the whole
    scroll area and hide the words, so the box shrinks to 96 tall (still 16:9,
    centred) and the title starts in view; the rest scrolls under a fixed ✕. */
@@ -565,20 +565,24 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
 .luxiOb-close:hover { background: #E1DEEA; }
 /* footer "Back" (ghost button) */
 .luxiOb-back { background: transparent; color: #6E6685; font-size: 15px; font-weight: 600; line-height: 24px; padding: 12px 16px; border: 0; border-radius: 12px; cursor: pointer; transition: background .15s ease, color .15s ease; }
-.luxiOb-back:hover { background: #F1EEF9; color: #262626; }
+.luxiOb-back:hover { background: #F1EEF9; color: var(--color-text-primary); }
 /* footer primary — "Next" and the final CTA share this look (padding set inline) */
-.luxiOb-cta { padding: 12px 24px; line-height: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #6169E0; color: #fff; font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 #3D43BE; cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
+.luxiOb-cta { padding: 12px 24px; line-height: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--brand-iris-500); color: var(--color-text-on-brand); font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 var(--brand-iris-700); cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
 .luxiOb-cta:hover { filter: brightness(1.04); }
-.luxiOb-close:focus-visible, .luxiOb-back:focus-visible, .luxiOb-cta:focus-visible { outline: 2px solid #6169E0; outline-offset: 2px; }
-.luxiOb-cta:active { transform: translateY(4px); box-shadow: 0 0 0 #3D43BE; }
+/* House focus ring: 1px Iris 700, 2px out (the [role="dialog"] rule below already won on specificity — this just says the same thing). */
+.luxiOb-close:focus-visible, .luxiOb-back:focus-visible, .luxiOb-cta:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+.luxiOb-cta:active { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700); }
 
 /* ── Seasonal promo popup (src/ui/PromoPopup.jsx, 2026-10-15) ──
    Chrome is .luxiOb-*; these are only its new pieces. Interactive states here,
    not inline (inline beats :hover). 4px grid; press = the governed 4px snap. */
 .luxiPromo-sound { position: absolute; right: 12px; bottom: 12px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(29,23,48,.6); color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s ease; }
 .luxiPromo-sound:hover { background: rgba(29,23,48,.8); }
-.luxiPromo-sound:focus-visible, .luxiPromo-pick:focus-visible, .luxiPromo-treat:focus-visible { outline: 2px solid #6169E0; outline-offset: 2px; }
-.luxiPromo-pick { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; padding: 12px 24px; background: #F1EEF9; color: #262626; font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 #D6CFEA; cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, background .15s ease; }
+.luxiPromo-pick:focus-visible, .luxiPromo-treat:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+/* The sound button sits ON the clip, so an Iris 700 ring alone vanishes into the dark video (2.12:1, contrast audit 2026-10-20).
+   Same house ring, plus a white 2px halo filling the gap: the white reads on any frame, the Iris ring on the white. */
+[role="dialog"] .luxiPromo-sound:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; box-shadow: 0 0 0 3px var(--color-text-inverse); }
+.luxiPromo-pick { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; padding: 12px 24px; background: #F1EEF9; color: var(--color-text-primary); font-size: 15px; font-weight: 700; border: 0; border-radius: 12px; box-shadow: 0 4px 0 #D6CFEA; cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, background .15s ease; }
 .luxiPromo-pick:hover { background: #E8E3F5; }
 .luxiPromo-pick:active { transform: translateY(4px); box-shadow: 0 0 0 #D6CFEA; }
 .luxiPromo-treat { flex: 1; }

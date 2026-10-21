@@ -169,7 +169,7 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
       >
         {/* Header — same chrome as Onboarding: title + ✕ on the right */}
         <div style={{ padding: '16px 16px 16px 24px', background: 'linear-gradient(180deg,#E9E2FA,#F8F5FE)', borderBottom: '1px solid #E7E0F3', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <span style={{ fontSize: 20, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>Happy Halloween</span>
+          <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>Happy Halloween</span>
           <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>✕</button>
         </div>
 
@@ -206,7 +206,7 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
 
         {/* Copy — swaps from the question to the reveal */}
         <div style={{ padding: '24px 24px 8px' }} aria-live="polite">
-          <div id="promo-title" style={{ fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>{copy.title}</div>
+          <div id="promo-title" style={{ fontSize: 19, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>{copy.title}</div>
           <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{copy.body}</p>
           {pick && (
             // The chip the burst lands in: one gem per gem earned drops in,
@@ -223,7 +223,7 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
                   </span>
                 ))}
               </span>
-              <span aria-hidden="true" style={{ fontSize: 20, fontWeight: 700, color: '#262626', fontVariantNumeric: 'tabular-nums' }}>
+              <span aria-hidden="true" style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', fontVariantNumeric: 'tabular-nums' }}>
                 <span key={counted} className={counted ? 'luxiPromo-tick' : undefined} style={{ display: 'inline-block' }}>+{counted}</span> gems
               </span>
               <span className="sr-only">You got {promo.gems} gems</span>

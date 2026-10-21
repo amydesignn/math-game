@@ -58,7 +58,7 @@ import { onboardingPages } from '../onboardingCopy'
  *  never animationend (it stalls in hidden panes). Keep the two in sync. */
 export const OB_EXIT_MS = 200
 
-const TITLE = { fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }
+const TITLE = { fontSize: 19, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }
 const BODY = { margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }
 
 // Three twinkles around the gem: gem cyan + the card's lilac star (% of the stage).
@@ -198,7 +198,7 @@ export function OnboardingCard({ entry = 'first', onClose }) {
     >
       {/* Header — title + ✕ (the house header idiom; the ✕ is always visible). */}
       <div className="luxiOb-head">
-        <span id={titleId} style={{ fontSize: 20, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>
+        <span id={titleId} style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>
           {page.kind === 'about' ? page.title : 'How to Play'}
         </span>
         <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>
