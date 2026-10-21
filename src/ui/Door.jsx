@@ -221,18 +221,19 @@ function QuestCard({ quest }) {
 /* ── badge + status indicator — Datum styling-v0.21. Two components, two jobs:
    Badge 'new' = a fact about the CONTENT (the Beta amber, 6.84:1, top-right).
    Status indicator = a live state about HER ("Last played", 10.37:1, top-left):
-   a green dot that breathes (motion-pulse). Token names copied verbatim into index.css. ── */
+   a green dot that breathes (motion-pulse). Colours = Luxi's own door-badge / door-status
+   tokens (same values as Datum's, 10-21: no Datum component tokens on Luxi elements). ── */
 const pill = { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1, 4px)', height: 20, padding: '0 var(--space-2, 8px)', borderRadius: 9999, borderWidth: 1, borderStyle: 'solid', fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' }
 const badgeS = {
-  new: { background: 'var(--color-component-badge-new-background)', borderColor: 'var(--color-component-badge-new-border)', color: 'var(--color-component-badge-new-text)' },
+  new: { background: 'var(--luxi-color-component-door-badge-new-background)', borderColor: 'var(--luxi-color-component-door-badge-new-border)', color: 'var(--luxi-color-component-door-badge-new-text)' },
 }
 function Badge({ variant, children, style }) {
   return <span style={{ ...pill, ...badgeS[variant], ...style }}>{children}</span>
 }
 const indicatorS = {
-  live: { background: 'var(--color-component-status-indicator-background)', borderColor: 'var(--color-component-status-indicator-border)', color: 'var(--color-component-status-indicator-text)' },
+  live: { background: 'var(--luxi-color-component-door-status-indicator-background)', borderColor: 'var(--luxi-color-component-door-status-indicator-border)', color: 'var(--luxi-color-component-door-status-indicator-text)' },
   // 6px dot: Datum's size-1.5 (a documented 2px step); colour on `color` so the pulse ring matches (bg = currentColor)
-  dot: { width: 6, height: 6, borderRadius: 9999, flex: 'none', color: 'var(--color-component-status-indicator-live-dot)', background: 'currentColor' },
+  dot: { width: 6, height: 6, borderRadius: 9999, flex: 'none', color: 'var(--luxi-color-component-door-status-indicator-live-dot)', background: 'currentColor' },
 }
 function StatusIndicator({ children, style }) {
   return (
@@ -247,7 +248,9 @@ const corner = { position: 'absolute', top: 'var(--space-3, 12px)', zIndex: 2 }
 /* ── what's new — a full-bleed manual carousel (Amy 2026-10-06): the image fills
    the card, "What's new" + the tag ride on it as pills, one arrow each side, no
    pagination. No auto-rotate: it would need a pause control (WCAG 2.2.2) and a
-   moving card fights the quest strip for a kid's attention. Type = 14 + 12 only. ── */
+   moving card fights the quest strip for a kid's attention. Type = 14 + 12 only.
+   Off-screen slides are inert: out of the tab order AND the accessibility tree, so a
+   screen reader only meets the slide she can see (10-21). ── */
 const newS = {
   card: { position: 'relative', background: T.surface, borderRadius: 24, boxShadow: '0 2px 14px rgba(74,54,110,.07)', overflow: 'hidden', marginTop: 16, animation: 'doorPop .4s .03s ease-out both' },
   track: { display: 'flex', overflowX: 'auto', scrollSnapType: 'x mandatory', scrollbarWidth: 'none' },
@@ -282,7 +285,7 @@ function WhatsNew({ map, onPlay, onResume }) {
           const w = WORLDS.find((x) => x.id === u.world)
           const open = () => (u.world === map ? onResume?.() : onPlay?.(u.world))
           return (
-            <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`What's new, ${k + 1} of ${n}: ${isFresh(u) ? 'New, ' : ''}${u.title}`} tabIndex={k === i ? 0 : -1}>
+            <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`What's new, ${k + 1} of ${n}: ${isFresh(u) ? 'New, ' : ''}${u.title}`} tabIndex={k === i ? 0 : -1} inert={k !== i} aria-hidden={k !== i || undefined}>
               <span style={{ ...newS.media, ...(w ? worldThumb(w.tint) : null), position: 'relative' }}>
                 {w?.art && <img src={w.art} alt="" style={newS.img} loading="lazy" />}
                 {isFresh(u) && <Badge variant="new" style={{ ...corner, right: 'var(--space-3, 12px)' }}>New</Badge>}
