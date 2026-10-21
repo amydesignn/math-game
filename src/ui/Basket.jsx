@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { SEED_KINDS } from '../config'
 
 /*
@@ -12,11 +12,13 @@ import { SEED_KINDS } from '../config'
  */
 const kindOf = (id) => SEED_KINDS[id] || { name: 'Flowers', emoji: '🌼' }
 
-export function BasketButton({ total, onTap, className = '', buttonRef }) {
+export function BasketButton({ total, onTap, className = '', buttonRef, open = false }) {
   return (
     <button
       ref={buttonRef}
       aria-label={`Open your basket — ${total} harvested`}
+      aria-expanded={open}
+      aria-controls={open ? 'basket-card' : undefined}
       data-hint="basket"
       className={`hud-basket ${className}`}
       onPointerDown={(e) => e.stopPropagation()}
@@ -69,6 +71,14 @@ export function BasketButton({ total, onTap, className = '', buttonRef }) {
 
 export function BasketCard({ total, basket, onClose }) {
   const rows = Object.entries(basket).filter(([, n]) => n > 0)
+  const closeRef = useRef(null)
+  // keyboard: focus lands in the card when it opens; Escape closes it
+  useEffect(() => {
+    closeRef.current?.focus()
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
   return (
     <>
       {/* invisible scrim: a tap anywhere else closes the card (and never walks her) */}
@@ -80,6 +90,7 @@ export function BasketCard({ total, basket, onClose }) {
         style={{ position: 'absolute', inset: 0 }}
       />
       <div
+        id="basket-card"
         role="dialog"
         aria-label="Your basket"
         className="basket-card"
@@ -95,14 +106,20 @@ export function BasketCard({ total, basket, onClose }) {
           background: '#ffffff',
           boxShadow: '0 12px 32px rgba(43,32,90,0.22)',
           transformOrigin: 'bottom left',
+          // above the GardenBar: on an iPad held upright (768px) the bar's hint pill
+          // reached in over the card's last row. The card is what she just opened.
+          zIndex: 1,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1, textTransform: 'uppercase', color: 'var(--brand-iris-700)' }}>Your basket</span>
+          {/* the house 12 caps eyebrow (= the Gem Shop's SectionLabel) */}
+          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--color-text-brand)' }}>Your basket</span>
           <button
+            ref={closeRef}
             aria-label="Close your basket"
             onClick={onClose}
-            style={{ width: 40, height: 40, borderRadius: 999, border: 'none', background: 'var(--brand-lilac-100)', color: 'var(--brand-lilac-900)', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}
+            // the ✕ is a WCAG glyph → neutral icon token, not Lilac (decoration only) — same as the Gem Shop's close
+            style={{ width: 40, height: 40, borderRadius: 999, border: 'none', background: 'var(--color-background-brand-subtle)', color: 'var(--color-icon-secondary)', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}
           >
             ✕
           </button>
@@ -119,7 +136,7 @@ export function BasketCard({ total, basket, onClose }) {
             {rows.map(([id, n]) => {
               const k = kindOf(id)
               return (
-                <li key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 16, color: 'var(--neutral-800)' }}>
+                <li key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 16, color: 'var(--color-text-primary)' }}>
                   <span style={{ fontSize: 20 }} aria-hidden>{k.emoji}</span>
                   <span style={{ flex: 1, fontWeight: 600 }}>{k.name}</span>
                   <span style={{ fontWeight: 800, color: 'var(--brand-iris-900)' }}>× {n}</span>
@@ -128,7 +145,7 @@ export function BasketCard({ total, basket, onClose }) {
             })}
           </ul>
         ) : (
-          <p style={{ margin: '12px 0 0', fontSize: 14, lineHeight: 1.45, color: 'var(--neutral-600)' }}>
+          <p style={{ margin: '12px 0 0', fontSize: 14, lineHeight: 1.45, color: 'var(--color-text-secondary)' }}>
             Empty for now. Grow flowers in Sunny Town and pick them to fill it 🌱
           </p>
         )}
@@ -140,10 +157,14 @@ export function BasketCard({ total, basket, onClose }) {
 /** Button + card together, owning the open state. */
 export default function Basket({ total, basket, className, buttonRef }) {
   const [open, setOpen] = useState(false)
+  const ownRef = useRef(null)
+  const btnRef = buttonRef || ownRef
+  // closing hands focus back to the button (keyboard users don't get lost)
+  const close = useCallback(() => { setOpen(false); btnRef.current?.focus({ preventScroll: true }) }, [btnRef])
   return (
     <>
-      {open && <BasketCard total={total} basket={basket} onClose={() => setOpen(false)} />}
-      <BasketButton total={total} className={className} buttonRef={buttonRef} onTap={() => setOpen((o) => !o)} />
+      {open && <BasketCard total={total} basket={basket} onClose={close} />}
+      <BasketButton total={total} open={open} className={className} buttonRef={btnRef} onTap={() => setOpen((o) => !o)} />
     </>
   )
 }

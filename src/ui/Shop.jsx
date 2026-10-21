@@ -86,7 +86,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
               unlocks with gems ONCE (tap → Unlock pill, the same two-tap buy as
               every shelf) and she plays as them right away. */}
           <SectionLabel>🦸 Heroes</SectionLabel>
-          <div style={{ ...grid, marginBottom: 6 }}>
+          <div role="group" aria-label="Heroes" style={{ ...grid, marginBottom: 6 }}>
             {HEROES.map((h) => {
               const isHers = h.price === 0 || ownedHeroes.includes(h.id)
               const isOn = character === h.id
@@ -95,15 +95,21 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
               return (
                 <button
                   key={h.id}
-                  onClick={() => {
+                  onClick={(e) => {
                     if (isOn) return
                     if (isHers) onChooseHero(h.id)
+                    // keyboard Enter/Space (detail 0) on an asked tile = the Unlock pill,
+                    // which is a span inside the button and can't take focus itself.
+                    // A tap off the pill still un-asks, as before.
+                    else if (isSel && e.detail === 0) { onBuyHero(h.id); setHeroSel(null) }
                     else if (affordable) setHeroSel(isSel ? null : h.id)
                   }}
                   aria-disabled={(!affordable || isOn) || undefined}
                   aria-pressed={isOn}
-                  aria-label={isHers ? h.name : `${h.name}, locked, ${h.price} gems`}
-                  style={{ ...tile(affordable), outline: isSel || isOn ? '3px solid var(--brand-iris-600)' : undefined }}
+                  aria-label={isHers ? h.name : isSel ? `Unlock ${h.name} for ${h.price} gems` : `${h.name}, locked, ${h.price} gems`}
+                  // selected/playing = an INSET Iris ring (border + inset shadow), not an
+                  // outline — the outline is left free for the 1px Iris 700 focus ring
+                  style={{ ...tile(affordable), ...(isSel || isOn ? { borderColor: 'var(--brand-iris-600)', boxShadow: 'inset 0 0 0 1px var(--brand-iris-600)' } : null) }}
                 >
                   <img
                     src={import.meta.env.BASE_URL + h.thumb}

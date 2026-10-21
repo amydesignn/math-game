@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { Analytics } from '@vercel/analytics/react'
-import App from './App.jsx'
+import App, { GardenBar } from './App.jsx'
 import { initStore } from './store.js'
 import { localBackend, supabaseBackend } from './backend.js'
 import { getSessionOnce, onAuthChange, sendMagicLink } from './auth.js'
@@ -14,6 +14,7 @@ import StationPopup from './ui/StationPopup.jsx'
 import MathPopup from './ui/MathPopup.jsx'
 import ProgressPopup from './ui/ProgressPopup.jsx'
 import Shop from './ui/Shop.jsx'
+import Basket from './ui/Basket.jsx'
 import LevelBar, { LevelUpPopup } from './ui/LevelBar.jsx'
 import { SKINS } from './ui/skins.js'
 import { TOPICS, solve } from './math.js'
@@ -547,6 +548,9 @@ function ProgressAudit() {
   )
 }
 function ShopAudit() {
+  // `&character=<id>&heroes=<id,id>` — who she's playing + which locked heroes she unlocked (a11y/heroes.audit.mjs)
+  const character = AUDIT_Q.get('character') || undefined
+  const ownedHeroes = AUDIT_Q.get('heroes')?.split(',').filter(Boolean) ?? []
   const owned = AUDIT_Q.has('owned') ? [
     { id: 'o1', asset: 'tree', pack: 'forest', size: 1 },
     { id: 'o2', asset: 'tent', pack: 'forest', size: 2 },
@@ -555,7 +559,28 @@ function ShopAudit() {
     <div data-audit-root style={{ position: 'fixed', inset: 0, background: 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
       <Shop gems={Number(AUDIT_Q.get('gems') ?? 4)} owned={owned}
         activeSparkle={AUDIT_Q.has('sparkle') ? { colorId: 'pink' } : null}
+        character={character} ownedHeroes={ownedHeroes} onBuyHero={() => {}} onChooseHero={() => {}}
         onBuy={() => {}} onBuySparkle={() => {}} onPlaceOwned={() => {}} onClose={() => {}} />
+    </div>
+  )
+}
+/*
+ * `/?a11y=garden&stage=…&gems=N[&full]` — Grow a Garden's DOM overlays: the 🧺 Basket
+ * (button + card; `full` = three kinds harvested, else empty) and the plot's GardenBar.
+ *   stage: plant (a seed, nothing planted) · noseed · grow (1 watering in) · bloom
+ * `gems` under the water cost (5) = the Water button disabled. (a11y/garden.audit.mjs)
+ */
+function GardenAudit() {
+  const stage = AUDIT_Q.get('stage') || 'plant'
+  const full = AUDIT_Q.has('full')
+  const garden = {
+    stage: { plant: null, noseed: null, grow: 1, bloom: 3 }[stage] ?? null,
+    seeds: stage === 'noseed' ? 0 : 1,
+  }
+  return (
+    <div data-audit-root style={{ position: 'fixed', inset: 0, background: 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
+      <Basket total={full ? 9 : 0} basket={full ? { starter: 4, pink: 3, yellow: 2 } : {}} />
+      <GardenBar garden={garden} gems={Number(AUDIT_Q.get('gems') ?? 12)} onPlant={() => {}} onWater={() => {}} onClose={() => {}} />
     </div>
   )
 }
@@ -573,13 +598,14 @@ const MATH_AUDIT =
 const PROGRESS_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'progress'
 const LEVEL_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'level'
 const SHOP_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'shop'
+const GARDEN_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'garden'
 const STATION_AUDIT =
   import.meta.env.DEV && new URLSearchParams(window.location.search).get('a11y') === 'station'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      {LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
+      {GARDEN_AUDIT ? <GardenAudit /> : LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
     </Oops>
     {/* Cookieless, privacy-friendly traffic counting (no personal data, no
       * consent banner needed) — the whole point of moving to a real domain. */}

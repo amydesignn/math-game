@@ -1602,7 +1602,7 @@ function MapToast({ name }) {
    sheet (the gear absorbed the standalone speaker on both the Door and the rail). */
 
 /** The garden's bar: what she can do for her plot right now (one main action). */
-function GardenBar({ garden, gems, onPlant, onWater, onClose }) {
+export function GardenBar({ garden, gems, onPlant, onWater, onClose }) {
   const hintKey = 'garden-bar' // data-hint: the hint layer can target / avoid it
   const close = { label: '✕', aria: 'Close', onTap: onClose }
   if (garden.stage == null) {
@@ -1637,6 +1637,10 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
         bottom: 'max(20px, env(safe-area-inset-bottom))',
         left: '50%',
         transform: 'translateX(-50%)',
+        // max-content: `left: 50%` alone capped the bar at half the screen, so on a phone
+        // "🌱 Plant your seed" wrapped out of its 46px pill (a11y/garden.audit.mjs, 2026-10-20)
+        width: 'max-content',
+        maxWidth: 'calc(100vw - 32px)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
