@@ -53,10 +53,10 @@ export function BasketButton({ total, onTap, className = '', buttonRef, open = f
             height: 24,
             padding: '0 8px',
             borderRadius: 999,
-            background: 'var(--brand-iris-600)',
-            color: 'var(--color-text-on-brand)',
-            fontSize: 12,
-            fontWeight: 700, // the 12 is a badge exception; house weight 700 (Amy, 2026-10-20)
+            background: 'var(--luxi-color-component-basket-count-background)',
+            color: 'var(--luxi-color-component-basket-count-text)',
+            fontSize: 'var(--luxi-component-basket-count-font-size)', // Luxi-own token, not Datum's Badge (Amy, 2026-10-20)
+            fontWeight: 'var(--luxi-component-basket-count-font-weight)',
             lineHeight: '24px',
             boxSizing: 'border-box',
             animation: 'gempop 0.45s ease-out',

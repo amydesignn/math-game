@@ -81,6 +81,13 @@
   --color-component-tooltip-background: #171717; /* neutral-900 */
   --color-component-tooltip-text: #FFFFFF; /* white */
   --color-text-inverse: #FFFFFF; /* white */
+  /* Luxi Math OWN component tokens (Amy, 2026-10-20) — the 🧺 basket count chip.
+     Luxi only, NOT Datum: Datum's Badge stays 12/500 (text-xs font-medium); this
+     chip is 12/700 for this one use, so the two never share a token. */
+  --luxi-component-basket-count-font-size: 12px;
+  --luxi-component-basket-count-font-weight: 700;
+  --luxi-color-component-basket-count-text: #FFFFFF; /* white, on brand-iris-600 = 5.81:1 */
+  --luxi-color-component-basket-count-background: #4B54DD; /* brand-iris-600 */
 
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */
