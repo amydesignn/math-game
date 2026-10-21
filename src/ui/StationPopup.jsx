@@ -37,7 +37,7 @@ function QuestSlots({ skin, total, done }) {
           <div key={i} style={{ width: 46, height: 46, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 24, lineHeight: 1,
             background: filled ? `${skin.accent}1e` : 'var(--color-background-subtle)',
-            border: filled ? `2px solid ${skin.accent}` : active ? `2px solid ${skin.accent}` : `2px dashed var(--neutral-300)`,
+            border: filled ? `2px solid ${skin.accent}` : active ? `2px solid ${skin.accent}` : `2px dashed var(--luxi-color-component-station-slot-border)`,
             boxShadow: active ? `0 0 0 5px ${skin.accent}22` : 'none',
             transition: 'all .25s' }}>
             {filled ? <span style={{ animation: 'slotFill .45s ease-out both' }}>{skin.marker}</span>
@@ -240,7 +240,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
               {/* the bonus moment — amber, ringed, visibly NOT the ordinary gem beat */}
               <div style={{ position: 'relative', width: 104, height: 104, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `3px solid ${T.amber}`, animation: 'bonusRing 1.1s ease-out .9s infinite' }} />
-                <div style={{ position: 'absolute', inset: 8, borderRadius: '50%', background: `${T.amber}1f` }} />
+                <div style={{ position: 'absolute', inset: 8, borderRadius: '50%', background: 'var(--luxi-color-component-station-bonus-halo)' }} />
                 <Gem size={76} style={{ animation: 'gemSpin .5s ease-out both', filter: `drop-shadow(0 0 14px ${T.amber}) drop-shadow(0 6px 14px rgba(217,119,6,.45))` }} />
               </div>
               <div style={{ textAlign: 'center' }}>
@@ -249,8 +249,8 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                 <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10 }}>
                   <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', fontWeight: 500, color: T.textPrimary,
                     background: 'var(--color-background-subtle)', border: `1px solid ${T.line}`, borderRadius: 12, padding: '7px 13px' }}>+{earned} <Gem size={16} /> earned</span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--amber-700)' /* amber-700 · AA on the cream chip */,
-                    background: '#FEF3E2', border: `1px solid #FDE0B8`, borderRadius: 12, padding: '7px 13px' }}>+{quest.bonus} <Gem size={16} /> bonus!</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--luxi-color-component-station-bonus-chip-text)' /* amber-700 · AA on the cream chip */,
+                    background: 'var(--luxi-color-component-station-bonus-chip-background)', border: '1px solid var(--luxi-color-component-station-bonus-chip-border)', borderRadius: 12, padding: '7px 13px' }}>+{quest.bonus} <Gem size={16} /> bonus!</span>
                 </div>
               </div>
               <BigButton tone="primary" onClick={() => close(true)} style={{ marginTop: 6, minWidth: 200 }}>Back to your world ✨</BigButton>
