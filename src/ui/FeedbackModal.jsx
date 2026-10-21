@@ -29,15 +29,15 @@
 import { useRef, useState } from 'react'
 
 // Datum tokens by name (Amy's map: Iris = text + anything WCAG; Lilac = supporting detail)
-const IRIS = 'var(--brand-iris-500)', // Luxi 3D button face (was iris-600 — the one primary off the Iris 500 spec; aligned 2026-10-05, Amy)
-  IRISD = 'var(--brand-iris-700)'
+const IRIS = 'var(--luxi-color-component-button3d-primary-background)', // Luxi 3D button face (was iris-600 — the one primary off the Iris 500 spec; aligned 2026-10-05, Amy)
+  IRISD = 'var(--luxi-color-component-button3d-primary-shadow)'
 const EMPTY = 'var(--color-border-interactive-default)' // neutral-500, 4.74:1 — an unselected star is a
 // RESTING control: a hollow outline in the same token as the textarea border (Amy, 2026-10-04).
 // each star a fixed happy hue, warming across the row and paying off on brand violet. (Oscar)
 // Darkened to Datum steps that reach WCAG non-text 3:1 on white — the stars are the
 // rating CONTROL, not decoration (Amy, 2026-10-04, option B: no brown yellow).
 // Star 5 moved Lilac → Iris so a 5-star rating never matches the empty star.
-const STARCOLORS = ['var(--red-500)', 'var(--orange-600)', 'var(--amber-600)', 'var(--amber-700)', 'var(--brand-iris-500)'] // 3.8 · 3.6 · 3.2 · 5.0 · 4.6
+const STARCOLORS = [1, 2, 3, 4, 5].map((n) => 'var(--luxi-color-component-feedback-star-' + n + ')') // 3.8 · 3.6 · 3.2 · 5.0 · 4.6
 const STARGLOW = STARCOLORS.map((c) => 'color-mix(in srgb, ' + c + ' 40%, transparent)')
 // caption per rating — playful, kid-voiced. index 0 = no rating yet. (Oscar, verbatim)
 const CAPTIONS = ['Tap the stars!', "Aw — we'll do better 🙏", 'Noted, thank you', "Glad you're here 🙂", 'Yay, thank you! 🎉', 'You love it?! 💜']
@@ -71,7 +71,7 @@ const primaryBtn = {
   ...TYPE.base,
   fontWeight: W.medium, // button labels = medium (Amy's weight rule)
   background: IRIS,
-  color: 'var(--brand-neutral-00)',
+  color: 'var(--luxi-color-component-button3d-primary-text)',
   boxShadow: '0 4px 0 ' + IRISD,
   cursor: 'pointer',
 }
@@ -123,15 +123,15 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
       onPointerDown={(e) => e.stopPropagation()}
       style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, fontFamily: "'Inter', system-ui, sans-serif" }}
     >
-      <div onClick={close} style={{ position: 'absolute', inset: 0, background: 'color-mix(in srgb, var(--brand-lilac-950) 50%, transparent)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', animation: 'scrimIn .25s ease-out both' }} />
+      <div onClick={close} style={{ position: 'absolute', inset: 0, background: 'var(--luxi-color-component-form-modal-scrim)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', animation: 'scrimIn .25s ease-out both' }} />
 
-      <div role="dialog" aria-modal="true" aria-labelledby="luxiFb-title" style={{ position: 'relative', width: 'min(400px, calc(100vw - 32px))', maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto', background: 'var(--brand-neutral-00)', border: '1.5px solid color-mix(in srgb, var(--brand-lilac-950) 10%, transparent)', borderRadius: 24, boxShadow: '0 24px 60px rgba(50,38,80,.32), 0 4px 16px rgba(50,38,80,.14)', animation: 'fbPopIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="luxiFb-title" style={{ position: 'relative', width: 'min(400px, calc(100vw - 32px))', maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto', background: 'var(--color-background-base)', border: '1.5px solid var(--luxi-color-component-form-modal-border)', borderRadius: 24, boxShadow: '0 24px 60px rgba(50,38,80,.32), 0 4px 16px rgba(50,38,80,.14)', animation: 'fbPopIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
         {/* header */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 24px', background: 'linear-gradient(180deg, var(--brand-lilac-50), var(--brand-neutral-00))', borderBottom: '1px solid var(--brand-lilac-100)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 24px', background: 'linear-gradient(180deg, var(--luxi-color-component-form-modal-header-background-start), var(--color-background-base))', borderBottom: '1px solid var(--luxi-color-component-modal-header-border)' }}>
           <span style={{ fontSize: 18, lineHeight: 1 }}>💬</span>
           <span id="luxiFb-title" style={{ ...TYPE.xs, fontWeight: W.bold, letterSpacing: 'var(--tracking-widest)', textTransform: 'uppercase', color: 'var(--color-text-brand)' }}>Feedback</span>
           <div style={{ flex: 1 }} />
-          <button aria-label="Close" onClick={close} className="luxiFb-close" style={{ border: 'none', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', color: 'var(--neutral-500)', fontSize: 16, lineHeight: 1 }}>
+          <button aria-label="Close" onClick={close} className="luxiFb-close" style={{ border: 'none', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', color: 'var(--color-icon-tertiary)', fontSize: 16, lineHeight: 1 }}>
             ✕
           </button>
         </div>
@@ -162,25 +162,25 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                   )
                 })}
               </div>
-              <div style={{ ...TYPE.base, fontWeight: W.medium, color: shown > 0 ? 'var(--color-text-brand)' : 'var(--brand-iris-500)', minHeight: 20, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
+              <div style={{ ...TYPE.base, fontWeight: W.medium, color: shown > 0 ? 'var(--color-text-brand)' : 'var(--luxi-color-component-feedback-caption-text-empty)', minHeight: 20, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
             </div>
 
-            <div style={{ height: 1, background: 'var(--brand-lilac-100)' }} />
+            <div style={{ height: 1, background: 'var(--luxi-color-component-feedback-divider)' }} />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={fieldLabel}>
                 What do you love? <span style={optionalTag}>(optional)</span>
               </div>
-              <textarea placeholder="My favorite thing is…" value={liked} onChange={(e) => setLiked(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.base, fontWeight: W.normal, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
-              <div style={{ textAlign: 'right', ...TYPE.sm, fontWeight: W.medium, color: likedLeft <= 40 ? 'var(--amber-700)' : 'var(--color-text-tertiary)' }}>{likedLeft} characters left</div>
+              <textarea placeholder="My favorite thing is…" value={liked} onChange={(e) => setLiked(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.base, fontWeight: W.normal, color: 'var(--color-text-primary)', background: 'var(--color-background-interactive-default)', fontFamily: 'inherit' }} />
+              <div style={{ textAlign: 'right', ...TYPE.sm, fontWeight: W.medium, color: likedLeft <= 40 ? 'var(--luxi-color-component-feedback-counter-text-warning)' : 'var(--color-text-tertiary)' }}>{likedLeft} characters left</div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={fieldLabel}>
                 What could be better? <span style={optionalTag}>(optional)</span>
               </div>
-              <textarea placeholder="I wish Luxi…" value={improve} onChange={(e) => setImprove(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.base, fontWeight: W.normal, color: 'var(--neutral-800)', background: 'var(--brand-neutral-00)', fontFamily: 'inherit' }} />
-              <div style={{ textAlign: 'right', ...TYPE.sm, fontWeight: W.medium, color: improveLeft <= 40 ? 'var(--amber-700)' : 'var(--color-text-tertiary)' }}>{improveLeft} characters left</div>
+              <textarea placeholder="I wish Luxi…" value={improve} onChange={(e) => setImprove(e.target.value.slice(0, 500))} maxLength={500} rows={2} className="luxiFb-ta" style={{ width: '100%', resize: 'none', borderRadius: 12, padding: '12px 16px', ...TYPE.base, fontWeight: W.normal, color: 'var(--color-text-primary)', background: 'var(--color-background-interactive-default)', fontFamily: 'inherit' }} />
+              <div style={{ textAlign: 'right', ...TYPE.sm, fontWeight: W.medium, color: improveLeft <= 40 ? 'var(--luxi-color-component-feedback-counter-text-warning)' : 'var(--color-text-tertiary)' }}>{improveLeft} characters left</div>
             </div>
 
             {/* no-PII guardrail (LOCKED copy — baked into the contract) */}
@@ -199,7 +199,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                 // disabled = a RESTING control → neutral (Amy's rule). The label is an instruction, so it
                 // stays readable: text-secondary on bg-interactive-disabled = 7.17:1.
                 background: canSend ? IRIS : 'var(--color-background-interactive-disabled)',
-                color: canSend ? 'var(--brand-neutral-00)' : 'var(--color-text-disabled)',
+                color: canSend ? 'var(--luxi-color-component-button3d-primary-text)' : 'var(--color-text-disabled)',
                 boxShadow: canSend ? '0 4px 0 ' + IRISD : '0 4px 0 var(--color-border-disabled)',
                 cursor: canSend ? 'pointer' : 'default',
               }}
@@ -212,7 +212,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
         {/* ── THANK YOU ── */}
         {phase === 'thanks' && (
           <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center' }}>
-            <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(160deg, var(--brand-lilac-100), var(--brand-lilac-200))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, animation: 'fbPop .5s cubic-bezier(.2,.9,.3,1.3) both' }}>💎</div>
+            <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(160deg, var(--luxi-color-component-feedback-thanks-badge-background-start), var(--luxi-color-component-feedback-thanks-badge-background-end))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, animation: 'fbPop .5s cubic-bezier(.2,.9,.3,1.3) both' }}>💎</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={heading}>Thanks for the idea!</div>
               <div style={{ ...TYPE.base, fontWeight: W.normal, color: 'var(--color-text-secondary)', textWrap: 'pretty' }}>Your feedback goes straight to the team building Luxi. Keep exploring! ✨</div>
@@ -226,7 +226,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
         {/* ── GENTLE FAILURE — never blocks play, never loses text ── */}
         {phase === 'fail' && (
           <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center' }}>
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--orange-50)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30 }}>🌙</div>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--luxi-color-component-feedback-error-badge-background)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30 }}>🌙</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={heading}>We'll try again in a bit</div>
               <div style={{ ...TYPE.base, fontWeight: W.normal, color: 'var(--color-text-secondary)', textWrap: 'pretty' }}>Couldn't send just now — your idea is safe and nothing's lost. You can keep playing.</div>
