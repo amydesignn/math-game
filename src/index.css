@@ -341,6 +341,24 @@
   --luxi-color-component-hint-toast-lucky-background-start: #973C00; /* amber-800 — the lucky pill (was Datum badge-new-text) */
   --luxi-color-component-hint-toast-lucky-background-end: color-mix(in srgb, #973C00 82%, #000); /* amber-800 darkened 18% */
 
+  /* ---- luxi govern S1 10-21: Door footer + the popup shell (Footer.jsx · mathkit MODAL) ----
+     Footer values unchanged from Oscar's comp (off-ramp lilac greys on his #1D1730 ink) — now named. */
+  --luxi-color-component-footer-background: #1D1730; /* off-ramp ink */
+  --luxi-color-component-footer-text: #C9C2E0; /* off-ramp lilac grey — 10.08:1 on the bar */
+  --luxi-color-component-footer-text-hover: #FFFFFF; /* white */
+  --luxi-color-component-footer-brand-text: #FFFFFF; /* white */
+  --luxi-color-component-footer-tagline-text: #ADA4CB; /* off-ramp — 7.35:1 */
+  --luxi-color-component-footer-heading-text: #A79DC4; /* off-ramp — 6.79:1 */
+  --luxi-color-component-footer-legal-text: #9990B3; /* off-ramp — 5.75:1 */
+  --luxi-color-component-footer-divider: rgba(255,255,255,.08); /* white @ 8% */
+  --luxi-color-component-footer-social-background: rgba(255,255,255,.06); /* white @ 6% */
+  --luxi-color-component-footer-social-background-hover: rgba(255,255,255,.14); /* white @ 14% */
+  --luxi-color-component-footer-focus-ring: #A9ADEE; /* brand-iris-300 — 8.13:1 on the bar */
+  /* the popup shell (mathkit Modal — Math, Station, Progress, Level popups) */
+  --luxi-color-component-popup-scrim: rgba(56,42,82,.44); /* off-ramp ink #382A52 @ 44% */
+  --luxi-color-component-popup-border: rgba(74,54,110,.10); /* off-ramp ink #4A366E @ 10% */
+  --luxi-shadow-popup: 0 24px 60px rgba(50,38,80,.30), 0 4px 16px rgba(50,38,80,.13);
+
   /* ---- luxi skins 10-21: the six station skins + the lucky skin (skins.js) ----
      accent = slots, rings, tints, the 3D ring/orb (fails AA on white — never text)
      glow   = the 3D orb's face
@@ -416,6 +434,7 @@
   --text-xs: 0.75rem;   --text-xs--line-height: 1.5;   /* 12px */
   --text-sm: 0.875rem;  --text-sm--line-height: 1.5;   /* 14px */
   --text-base: 1rem;    --text-base--line-height: 1.5; /* 16px */
+  --text-lg: 1.125rem;  --text-lg--line-height: 1.5;   /* 18px — Datum text-lg (footer brand name) */
   --text-xl: 1.25rem;   --text-xl--line-height: 1.5;   /* 20px */
   /* game display — equation + keypad (Amy 2026-10-05: on Datum's full scale) */
   --text-2xl: 1.5rem;   --text-2xl--line-height: 1.25; /* 24px */
@@ -736,13 +755,20 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
  * :hover rule (Oscar's `style-hover` attribute isn't real CSS). Footer.jsx keeps
  * only the static geometry inline; every property that changes on hover is below. */
 .luxiFooter a { text-decoration: none; }
-.luxiFooter .lf-link { color: #C9C2E0; transition: color .12s ease; }
-.luxiFooter .lf-link:hover { color: #fff; }
-.luxiFooter .lf-muted { color: #C9C2E0; cursor: default; }
-.luxiFooter .lf-social { background: rgba(255,255,255,.06); color: #C9C2E0; transition: background .12s ease, color .12s ease; }
-.luxiFooter .lf-social:hover { background: rgba(255,255,255,.14); color: #fff; }
-.luxiFooter .lf-kenney { color: #9990B3; text-decoration: underline; text-underline-offset: 2px; transition: color .12s ease; }
-.luxiFooter .lf-kenney:hover { color: #fff; }
+/* colour hover = Datum's 150ms colour step on the strong ease-out (was .12s ease) */
+.luxiFooter .lf-link { color: var(--luxi-color-component-footer-text); transition: color 150ms var(--ease-out); }
+.luxiFooter .lf-link:hover { color: var(--luxi-color-component-footer-text-hover); }
+.luxiFooter .lf-muted { color: var(--luxi-color-component-footer-text); cursor: default; }
+.luxiFooter .lf-social { background: var(--luxi-color-component-footer-social-background); color: var(--luxi-color-component-footer-text); transition: background 150ms var(--ease-out), color 150ms var(--ease-out); }
+.luxiFooter .lf-social:hover { background: var(--luxi-color-component-footer-social-background-hover); color: var(--luxi-color-component-footer-text-hover); }
+.luxiFooter .lf-kenney { color: var(--luxi-color-component-footer-legal-text); text-decoration: underline; text-underline-offset: 2px; transition: color 150ms var(--ease-out); }
+.luxiFooter .lf-kenney:hover { color: var(--luxi-color-component-footer-text-hover); }
+/* keyboard focus (S1, 2026-10-21) — the footer's links had NO visible focus (12 'need review').
+   The house ring is Iris 700, 2.25:1 on this dark bar → the footer reads its own Iris 300
+   ring (8.13:1 on the bar, 5.34:1 on a hovered social disc). 1px, offset 2px = the house shape;
+   focus also takes the hover colour so the item itself lights up. */
+.luxiFooter :is(.lf-link, .lf-social, .lf-kenney):focus-visible { outline: 1px solid var(--luxi-color-component-footer-focus-ring); outline-offset: 2px; color: var(--luxi-color-component-footer-text-hover); }
+.luxiFooter .lf-social:focus-visible { background: var(--luxi-color-component-footer-social-background-hover); }
 
 /* ── Onboarding walkthrough (Oscar's "Luxi Onboarding" / "Onboarding Card"
    comps, lifted 2026-09-19 → src/ui/Onboarding.jsx) ──
