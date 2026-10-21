@@ -156,7 +156,7 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
       className="luxiOb-scrim"
       onPointerDown={(e) => e.stopPropagation()} // never fall through to the R3F canvas
       onClick={onClose}
-      style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(29,23,48,.5)', backdropFilter: 'blur(2px)', WebkitBackdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+      style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'var(--luxi-color-component-modal-scrim)', backdropFilter: 'blur(2px)', WebkitBackdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
     >
       <div
         ref={cardRef}
@@ -169,14 +169,14 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
         style={{ fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", width: '100%', maxWidth: 440, background: 'var(--color-background-base)', borderRadius: 24, overflow: 'hidden', boxShadow: '0 24px 60px rgba(74,54,110,.22), inset 0 0 0 1px rgba(255,255,255,.6)' }}
       >
         {/* Header — same chrome as Onboarding: title + ✕ on the right */}
-        <div style={{ padding: '16px 16px 16px 24px', background: 'linear-gradient(180deg,var(--brand-lilac-100),var(--brand-lilac-50))', borderBottom: '1px solid var(--brand-lilac-100)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ padding: '16px 16px 16px 24px', background: 'linear-gradient(180deg,var(--luxi-color-component-modal-header-background-start),var(--luxi-color-component-modal-header-background-end))', borderBottom: '1px solid var(--luxi-color-component-modal-header-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>Happy Halloween</span>
           <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>✕</button>
         </div>
 
         {/* The clip — 16:9 stage, same box as Onboarding's step media */}
         <div style={{ padding: '16px 16px 0' }}>
-          <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', background: '#2A2140' }}>
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9', borderRadius: 16, overflow: 'hidden', background: 'var(--luxi-color-component-video-letterbox)' }}>
             <video
               ref={videoRef}
               autoPlay={!reduceMotion}
@@ -213,7 +213,7 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
             // The chip the burst lands in: one gem per gem earned drops in,
             // tumbles and settles (staggered) with a twinkle; the number ticks
             // up +1 as each lands and pops. Motion: index.css .luxiPromo-*.
-            <div className="luxiPromo-gift" style={{ animationDelay: reduceMotion ? '0ms' : `${CHIP_START - 150}ms`, marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 12, padding: '8px 20px 8px 12px', borderRadius: 999, background: 'var(--brand-lilac-50)', border: '1px solid var(--brand-lilac-100)' }}>
+            <div className="luxiPromo-gift" style={{ animationDelay: reduceMotion ? '0ms' : `${CHIP_START - 150}ms`, marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 12, padding: '8px 20px 8px 12px', borderRadius: 999, background: 'var(--luxi-color-component-reward-chip-background)', border: '1px solid var(--luxi-color-component-reward-chip-border)' }}>
               <span style={{ display: 'inline-flex', gap: 4 }} aria-hidden="true">
                 {Array.from({ length: promo.gems }, (_, i) => (
                   <span key={i} className="luxiPromo-gem" style={{ animationDelay: `${chipDelay(i)}ms` }}>

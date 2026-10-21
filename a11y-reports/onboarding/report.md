@@ -1,6 +1,6 @@
 # Contrast audit — Onboarding
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Onboarding.jsx` · **Run:** 2026-10-21 00:59 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Onboarding.jsx` · **Run:** 2026-10-21 03:00 UTC  
 **Variants:** First run (About + steps), Settings → How to Play · **Phases:** about → step-1 → step-2 → step-3
 
 > **75 unique checks · 71 pass · 0 fail · 0 exempt (disabled) · 0 need review**

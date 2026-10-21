@@ -89,6 +89,39 @@
   --luxi-color-component-basket-count-text: #FFFFFF; /* white, on brand-iris-600 = 5.81:1 */
   --luxi-color-component-basket-count-background: #4B54DD; /* brand-iris-600 */
 
+  /* Luxi Math OWN tokens — onboarding + promo chrome (Amy 2026-10-20)
+     Luxi elements never use Datum COMPONENT tokens (--color-component-*) or raw
+     primitives at the use site: Datum semantic tokens directly, else one of these. */
+  --luxi-color-focus-ring: #3D43BE; /* brand-iris-700 — the 1px house ring */
+  --luxi-color-component-modal-header-background-start: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-modal-header-background-end: #F6F2FF; /* brand-lilac-50 */
+  --luxi-color-component-modal-header-border: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-modal-close-background-default: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-modal-close-background-hover: #DDD1F7; /* brand-lilac-200 */
+  --luxi-color-component-modal-back-background-hover: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-stepper-dot-upcoming: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-stepper-dot-current: #4B54DD; /* brand-iris-600 */
+  --luxi-color-component-stepper-dot-done: #C6B4F0; /* brand-lilac-300 */
+  --luxi-color-component-button3d-primary-background: #6169E0; /* brand-iris-500 */
+  --luxi-color-component-button3d-primary-text: #FFFFFF; /* white */
+  --luxi-color-component-button3d-primary-shadow: #3D43BE; /* brand-iris-700 */
+  --luxi-color-component-button3d-secondary-background: #EDE7FC; /* brand-lilac-100 */
+  --luxi-color-component-button3d-secondary-background-hover: #DDD1F7; /* brand-lilac-200 */
+  --luxi-color-component-button3d-secondary-text: #262626; /* neutral-800 */
+  --luxi-color-component-button3d-secondary-shadow: #C6B4F0; /* brand-lilac-300 */
+  --luxi-color-component-reward-chip-background: #F6F2FF; /* brand-lilac-50 */
+  --luxi-color-component-reward-chip-border: #EDE7FC; /* brand-lilac-100 */
+  /* off-ramp values kept exactly as they render (no Datum step matches) — named so they live in one place */
+  --luxi-color-component-modal-scrim: rgba(29,23,48,.5); /* off-ramp ink #1D1730 @ 50% */
+  --luxi-color-component-media-placeholder-start: #EDE7FB; /* off-ramp, ≈ brand-lilac-100 */
+  --luxi-color-component-media-placeholder-end: #E3DBF7; /* off-ramp, between brand-lilac-100 and -200 */
+  --luxi-color-component-gem-stage-center: #F6F1FF; /* off-ramp, ≈ brand-lilac-50 */
+  --luxi-color-component-gem-stage-mid: #ECE4FB; /* off-ramp, ≈ brand-lilac-100 */
+  --luxi-color-component-gem-stage-edge: #E4D9F6; /* off-ramp, between brand-lilac-100 and -200 */
+  --luxi-color-component-video-letterbox: #2A2140; /* off-ramp, ≈ brand-lilac-950 */
+  --luxi-color-component-media-button-background: rgba(29,23,48,.6); /* off-ramp ink #1D1730 @ 60% — the sound button on the clip */
+  --luxi-color-component-media-button-background-hover: rgba(29,23,48,.8); /* off-ramp ink #1D1730 @ 80% */
+
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */
   --color-background-subtle: #FAFAFA; /* neutral-50 */
@@ -466,20 +499,20 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
 /* Layout (Linden, rebuilt 2026-10-18). The card rules are scoped to .luxiOb-frame so the Halloween promo (which reuses .luxiOb-card) keeps its own layout. Static only: NO transition or
    animation in this block — motion on these hooks is Fern's (see the header of
    Onboarding.jsx for the data-attr contract). */
-.luxiOb-scrim { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(29,23,48,.5); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+.luxiOb-scrim { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--luxi-color-component-modal-scrim); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
 .luxiOb-scrim[data-state="closing"] { pointer-events: none; }
 .luxiOb-frame { width: 100%; max-width: 440px; }
 .luxiOb-frame > .luxiOb-card { display: flex; flex-direction: column; width: 100%; max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); background: var(--color-background-base); border-radius: 24px; overflow: hidden; box-shadow: 0 24px 60px rgba(74,54,110,.22), inset 0 0 0 1px rgba(255,255,255,.6); font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
 .luxiOb-card:focus { outline: none; } /* focused on open so Tab starts inside + the title is announced; a container, not a control */
-.luxiOb-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 16px 16px 24px; background: linear-gradient(180deg,var(--brand-lilac-100),var(--brand-lilac-50)); border-bottom: 1px solid var(--brand-lilac-100); }
+.luxiOb-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 16px 16px 24px; background: linear-gradient(180deg,var(--luxi-color-component-modal-header-background-start),var(--luxi-color-component-modal-header-background-end)); border-bottom: 1px solid var(--luxi-color-component-modal-header-border); }
 /* the only part that scrolls (phone landscape): header + footer stay put */
 .luxiOb-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 .luxiOb-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px 24px; }
 /* ONE fixed 16:9 box; its lilac IS the calm placeholder for a media:null step */
-.luxiOb-mediaBox { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: linear-gradient(150deg,#EDE7FB,#E3DBF7); box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
+.luxiOb-mediaBox { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 16px; overflow: hidden; background: linear-gradient(150deg,var(--luxi-color-component-media-placeholder-start),var(--luxi-color-component-media-placeholder-end)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.5); }
 .luxiOb-media { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
 .luxiOb-media[data-active="true"] { opacity: 1; }
-.luxiOb-stage { display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 100% at 50% 30%, #F6F1FF 0%, #ECE4FB 62%, #E4D9F6 100%); }
+.luxiOb-stage { display: flex; align-items: center; justify-content: center; background: radial-gradient(120% 100% at 50% 30%, var(--luxi-color-component-gem-stage-center) 0%, var(--luxi-color-component-gem-stage-mid) 62%, var(--luxi-color-component-gem-stage-edge) 100%); }
 /* every page's text stacked in one cell → the block is as tall as the tallest */
 .luxiOb-pages { display: grid; padding: 24px 24px 0; }
 .luxiOb-page { grid-area: 1 / 1; opacity: 0; }
@@ -491,9 +524,9 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
 .luxiOb-small { margin: 16px 0 0; font-size: 14px; font-weight: 400; color: var(--color-text-secondary); line-height: 1.5; text-wrap: pretty; }
 /* dots: the slot keeps its 8px height on About (no dots) so nothing moves */
 .luxiOb-dots { display: flex; gap: 8px; align-items: center; justify-content: center; height: 8px; padding: 24px 24px 0; box-sizing: content-box; }
-.luxiOb-dot { height: 8px; width: 8px; border-radius: 99px; background: var(--brand-lilac-100); }
-.luxiOb-dot[data-state="current"] { width: 24px; background: var(--brand-iris-600); }
-.luxiOb-dot[data-state="past"] { background: var(--brand-lilac-300); }
+.luxiOb-dot { height: 8px; width: 8px; border-radius: 99px; background: var(--luxi-color-component-stepper-dot-upcoming); }
+.luxiOb-dot[data-state="current"] { width: 24px; background: var(--luxi-color-component-stepper-dot-current); }
+.luxiOb-dot[data-state="past"] { background: var(--luxi-color-component-stepper-dot-done); }
 /* Short screens (phone landscape 812×375): a 230-tall image would fill the whole
    scroll area and hide the words, so the box shrinks to 96 tall (still 16:9,
    centred) and the title starts in view; the rest scrolls under a fixed ✕. */
@@ -572,30 +605,30 @@ a.doorApp:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offs
   .luxiOb-twinkle { animation: none; opacity: .8; }
 }
 /* header close / back control */
-.luxiOb-close { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--color-background-brand-subtle); color: var(--color-icon-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none; transition: background .15s ease; }
-.luxiOb-close:hover { background: var(--brand-lilac-200); }
+.luxiOb-close { width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--luxi-color-component-modal-close-background-default); color: var(--color-icon-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; flex: none; transition: background .15s ease; }
+.luxiOb-close:hover { background: var(--luxi-color-component-modal-close-background-hover); }
 /* footer "Back" (ghost button) */
 .luxiOb-back { background: transparent; color: var(--color-text-secondary); font-size: 16px; font-weight: 500; line-height: 24px; padding: 12px 16px; border: 0; border-radius: 12px; cursor: pointer; transition: background .15s ease, color .15s ease; }
-.luxiOb-back:hover { background: var(--color-component-button-ghost-background-hover); color: var(--color-text-primary); }
+.luxiOb-back:hover { background: var(--luxi-color-component-modal-back-background-hover); color: var(--color-text-primary); }
 /* footer primary — "Next" and the final CTA share this look (padding set inline) */
-.luxiOb-cta { padding: 12px 24px; line-height: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--brand-iris-500); color: var(--color-text-on-brand); font-size: 16px; font-weight: 500; border: 0; border-radius: 12px; box-shadow: 0 4px 0 var(--brand-iris-700); cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
+.luxiOb-cta { padding: 12px 24px; line-height: 24px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--luxi-color-component-button3d-primary-background); color: var(--luxi-color-component-button3d-primary-text); font-size: 16px; font-weight: 500; border: 0; border-radius: 12px; box-shadow: 0 4px 0 var(--luxi-color-component-button3d-primary-shadow); cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
 .luxiOb-cta:hover { filter: brightness(1.04); }
 /* House focus ring: 1px Iris 700, 2px out (the [role="dialog"] rule below already won on specificity — this just says the same thing). */
-.luxiOb-close:focus-visible, .luxiOb-back:focus-visible, .luxiOb-cta:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
-.luxiOb-cta:active { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-iris-700); }
+.luxiOb-close:focus-visible, .luxiOb-back:focus-visible, .luxiOb-cta:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; }
+.luxiOb-cta:active { transform: translateY(4px); box-shadow: 0 0 0 var(--luxi-color-component-button3d-primary-shadow); }
 
 /* ── Seasonal promo popup (src/ui/PromoPopup.jsx, 2026-10-15) ──
    Chrome is .luxiOb-*; these are only its new pieces. Interactive states here,
    not inline (inline beats :hover). 4px grid; press = the governed 4px snap. */
-.luxiPromo-sound { position: absolute; right: 12px; bottom: 12px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(29,23,48,.6); color: var(--color-text-inverse); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s ease; }
-.luxiPromo-sound:hover { background: rgba(29,23,48,.8); }
-.luxiPromo-pick:focus-visible, .luxiPromo-treat:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; }
+.luxiPromo-sound { position: absolute; right: 12px; bottom: 12px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--luxi-color-component-media-button-background); color: var(--color-text-inverse); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background .15s ease; }
+.luxiPromo-sound:hover { background: var(--luxi-color-component-media-button-background-hover); }
+.luxiPromo-pick:focus-visible, .luxiPromo-treat:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; }
 /* The sound button sits ON the clip, so an Iris 700 ring alone vanishes into the dark video (2.12:1, contrast audit 2026-10-20).
    Same house ring, plus a white 2px halo filling the gap: the white reads on any frame, the Iris ring on the white. */
-[role="dialog"] .luxiPromo-sound:focus-visible { outline: 1px solid var(--brand-iris-700); outline-offset: 2px; box-shadow: 0 0 0 3px var(--color-text-inverse); }
-.luxiPromo-pick { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; padding: 12px 24px; background: var(--color-component-button-secondary-background-default); color: var(--color-text-primary); font-size: 16px; font-weight: 500; border: 0; border-radius: 12px; box-shadow: 0 4px 0 var(--brand-lilac-300); cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, background .15s ease; }
-.luxiPromo-pick:hover { background: var(--color-component-button-secondary-background-hover); }
-.luxiPromo-pick:active { transform: translateY(4px); box-shadow: 0 0 0 var(--brand-lilac-300); }
+[role="dialog"] .luxiPromo-sound:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; box-shadow: 0 0 0 3px var(--color-text-inverse); }
+.luxiPromo-pick { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; padding: 12px 24px; background: var(--luxi-color-component-button3d-secondary-background); color: var(--luxi-color-component-button3d-secondary-text); font-size: 16px; font-weight: 500; border: 0; border-radius: 12px; box-shadow: 0 4px 0 var(--luxi-color-component-button3d-secondary-shadow); cursor: pointer; transition: transform .08s ease, box-shadow .08s ease, background .15s ease; }
+.luxiPromo-pick:hover { background: var(--luxi-color-component-button3d-secondary-background-hover); }
+.luxiPromo-pick:active { transform: translateY(4px); box-shadow: 0 0 0 var(--luxi-color-component-button3d-secondary-shadow); }
 .luxiPromo-treat { flex: 1; }
 /* The treat (first-and-only view = the delight budget, so it goes BIG).
    CSS keyframes, not JS: the Door's R3F hero renders underneath, and CSS stays
