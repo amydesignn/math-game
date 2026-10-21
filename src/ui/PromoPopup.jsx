@@ -18,6 +18,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { GemIcon } from './hudkit'
+import { useDialogFocus } from './Onboarding'
 import { currentSeason } from '../season'
 import { holdMusic } from '../audio'
 
@@ -109,6 +110,7 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
   const [counted, setCounted] = useState(0) // the chip's number, ticking up as each gem lands
   const [burst, setBurst] = useState(false) // the big treat burst layer (unmounted once it's played)
   const videoRef = useRef(null)
+  const cardRef = useRef(null)
   const reduceMotion = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
   // The pick → the treat lands. The burst plays over the card, then the chip's
@@ -126,12 +128,9 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
     return () => timers.forEach(clearTimeout)
   }, [pick, reduceMotion, promo.gems])
 
-  // Escape closes, like the house's other modals.
-  useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  // Focus moves in on open, Tab stays inside, Escape closes, focus returns to
+  // the opener on close (WCAG 2.4.3 — Onboarding's shared hook).
+  useDialogFocus(cardRef, onClose)
 
   // The game's music steps aside while the clip has sound, and returns on close.
   useEffect(() => {
@@ -160,15 +159,17 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
       style={{ position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(29,23,48,.5)', backdropFilter: 'blur(2px)', WebkitBackdropFilter: 'blur(2px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
     >
       <div
+        ref={cardRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="promo-title"
         className="luxiOb-card"
         onClick={(e) => e.stopPropagation()}
-        style={{ fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", width: '100%', maxWidth: 440, background: '#fff', borderRadius: 24, overflow: 'hidden', boxShadow: '0 24px 60px rgba(74,54,110,.22), inset 0 0 0 1px rgba(255,255,255,.6)' }}
+        style={{ fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", width: '100%', maxWidth: 440, background: 'var(--color-background-base)', borderRadius: 24, overflow: 'hidden', boxShadow: '0 24px 60px rgba(74,54,110,.22), inset 0 0 0 1px rgba(255,255,255,.6)' }}
       >
         {/* Header — same chrome as Onboarding: title + ✕ on the right */}
-        <div style={{ padding: '16px 16px 16px 24px', background: 'linear-gradient(180deg,#E9E2FA,#F8F5FE)', borderBottom: '1px solid #E7E0F3', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ padding: '16px 16px 16px 24px', background: 'linear-gradient(180deg,var(--brand-lilac-100),var(--brand-lilac-50))', borderBottom: '1px solid var(--brand-lilac-100)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>Happy Halloween</span>
           <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>✕</button>
         </div>
@@ -206,13 +207,13 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
 
         {/* Copy — swaps from the question to the reveal */}
         <div style={{ padding: '24px 24px 8px' }} aria-live="polite">
-          <div id="promo-title" style={{ fontSize: 19, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>{copy.title}</div>
-          <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }}>{copy.body}</p>
+          <div id="promo-title" style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>{copy.title}</div>
+          <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.55, textWrap: 'pretty' }}>{copy.body}</p>
           {pick && (
             // The chip the burst lands in: one gem per gem earned drops in,
             // tumbles and settles (staggered) with a twinkle; the number ticks
             // up +1 as each lands and pops. Motion: index.css .luxiPromo-*.
-            <div className="luxiPromo-gift" style={{ animationDelay: reduceMotion ? '0ms' : `${CHIP_START - 150}ms`, marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 12, padding: '8px 20px 8px 12px', borderRadius: 999, background: '#F6F4FE', border: '1px solid #EEE9FB' }}>
+            <div className="luxiPromo-gift" style={{ animationDelay: reduceMotion ? '0ms' : `${CHIP_START - 150}ms`, marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 12, padding: '8px 20px 8px 12px', borderRadius: 999, background: 'var(--brand-lilac-50)', border: '1px solid var(--brand-lilac-100)' }}>
               <span style={{ display: 'inline-flex', gap: 4 }} aria-hidden="true">
                 {Array.from({ length: promo.gems }, (_, i) => (
                   <span key={i} className="luxiPromo-gem" style={{ animationDelay: `${chipDelay(i)}ms` }}>
