@@ -14,8 +14,9 @@
  *   <Onboarding entry={'first'|'howto'} onClose={fn} />
  *   · 'first' — About cover (gem stage, 3 kid lines + parent small print, no dot,
  *     no Back, one Next) → steps 1–3 with 3 dots; Back from step 1 → About.
- *     Closes on the ✕ ONLY (Amy's decision #5: a kid's stray tap on the scrim
- *     must not dismiss it at word zero).
+ *     Closes on the ✕ or Escape, never the scrim (Amy's decision #5: a kid's
+ *     stray tap on the scrim must not dismiss it at word zero; Escape is a
+ *     deliberate key, so it closes — Amy 2026-10-20, WCAG 2.4.3 pass).
  *   · 'howto' — Settings → How to Play: opens on step 1, 3 dots, no Back on
  *     step 1. The ✕, a scrim tap and Escape all close it.
  *   · The last step's "Let's play →" closes. There is no 4th card and no
@@ -58,8 +59,49 @@ import { onboardingPages } from '../onboardingCopy'
  *  never animationend (it stalls in hidden panes). Keep the two in sync. */
 export const OB_EXIT_MS = 200
 
-const TITLE = { fontSize: 19, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }
-const BODY = { margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: '#5C5470', lineHeight: 1.55, textWrap: 'pretty' }
+const TITLE = { fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }
+const BODY = { margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.55, textWrap: 'pretty' }
+
+const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+/**
+ * Modal focus (WCAG 2.4.3, Amy 2026-10-20) — shared with PromoPopup. On open,
+ * focus moves onto the dialog itself (`tabIndex={-1}` on it, so the title is
+ * announced and Tab starts inside); Tab / Shift+Tab wrap within it; Escape calls
+ * `onEscape`; on unmount focus goes back to whatever opened it (if it's still on
+ * the page — a sheet that closed behind the modal is simply skipped).
+ */
+export function useDialogFocus(ref, onEscape) {
+  const esc = useRef(onEscape)
+  esc.current = onEscape
+  useEffect(() => {
+    const box = ref.current
+    if (!box) return
+    const opener = document.activeElement
+    box.focus({ preventScroll: true })
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        esc.current?.()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const els = [...box.querySelectorAll(FOCUSABLE)].filter((el) => el.getClientRects().length > 0)
+      if (!els.length) return e.preventDefault()
+      const first = els[0]
+      const last = els[els.length - 1]
+      const at = document.activeElement
+      if (!box.contains(at)) { e.preventDefault(); first.focus() }
+      else if (e.shiftKey && (at === first || at === box)) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && at === last) { e.preventDefault(); first.focus() }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      if (opener?.isConnected && opener !== document.body) opener.focus?.({ preventScroll: true })
+    }
+  }, [ref])
+}
 
 // Three twinkles around the gem: gem cyan + the card's lilac star (% of the stage).
 const TWINKLES = [
@@ -153,7 +195,7 @@ function PageText({ page, stepNum }) {
 }
 
 /**
- * The card. Owns its own page cursor. `onClose` = the ✕ and the last CTA.
+ * The card. Owns its own page cursor. `onClose` = the ✕, Escape and the last CTA.
  */
 export function OnboardingCard({ entry = 'first', onClose }) {
   const pages = useMemo(() => onboardingPages(entry), [entry])
@@ -167,6 +209,8 @@ export function OnboardingCard({ entry = 'first', onClose }) {
   const isLast = i === pages.length - 1
   const titleId = `luxiOb-title-${entry}`
   const [still] = useState(prefersReducedMotion)
+  const cardRef = useRef(null)
+  useDialogFocus(cardRef, onClose)
 
   // Preload + decode every step image the moment the card opens (~50KB, during
   // the seconds she spends on the first page), so a fast Next never paints a
@@ -189,6 +233,8 @@ export function OnboardingCard({ entry = 'first', onClose }) {
 
   return (
     <div
+      ref={cardRef}
+      tabIndex={-1}
       className="luxiOb-card"
       role="dialog"
       aria-modal="true"
@@ -198,7 +244,7 @@ export function OnboardingCard({ entry = 'first', onClose }) {
     >
       {/* Header — title + ✕ (the house header idiom; the ✕ is always visible). */}
       <div className="luxiOb-head">
-        <span id={titleId} style={{ fontSize: 20, fontWeight: 700, color: '#262626', letterSpacing: '-.01em' }}>
+        <span id={titleId} style={TITLE}>
           {page.kind === 'about' ? page.title : 'How to Play'}
         </span>
         <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>
@@ -262,8 +308,8 @@ export function OnboardingCard({ entry = 'first', onClose }) {
 }
 
 /**
- * The modal: scrim + centred card. On 'first' only the ✕ closes (the scrim does
- * nothing — Amy's decision #5); on 'howto' the scrim and Escape close it too.
+ * The modal: scrim + centred card. The ✕ and Escape always close it (the card's
+ * useDialogFocus); the scrim closes only on 'howto' (Amy's decision #5).
  */
 export function Onboarding({ entry = 'first', onClose }) {
   const [state, setState] = useState('open')
@@ -279,12 +325,6 @@ export function Onboarding({ entry = 'first', onClose }) {
   useEffect(() => () => clearTimeout(timer.current), [])
 
   const dismissable = entry === 'howto'
-  useEffect(() => {
-    if (!dismissable) return
-    const onKey = (e) => { if (e.key === 'Escape') close() }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  })
 
   return (
     <div
