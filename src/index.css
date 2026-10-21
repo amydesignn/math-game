@@ -250,9 +250,9 @@
   --luxi-color-component-button3d-ghost-text: #4B54DD; /* brand-iris-600 */
   --luxi-color-component-button3d-ghost-border: #E4E5FA; /* brand-iris-100 */
   --luxi-color-component-button3d-ghost-shadow: #C9CBF5; /* brand-iris-200 */
-  --luxi-color-component-button3d-amber-background: #FE9A00; /* amber-500 */
-  --luxi-color-component-button3d-amber-text: #FFFFFF; /* white (2.1:1 on amber-500 — no caller uses this tone today) */
-  --luxi-color-component-button3d-amber-shadow: #D97706; /* off-ramp, ≈ amber-600 */
+  --luxi-color-component-button3d-amber-background: oklch(55.5% 0.163 48.998); /* amber-700 — same primitive as skin-bakery-ink (Amy 10-21) */
+  --luxi-color-component-button3d-amber-text: #FFFFFF; /* white — 5.03:1 on amber-700 (was 2.13 on amber-500) */
+  --luxi-color-component-button3d-amber-shadow: #973C00; /* amber-800 — one step under the face */
   --luxi-color-component-keypad-key-shadow: #D4D4D4; /* neutral-300 — the key's 3D edge */
   --luxi-color-component-gift-chip-background: #FFFBEB; /* amber-50 — was Datum badge-new */
   --luxi-color-component-gift-chip-border: #FEE685; /* amber-200 */
@@ -340,6 +340,34 @@
   --luxi-color-component-profile-upload-button-focus-ring: #333A98; /* brand-iris-800 */
   --luxi-color-component-hint-toast-lucky-background-start: #973C00; /* amber-800 — the lucky pill (was Datum badge-new-text) */
   --luxi-color-component-hint-toast-lucky-background-end: color-mix(in srgb, #973C00 82%, #000); /* amber-800 darkened 18% */
+
+  /* ---- luxi skins 10-21: the six station skins + the lucky skin (skins.js) ----
+     accent = slots, rings, tints, the 3D ring/orb (fails AA on white — never text)
+     glow   = the 3D orb's face
+     ink    = TEXT + text-bearing fills (eyebrow tag, QUEST badge). Inks keep the
+              primitive's exact oklch so nothing re-renders. accent + glow are read
+              as hex by the 3D station + minimap (skinColor() in skins.js) — keep them hex. */
+  --luxi-color-component-skin-feed-pet-accent: #00BBA7; /* teal-500 */
+  --luxi-color-component-skin-feed-pet-glow: #46ECD5; /* teal-300 */
+  --luxi-color-component-skin-feed-pet-ink: oklch(51.1% 0.096 186.391); /* teal-700 */
+  --luxi-color-component-skin-water-tree-accent: #00A63E; /* green-600 */
+  --luxi-color-component-skin-water-tree-glow: #7BF1A8; /* green-300 */
+  --luxi-color-component-skin-water-tree-ink: oklch(52.7% 0.154 150.069); /* green-700 */
+  --luxi-color-component-skin-bakery-accent: #E17100; /* amber-600 */
+  --luxi-color-component-skin-bakery-glow: #FFD230; /* amber-300 */
+  --luxi-color-component-skin-bakery-ink: oklch(55.5% 0.163 48.998); /* amber-700 */
+  --luxi-color-component-skin-flowers-accent: #F6339A; /* pink-500 */
+  --luxi-color-component-skin-flowers-glow: #FDA5D5; /* pink-300 */
+  --luxi-color-component-skin-flowers-ink: oklch(45.9% 0.187 3.815); /* pink-800 (Amy 10-05: +1 step for headroom) */
+  --luxi-color-component-skin-arcade-accent: #2B7FFF; /* blue-500 */
+  --luxi-color-component-skin-arcade-glow: #8EC5FF; /* blue-300 */
+  --luxi-color-component-skin-arcade-ink: oklch(48.8% 0.243 264.376); /* blue-700 */
+  --luxi-color-component-skin-star-party-accent: #00A6F4; /* sky-500 */
+  --luxi-color-component-skin-star-party-glow: #74D4FF; /* sky-300 */
+  --luxi-color-component-skin-star-party-ink: oklch(44.3% 0.11 240.79); /* sky-800 */
+  --luxi-color-component-skin-lucky-accent: #FE9A00; /* amber-500 */
+  --luxi-color-component-skin-lucky-glow: #FFE08A; /* off-ramp pastel yellow */
+  --luxi-color-component-skin-lucky-ink: #973C00; /* amber-800 — was Datum badge-new-text */
 
   /* surfaces · borders · icons — the shared popup kit (mathkit), styling-v0.20 */
   --color-background-base: #FFFFFF; /* white */

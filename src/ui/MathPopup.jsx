@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { solve } from '../math'
-import { SKINS } from './skins'
+import { SKINS, skinTint } from './skins'
 import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk, GiftWin } from './mathkit'
 import { HINT_COPY } from '../gameHintsCopy'
 import DivisionWalkthrough from './DivisionWalkthrough'
@@ -109,7 +109,7 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
         ) : (
           /* skin banner — the family header: scenario tint → white + a 1px divider */
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
-            background: `linear-gradient(180deg,${skin.accent}14,#fff)`, borderBottom: `1px solid ${T.line}` }}>
+            background: `linear-gradient(180deg in srgb,${skinTint(skin.accent, '14')},#fff)`, borderBottom: `1px solid ${T.line}` }}>
             <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
             <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
             <div style={{ flex: 1 }} />
@@ -170,7 +170,7 @@ function CorrectState({ skin, pay, onNext }) {
       padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
       <Sparkles colors={['#fff', skin.accent, T.irisSoft, T.tealLt]} n={16} />
       <div style={{ position: 'relative', width: 96, height: 96, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: `${skin.accent}22`,
+        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: skinTint(skin.accent, '22'),
           animation: 'ringpulse 1.4s ease-out infinite' }} />
         <Gem size={72} style={{ animation: 'gemSpin .5s ease-out both', filter: 'drop-shadow(0 6px 14px rgba(46,197,197,.4))' }} />
       </div>
