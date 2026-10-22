@@ -194,12 +194,14 @@ export default function SparkleTrail({ sparkle, charPosRef, onExpire }) {
       {aura.map((a, i) => <primitive key={'a' + i} object={a.sp} />)}
       <group ref={barGroup}>
         <Html center distanceFactor={9} style={{ pointerEvents: 'none', userSelect: 'none' }} zIndexRange={[11, 0]}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, whiteSpace: 'nowrap' }}>
-            <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: '#fff',
-              textShadow: '0 1px 3px rgba(40,30,70,.6)', fontFamily: 'Inter, system-ui, sans-serif' }}>sparkle</span>
-            <div style={{ width: 82, height: 9, borderRadius: 6, background: 'rgba(255,255,255,.45)', overflow: 'hidden',
-              boxShadow: 'inset 0 1px 2px rgba(40,30,70,.25)' }}>
-              <div ref={barFill} style={{ height: '100%', width: '100%', borderRadius: 6, background: barBg }} />
+          {/* S8: 4px grid (gap 3 → 4, bar 82×9 → 80×8, radius → full) · label 10.5 → --text-xs · colours by name.
+              barBg stays the sparkle's own SKU colour (product data shared with the 3D trail). */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--luxi-color-component-sparkle-bar-label-text)',
+              textShadow: 'var(--luxi-shadow-sparkle-bar-label)', fontFamily: 'Inter, system-ui, sans-serif' }}>sparkle</span>
+            <div style={{ width: 80, height: 8, borderRadius: 999, background: 'var(--luxi-color-component-sparkle-bar-track)', overflow: 'hidden',
+              boxShadow: 'var(--luxi-shadow-sparkle-bar-track)' }}>
+              <div ref={barFill} style={{ height: '100%', width: '100%', borderRadius: 999, background: barBg }} />
             </div>
           </div>
         </Html>

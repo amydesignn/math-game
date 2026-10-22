@@ -128,14 +128,15 @@ export default function Buddy({ profile, sim, emote }) {
         <Html position={[0, 2.15, 0]} center distanceFactor={11} style={{ pointerEvents: 'none' }}>
           <div
             style={{
-              padding: '3px 10px',
-              background: 'rgba(255,255,255,0.88)',
-              color: 'var(--brand-iris-900, #2b205a)',
+              /* S8: 4px grid (3/10 → 4/12) · type on scale (13 → --text-xs) · weight 800 → 700 · colours by name */
+              padding: '4px 12px',
+              background: 'var(--luxi-color-component-buddy-tag-background)',
+              color: 'var(--luxi-color-component-buddy-tag-text)',
               borderRadius: 999,
-              fontWeight: 800,
-              fontSize: 13,
+              fontWeight: 700,
+              fontSize: 'var(--text-xs)',
               whiteSpace: 'nowrap',
-              boxShadow: '0 2px 8px rgba(43,32,90,0.18)',
+              boxShadow: 'var(--luxi-shadow-buddy-tag)',
               fontFamily: 'inherit',
             }}
           >
@@ -148,8 +149,8 @@ export default function Buddy({ profile, sim, emote }) {
             <div
               style={{
                 fontSize: 30,
-                animation: 'gempop 0.35s ease',
-                filter: 'drop-shadow(0 2px 6px rgba(43,32,90,0.25))',
+                animation: 'gempop 300ms var(--ease-out)', /* was 0.35s ease (S8: motion ladder) */
+                filter: 'drop-shadow(var(--luxi-shadow-buddy-emote))',
               }}
             >
               {emote.emoji}

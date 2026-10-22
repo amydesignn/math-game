@@ -354,7 +354,7 @@ function SignupDemo() {
     setOpen(true)
     setK((n) => n + 1)
   }
-  const bar = { padding: '6px 12px', borderRadius: 999, border: 'none', fontWeight: 700, fontSize: 13, cursor: 'pointer' }
+  const bar = { padding: '6px 12px', borderRadius: 999, border: 'none', fontWeight: 700, fontSize: 'var(--text-xs)', cursor: 'pointer' }
   return (
     <div
       style={{
@@ -382,7 +382,7 @@ function SignupDemo() {
           flexWrap: 'wrap',
         }}
       >
-        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.07em', color: '#8A7FB8' }}>DEMO</span>
+        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.07em', color: '#8A7FB8' }}>DEMO</span>
         <button style={{ ...bar, background: '#4B54DD', color: '#fff' }} onClick={() => reopen('form')}>
           Modal
         </button>
@@ -429,15 +429,15 @@ function SettingsDemo() {
   const chip = (on) => ({
     border: 'none',
     borderRadius: 999,
-    padding: '6px 14px',
-    fontSize: 13,
+    padding: '6px 16px',
+    fontSize: 'var(--text-xs)',
     fontWeight: 700,
     cursor: 'pointer',
     background: on ? '#4B54DD' : 'transparent',
     color: on ? '#fff' : '#6e6e6e',
   })
   const gearBtnDoor = { width: 44, height: 44, borderRadius: '50%', border: 'none', background: view === 'settings' ? '#DDD1F7' : '#EDE7FC', cursor: 'pointer', fontSize: 20, lineHeight: 1 }
-  const railBtn = { width: 50, height: 50, borderRadius: '50%', border: 'none', background: '#fff', boxShadow: '0 4px 14px rgba(50,38,80,.16)', cursor: 'pointer', fontSize: 22, lineHeight: 1 }
+  const railBtn = { width: 50, height: 50, borderRadius: '50%', border: 'none', background: '#fff', boxShadow: '0 4px 14px rgba(50,38,80,.16)', cursor: 'pointer', fontSize: 24, lineHeight: 1 }
   return (
     <div style={{ position: 'fixed', inset: 0, fontFamily: "'Inter', system-ui, sans-serif", background: isDoor ? 'linear-gradient(180deg,#F6F3FD,#EEE9F8)' : 'radial-gradient(130% 120% at 50% 30%,#C9D8B6,#B7C9A6 70%,#AEC29C)' }}>
       {/* faux chrome */}
@@ -445,7 +445,7 @@ function SettingsDemo() {
         <div style={{ height: 64, background: '#fff', boxShadow: '0 1px 0 rgba(74,54,110,.07),0 3px 14px rgba(74,54,110,.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <GemIcon size={26} />
-            <span style={{ fontSize: 20, fontWeight: 600, color: '#4B54DD' }}>Luxi Math</span>
+            <span style={{ fontSize: 20, fontWeight: 500, color: '#4B54DD' }}>Luxi Math</span>
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button aria-label="Profile" onClick={() => setView('profile')} style={{ width: 44, height: 44, borderRadius: '50%', border: 'none', overflow: 'hidden', background: '#EDE7FC', boxShadow: '0 0 0 2px #fff,0 0 0 3.5px #DDD1F7', cursor: 'pointer', fontSize: 20, padding: 0 }}>
@@ -458,7 +458,7 @@ function SettingsDemo() {
         </div>
       ) : (
         <div style={{ position: 'absolute', top: 16, left: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <div style={{ height: 44, background: '#fff', borderRadius: 999, padding: '0 18px 0 14px', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 4px 14px rgba(50,38,80,.16)', color: '#3B3266', fontWeight: 700 }}>‹ Exit</div>
+          <div style={{ height: 44, background: '#fff', borderRadius: 999, padding: '0 16px 0 12px', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(50,38,80,.16)', color: '#3B3266', fontWeight: 700 }}>‹ Exit</div>
           <button aria-label="Shop" style={railBtn}>🛍️</button>
           <button aria-label="Settings" onClick={() => setView('settings')} style={railBtn}>⚙️</button>
         </div>
@@ -466,7 +466,7 @@ function SettingsDemo() {
 
       {/* control bar */}
       <div style={{ position: 'fixed', bottom: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 90, display: 'flex', gap: 8, alignItems: 'center', background: 'rgba(255,255,255,.92)', borderRadius: 999, padding: '8px 12px', boxShadow: '0 6px 18px rgba(50,38,80,.16)' }}>
-        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.07em', color: '#8A7FB8' }}>DEMO</span>
+        <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.07em', color: '#8A7FB8' }}>DEMO</span>
         <span style={{ display: 'flex', gap: 4, background: '#F1ECF8', borderRadius: 999, padding: 4 }}>
           <button style={chip(isDoor)} onClick={() => { setSurface('door'); setView('none') }}>Door</button>
           <button style={chip(!isDoor)} onClick={() => { setSurface('game'); setView('none') }}>In-game</button>
