@@ -54,28 +54,37 @@ const MOVES = [
 /* Diagram labels (Amy 2026-10-05): the math TERM leads (12/700 caps, the part's colour),
    the friendly explanation sits under it as secondary text (12/400). */
 const term = (color) => ({ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '.05em' })
-const explain = { display: 'block', fontSize: 'var(--text-xs)', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.3 }
+const explain = { display: 'block', fontSize: 'var(--text-xs)', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 'var(--text-xs--line-height)' } // 18 — an on-grid line box (was 1.3 = 15.6)
 const CANDY = '/worked/candies.png'
 const FRIEND = '/worked/friend.png'
 
 /* diagram geometry (Oscar's exact values) */
 /* Label ↔ math spacing (Amy 2026-10-05): every annotation sits LABELGAP from its math —
    QUOTIENT above the Answer Box, the divisor column left of the bracket, DIVIDEND right of
-   the box. COLW = the divisor column (widest label, centred); the bracket is drawn 7px
-   inside GUTTER, so GUTTER = COLW + LABELGAP + 7 (measured: 16px rendered). */
-const LABELGAP = 16, COLW = 68
-const CELL = 44, FS = 26, ROWH = 50, TOPPAD = 52, GUTTER = COLW + LABELGAP + 7, BOTPAD = 26
+   the box. COLW = the divisor column (widest label, centred); the Answer Box and the
+   Sharing Table overhang their cells by PAD, so GUTTER = COLW + LABELGAP + PAD.
+   S3 govern (10-21): Oscar's 7 · 46 · 50 · 26 · 68 → 8 · 48 · 48 · 24 · 72, every
+   offset on the 4px grid (COLW 72 centres the 48 divisor circle at 12). */
+const LABELGAP = 16, COLW = 72, PAD = 8
+const CELL = 44, FS = 'var(--text-2xl)', ROWH = 48, TOPPAD = 52, GUTTER = COLW + LABELGAP + PAD, BOTPAD = 24
 const LABELW = 128 // the dividend label column: fits "all the candy to share" on one line at 12px
-const RW = 37 // "R3" beside the Answer Box: 8px gap + glyphs (measured: DIVIDEND lands 16px past it)
+const RW = 40 // "R3" beside the Answer Box: 8px gap + glyphs (measured: DIVIDEND lands LABELGAP past it)
+const QLH = 36 // the QUOTIENT label block: two 18px lines (term + explain)
+const BOX_TOP = 4, BOX_H = ROWH - 8 // the Answer Box inside the quotient row: centred, 4px clear of the bracket
+/* Motion (S3): chrome ≤ 300ms; the TEACHING moves inside the diagram take 500 so a kid
+   can follow them. Overshoot lives in the dv- keyframes, never in the curve. */
+const TEACH = '500ms var(--ease-in-out)' // on-screen moves (spotlight slide, the bring-down arc)
+const POP = '300ms var(--ease-out)' // a digit landing
 
 /* Oscar's skeuomorphic pressable button (his `style-active` → a pressed state).
    Distinct from mathkit's BigButton — this is the division comp's own look. */
 function PressBtn({ children, onClick, variant = 'primary' }) {
   const [down, setDown] = useState(false)
   const V = {
-    primary: { bg: 'var(--luxi-color-component-division-button-primary-background)' /* Iris 500 / 700 shadow, like every Luxi primary */, color: 'var(--luxi-color-component-division-button-primary-text)', border: 'none', shadow: 'var(--luxi-color-component-division-button-primary-shadow)', pad: '13px 24px', fs: 'var(--text-base)' },
-    secondary: { bg: 'var(--color-background-base)', color: 'var(--luxi-color-component-division-button-secondary-text)', border: '2px solid var(--luxi-color-component-division-button-secondary-border)', shadow: 'var(--luxi-color-component-division-button-secondary-shadow)', pad: '12px 20px', fs: 'var(--text-base)' },
-    back: { bg: 'var(--color-background-base)', color: 'var(--color-text-secondary)', border: '2px solid var(--color-border-default)', shadow: 'var(--luxi-color-component-division-button-back-shadow)', pad: '12px 20px', fs: 'var(--text-base)' },
+    /* S3: primary carries a transparent stroke so all three share one height (was 13px pad, no border) */
+    primary: { bg: 'var(--luxi-color-component-division-button-primary-background)' /* Iris 500 / 700 shadow, like every Luxi primary */, color: 'var(--luxi-color-component-division-button-primary-text)', border: 'var(--border-stroke-2) solid transparent', shadow: 'var(--luxi-color-component-division-button-primary-shadow)', pad: '12px 24px', fs: 'var(--text-base)' },
+    secondary: { bg: 'var(--color-background-base)', color: 'var(--luxi-color-component-division-button-secondary-text)', border: 'var(--border-stroke-2) solid var(--luxi-color-component-division-button-secondary-border)', shadow: 'var(--luxi-color-component-division-button-secondary-shadow)', pad: '12px 20px', fs: 'var(--text-base)' },
+    back: { bg: 'var(--color-background-base)', color: 'var(--color-text-secondary)', border: 'var(--border-stroke-2) solid var(--color-border-default)', shadow: 'var(--luxi-color-component-division-button-back-shadow)', pad: '12px 20px', fs: 'var(--text-base)' },
   }[variant]
   return (
     <button
@@ -84,10 +93,10 @@ function PressBtn({ children, onClick, variant = 'primary' }) {
       onPointerUp={() => setDown(false)}
       onPointerLeave={() => setDown(false)}
       style={{
-        display: 'inline-flex', alignItems: 'center', gap: 6, border: V.border, background: V.bg,
-        color: V.color, fontWeight: 500, fontSize: V.fs, borderRadius: 14, padding: V.pad, cursor: 'pointer',
-        boxShadow: down ? `0 1px 0 ${V.shadow}` : `0 4px 0 ${V.shadow}`,
-        transform: down ? 'translateY(3px)' : 'none', transition: 'transform .07s, box-shadow .07s',
+        display: 'inline-flex', alignItems: 'center', gap: 8, border: V.border, background: V.bg,
+        color: V.color, fontWeight: 500, fontSize: V.fs, borderRadius: 16, /* was 14 — BigButton's 16 */ padding: V.pad, cursor: 'pointer',
+        boxShadow: down ? `0 0 0 ${V.shadow}` : `0 4px 0 ${V.shadow}`, /* the 4px house press (was 3px → 1px) */
+        transform: down ? 'translateY(4px)' : 'none', transition: 'transform 100ms var(--ease-out), box-shadow 100ms var(--ease-out)',
       }}>
       {children}
     </button>
@@ -99,10 +108,10 @@ function PressBtn({ children, onClick, variant = 'primary' }) {
    fitScale to fit a narrow modal (never up). Everything is his notation. */
 function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   const { n, steps, remainder, digits, b } = built
-  const textPrimary = P.textPrimary, textTertiary = P.textTertiary
+  const textPrimary = P.textPrimary
   const xL = (c) => GUTTER + c * CELL
   const yT = (r) => TOPPAD + r * ROWH
-  const totemL = Math.round((COLW - 46) / 2)
+  const totemL = (COLW - 48) / 2 // 12
   const els = []
 
   // Sharing Table spotlight (neutral slate) — slides + pulses between columns
@@ -110,14 +119,14 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     const cs = snap.table.cols[0], ce = snap.table.cols[1], r = snap.table.row
     els.push(
       <div key="table" style={{
-        position: 'absolute', left: xL(cs) - 7, top: yT(r) - 6, width: (ce - cs + 1) * CELL + 14, height: ROWH + 4,
-        border: `2.5px solid ${P.slate400}`, background: P.slateTint, borderRadius: 14, zIndex: 1,
-        animation: 'dvTablePulse 2.3s ease-in-out infinite',
-        transition: 'left .45s cubic-bezier(.3,.8,.3,1),top .45s cubic-bezier(.3,.8,.3,1),width .45s',
+        position: 'absolute', left: xL(cs) - PAD, top: yT(r) - 4, width: (ce - cs + 1) * CELL + 2 * PAD, height: ROWH + 4,
+        border: `var(--border-stroke-2) solid ${P.slate400}`, background: P.slateTint, borderRadius: 12, /* was 14 — the Answer Box's 12 */ zIndex: 1,
+        animation: 'dvTablePulse 2.3s ease-in-out infinite', /* infinite loop — exempt */
+        transition: `left ${TEACH}, top ${TEACH}, width ${TEACH}`,
       }}>
         <span style={{
-          position: 'absolute', bottom: -13, left: 11, fontSize: 'var(--text-xs)' /* bottom edge: on top it hid under the Answer Box in round 1 */, lineHeight: 1.2, fontWeight: 700, letterSpacing: '.05em',
-          textTransform: 'uppercase', color: 'var(--color-text-inverse)', background: P.slate, borderRadius: 7, padding: '2px 7px', whiteSpace: 'nowrap',
+          position: 'absolute', bottom: -12, left: 12, fontSize: 'var(--text-xs)' /* bottom edge: on top it hid under the Answer Box in round 1 */, lineHeight: 1, fontWeight: 700, letterSpacing: '.05em',
+          textTransform: 'uppercase', color: 'var(--color-text-inverse)', background: P.slate, borderRadius: 8, padding: '4px 8px', /* 20 tall (was 18.4) */ whiteSpace: 'nowrap',
         }}>Sharing Table</span>
       </div>,
     )
@@ -127,13 +136,13 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   const sealed = snap.final
   els.push(
     <div key="ansbox" style={{
-      position: 'absolute', left: xL(0) - 7, top: yT(0) + 1, width: n * CELL + 14, height: ROWH - 4, borderRadius: 12,
-      background: P.answerFill, border: sealed ? `2.5px solid ${P.answerLineSolid}` : `2.5px dashed ${P.answerLine}`,
-      zIndex: 1, animation: sealed ? 'dvAnswerSeal .55s ease-out both' : 'none', transition: 'border-color .3s',
+      position: 'absolute', left: xL(0) - PAD, top: yT(0) + BOX_TOP, width: n * CELL + 2 * PAD, height: BOX_H, borderRadius: 12,
+      background: P.answerFill, border: sealed ? `var(--border-stroke-2) solid ${P.answerLineSolid}` : `var(--border-stroke-2) dashed ${P.answerLine}`,
+      zIndex: 1, animation: sealed ? 'dvAnswerSeal 500ms var(--ease-out) both' : 'none', transition: 'border-color 300ms var(--ease-out)',
     }} />,
   )
   els.push(
-    <div key="ql" style={{ position: 'absolute', left: xL(0) - 7, top: yT(0) - 48, /* text ends LABELGAP above the Answer Box */ width: n * CELL + 14, textAlign: 'center', zIndex: 2 }}>
+    <div key="ql" style={{ position: 'absolute', left: xL(0) - PAD, top: yT(0) + BOX_TOP - LABELGAP - QLH, /* text ends LABELGAP above the Answer Box */ width: n * CELL + 2 * PAD, textAlign: 'center', zIndex: 2 }}>
       {showTerms && <span style={term(P.quotient)}>Quotient</span>}
       <span style={{ ...explain, whiteSpace: 'nowrap' }}>Each friend&apos;s share</span>
     </div>,
@@ -141,33 +150,34 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   if (!snap.qShown.some(Boolean)) {
     els.push(
       <div key="qmark" style={{
-        position: 'absolute', left: xL(0) - 7, top: yT(0) + 1, width: n * CELL + 14, height: ROWH - 4,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: FS, fontWeight: 800, color: P.quotient, zIndex: 2,
+        position: 'absolute', left: xL(0) - PAD, top: yT(0) + BOX_TOP, width: n * CELL + 2 * PAD, height: BOX_H,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: FS, fontWeight: 700, color: P.quotient, zIndex: 2,
       }}>?</div>,
     )
   }
 
   // The Friends totem (divisor): friend image + teal-ringed number + label
-  els.push(<img key="fimg" src={FRIEND} alt="friend" style={{ position: 'absolute', left: totemL - 1, top: yT(1) - 52, width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', boxShadow: '0 2px 7px rgba(90,60,120,.22)', zIndex: 2 }} />)
+  els.push(<img key="fimg" src={FRIEND} alt="friend" style={{ position: 'absolute', left: totemL, top: yT(1) - 52, /* 4px above the circle */ width: 48, height: 48, borderRadius: '50%', objectFit: 'cover', boxShadow: 'var(--luxi-shadow-division-friend)', zIndex: 2 }} />)
   els.push(
     <div key="dv" style={{
-      position: 'absolute', left: totemL, top: yT(1) + (ROWH - 46) / 2, width: 46, height: 46, borderRadius: '50%',
-      border: `2.5px solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: 24, fontWeight: 800, color: P.tealInk, zIndex: 2, /* divisor = dark teal */
+      position: 'absolute', left: totemL, top: yT(1), width: 48, height: 48, /* fills the row (was 46) */ borderRadius: '50%',
+      border: `var(--border-stroke-2) solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: 'var(--text-2xl)', fontWeight: 700, color: P.tealInk, zIndex: 2, /* divisor = dark teal */
     }}>{String(b)}</div>,
   )
   els.push(
-    <div key="dvl" style={{ position: 'absolute', left: 0, top: yT(1) + 60, /* 12px under the divisor circle */ width: COLW, textAlign: 'center', zIndex: 2 }}>
+    <div key="dvl" style={{ position: 'absolute', left: 0, top: yT(1) + 60, /* 12px under the 48 circle */ width: COLW, textAlign: 'center', zIndex: 2 }}>
       {showTerms && <span style={term(P.tealInk)}>Divisor</span>}
       <span style={explain}>The friends</span>
     </div>,
   )
 
   // Division bracket (hand-drawn path)
-  const brW = n * CELL + 18, brH = ROWH + 6
+  // the path is DRAWING (coordinates + the 3px pen are artwork, not layout); the box is on the grid
+  const brW = n * CELL + 20, brH = ROWH + 8
   els.push(
-    <svg key="br" width={brW} height={brH} viewBox={`0 0 ${brW} ${brH}`} style={{ position: 'absolute', left: GUTTER - 16, top: yT(1) - 3, zIndex: 2, overflow: 'visible' }}>
-      <path d={`M16 3 H ${brW - 2} M16 3 Q 3 ${brH * 0.5} 10 ${brH - 2}`} fill="none" style={{ stroke: textPrimary }} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+    <svg key="br" width={brW} height={brH} viewBox={`0 0 ${brW} ${brH}`} style={{ position: 'absolute', left: GUTTER - 16, top: yT(1) - 4, zIndex: 2, overflow: 'visible' }}>
+      <path d={`M16 4 H ${brW - 4} M16 4 Q 3 ${brH * 0.5} 10 ${brH - 2}`} fill="none" style={{ stroke: textPrimary }} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
     </svg>,
   )
 
@@ -175,8 +185,8 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   els.push(
     <div key="cbag" style={{
       /* LABELGAP right of the Answer Box; on the final step it slides aside for "R3" */
-      position: 'absolute', left: xL(0) + n * CELL + 7 + LABELGAP + (snap.final && remainder > 0 ? RW : 0), transition: 'left .4s ease', top: yT(0) - 10, width: LABELW, display: 'flex', flexDirection: 'column', gap: 5, zIndex: 2 }}>
-      <img src={CANDY} alt="candy bag" style={{ width: 54, height: 54, objectFit: 'contain', alignSelf: 'flex-start', filter: 'drop-shadow(0 3px 6px rgba(90,60,120,.18))' }} />
+      position: 'absolute', left: xL(0) + n * CELL + PAD + LABELGAP + (snap.final && remainder > 0 ? RW : 0), transition: 'left 300ms var(--ease-in-out)', top: yT(0) - 12, width: LABELW, display: 'flex', flexDirection: 'column', gap: 4, zIndex: 2 }}>
+      <img src={CANDY} alt="candy bag" style={{ width: 56, height: 56, objectFit: 'contain', alignSelf: 'flex-start', filter: 'var(--luxi-shadow-division-candy)' }} />
       <div>
         {showTerms && <span style={term(P.berryInk)}>Dividend</span>}
         <span style={{ ...explain, whiteSpace: 'nowrap' }}>all the candy to share</span>{/* one line, like the other two (Amy: the picture already says "candy bag") */}
@@ -191,16 +201,16 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     els.push(
       <div key={'q' + c} style={{
         position: 'absolute', left: xL(c), top: yT(0), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: P.quotient, zIndex: 3,
-        animation: hot ? (sneaky ? 'dvShimmer .6s ease-out both' : 'dvQuoUp .5s cubic-bezier(.2,.8,.3,1.2) both') : 'none',
+        justifyContent: 'center', fontSize: FS, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: P.quotient, zIndex: 3,
+        animation: hot ? (sneaky ? 'dvShimmer 500ms var(--ease-out) both' : 'dvQuoUp 500ms var(--ease-out) both') : 'none',
       }}>{String(built.q[c])}</div>,
     )
     if (sneaky && hot) {
       els.push(
         <span key={'qz' + c} style={{
-          position: 'absolute', left: xL(0) + n * CELL + 15, top: yT(0) + ROWH / 2 - 11, fontSize: 'var(--text-xs)' /* beside the Answer Box: at 12px it covered QUOTIENT */, lineHeight: 1.2, fontWeight: 700, letterSpacing: '.02em',
-          color: 'var(--color-text-inverse)', background: P.goldB, borderRadius: 6, padding: '2px 6px', whiteSpace: 'nowrap', zIndex: 4,
-          animation: 'dvFadeSlide .5s .15s both', boxShadow: '0 2px 5px rgba(0,0,0,.12)',
+          position: 'absolute', left: xL(0) + n * CELL + PAD + 8, top: yT(0) + 12, /* 20 tall, on the box's middle */ fontSize: 'var(--text-xs)' /* beside the Answer Box: at 12px it covered QUOTIENT */, lineHeight: 1, fontWeight: 700, letterSpacing: '.02em',
+          color: 'var(--color-text-inverse)', background: P.goldB, borderRadius: 8, padding: '4px 8px', whiteSpace: 'nowrap', zIndex: 4,
+          animation: 'dvFadeSlide 300ms 150ms var(--ease-out) both', boxShadow: 'var(--luxi-shadow-division-sneaky-zero-tag)',
         }}>keeps the line!</span>,
       )
     }
@@ -210,8 +220,8 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     els.push(
       <div key={'d' + c} style={{
         position: 'absolute', left: xL(c), top: yT(1), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-        justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: snap.dim[c] ? P.textTertiary : P.berryInk, zIndex: 3, /* dividend = pink; waiting digits stay tertiary */ /* faded = tertiary (4.74), Amy 2026-10-05 */
-        transition: 'color .4s',
+        justifyContent: 'center', fontSize: FS, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: snap.dim[c] ? P.textTertiary : P.berryInk, zIndex: 3, /* dividend = pink; waiting digits stay tertiary */ /* faded = tertiary (4.74), Amy 2026-10-05 */
+        transition: 'color 300ms var(--ease-out)',
       }}>{String(digits[c])}</div>,
     )
   }
@@ -225,7 +235,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
       els.push(
         <div key={kp + '_' + j} style={{
           position: 'absolute', left: xL(c), top: yT(rowIdx), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-          justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
+          justifyContent: 'center', fontSize: FS, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
           animation: anim || 'none',
         }}>{s[j]}</div>,
       )
@@ -239,16 +249,16 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     // subtraction bar spans the group being divided: the leading group for the
     // first step, else the leftover + the brought-down digit (two columns)
     const barCols = si === 0 ? [0, built.startCol] : [col - 1, col]
-    if (snap.multShown[si]) placeNum(s.prod, col, multRow, snap.hot.mult === si ? 'dvCellPop .34s ease-out both' : null, 'm' + si)
+    if (snap.multShown[si]) placeNum(s.prod, col, multRow, snap.hot.mult === si ? `dvCellPop ${POP} both` : null, 'm' + si)
     if (snap.subShown[si]) {
       els.push(
-        <div key={'bar' + si} style={{ position: 'absolute', left: xL(barCols[0]) + 4, top: yT(subRow) - 3, width: (barCols[1] - barCols[0] + 1) * CELL - 8, height: 0, borderTop: `2.5px solid ${textPrimary}`, zIndex: 2 }} />,
+        <div key={'bar' + si} style={{ position: 'absolute', left: xL(barCols[0]) + 4, top: yT(subRow) - 4, width: (barCols[1] - barCols[0] + 1) * CELL - 8, height: 0, borderTop: `var(--border-stroke-2) solid ${textPrimary}`, zIndex: 2 }} />,
       )
       const isRem = si === steps.length - 1
-      placeNum(s.sub, col, subRow, snap.hot.sub === si ? 'dvCellPop .34s ease-out both' : null, 's' + si)
+      placeNum(s.sub, col, subRow, snap.hot.sub === si ? `dvCellPop ${POP} both` : null, 's' + si)
       if (isRem && remainder > 0) {
         els.push(
-          <span key="rt" style={{ position: 'absolute', left: xL(col) - 8, top: yT(subRow) + ROWH + 2, width: CELL + 16, textAlign: 'center', fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.03em', textTransform: 'uppercase', color: P.goldB }}>leftover</span>,
+          <span key="rt" style={{ position: 'absolute', left: xL(col) - 8, top: yT(subRow) + ROWH + 4, width: CELL + 16, textAlign: 'center', fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.03em', textTransform: 'uppercase', color: P.goldB }}>leftover</span>,
         )
       }
     }
@@ -257,7 +267,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
       const dist = (subRow - 1) * ROWH
       if (snap.hot.bd === si) {
         els.push(
-          <svg key={'bda' + si} width={CELL + 8} height={dist} viewBox={`0 0 ${CELL + 8} ${dist}`} style={{ position: 'absolute', left: xL(nextCol) - 4, top: yT(1), zIndex: 2, overflow: 'visible', animation: 'dvArrowInOut 1s ease-out both' }}>
+          <svg key={'bda' + si} width={CELL + 8} height={dist} viewBox={`0 0 ${CELL + 8} ${dist}`} style={{ position: 'absolute', left: xL(nextCol) - 4, top: yT(1), zIndex: 2, overflow: 'visible', animation: 'dvArrowInOut 500ms var(--ease-out) both' }}>{/* the arrow's path + pen are drawing */}
             <path d={`M ${(CELL + 8) / 2} 10 C ${(CELL + 8) / 2 + 11} ${dist * 0.42}, ${(CELL + 8) / 2 - 7} ${dist * 0.72}, ${(CELL + 8) / 2} ${dist - 14}`} fill="none" style={{ stroke: 'var(--luxi-color-component-division-bring-down-arrow)' }} /* style: var() never resolves in an SVG attribute */ strokeWidth={2.5} strokeLinecap="round" />
             <path d={`M ${(CELL + 8) / 2 - 6} ${dist - 20} L ${(CELL + 8) / 2} ${dist - 9} L ${(CELL + 8) / 2 + 6} ${dist - 20}`} fill="none" style={{ stroke: 'var(--luxi-color-component-division-bring-down-arrow)' }} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
           </svg>,
@@ -265,8 +275,8 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
         els.push(
           <div key={'bd' + si} style={{
             position: 'absolute', left: xL(nextCol), top: yT(subRow), width: CELL, height: ROWH, display: 'flex', alignItems: 'center',
-            justifyContent: 'center', fontSize: FS, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
-            '--ay': -dist + 'px', '--ax': '9px', animation: 'dvBringArc .62s cubic-bezier(.3,.7,.3,1.15) both',
+            justifyContent: 'center', fontSize: FS, fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3,
+            '--ay': -dist + 'px', '--ax': '8px', animation: `dvBringArc ${TEACH} both`,
           }}>{String(digits[nextCol])}</div>,
         )
       } else {
@@ -276,22 +286,23 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   }
 
   if (snap.final && remainder > 0) {
-    const boxR = xL(0) - 7 + n * CELL + 14
+    const boxR = xL(0) + n * CELL + PAD
     els.push(
-      <div key="Rtop" style={{ position: 'absolute', left: boxR + 8, top: yT(0) + 1, height: ROWH - 4, display: 'flex', alignItems: 'center', fontSize: 22, fontWeight: 800, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3, animation: 'dvCellPop .4s .15s both' }}>{'R' + remainder}</div>,
+      <div key="Rtop" style={{ position: 'absolute', left: boxR + 8, top: yT(0) + BOX_TOP, height: BOX_H, display: 'flex', alignItems: 'center', fontSize: 'var(--text-2xl)', fontWeight: 700, fontVariantNumeric: 'tabular-nums', color: textPrimary, zIndex: 3, animation: `dvCellPop ${POP} 150ms both` }}>{'R' + remainder}</div>,
     )
   }
   if (snap.celebrate) {
     const cc = snap.celebrate === 'sneaky' ? P.goldB : snap.celebrate === 'final' ? P.teal : P.slate400
     els.push(
-      <div key={'burst' + snap.celebrate + snap.round} style={{ position: 'absolute', left: xL(0) + (n * CELL) / 2 - 22, top: yT(0) + 2, width: 44, height: 44, borderRadius: '50%', border: `3px solid ${cc}`, zIndex: 1, animation: 'dvBurst .75s ease-out both', pointerEvents: 'none' }} />,
+      <div key={'burst' + snap.celebrate + snap.round} style={{ position: 'absolute', left: xL(0) + (n * CELL) / 2 - 24, /* centred on the Answer Box */ top: yT(0), width: 48, height: 48, borderRadius: '50%', border: `var(--border-stroke-2) solid ${cc}`, zIndex: 1, animation: 'dvBurst 500ms var(--ease-out) both', pointerEvents: 'none' }} />,
     )
   }
   if (snap.final) {
     const cols = [P.berry, P.teal, P.answerLine, 'var(--luxi-color-component-division-confetti-lilac)', 'var(--luxi-color-component-division-confetti-iris)']
     for (let j = 0; j < 15; j++) {
       els.push(
-        <div key={'cf' + j} style={{ position: 'absolute', left: W * 0.5 + Math.sin(j * 1.8) * W * 0.4, top: 0, width: 8, height: 12, borderRadius: 2, background: cols[j % cols.length], zIndex: 5, opacity: 0, animation: `dvConfetti ${1.7 + (j % 5) * 0.25}s ${0.05 * j}s ease-in both` }} />,
+        // confetti: the scatter is decoration (sin spread); the fall is on the ladder, staggered so it still rains
+        <div key={'cf' + j} style={{ position: 'absolute', left: W * 0.5 + Math.sin(j * 1.8) * W * 0.4, top: 0, width: 8, height: 12, borderRadius: 4, background: cols[j % cols.length], zIndex: 5, opacity: 0, animation: `dvConfetti 500ms ${50 * j}ms var(--ease-in-out) both` }} />,
       )
     }
   }
@@ -309,7 +320,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
   const built = useMemo(() => buildDivisionStages(a, b), [a, b])
   const stages = built.stages
   const n = built.n
-  const W = GUTTER + n * CELL + 7 + LABELGAP + (built.remainder > 0 ? RW : 0) + LABELW // room for the dividend label incl. its final slide past "R3"
+  const W = GUTTER + n * CELL + PAD + LABELGAP + (built.remainder > 0 ? RW : 0) + LABELW // room for the dividend label incl. its final slide past "R3"
   const Hh = TOPPAD + (2 + 2 * built.steps.length) * ROWH + BOTPAD
 
   const [phase, setPhase] = useState('intro') // 'intro' | 'work'
@@ -371,7 +382,7 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
   const isLast = idx >= stages.length - 1
   const roundLabel = snap.final ? null /* Amy 2026-10-05: no "All shared!" pill — less noise */ : snap.round == null ? "Let's begin" : 'Round ' + (snap.round + 1) + ' of ' + built.steps.length
   // keep intro and work the same height so switching phases doesn't jump (Oscar)
-  const stageMinH = 250 + Math.max(300, 8 + Hh * (fitScale || 1))
+  const stageMinH = 252 + Math.max(300, 8 + Hh * (fitScale || 1))
 
   const discover = () => { setPhase('work'); setI(0); setPlaying(false); setDone(false) }
   const back = () => {
@@ -393,14 +404,14 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
 
   // intro concept-card style (staggered reveal at index `idx`)
   const cardStyle = (n2) => ({
-    display: 'flex', alignItems: 'center', gap: 14, padding: '15px 16px', minHeight: 157,
+    display: 'flex', alignItems: 'center', gap: 16, padding: 16, minHeight: 156, /* was 14 · 15/16 · 157 */
     background: 'var(--color-background-subtle)', border: '1px solid var(--luxi-color-component-division-intro-card-border)', borderRadius: 16,
     opacity: reveal >= n2 ? 1 : 0, transform: reveal >= n2 ? 'translateY(0)' : 'translateY(12px)',
-    transition: 'opacity .55s ease, transform .55s cubic-bezier(.2,.8,.3,1.2)',
+    transition: 'opacity 300ms var(--ease-out), transform 300ms var(--ease-out)', /* was .55s on an overshoot */
   })
   const totemCol = { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 116, flexShrink: 0 }
   const copyStyle = { fontSize: 'var(--text-base)', fontWeight: 400, color: P.textPrimary, lineHeight: 1.45, textWrap: 'pretty' }
-  const badge = (color, bg) => ({ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.05em', color, background: bg, borderRadius: 999, padding: '3px 10px' })
+  const badge = (color, bg) => ({ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.05em', color, background: bg, borderRadius: 999, padding: '4px 12px' })
 
   return (
     // renders as content inside a white card parent (the house <Modal>); the
@@ -412,23 +423,23 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
           // closeGutter: only the sparkle popup floats its ✕ (40px at right:14) in this
           // corner, so only there does the pill reserve 44px (Amy 2026-08-31). Everywhere
           // else it aligns with the bubble's right edge (Amy 2026-10-05).
-          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)', background: 'var(--luxi-color-component-division-round-pill-background)', borderRadius: 999, padding: '6px 13px', whiteSpace: 'nowrap', marginRight: closeGutter ? 44 : 0 }}>{roundLabel}</span>
+          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-secondary)', background: 'var(--luxi-color-component-division-round-pill-background)', borderRadius: 999, padding: '4px 12px', /* was 6/13 — 29 tall, the title's line */ whiteSpace: 'nowrap', marginRight: closeGutter ? 44 : 0 }}>{roundLabel}</span>
         )}
       </div>
 
       {phase === 'intro' ? (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 120 }}>
-            <div style={{ width: 128, height: 128, borderRadius: '50%', background: 'radial-gradient(circle at 50% 44%, var(--luxi-color-component-division-intro-candy-start) 0%, var(--luxi-color-component-division-intro-candy-mid) 64%, var(--luxi-color-component-division-intro-candy-end) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 24px rgba(120,80,150,.15)' }}>
-              <img src={CANDY} alt="candy bag" style={{ width: 92, height: 92, objectFit: 'contain', filter: 'drop-shadow(0 5px 10px rgba(90,60,120,.24))' }} />
+            <div style={{ width: 128, height: 128, borderRadius: '50%', background: 'radial-gradient(circle at 50% 44%, var(--luxi-color-component-division-intro-candy-start) 0%, var(--luxi-color-component-division-intro-candy-mid) 64%, var(--luxi-color-component-division-intro-candy-end) 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--luxi-shadow-division-intro-candy-halo)' }}>
+              <img src={CANDY} alt="candy bag" style={{ width: 92, height: 92, objectFit: 'contain', filter: 'var(--luxi-shadow-division-intro-candy)' }} />
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             {/* Card 1 — Candy Bag / DIVIDEND */}
             <div style={cardStyle(1)}>
-              <div style={{ ...totemCol, gap: 5 }}>
-                <img src={CANDY} alt="candy bag" style={{ width: 40, height: 40, objectFit: 'contain', filter: 'drop-shadow(0 3px 6px rgba(90,60,120,.20))' }} />
-                <div style={{ fontSize: 40, fontWeight: 800, color: P.berryInk, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{a}</div>
+              <div style={{ ...totemCol, gap: 4 }}>
+                <img src={CANDY} alt="candy bag" style={{ width: 40, height: 40, objectFit: 'contain', filter: 'var(--luxi-shadow-division-card-candy)' }} />
+                <div style={{ fontSize: 'var(--text-40)', fontWeight: 700, color: P.berryInk, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{a}</div>
                 {showMathTerms && <span style={badge(P.berryInk, 'var(--luxi-color-component-division-dividend-background)')}>DIVIDEND</span>}
               </div>
               <div style={copyStyle}>You have {a} candies to share.</div>
@@ -436,60 +447,60 @@ export default function DivisionWalkthrough({ problem, showMathTerms = true, aut
             {/* Card 2 — The Friends / DIVISOR */}
             <div style={cardStyle(2)}>
               <div style={{ ...totemCol, gap: 4 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,26px)', gap: 4, justifyContent: 'center' }}>
-                  {[0, 1, 2, 3].map((k) => <img key={k} src={FRIEND} alt="friend" style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />)}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,24px)', gap: 4, justifyContent: 'center' }}>
+                  {[0, 1, 2, 3].map((k) => <img key={k} src={FRIEND} alt="friend" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />)}
                 </div>
-                <div style={{ width: 44, height: 44, borderRadius: '50%', border: `2.5px solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 800, color: P.tealInk }}>{b}</div>
+                <div style={{ width: 44, height: 44, borderRadius: '50%', border: `var(--border-stroke-2) solid ${P.teal}`, background: P.tealTint, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-2xl)', fontWeight: 700, color: P.tealInk }}>{b}</div>
                 {showMathTerms && <span style={badge(P.tealInk, P.tealTint)}>DIVISOR</span>}
               </div>
               <div style={copyStyle}>You share them with {b} friends.</div>
             </div>
             {/* Card 3 — Quotient / QUOTIENT */}
             <div style={cardStyle(3)}>
-              <div style={{ ...totemCol, gap: 5 }}>
-                <div style={{ width: 62, height: 50, border: `2.5px dashed ${P.answerLine}`, background: P.answerFill, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, fontWeight: 800, color: P.quotient }}>?</div>
+              <div style={{ ...totemCol, gap: 4 }}>
+                <div style={{ width: 64, height: 48, border: `var(--border-stroke-2) dashed ${P.answerLine}`, background: P.answerFill, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-3xl)', fontWeight: 700, color: P.quotient }}>?</div>
                 {showMathTerms && <span style={badge(P.quotient, P.answerFill)}>QUOTIENT</span>}
               </div>
               <div style={copyStyle}>How many does each friend get?</div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', marginTop: 'auto', paddingTop: 18, opacity: reveal >= 4 ? 1 : 0, transform: reveal >= 4 ? 'translateY(0)' : 'translateY(8px)', transition: 'opacity .5s ease, transform .5s ease', pointerEvents: reveal >= 4 ? 'auto' : 'none' }}>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', marginTop: 'auto', paddingTop: 16, opacity: reveal >= 4 ? 1 : 0, transform: reveal >= 4 ? 'translateY(0)' : 'translateY(8px)', transition: 'opacity 300ms var(--ease-out), transform 300ms var(--ease-out)', pointerEvents: reveal >= 4 ? 'auto' : 'none' }}>
             <PressBtn variant="primary" onClick={discover}>Let&apos;s discover it! ▸</PressBtn>
           </div>
         </div>
       ) : (
         <>
           {/* speech-bubble caption card with a 45° tail bottom-left */}
-          <div style={{ position: 'relative', minHeight: 72, background: 'var(--color-background-base)', border: '1px solid var(--luxi-color-component-division-caption-border)', borderRadius: 16, boxShadow: '0 5px 16px rgba(40,30,70,.07)', padding: '14px 18px', margin: '14px 0', display: 'flex', alignItems: 'center', fontSize: 16, lineHeight: 1.5, color: P.textPrimary, fontWeight: 500, textWrap: 'pretty' }}>
+          <div style={{ position: 'relative', minHeight: 72, background: 'var(--color-background-base)', border: '1px solid var(--luxi-color-component-division-caption-border)', borderRadius: 16, boxShadow: 'var(--luxi-shadow-division-caption)', padding: '16px 20px', margin: '16px 0', /* was 14/18 · 14 */ display: 'flex', alignItems: 'center', fontSize: 'var(--text-base)', lineHeight: 1.5, color: P.textPrimary, fontWeight: 500, textWrap: 'pretty' }}>
             {snap.caption}
-            <span style={{ content: '""', position: 'absolute', left: 38, bottom: -9, width: 17, height: 17, background: 'var(--color-background-base)', borderRight: '1px solid var(--luxi-color-component-division-caption-border)', borderBottom: '1px solid var(--luxi-color-component-division-caption-border)', transform: 'rotate(45deg)' }} />
+            <span style={{ content: '""', position: 'absolute', left: 40, bottom: -8, width: 16, height: 16, background: 'var(--color-background-base)', borderRight: '1px solid var(--luxi-color-component-division-caption-border)', borderBottom: '1px solid var(--luxi-color-component-division-caption-border)', transform: 'rotate(45deg)' }} />
           </div>
 
           {/* four move chips — active lights to its move colour */}
-          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', margin: '2px 0 4px' }}>
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', margin: '0 0 4px' }}>
             {MOVES.map((m, mi) => {
               const on = mi === activeMoveIdx
               return (
-                <div key={m.key} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ width: 11, height: 11, borderRadius: '50%', flexShrink: 0, background: on ? m.color : 'var(--color-background-base)', border: on ? `2px solid ${m.color}` : '2px solid var(--luxi-color-component-division-move-dot-border)', boxShadow: on ? `0 0 0 3px ${m.tint}` : 'none', transition: 'all .25s' }} />
-                  <span style={{ fontSize: 'var(--text-sm)', fontWeight: on ? 700 : 500, color: on ? m.color : P.textTertiary, whiteSpace: 'nowrap', transition: 'color .25s' }}>{m.label}</span>
+                <div key={m.key} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 12, height: 12, borderRadius: '50%', flexShrink: 0, background: on ? m.color : 'var(--color-background-base)', border: on ? `var(--border-stroke-2) solid ${m.color}` : 'var(--border-stroke-2) solid var(--luxi-color-component-division-move-dot-border)', boxShadow: on ? `0 0 0 3px ${m.tint}` /* halo — a shadow, value unchanged */ : 'none', transition: 'background-color 200ms var(--ease-out), border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out)' }} />
+                  <span style={{ fontSize: 'var(--text-sm)', fontWeight: on ? 700 : 500, color: on ? m.color : P.textTertiary, whiteSpace: 'nowrap', transition: 'color 200ms var(--ease-out)' }}>{m.label}</span>
                 </div>
               )
             })}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '6px 0 2px', minHeight: 300, overflow: 'visible' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '4px 0', minHeight: 300, overflow: 'visible' }}>
             {renderDiagram(snap, built, showMathTerms, fitScale, W, Hh)}
           </div>
 
           {/* progress dots (active = wide pill) */}
-          <div style={{ display: 'flex', gap: 6, justifyContent: 'center', alignItems: 'center', margin: '8px 0 12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', alignItems: 'center', margin: '8px 0 12px', flexWrap: 'wrap' }}>
             {stages.map((_, j) => (
-              <span key={j} style={{ width: j === idx ? 18 : 7, height: 7, borderRadius: 5, background: j === idx ? 'var(--luxi-color-component-division-progress-dot-current)' : j < idx ? 'var(--luxi-color-component-division-progress-dot-done)' : 'var(--luxi-color-component-division-progress-dot-upcoming)', transition: 'all .2s' }} />
+              <span key={j} style={{ width: j === idx ? 20 : 8, height: 8, borderRadius: 4, /* was 18/7 · 5 */ background: j === idx ? 'var(--luxi-color-component-division-progress-dot-current)' : j < idx ? 'var(--luxi-color-component-division-progress-dot-done)' : 'var(--luxi-color-component-division-progress-dot-upcoming)', transition: 'width 200ms var(--ease-out), background-color 200ms var(--ease-out)' }} />
             ))}
           </div>
 
-          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
             {!isLast && <PressBtn variant="secondary" onClick={() => setPlaying((p) => !p)}>{playing ? '❚❚ Pause' : '▶ Play'}</PressBtn>}
             {isLast && <PressBtn variant="secondary" onClick={restart}>↺ Watch again</PressBtn>}
             <PressBtn variant="back" onClick={back}>◂ Back</PressBtn>
