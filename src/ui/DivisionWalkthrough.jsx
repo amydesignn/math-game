@@ -71,9 +71,11 @@ const LABELW = 128 // the dividend label column: fits "all the candy to share" o
 const RW = 40 // "R3" beside the Answer Box: 8px gap + glyphs (measured: DIVIDEND lands LABELGAP past it)
 const QLH = 36 // the QUOTIENT label block: two 18px lines (term + explain)
 const BOX_TOP = 4, BOX_H = ROWH - 8 // the Answer Box inside the quotient row: centred, 4px clear of the bracket
-/* Motion (S3): chrome ≤ 300ms; the TEACHING moves inside the diagram take 500 so a kid
-   can follow them. Overshoot lives in the dv- keyframes, never in the curve. */
-const TEACH = '500ms var(--ease-in-out)' // on-screen moves (spotlight slide, the bring-down arc)
+/* Motion (S3): chrome ≤ 300ms; on-screen moves 500; the moves that TEACH use Datum's
+   expressive tier (800 · 1000, styling-v0.36) so a kid can follow them. Overshoot lives in
+   the dv- keyframes, never in the curve. */
+const SLIDE = '500ms var(--ease-in-out)' // the Sharing Table sliding to the next digits
+const TEACH = '800ms var(--ease-in-out)' // expressive: the digit brought down (was .62s)
 const POP = '300ms var(--ease-out)' // a digit landing
 
 /* Oscar's skeuomorphic pressable button (his `style-active` → a pressed state).
@@ -122,7 +124,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
         position: 'absolute', left: xL(cs) - PAD, top: yT(r) - 4, width: (ce - cs + 1) * CELL + 2 * PAD, height: ROWH + 4,
         border: `var(--border-stroke-2) solid ${P.slate400}`, background: P.slateTint, borderRadius: 12, /* was 14 — the Answer Box's 12 */ zIndex: 1,
         animation: 'dvTablePulse 2.3s ease-in-out infinite', /* infinite loop — exempt */
-        transition: `left ${TEACH}, top ${TEACH}, width ${TEACH}`,
+        transition: `left ${SLIDE}, top ${SLIDE}, width ${SLIDE}`,
       }}>
         <span style={{
           position: 'absolute', bottom: -12, left: 12, fontSize: 'var(--text-xs)' /* bottom edge: on top it hid under the Answer Box in round 1 */, lineHeight: 1, fontWeight: 700, letterSpacing: '.05em',
@@ -267,7 +269,7 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
       const dist = (subRow - 1) * ROWH
       if (snap.hot.bd === si) {
         els.push(
-          <svg key={'bda' + si} width={CELL + 8} height={dist} viewBox={`0 0 ${CELL + 8} ${dist}`} style={{ position: 'absolute', left: xL(nextCol) - 4, top: yT(1), zIndex: 2, overflow: 'visible', animation: 'dvArrowInOut 500ms var(--ease-out) both' }}>{/* the arrow's path + pen are drawing */}
+          <svg key={'bda' + si} width={CELL + 8} height={dist} viewBox={`0 0 ${CELL + 8} ${dist}`} style={{ position: 'absolute', left: xL(nextCol) - 4, top: yT(1), zIndex: 2, overflow: 'visible', animation: 'dvArrowInOut 1000ms var(--ease-out) both' /* expressive: the path shows, holds over the arc, fades (was 1s) */ }}>{/* the arrow's path + pen are drawing */}
             <path d={`M ${(CELL + 8) / 2} 10 C ${(CELL + 8) / 2 + 11} ${dist * 0.42}, ${(CELL + 8) / 2 - 7} ${dist * 0.72}, ${(CELL + 8) / 2} ${dist - 14}`} fill="none" style={{ stroke: 'var(--luxi-color-component-division-bring-down-arrow)' }} /* style: var() never resolves in an SVG attribute */ strokeWidth={2.5} strokeLinecap="round" />
             <path d={`M ${(CELL + 8) / 2 - 6} ${dist - 20} L ${(CELL + 8) / 2} ${dist - 9} L ${(CELL + 8) / 2 + 6} ${dist - 20}`} fill="none" style={{ stroke: 'var(--luxi-color-component-division-bring-down-arrow)' }} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" />
           </svg>,
@@ -294,15 +296,15 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
   if (snap.celebrate) {
     const cc = snap.celebrate === 'sneaky' ? P.goldB : snap.celebrate === 'final' ? P.teal : P.slate400
     els.push(
-      <div key={'burst' + snap.celebrate + snap.round} style={{ position: 'absolute', left: xL(0) + (n * CELL) / 2 - 24, /* centred on the Answer Box */ top: yT(0), width: 48, height: 48, borderRadius: '50%', border: `var(--border-stroke-2) solid ${cc}`, zIndex: 1, animation: 'dvBurst 500ms var(--ease-out) both', pointerEvents: 'none' }} />,
+      <div key={'burst' + snap.celebrate + snap.round} style={{ position: 'absolute', left: xL(0) + (n * CELL) / 2 - 24, /* centred on the Answer Box */ top: yT(0), width: 48, height: 48, borderRadius: '50%', border: `var(--border-stroke-2) solid ${cc}`, zIndex: 1, animation: 'dvBurst 800ms var(--ease-out) both' /* expressive (was .75s) */, pointerEvents: 'none' }} />,
     )
   }
   if (snap.final) {
     const cols = [P.berry, P.teal, P.answerLine, 'var(--luxi-color-component-division-confetti-lilac)', 'var(--luxi-color-component-division-confetti-iris)']
     for (let j = 0; j < 15; j++) {
       els.push(
-        // confetti: the scatter is decoration (sin spread); the fall is on the ladder, staggered so it still rains
-        <div key={'cf' + j} style={{ position: 'absolute', left: W * 0.5 + Math.sin(j * 1.8) * W * 0.4, top: 0, width: 8, height: 12, borderRadius: 4, background: cols[j % cols.length], zIndex: 5, opacity: 0, animation: `dvConfetti 500ms ${50 * j}ms var(--ease-in-out) both` }} />,
+        // confetti: the scatter is decoration (sin spread); each piece falls 1000 (expressive), staggered 50ms → ~1.7s of rain (was 1.7–2.7s)
+        <div key={'cf' + j} style={{ position: 'absolute', left: W * 0.5 + Math.sin(j * 1.8) * W * 0.4, top: 0, width: 8, height: 12, borderRadius: 4, background: cols[j % cols.length], zIndex: 5, opacity: 0, animation: `dvConfetti 1000ms ${50 * j}ms var(--ease-in-out) both` }} />,
       )
     }
   }
