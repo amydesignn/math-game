@@ -303,8 +303,10 @@ function renderDiagram(snap, built, showTerms, fitScale, W, Hh) {
     const cols = [P.berry, P.teal, P.answerLine, 'var(--luxi-color-component-division-confetti-lilac)', 'var(--luxi-color-component-division-confetti-iris)']
     for (let j = 0; j < 15; j++) {
       els.push(
-        // confetti: the scatter is decoration (sin spread); each piece falls 1000 (expressive), staggered 50ms → ~1.7s of rain (was 1.7–2.7s)
-        <div key={'cf' + j} style={{ position: 'absolute', left: W * 0.5 + Math.sin(j * 1.8) * W * 0.4, top: 0, width: 8, height: 12, borderRadius: 4, background: cols[j % cols.length], zIndex: 5, opacity: 0, animation: `dvConfetti 1000ms ${50 * j}ms var(--ease-in-out) both` }} />,
+        // confetti (Oscar's): the scatter is decoration (sin spread). Each piece flies on Datum's
+        // CELEBRATION tier — alternating 1800 / 2800 so they flutter at different speeds — with his
+        // 50ms stagger. His ease-in gravity is baked into dvConfetti's stops, so the timing is linear.
+        <div key={'cf' + j} style={{ position: 'absolute', left: W * 0.5 + Math.sin(j * 1.8) * W * 0.4, top: 0, width: 8, height: 12, borderRadius: 4, background: cols[j % cols.length], zIndex: 5, opacity: 0, animation: `dvConfetti var(--duration-${j % 2 ? 2800 : 1800}) ${50 * j}ms linear both` }} />,
       )
     }
   }

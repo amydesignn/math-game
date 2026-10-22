@@ -379,6 +379,8 @@
   --luxi-shadow-division-caption: 0 5px 16px rgba(40,30,70,.07); /* off-ramp ink #281E46 @ 7% — the speech bubble */
   --luxi-shadow-division-table-pulse-rest: 0 0 0 4px rgba(98,116,142,.12); /* off-ramp slate #62748E @ 12% — dvTablePulse */
   --luxi-shadow-division-table-pulse-peak: 0 0 0 9px rgba(98,116,142,.18); /* slate @ 18% */
+  --duration-1800: 1800ms; /* Datum, verbatim (styling-v0.36 celebration tier) — confetti, quick */
+  --duration-2800: 2800ms; /* Datum, verbatim — confetti, slow */
 
   /* ---- luxi skins 10-21: the six station skins + the lucky skin (skins.js) ----
      accent = slots, rings, tints, the 3D ring/orb (fails AA on white — never text)
@@ -755,7 +757,19 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 @keyframes dvTablePulse { 0%, 100% { box-shadow: var(--luxi-shadow-division-table-pulse-rest); } 50% { box-shadow: var(--luxi-shadow-division-table-pulse-peak); } }
 @keyframes dvAnswerSeal { 0% { transform: scale(1); } 40% { transform: scale(1.045); } 100% { transform: scale(1); } }
 @keyframes dvBurst { 0% { transform: scale(.2); opacity: 0.9; } 100% { transform: scale(2.6); opacity: 0; } } /* S3: .85 → .9 */
-@keyframes dvConfetti { 0% { transform: translateY(-8px) rotate(0); opacity: 0; } 12% { opacity: 1; } 100% { transform: translateY(380px) rotate(560deg); opacity: 0; } }
+/* S3: Oscar's confetti fall, his ease-in GRAVITY sampled into the stops (ease-in is removed from
+   Datum, so the curve lives here and the timing is linear). Opacity rounded to the ladder. */
+@keyframes dvConfetti {
+  0% { transform: translateY(-8px) rotate(0deg); opacity: 0; }
+  12% { transform: translateY(1px) rotate(13deg); opacity: 1; }
+  25% { transform: translateY(28px) rotate(52deg); opacity: 1; }
+  37.5% { transform: translateY(67px) rotate(108deg); opacity: 0.9; }
+  50% { transform: translateY(114px) rotate(177deg); opacity: 0.8; }
+  62.5% { transform: translateY(170px) rotate(257deg); opacity: 0.6; }
+  75% { transform: translateY(233px) rotate(348deg); opacity: 0.4; }
+  87.5% { transform: translateY(303px) rotate(449deg); opacity: 0.2; }
+  100% { transform: translateY(380px) rotate(560deg); opacity: 0; }
+}
 @keyframes dvFadeSlide { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
 /* division ASK screen (C2 Phase 1) */
 @keyframes dvCaret { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
