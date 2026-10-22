@@ -1,6 +1,7 @@
 /*
  * The gem — one identity everywhere (HUD counter, shop prices, math rewards).
  * Oscar's comp used a placeholder PNG; in-game the gem IS this SVG.
+ * Its paths + facet fills are ARTWORK (drawing, not layout) — left as drawn (S4 10-22).
  */
 export default function Gem({ size = 22, style }) {
   return (

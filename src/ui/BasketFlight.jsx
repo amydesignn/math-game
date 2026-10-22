@@ -11,7 +11,7 @@ import * as THREE from 'three'
  * setTimeout(FLY_MS), like the gem award — so a starved/hidden frame loop can
  * never strand a harvest. Reduced motion: no flight, App ticks at once.
  */
-export const FLY_MS = 760
+export const FLY_MS = 800 // Datum's expressive tier (was 760) — the move carries meaning: the pick lands in the basket
 const ARC = 0.32 // how high the arc bows above the straight line, × the distance
 const STEPS = 16 // keyframes sampled along the curve
 
@@ -46,7 +46,9 @@ export function FlyFlower({ from, to, emoji }) {
       const o = t < 0.88 ? 1 : 1 - (t - 0.88) / 0.12
       frames.push({ transform: `translate(${p.x}px, ${p.y}px) translate(-50%, -50%) scale(${s}) rotate(${-12 + 24 * t}deg)`, opacity: o })
     }
-    const a = el.animate(frames, { duration: FLY_MS, easing: 'cubic-bezier(.45,0,.35,1)', fill: 'forwards' })
+    // Datum's on-screen-movement curve, by name (WAAPI can't resolve var() itself)
+    const easing = getComputedStyle(document.documentElement).getPropertyValue('--ease-in-out').trim() || undefined
+    const a = el.animate(frames, { duration: FLY_MS, easing, fill: 'forwards' })
     return () => a.cancel()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -59,11 +61,11 @@ export function FlyFlower({ from, to, emoji }) {
         left: 0,
         top: 0,
         zIndex: 40,
-        fontSize: 40,
+        fontSize: 'var(--text-40)',
         lineHeight: 1,
         pointerEvents: 'none',
         transform: `translate(${from.x}px, ${from.y}px) translate(-50%, -50%)`,
-        filter: 'drop-shadow(0 4px 8px rgba(43,32,90,0.28))',
+        filter: 'var(--luxi-shadow-fly-flower)',
       }}
     >
       {emoji}

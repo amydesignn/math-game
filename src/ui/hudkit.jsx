@@ -8,7 +8,8 @@
  */
 
 /* Gem — Amy's exact cut-diamond w/ white "+" (Math version 3.svg), tight viewBox.
-   The single gem in the app; Door.jsx and the in-world level bar both import it. */
+   The single gem in the app; Door.jsx and the in-world level bar both import it.
+   Its path coordinates + facet fills are ARTWORK (drawing, not layout) — left as drawn (S4 10-22). */
 export function GemIcon({ size = 24 }) {
   return (
     <svg width={size} height={size} viewBox="18 25.5 60 60" fill="none" aria-hidden="true">
@@ -31,6 +32,7 @@ export function GemIcon({ size = 24 }) {
    profile photo, see avatar.js) it shows the photo clipped to the circle; with no
    photo it falls back to the friendly 🙂, same as before. */
 export function ProfileChip({ size = 44, src = null }) {
+  const glyph = Math.round(size / 2) // the 🙂 is an icon sized to its chip, not a type step
   return (
     <span
       role="button"
@@ -42,12 +44,12 @@ export function ProfileChip({ size = 44, src = null }) {
         flex: 'none',
         borderRadius: '50%',
         overflow: 'hidden', // clip a photo to the circle
-        boxShadow: '0 0 0 2px #fff, 0 0 0 3.5px #DDD1F7',
-        background: 'radial-gradient(120% 120% at 30% 25%, #EDE7FC, #B29BEA)',
+        boxShadow: 'var(--luxi-shadow-profile-chip)',
+        background: 'radial-gradient(120% 120% at 30% 25%, var(--luxi-color-component-profile-chip-fill-start), var(--luxi-color-component-profile-chip-fill-end))',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: Math.round(size * 0.5),
+        fontSize: glyph,
       }}
     >
       {src ? <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : '🙂'}

@@ -1,6 +1,6 @@
 # Contrast audit — LevelBar + LevelUpPopup
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/LevelBar.jsx` · **Run:** 2026-10-22 01:40 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/LevelBar.jsx` · **Run:** 2026-10-22 05:05 UTC  
 **Variants:** HUD pill · Level 2, Congratulations card · **Phases:** default
 
 > **30 unique checks · 30 pass · 0 fail · 0 exempt (disabled) · 0 need review**
@@ -22,8 +22,8 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
-| Level 2 | `#262626` on `#FFFFFF` | 15px bold | 15.13:1 | 4.50:1 | ✅ | default |
-| 2 | `#262626` on `#FFFFFF` | 15px bold | 15.13:1 | 4.50:1 | ✅ | default |
+| Level 2 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | default |
+| 2 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | default |
 | 78 | `#3D43BE` on `#FFFFFF` | 14px bold | 7.65:1 | 4.50:1 | ✅ | default |
 | 12 | `#0E7490` on `#FFFFFF` | 14px bold | 5.35:1 | 4.50:1 | ✅ | default |
 
@@ -39,16 +39,16 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
-| LEVEL UP! | `#3D43BE` on `#FFFFFF` | 13px bold | 7.65:1 | 4.50:1 | ✅ | default |
-| 2 | `#FFFFFF` on `#6169E0` | 46px bold (large) | 4.55:1 | 3.00:1 | ✅ | default |
-| You climbed a whole level — every problem counted! | `#262626` on `#FFFFFF` | 19px bold (large) | 15.13:1 | 3.00:1 | ✅ | default |
+| LEVEL UP! | `#3D43BE` on `#FFFFFF` | 12px bold | 7.65:1 | 4.50:1 | ✅ | default |
+| 2 | `#FFFFFF` on `#6169E0` | 48px bold (large) | 4.55:1 | 3.00:1 | ✅ | default |
+| You climbed a whole level — every problem counted! | `#262626` on `#FFFFFF` | 20px bold (large) | 15.13:1 | 3.00:1 | ✅ | default |
 | Keep going! ✨ | `#FFFFFF` on `#6169E0` | 18px bold | 4.55:1 | 4.50:1 | ✅ | default |
 
 ### Interactive elements — every state
 
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
-| Keep going! ✨ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.18:1 · 53% of edge | default |
+| Keep going! ✨ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.18:1 · 54% of edge | default |
 
 ---
 

@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react'
 import { WORLD } from '../config'
 import { MAPS } from '../maps'
 
-const SIZE = 104 // css px, drawn 2x for retina
+const SIZE = 104 // css px (frame included — the app is border-box)
+const DPR = 2 // the canvas backing store is drawn 2x for retina
 
 /**
  * Tiny map, top-right. The rounded square IS the playable map (edge = edge of
@@ -15,25 +16,28 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
   useEffect(() => {
     const ctx = canvas.current.getContext('2d')
     const css = getComputedStyle(document.documentElement)
-    const iris = css.getPropertyValue('--brand-iris-600').trim() || '#4b54dd'
-    const gold = css.getPropertyValue('--star-gold').trim() || '#f5b623'
-    const cyan = css.getPropertyValue('--gem-cyan').trim() || '#2ec5c5'
+    // every colour by name from the S4 :root block (a canvas can't read var() itself)
+    const tok = (n) => css.getPropertyValue(`--luxi-color-component-minimap-${n}`).trim()
+    const iris = tok('player')
+    const gold = tok('pet')
+    const cyan = tok('sparkle')
+    const ring = tok('ring')
     const B = WORLD.bounds
-    const s = (SIZE * 2) / (B * 2) // world units → device px
+    const s = (SIZE * DPR) / (B + B) // world units → device px
     const toPx = (v) => (v + B) * s
 
     let raf
     const draw = () => {
-      ctx.clearRect(0, 0, SIZE * 2, SIZE * 2)
+      ctx.clearRect(0, 0, SIZE * DPR, SIZE * DPR)
 
       // the map itself — same color as this world's playable ground
       ctx.fillStyle = map.ground
       ctx.beginPath()
-      ctx.roundRect(0, 0, SIZE * 2, SIZE * 2, 24)
+      ctx.roundRect(0, 0, SIZE * DPR, SIZE * DPR, 24)
       ctx.fill()
 
       // scenery (static)
-      ctx.fillStyle = 'rgba(74,61,122,0.35)' // lilac-900 @ 35%
+      ctx.fillStyle = tok('scenery') // lilac-900 @ 35%
       for (const d of map.decor) {
         ctx.beginPath()
         ctx.arc(toPx(d.position[0]), toPx(d.position[2]), 5, 0, Math.PI * 2)
@@ -43,7 +47,7 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
       // gates — glowing dots in the color of the map they lead to
       for (const g of map.gates) {
         ctx.fillStyle = MAPS[g.to].gateColor
-        ctx.strokeStyle = '#ffffff'
+        ctx.strokeStyle = ring
         ctx.lineWidth = 3
         ctx.beginPath()
         ctx.arc(toPx(g.position[0]), toPx(g.position[2]), 7, 0, Math.PI * 2)
@@ -52,7 +56,7 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
       }
 
       // Ivy's placed decorations (lilac — hers, distinct from grey scenery)
-      ctx.fillStyle = '#9b84e0'
+      ctx.fillStyle = tok('placed')
       for (const w of placed) {
         ctx.beginPath()
         ctx.arc(toPx(w.x), toPx(w.z), 5, 0, Math.PI * 2)
@@ -61,7 +65,7 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
 
       // gem sparkles (cyan — "something to find here")
       ctx.fillStyle = cyan
-      ctx.strokeStyle = '#ffffff'
+      ctx.strokeStyle = ring
       ctx.lineWidth = 2
       for (const sp of sparklesRef?.current || []) {
         ctx.beginPath()
@@ -78,7 +82,7 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
         ctx.arc(toPx(st.x), toPx(st.z), 8, 0, Math.PI * 2)
         ctx.fillStyle = st.color
         ctx.fill()
-        ctx.strokeStyle = '#ffffff'
+        ctx.strokeStyle = ring
         ctx.lineWidth = 3
         ctx.stroke()
       }
@@ -87,8 +91,8 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
       for (const b of buddiesRef?.current || []) {
         const bp = b.sim?.pos
         if (!bp) continue
-        ctx.fillStyle = '#ef7fb5'
-        ctx.strokeStyle = '#ffffff'
+        ctx.fillStyle = tok('buddy')
+        ctx.strokeStyle = ring
         ctx.lineWidth = 3
         ctx.beginPath()
         ctx.arc(toPx(bp.x), toPx(bp.z), 8, 0, Math.PI * 2)
@@ -106,7 +110,7 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
       // Ivy (iris, biggest dot, white ring so she pops on any background)
       const c = charPosRef.current
       ctx.fillStyle = iris
-      ctx.strokeStyle = '#ffffff'
+      ctx.strokeStyle = ring
       ctx.lineWidth = 4
       ctx.beginPath()
       ctx.arc(toPx(c.x), toPx(c.z), 9, 0, Math.PI * 2)
@@ -123,17 +127,17 @@ export default function Minimap({ map, charPosRef, petPosRef, sparklesRef, stati
     <canvas
       data-hint="minimap"
       ref={canvas}
-      width={SIZE * 2}
-      height={SIZE * 2}
+      width={SIZE * DPR}
+      height={SIZE * DPR}
       style={{
         position: 'absolute',
         top: 'max(16px, env(safe-area-inset-top))',
         right: 16,
         width: SIZE,
         height: SIZE,
-        borderRadius: 14,
-        boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
-        border: '3px solid #ffffff',
+        borderRadius: 16, // S4: 14 → 16; the 2px frame leaves a 14 inner curve, wider than the drawn map's 12, so no corner gaps
+        boxShadow: 'var(--luxi-shadow-hud-chip)',
+        border: 'var(--border-stroke-2) solid var(--luxi-color-component-minimap-ring)', // S4: 3px → stroke-2
         pointerEvents: 'none',
       }}
     />

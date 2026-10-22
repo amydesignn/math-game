@@ -1,6 +1,6 @@
 # Contrast audit — Garden overlays (Basket + GardenBar)
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Basket.jsx · src/App.jsx (GardenBar/ActionBar)` · **Run:** 2026-10-21 02:03 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Basket.jsx · src/App.jsx (GardenBar/ActionBar)` · **Run:** 2026-10-22 05:06 UTC  
 **Variants:** A seed to plant · basket empty, Growing, can water (12 💎) · basket full, Growing, can’t afford water (2 💎) · basket full, Bloomed · basket full, No seeds yet · basket empty · **Phases:** closed → basket-open
 
 > **98 unique checks · 92 pass · 0 fail · 1 exempt (disabled) · 0 need review**
@@ -33,8 +33,8 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
 | Open your basket — 0 harvested | — | — | — | — | ✅ 4.06:1 · 100% of edge | closed, basket-open |
-| Plant your seed | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 7.65:1 · 89% of edge | closed, basket-open |
-| Close | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 3.74:1 · 73% of edge | closed, basket-open |
+| Plant your seed | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 7.65:1 · 87% of edge | closed, basket-open |
+| Close | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 3.84:1 · 69% of edge | closed, basket-open |
 | Close your basket | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 4.04:1 · 80% of edge | basket-open |
 
 ## Growing, can water (12 💎) · basket full
@@ -60,8 +60,8 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
 | Open your basket — 9 harvested | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 3.98:1 · 100% of edge | closed, basket-open |
-| Water your plant | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 7.65:1 · 86% of edge | closed, basket-open |
-| Close | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 3.79:1 · 70% of edge | closed, basket-open |
+| Water your plant | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 7.65:1 · 85% of edge | closed, basket-open |
+| Close | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 3.88:1 · 70% of edge | closed, basket-open |
 | Close your basket | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 4.04:1 · 80% of edge | basket-open |
 
 ## Growing, can’t afford water (2 💎) · basket full
@@ -87,7 +87,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 |---|---|---|---|---|---|---|
 | Open your basket — 9 harvested | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 3.98:1 · 100% of edge | closed, basket-open |
 | Water your plant | ⚪ disabled 2.37:1 — exempt (WCAG 1.4.3) | | | | | closed, basket-open |
-| Close | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 4.29:1 · 71% of edge | closed, basket-open |
+| Close | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 7.98:1 | ✅ 4.19:1 · 76% of edge | closed, basket-open |
 | Close your basket | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 6.49:1 | ✅ 4.04:1 · 80% of edge | basket-open |
 
 ## Bloomed · basket full
