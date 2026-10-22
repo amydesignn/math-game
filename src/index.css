@@ -568,6 +568,22 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1); /* Datum, verbatim — the gem flight + the shakes (S2) */
 
+  /* ---- luxi govern S7 2026-10-22: shared files (main.jsx Boot · SignIn · crash card · index.css globals ·
+     App.jsx gift card + gate fade · the lucky gift's halo + pill · the division ask's tap glow) ----
+     Values unchanged — raw literals at those use sites, now named. */
+  --luxi-color-component-gate-fade-background: #FFFFFF; /* white — the gate-travel fade (App.jsx) */
+  --luxi-shadow-signin-card: 0 18px 50px rgba(43,32,90,0.18); /* off-ramp ink #2B205A @ 18% — the sign-in card */
+  --luxi-shadow-division-ask-tap-rest: 0 0 0 0 rgba(45,109,246,0); /* off-ramp blue #2D6DF6 @ 0% — dvTapMe rest */
+  --luxi-shadow-division-ask-tap-peak: 0 0 0 6px rgba(45,109,246,.14); /* off-ramp blue #2D6DF6 @ 14% — dvTapMe peak */
+  --luxi-color-component-gift-halo-pink: #FFB3C7; /* off-ramp pastel — the welcome gift's turning halo (.lkHalo) */
+  --luxi-color-component-gift-halo-yellow: #FFE08A; /* off-ramp pastel */
+  --luxi-color-component-gift-halo-mint: #9BE7C4; /* off-ramp pastel */
+  --luxi-color-component-gift-halo-blue: #A9C7FF; /* off-ramp pastel */
+  --luxi-color-component-gift-halo-lilac: #D3B5FF; /* off-ramp pastel */
+  --luxi-shadow-hint-lucky-pill: 0 0 0 2px #fff, 0 0 0 4px #FFE08A, 0 6px 18px rgba(151, 60, 0, .35); /* white + pastel-yellow rim + amber-800 #973C00 @ 35% — the lucky hint pill */
+  --duration-800: 800ms; /* Datum, verbatim (styling-v0.36 expressive tier) — the gift's seed pop */
+  --duration-1000: 1000ms; /* Datum, verbatim — the seed chip's delay */
+
   /* house-only (not Datum) */
   --lilac-50: #f6f4fd;
   /* reward accent — same gold family as the Planner */
@@ -597,8 +613,22 @@ canvas { touch-action: none; display: block; }
 /* boot-gate shimmer (main.jsx) — delayed 350ms so a fast local boot shows nothing */
 @keyframes bootshimmer {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(.92); }
-  100% { opacity: .85; transform: translate(-50%, -50%) scale(1.06); }
+  100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.06); } /* S7: .85 → .8 (opacity ladder) */
 }
+
+/* ── The account sign-in wall (main.jsx SignIn) — S7, 2026-10-22 ──
+   Interactive states here (inline beats :hover). The field is the house field (Datum's
+   interactive border trio — the old pale-grey edge was 1.26:1 on white, too faint to find, and
+   it had no focus at all); the button is the house 3D press; both wear the house ring. */
+.luxiSi-input { border: var(--border-stroke-1_6) solid var(--color-border-interactive-default); background: var(--color-background-interactive-default); outline: none; transition: border-color 150ms var(--ease-out); }
+.luxiSi-input:hover { border-color: var(--color-border-interactive-hover); }
+.luxiSi-input:focus { border-color: var(--color-border-interactive-focus); outline: var(--border-stroke-2) solid var(--color-border-interactive-focus); outline-offset: calc(-1 * var(--border-stroke-2)); } /* field focus = a 2px Iris 600 stroke, same as the signup field */
+.luxiSi-input::placeholder { color: var(--color-text-placeholder); }
+.luxiSi-btn { transition: transform 100ms var(--ease-out), box-shadow 100ms var(--ease-out), filter 150ms var(--ease-out); }
+.luxiSi-btn:hover { filter: brightness(1.04); }
+.luxiSi-btn:active { transform: translateY(4px); box-shadow: 0 0 0 var(--luxi-color-component-button3d-primary-shadow) !important; } /* !important: the base shadow is inline */
+.luxiSi-btn:focus-visible, .luxiSi-link:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .luxiSi-btn:active { transform: none; } }
 
 /* ── Door hub (Oscar's math-door comp, lifted) ── */
 /* the app is position:fixed/overflow:hidden, so the hub is its own scroll
@@ -633,7 +663,7 @@ canvas { touch-action: none; display: block; }
    has no step between neutral-400 (2.6:1 ✗) and neutral-500 (4.74:1, felt too heavy
    beside Luxi Math, Amy). It is 3.36:1 on the white bar → AA for LARGE text, which
    is why the app names are 24px (large at any weight). Phones drop below large
-   text, so ≤600px falls back to text-tertiary (4.74). Datum gap: a "neutral 450" /
+   text, so below md (768) falls back to text-tertiary (4.74). Datum gap: a "neutral 450" /
    "text-muted-large" step. Hover ≈ active (Amy): iris words + the mark in colour. */
 .doorApps { display: flex; align-items: center; gap: 0; min-width: 0; }
 .doorAppsMark { margin-right: 6px; } /* 6 = the documented 6px exception: the mark hugs its wordmark */
@@ -659,7 +689,7 @@ a.doorApp:hover .hgM, a.doorApp:focus-visible .hgM { fill: var(--luxi-color-comp
 a.doorApp:hover .hgD, a.doorApp:focus-visible .hgD { fill: var(--luxi-color-component-door-app-icon-dark-hover); }
 a.doorApp:active { color: var(--luxi-color-component-door-app-text-pressed); }
 a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outline-offset: 2px; }
-@media (max-width: 600px) {
+@media (width < 768px) { /* S7: 600 → below md (Datum md 768) */
   .doorHdrIn { gap: 8px; }
   .doorApp { font-size: var(--text-base); padding: 4px; gap: 6px; color: var(--color-text-tertiary); } /* S5: 17 → 16; gap 6 = the 6px exception (icon hugs its name) */
   .doorApp--on { color: var(--luxi-color-component-door-app-text-current); }
@@ -667,7 +697,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
   .doorAppIcon { width: 24px; height: 24px; }
   .doorAppsSep { height: 20px; }
 }
-@media (max-width: 440px) {
+@media (max-width: 440px) { /* no Datum step below md — kept for Amy's call (S7) */
   .doorAppsMark, .doorAppIcon { display: none !important; } /* beats hS.mark inline display:flex */
   .doorApp { font-size: var(--text-sm); padding: 4px 2px; } /* S5: 15 → 14; 2px inline = the 2px exception (two names on a 375 phone) */
 }
@@ -690,7 +720,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 /* Sticky only when the whole column fits under the 84px header: with What's new
    added it is ~716px tall, so on a 768px laptop a sticky column would hide the
    quest strip. Shorter windows just scroll it with the page. */
-@media (min-height: 820px) {
+@media (min-height: 820px) { /* a HEIGHT query (does the column fit) — Datum names widths only; kept (S7) */
   .doorLeft { position: sticky; top: 84px; }
 }
 .doorWorlds {
@@ -698,10 +728,10 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
-@media (min-width: 1000px) {
+@media (width >= 1024px) { /* S7: 1000 → lg */
   .doorWorlds { grid-template-columns: repeat(3, 1fr); }
 }
-@media (max-width: 860px) {
+@media (width < 1024px) { /* S7: 860 → below lg — every iPad portrait (744–834) stays single-column as before */
   /* minmax(0,1fr), not plain 1fr: a bare 1fr track keeps its implicit
      min-width:auto (= min-content), and the left column's widest unbreakable
      content (the quest line, the level rows) measured ~356px > the 338px track,
@@ -760,10 +790,10 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    glance stats — with the full record still one tap away (the pill stays
    tappable). !important is required because barStyles.pill sets padding/gap
    inline; the hidden spans set no `display` inline, so display:none alone wins
-   for them. 600px clears every phone-portrait and sits well below iPad (768). */
-@media (max-width: 600px) {
+   for them. S7: below md (767) — clears every phone-portrait; iPad (768+) keeps the full pill. */
+@media (width < 768px) {
   .lvlbar-track, .lvlbar-pts, .lvlbar-div { display: none; }
-  .lvlbar-pill { padding: 0 13px !important; gap: 8px !important; }
+  .lvlbar-pill { padding: 0 12px !important; gap: 8px !important; } /* S7: 13 → 12 */
 }
 
 /* ── Phone HUD: top row = stat pill (fills) · gear ──
@@ -773,7 +803,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    The left rail (Exit as a 48px door+arrow icon, then 🛍️) drops below it. */
 .hud-exit-wide { display: inline-flex; align-items: center; gap: 8px; } /* S4: 6 → 8 */
 .hud-exit-icon { display: none; }
-@media (max-width: 600px) {
+@media (width < 768px) { /* S7: 600 → below md */
   /* both rail buttons 48px (Amy: a bigger target for kids; Datum has no
      40/48 icon-button size yet — Notion Datum Backlog). Pill + gear stay 44. */
   .hud-exit { width: 48px; height: 48px !important; padding: 0 !important; justify-content: center; }
@@ -793,7 +823,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 }
 
 /* ── Math popup animations (Oscar's Phase 4 comp, lifted) ── */
-@keyframes ringpulse { 0% { transform: scale(.9); opacity: .55; } 70% { transform: scale(1.35); opacity: 0; } 100% { opacity: 0; } }
+@keyframes ringpulse { 0% { transform: scale(.9); opacity: 0.5; } /* S7: .55 → .5 */ 70% { transform: scale(1.35); opacity: 0; } 100% { opacity: 0; } }
 @keyframes popIn { 0% { transform: scale(.86) translateY(14px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 @keyframes scrimIn { 0% { opacity: 0; } 100% { opacity: 1; } }
 @keyframes gemSpin { 0% { transform: rotate(-8deg) scale(.4); opacity: 0; } 40% { opacity: 1; } 100% { transform: rotate(6deg) scale(1); opacity: 1; } }
@@ -813,7 +843,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 /* Neighbour speech bubble (world/Neighbour.jsx) — namespaced nb- so it can never retune another popIn */
 @keyframes nbPop { 0% { opacity: 0; transform: translateY(8px) scale(.8); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes slotFill { 0% { transform: scale(.4) rotate(-14deg); } 60% { transform: scale(1.25) rotate(6deg); } 100% { transform: scale(1) rotate(0); } }
-@keyframes bonusRing { 0% { transform: scale(.5); opacity: .8; } 100% { transform: scale(2.1); opacity: 0; } }
+@keyframes bonusRing { 0% { transform: scale(.5); opacity: 0.8; } 100% { transform: scale(2.1); opacity: 0; } }
 
 /* ── Level bar + level-up popup (Oscar's Phase 5-A comp, lifted) ── */
 /* the bar */
@@ -883,7 +913,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 @keyframes dvFadeSlide { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
 /* division ASK screen (C2 Phase 1) */
 @keyframes dvCaret { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
-@keyframes dvTapMe { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,109,246,0); } 50% { box-shadow: 0 0 0 6px rgba(45,109,246,.14); } }
+@keyframes dvTapMe { 0%, 100% { box-shadow: var(--luxi-shadow-division-ask-tap-rest); } 50% { box-shadow: var(--luxi-shadow-division-ask-tap-peak); } } /* S7: named */
 @keyframes dvDigitPop { 0% { transform: scale(.55); opacity: 0; } 60% { transform: scale(1.16); } 100% { transform: scale(1); opacity: 1; } }
 @keyframes dvShakeCell { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
 
@@ -1008,7 +1038,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 /* Short screens (phone landscape 812×375): a 230-tall image would fill the whole
    scroll area and hide the words, so the box shrinks to 96 tall (still 16:9,
    centred) and the title starts in view; the rest scrolls under a fixed ✕. */
-@media (max-height: 480px) {
+@media (max-height: 480px) { /* a HEIGHT query (phone landscape) — Datum names widths only; kept (S7) */
   .luxiOb-mediaBox { width: auto; height: 96px; margin: 0 auto; }
   .luxiOb-pages { padding-top: 16px; }
   .luxiOb-dots { padding-top: 16px; }
@@ -1258,11 +1288,11 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 /* ── 🧺 Basket (Grow a Garden ticket 8) ──
    The card grows up out of the bottom-left button. On phones the garden bar
    (bottom-centre) is wide enough to reach the button, so while it's open the
-   basket steps aside below 600px; iPad keeps both. */
+   basket steps aside below md (768); iPad keeps both. */
 .basket-card { animation: basketIn 200ms var(--ease-out); } /* S4: was .22s on a raw overshoot curve */
 @keyframes basketIn { 0% { transform: scale(.9) translateY(8px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .basket-card, .hud-basket span { animation: none !important; } }
-@media (max-width: 600px) { .hud-basket--bar { display: none !important; } }
+@media (width < 768px) { .hud-basket--bar { display: none !important; } } /* S7: 600 → below md */
 
 /* ── The lucky station's welcome gift (2026-10-18, Fern) ──
    The win card's pastel rainbow turns slowly behind the gem — the colours move,
@@ -1270,19 +1300,19 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    (they fly first), its chip a beat later. Namespaced lk- (house lesson: never
    reuse a shared keyframe name with a new curve). */
 .lkHalo {
-  position: absolute; left: 50%; top: 50%; width: 132px; height: 132px; margin: -66px 0 0 -66px;
+  position: absolute; inset: 0; margin: auto; width: 132px; height: 132px; /* S7: centred by inset+auto, not a -66 margin */
   border-radius: 50%;
-  background: conic-gradient(from 0deg, #FFB3C7, #FFE08A, #9BE7C4, #A9C7FF, #D3B5FF, #FFB3C7);
-  opacity: .55; filter: blur(10px);
+  background: conic-gradient(from 0deg, var(--luxi-color-component-gift-halo-pink), var(--luxi-color-component-gift-halo-yellow), var(--luxi-color-component-gift-halo-mint), var(--luxi-color-component-gift-halo-blue), var(--luxi-color-component-gift-halo-lilac), var(--luxi-color-component-gift-halo-pink));
+  opacity: 0.5; filter: blur(10px); /* S7: .55 → .5 (opacity ladder) */
   animation: lkTurn 8s linear infinite;
 }
-.lkSeed { animation: lkSeedPop .6s cubic-bezier(.2,.9,.3,1.3) .75s both; }
-.lkSeedChip { animation: lkSeedPop .45s cubic-bezier(.2,.9,.3,1.3) 1.05s both; }
+.lkSeed { animation: lkSeedPop var(--duration-800) var(--ease-out) var(--duration-800) both; } /* S7: was .6s at .75s on a raw overshoot curve → the expressive tier (her first seed carries meaning); the overshoot lives in the keyframe */
+.lkSeedChip { animation: lkSeedPop 300ms var(--ease-out) var(--duration-1000) both; } /* S7: was .45s at 1.05s */
 @keyframes lkTurn { to { transform: rotate(360deg); } }
-@keyframes lkSeedPop { 0% { transform: scale(0) rotate(-20deg); opacity: 0; } 70% { transform: scale(1.12) rotate(4deg); opacity: 1; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+@keyframes lkSeedPop { 0% { transform: scale(.4) rotate(-20deg); opacity: 0; } /* S7: from .4, not 0 (no scale-from-0) */ 70% { transform: scale(1.12) rotate(4deg); opacity: 1; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) {
   .lkHalo { animation: none; }
-  .lkSeed, .lkSeedChip { animation: lkFade .2s ease-out both; }
+  .lkSeed, .lkSeedChip { animation: lkFade 200ms var(--ease-out) both; }
 }
 @keyframes lkFade { from { opacity: 0; } to { opacity: 1; } }
 
@@ -1293,5 +1323,6 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
   --luxiHint-toast-bg: linear-gradient(180deg, var(--luxi-color-component-hint-toast-lucky-background-start), var(--luxi-color-component-hint-toast-lucky-background-end));
 }
 .luxiHint-layer[data-tone='lucky'] .luxiHint-pillBody {
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #FFE08A, 0 6px 18px rgba(151, 60, 0, .35);
+  box-shadow: var(--luxi-shadow-hint-lucky-pill); /* S7: named, value unchanged */
 }
+

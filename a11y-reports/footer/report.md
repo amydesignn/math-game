@@ -1,6 +1,6 @@
 # Contrast audit — Footer
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Footer.jsx` · **Run:** 2026-10-22 05:07 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Footer.jsx` · **Run:** 2026-10-22 13:01 UTC  
 **Variants:** Door footer · **Phases:** idle
 
 > **62 unique checks · 62 pass · 0 fail · 0 exempt (disabled) · 0 need review**

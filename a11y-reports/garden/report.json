@@ -2,7 +2,7 @@
   "component": "Garden overlays (Basket + GardenBar)",
   "file": "src/ui/Basket.jsx · src/App.jsx (GardenBar/ActionBar)",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-22T05:06:31.098Z",
+  "ranAt": "2026-10-22T13:01:34.742Z",
   "variants": [
     "A seed to plant · basket empty",
     "Growing, can water (12 💎) · basket full",
