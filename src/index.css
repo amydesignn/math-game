@@ -368,6 +368,20 @@
   --luxi-shadow-fly-gem: drop-shadow(0 4px 8px rgba(46,197,197,.5)); /* gem cyan @ 50% — the flight to the HUD */
   --luxi-shadow-fly-gem-bonus: drop-shadow(0 0 12px var(--luxi-color-component-math-amber)) drop-shadow(0 4px 10px rgba(217,119,6,.55)); /* amber-600 @ 55% — the bonus flight */
 
+  /* ---- luxi govern S3 10-21: the division walkthrough (DivisionWalkthrough.jsx + its dv- keyframes) ----
+     Values unchanged — raw shadows at the use sites, now named. */
+  --luxi-shadow-division-friend: 0 2px 7px rgba(90,60,120,.22); /* off-ramp plum #5A3C78 @ 22% — the divisor's friend photo */
+  --luxi-shadow-division-candy: drop-shadow(0 3px 6px rgba(90,60,120,.18)); /* plum @ 18% — the diagram's candy bag */
+  --luxi-shadow-division-card-candy: drop-shadow(0 3px 6px rgba(90,60,120,.20)); /* plum @ 20% — the DIVIDEND card's candy */
+  --luxi-shadow-division-intro-candy: drop-shadow(0 5px 10px rgba(90,60,120,.24)); /* plum @ 24% — the big intro candy */
+  --luxi-shadow-division-intro-candy-halo: 0 10px 24px rgba(120,80,150,.15); /* off-ramp #785096 @ 15% — the intro circle */
+  --luxi-shadow-division-sneaky-zero-tag: 0 2px 5px rgba(0,0,0,.12); /* black @ 12% — "keeps the line!" */
+  --luxi-shadow-division-caption: 0 5px 16px rgba(40,30,70,.07); /* off-ramp ink #281E46 @ 7% — the speech bubble */
+  --luxi-shadow-division-table-pulse-rest: 0 0 0 4px rgba(98,116,142,.12); /* off-ramp slate #62748E @ 12% — dvTablePulse */
+  --luxi-shadow-division-table-pulse-peak: 0 0 0 9px rgba(98,116,142,.18); /* slate @ 18% */
+  --duration-1800: 1800ms; /* Datum, verbatim (styling-v0.36 celebration tier) — confetti, quick */
+  --duration-2800: 2800ms; /* Datum, verbatim — confetti, slow */
+
   /* ---- luxi skins 10-21: the six station skins + the lucky skin (skins.js) ----
      accent = slots, rings, tints, the 3D ring/orb (fails AA on white — never text)
      glow   = the 3D orb's face
@@ -733,17 +747,29 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    DIFFERENT curves than the math card's `popIn` (line 138) and the column
    grid's `cellPop` (line 143) — overwriting either would silently retune
    MathPopup and the worked-example grids. Same lesson as `lvlPopIn` above.
-   The rest are prefixed too, so a future comp can't collide with them. */
-@keyframes dvPop { 0% { transform: scale(.92) translateY(16px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+   The rest are prefixed too, so a future comp can't collide with them.
+   S3 (10-21): his unused dvPop removed (the walkthrough sits in the house Modal, which opens with popIn). */
 @keyframes dvCellPop { 0% { transform: scale(.4); opacity: 0; } 60% { transform: scale(1.18); } 100% { transform: scale(1); opacity: 1; } }
 @keyframes dvQuoUp { 0% { transform: translateY(30px) scale(.5); opacity: 0; } 60% { transform: translateY(-4px) scale(1.16); } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 @keyframes dvBringArc { 0% { transform: translate(var(--ax,8px),var(--ay,-100px)) scale(.72); opacity: 0; } 35% { opacity: 1; } 60% { transform: translate(calc(var(--ax,8px) * -1),calc(var(--ay,-100px) * .34)) scale(1.12); } 100% { transform: translate(0,0) scale(1); opacity: 1; } }
-@keyframes dvArrowInOut { 0% { opacity: 0; } 22% { opacity: .95; } 66% { opacity: .95; } 100% { opacity: 0; } }
+@keyframes dvArrowInOut { 0% { opacity: 0; } 22% { opacity: 0.9; } 66% { opacity: 0.9; } 100% { opacity: 0; } } /* S3: .95 → .9 (opacity ladder) */
 @keyframes dvShimmer { 0% { transform: scale(.3) rotate(-20deg); opacity: 0; } 45% { transform: scale(1.32) rotate(12deg); opacity: 1; } 72% { transform: scale(.94) rotate(-5deg); } 100% { transform: scale(1) rotate(0); opacity: 1; } }
-@keyframes dvTablePulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(98,116,142,.12); } 50% { box-shadow: 0 0 0 9px rgba(98,116,142,.18); } }
+@keyframes dvTablePulse { 0%, 100% { box-shadow: var(--luxi-shadow-division-table-pulse-rest); } 50% { box-shadow: var(--luxi-shadow-division-table-pulse-peak); } }
 @keyframes dvAnswerSeal { 0% { transform: scale(1); } 40% { transform: scale(1.045); } 100% { transform: scale(1); } }
-@keyframes dvBurst { 0% { transform: scale(.2); opacity: .85; } 100% { transform: scale(2.6); opacity: 0; } }
-@keyframes dvConfetti { 0% { transform: translateY(-8px) rotate(0); opacity: 0; } 12% { opacity: 1; } 100% { transform: translateY(380px) rotate(560deg); opacity: 0; } }
+@keyframes dvBurst { 0% { transform: scale(.2); opacity: 0.9; } 100% { transform: scale(2.6); opacity: 0; } } /* S3: .85 → .9 */
+/* S3: Oscar's confetti fall, his ease-in GRAVITY sampled into the stops (ease-in is removed from
+   Datum, so the curve lives here and the timing is linear). Opacity rounded to the ladder. */
+@keyframes dvConfetti {
+  0% { transform: translateY(-8px) rotate(0deg); opacity: 0; }
+  12% { transform: translateY(1px) rotate(13deg); opacity: 1; }
+  25% { transform: translateY(28px) rotate(52deg); opacity: 1; }
+  37.5% { transform: translateY(67px) rotate(108deg); opacity: 0.9; }
+  50% { transform: translateY(114px) rotate(177deg); opacity: 0.8; }
+  62.5% { transform: translateY(170px) rotate(257deg); opacity: 0.6; }
+  75% { transform: translateY(233px) rotate(348deg); opacity: 0.4; }
+  87.5% { transform: translateY(303px) rotate(449deg); opacity: 0.2; }
+  100% { transform: translateY(380px) rotate(560deg); opacity: 0; }
+}
 @keyframes dvFadeSlide { 0% { opacity: 0; transform: translateY(6px); } 100% { opacity: 1; transform: translateY(0); } }
 /* division ASK screen (C2 Phase 1) */
 @keyframes dvCaret { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
