@@ -127,9 +127,9 @@ function Boot() {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          fontSize: 40,
+          fontSize: 'var(--text-40)',
           opacity: 0,
-          animation: 'bootshimmer 1.1s ease 0.35s infinite alternate',
+          animation: 'bootshimmer 1.1s var(--ease-in-out) 0.35s infinite alternate', // an infinite loop = exempt from the duration ladder; easing on Datum's (S7)
         }}
       >
         ✨
@@ -155,59 +155,66 @@ const si = {
     background: 'var(--luxi-color-component-signin-background)',
     padding: 20,
   },
+  // S7 (2026-10-22): onto Datum — 4px grid (radius 26 → 24, padding 30/26 → 32/24, 18/14 → 16),
+  // type on --text-* with weights 700/500, the field + button on the house recipes (index.css .luxiSi-)
   card: {
     width: 'min(400px, 92vw)',
-    background: '#fff',
-    borderRadius: 26,
-    boxShadow: '0 18px 50px rgba(43,32,90,0.18)',
-    padding: '30px 26px 26px',
+    background: 'var(--color-background-base)',
+    borderRadius: 24,
+    boxShadow: 'var(--luxi-shadow-signin-card)',
+    padding: '32px 24px 24px',
     textAlign: 'center',
     fontFamily: 'inherit',
   },
-  big: { fontSize: 44, lineHeight: 1 },
-  head: { margin: '12px 0 6px', fontSize: 21, fontWeight: 800, color: '#262626' },
-  sub: { margin: 0, fontSize: 14.5, fontWeight: 600, color: 'var(--luxi-color-component-signin-subtitle-text)', lineHeight: 1.45 },
+  big: { fontSize: 'var(--text-5xl)', lineHeight: 1 },
+  head: { margin: '12px 0 8px', fontSize: 'var(--text-xl)', fontWeight: 700, lineHeight: 1.5, color: 'var(--color-text-primary)' },
+  sub: { margin: 0, fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--luxi-color-component-signin-subtitle-text)', lineHeight: 1.5 },
   input: {
     width: '100%',
-    marginTop: 18,
+    marginTop: 16,
     height: 48,
-    borderRadius: 14,
-    border: '2px solid #E6E6E6',
-    outline: 'none',
-    padding: '0 14px',
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#262626',
+    borderRadius: 12,
+    padding: '0 16px',
+    fontSize: 'var(--text-base)',
+    fontWeight: 500,
+    color: 'var(--color-text-primary)',
     boxSizing: 'border-box',
   },
   btn: {
     width: '100%',
     marginTop: 12,
-    height: 50,
-    borderRadius: 14,
+    height: 48,
+    borderRadius: 12,
     border: 'none',
-    background: '#6169E0', // Brand Iris 500
-    color: '#fff',
-    fontSize: 16.5,
-    fontWeight: 800,
-    cursor: 'pointer',
-    boxShadow: '0 6px 0 #3D43BE', // Iris 700
-  },
-  note: { marginTop: 12, fontSize: 13.5, fontWeight: 700, color: '#D97706' },
-  again: {
-    marginTop: 14,
-    display: 'inline-block',
-    fontSize: 13.5,
+    background: 'var(--luxi-color-component-button3d-primary-background)',
+    color: 'var(--luxi-color-component-button3d-primary-text)',
+    fontFamily: 'inherit',
+    fontSize: 'var(--text-base)',
     fontWeight: 700,
+    cursor: 'pointer',
+    boxShadow: '0 4px 0 var(--luxi-color-component-button3d-primary-shadow)', // the house 3D press (was 6px)
+  },
+  // amber-600 #D97706 was 3.19:1 on the white card (fails AA at 14px) → Datum's warning text, amber-800
+  note: { marginTop: 12, fontSize: 'var(--text-sm)', fontWeight: 700, lineHeight: 1.5, color: 'var(--color-status-warning-text)' },
+  again: {
+    marginTop: 16,
+    display: 'inline-block',
+    padding: 0,
+    border: 0,
+    background: 'none',
+    fontFamily: 'inherit',
+    fontSize: 'var(--text-sm)',
+    fontWeight: 700,
+    lineHeight: 1.5,
     color: 'var(--luxi-color-component-signin-retry-text)',
     cursor: 'pointer',
     textDecoration: 'underline',
   },
 }
 
-function SignIn() {
+function SignIn({ initial = 'idle' }) {
   const [email, setEmail] = React.useState('')
-  const [state, setState] = React.useState('idle') // idle | sending | sent | error
+  const [state, setState] = React.useState(initial) // idle | sending | sent | error  (initial: the a11y harness)
   const send = async () => {
     if (!email.trim() || state === 'sending') return
     setState('sending')
@@ -227,9 +234,10 @@ function SignIn() {
           <p style={si.sub}>
             Tap the link inside and your world opens right up ✨
           </p>
-          <span style={si.again} onPointerDown={() => setState('idle')}>
+          {/* a real button (was a span on pointerdown — no keyboard way back) */}
+          <button type="button" className="luxiSi-link" style={si.again} onClick={() => setState('idle')}>
             Send it again
-          </span>
+          </button>
         </div>
       </div>
     )
@@ -240,6 +248,8 @@ function SignIn() {
         <h1 style={si.head}>Open your world</h1>
         <p style={si.sub}>Enter your email and we’ll send you a link to sign in — no password needed.</p>
         <input
+          className="luxiSi-input"
+          aria-label="Email"
           style={si.input}
           type="email"
           inputMode="email"
@@ -249,7 +259,7 @@ function SignIn() {
           onChange={(e) => setEmail(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && send()}
         />
-        <button style={{ ...si.btn, opacity: state === 'sending' ? 0.6 : 1 }} onPointerDown={send}>
+        <button type="button" className="luxiSi-btn" style={{ ...si.btn, opacity: state === 'sending' ? 0.6 : 1 }} onClick={send}>
           {state === 'sending' ? 'Sending…' : 'Send my link'}
         </button>
         {state === 'error' && (
@@ -281,17 +291,17 @@ class Oops extends React.Component {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 10,
+          gap: 12, // S7: 10 → 12; type on --text-*, 600 → 500
           background: 'var(--luxi-color-component-crash-background)',
           color: 'var(--luxi-color-component-crash-text)',
           fontWeight: 700,
-          fontSize: 20,
+          fontSize: 'var(--text-xl)',
           cursor: 'pointer',
         }}
       >
-        <span style={{ fontSize: 44 }}>🙀</span>
+        <span style={{ fontSize: 'var(--text-5xl)' }}>🙀</span>
         Oops, the world hiccupped!
-        <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--luxi-color-component-crash-subtitle-text)' }}>
+        <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--luxi-color-component-crash-subtitle-text)' }}>
           Tap anywhere to reload — your world is safe ✨
         </span>
       </div>
@@ -637,11 +647,13 @@ const SHOP_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'shop'
 const GARDEN_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'garden'
 const STATION_AUDIT =
   import.meta.env.DEV && new URLSearchParams(window.location.search).get('a11y') === 'station'
+// `?a11y=signin` (add `&state=sent|error`) — the account sign-in wall without a Supabase session (S7)
+const SIGNIN_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'signin'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      {ONBOARDING_AUDIT ? <OnboardingAudit /> : PROMO_AUDIT ? <PromoAudit /> : GARDEN_AUDIT ? <GardenAudit /> : LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
+      {SIGNIN_AUDIT ? <SignIn initial={AUDIT_Q.get('state') || 'idle'} /> : ONBOARDING_AUDIT ? <OnboardingAudit /> : PROMO_AUDIT ? <PromoAudit /> : GARDEN_AUDIT ? <GardenAudit /> : LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
     </Oops>
     {/* Cookieless, privacy-friendly traffic counting (no personal data, no
       * consent banner needed) — the whole point of moving to a real domain. */}
