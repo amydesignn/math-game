@@ -1,6 +1,6 @@
 # Contrast audit — Map HUD (Exit + MapLabel)
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/App.jsx` · **Run:** 2026-10-22 05:05 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/App.jsx` · **Run:** 2026-10-22 13:02 UTC  
 **Variants:** In world · Sunny Town · **Phases:** idle
 
 > **32 unique checks · 32 pass · 0 fail · 0 exempt (disabled) · 0 need review**
