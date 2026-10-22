@@ -2,7 +2,7 @@
   "component": "Heroes picker (Gem Shop)",
   "file": "src/ui/Shop.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-22T13:02:05.494Z",
+  "ranAt": "2026-10-22T15:49:51.937Z",
   "variants": [
     "60 gems · playing Sunny · Champ unlocked",
     "4 gems · playing the Sorcerer (every locked hero unaffordable)"
@@ -3160,7 +3160,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.93
+      "coverage": 0.94
     },
     {
       "variant": "60 gems · playing Sunny · Champ unlocked",
@@ -4150,7 +4150,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.93
+      "coverage": 0.94
     },
     {
       "variant": "60 gems · playing Sunny · Champ unlocked",

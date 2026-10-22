@@ -2,7 +2,7 @@
   "component": "Shop",
   "file": "src/ui/Shop.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-22T13:09:05.301Z",
+  "ranAt": "2026-10-22T15:49:20.445Z",
   "variants": [
     "4 gems · your things · sparkle on",
     "0 gems (nothing affordable)"
@@ -25,7 +25,7 @@
       "ratio": 15.13,
       "min": 3,
       "large": true,
-      "px": 19,
+      "px": 20,
       "weight": 700,
       "method": "axe",
       "status": "pass",
@@ -1598,7 +1598,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -1616,7 +1616,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -1634,7 +1634,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -1652,7 +1652,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -3033,7 +3033,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.93
+      "coverage": 0.92
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -3528,7 +3528,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.93
+      "coverage": 0.92
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -3693,7 +3693,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.93
+      "coverage": 0.92
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -3782,7 +3782,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.98
+      "coverage": 0.97
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -3871,7 +3871,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.98
+      "coverage": 0.97
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -3960,7 +3960,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.98
+      "coverage": 0.97
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -5469,7 +5469,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -5964,7 +5964,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -7404,7 +7404,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -7569,7 +7569,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -7899,7 +7899,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -8064,7 +8064,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -8443,7 +8443,7 @@
       "ratio": 15.13,
       "min": 3,
       "large": true,
-      "px": 19,
+      "px": 20,
       "weight": 700,
       "method": "axe",
       "status": "pass",
@@ -10016,7 +10016,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -10034,7 +10034,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -10052,7 +10052,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -10070,7 +10070,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -11451,7 +11451,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.93
+      "coverage": 0.92
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -11946,7 +11946,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.93
+      "coverage": 0.92
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -12111,7 +12111,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.93
+      "coverage": 0.92
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -12200,7 +12200,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.98
+      "coverage": 0.97
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -12289,7 +12289,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.98
+      "coverage": 0.97
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -12378,7 +12378,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.98
+      "coverage": 0.97
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -12873,7 +12873,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.93
+      "coverage": 0.94
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -13887,7 +13887,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -14382,7 +14382,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -15822,7 +15822,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -15987,7 +15987,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -16317,7 +16317,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -16482,7 +16482,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -16861,7 +16861,7 @@
       "ratio": 15.13,
       "min": 3,
       "large": true,
-      "px": 19,
+      "px": 20,
       "weight": 700,
       "method": "axe",
       "status": "pass",
@@ -18434,7 +18434,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -18452,7 +18452,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -18470,7 +18470,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -18488,7 +18488,7 @@
       "bg": "#EDE7FC",
       "ratio": 6.49,
       "min": 3,
-      "px": 15,
+      "px": 16,
       "weight": 700,
       "method": "pixel",
       "status": "pass",
@@ -20618,7 +20618,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.98
+      "coverage": 0.97
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -20707,7 +20707,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.98
+      "coverage": 0.97
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -20796,7 +20796,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.98
+      "coverage": 0.97
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -22305,7 +22305,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -22800,7 +22800,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -24240,7 +24240,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -24405,7 +24405,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -24735,7 +24735,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -24900,7 +24900,7 @@
       "criterion": "1.4.11",
       "ratio": 7.65,
       "min": 3,
-      "coverage": 0.94
+      "coverage": 0.93
     },
     {
       "variant": "4 gems · your things · sparkle on",
@@ -25279,7 +25279,7 @@
       "ratio": 15.13,
       "min": 3,
       "large": true,
-      "px": 19,
+      "px": 20,
       "weight": 700,
       "method": "axe",
       "status": "pass",
@@ -26393,7 +26393,7 @@
       "ratio": 15.13,
       "min": 3,
       "large": true,
-      "px": 19,
+      "px": 20,
       "weight": 700,
       "method": "axe",
       "status": "pass",

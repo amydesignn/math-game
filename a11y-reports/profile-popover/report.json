@@ -2,7 +2,7 @@
   "component": "ProfilePopover",
   "file": "src/ui/Settings.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-22T13:05:45.643Z",
+  "ranAt": "2026-10-22T15:47:13.041Z",
   "variants": [
     "Guest · no photo",
     "Signed in · initial",
@@ -316,12 +316,12 @@
       "bg": "#6856B5",
       "bgRange": [
         "#6856B5",
-        "#6150A9"
+        "#6150A8"
       ],
       "ratio": 5.85,
       "min": 3,
       "large": true,
-      "px": 38,
+      "px": 40,
       "weight": 700,
       "method": "pixel",
       "status": "pass",

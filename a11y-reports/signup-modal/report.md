@@ -1,6 +1,6 @@
 # Contrast audit — SignupModal
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/SignupModal.jsx` · **Run:** 2026-10-22 13:09 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/SignupModal.jsx` · **Run:** 2026-10-22 15:50 UTC  
 **Variants:** Form, Sending, Error, Check your inbox, Guest popup, Saved toast · **Phases:** empty → filled → sending → error → check → guest → toast
 
 > **168 unique checks · 158 pass · 0 fail · 4 exempt (disabled) · 0 need review**
