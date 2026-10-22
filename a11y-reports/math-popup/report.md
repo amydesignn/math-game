@@ -1,6 +1,6 @@
 # Contrast audit — MathPopup
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/MathPopup.jsx` · **Run:** 2026-10-22 01:43 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/MathPopup.jsx` · **Run:** 2026-10-22 03:18 UTC  
 **Variants:** 2-digit × 1-digit, Long multiplication, 2-digit addition, Long division, Lucky station · **Phases:** ask → correct → recover → step-2 → step-3 → step-4 → step-5 → step-6 → step-7 → step-8 → walkthrough
 
 > **559 unique checks · 548 pass · 0 fail · 1 exempt (disabled) · 0 need review**
@@ -23,13 +23,13 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
 | Your pet wants a snack! Solve it to fill the bowl. | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | ask |
-| 25 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 36 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | × | `#737373` on `#FFFFFF` | 40px (large) | 4.74:1 | 3.00:1 | ✅ | ask, recover, step-2, step-3, step-4 |
-| 5 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 3 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 1 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 2 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 3 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 4 | `#262626` on `#F1F1FD` | 30px bold (large) | 13.50:1 | 3.00:1 | ✅ | ask, recover, step-2, step-3, step-4 |
+| 5 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 6 | `#262626` on `#F1F1FD` | 30px bold (large) | 13.50:1 | 3.00:1 | ✅ | ask, recover, step-2, step-3, step-4 |
 | 7 | `#262626` on `#F1F1FD` | 30px bold (large) | 13.50:1 | 3.00:1 | ✅ | ask, recover, step-2, step-3, step-4 |
 | 8 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
@@ -45,20 +45,20 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Let's look at one together 💡 | `#262626` on `#FFFFFF` | 20px bold (large) | 15.13:1 | 3.00:1 | ✅ | recover, step-2, step-3, step-4 |
 | No worries — follow the steps, then give it another go. | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4 |
 | Your problem: | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4 |
-| 42 × 3 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | recover |
+| 38 × 3 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | recover |
 | · here's one just like it | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4 |
 | Line up the ones, with the × underneath. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | recover |
 | Show next step ▸ | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | recover, step-2, step-3 |
 | I've got it | `#4B54DD` on `#FFFFFF` | 16px | 5.81:1 | 4.50:1 | ✅ | recover, step-2, step-3 |
-| 15 × 6 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-2 |
+| 49 × 3 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-2 |
 | 4 | `#BB4D00` on `#FFFFFF` | 18px bold | 5.03:1 | 4.50:1 | ✅ | step-2, step-3 |
 | 2 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-2, step-3, step-4 |
 | Multiply the ones: 6 × 7 = 42. Write 2, carry the 4. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-2 |
 | ◂ Back | `#4B54DD` on `#FFFFFF` | 16px | 5.81:1 | 4.50:1 | ✅ | step-2, step-3, step-4 |
-| 32 × 6 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-3 |
+| 24 × 4 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-3 |
 | 8 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-3, step-4 |
 | Multiply the tens: 6 × 4 = 24. Add the 4 you carried: 24 + 4 | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-3 |
-| 42 × 2 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-4 |
+| 49 × 6 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-4 |
 | Read it together: 282. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-4 |
 | Now try yours again | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | step-4 |
 
@@ -92,9 +92,9 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
 | Your pet wants a snack! Solve it to fill the bowl. | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | ask |
-| 14 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 31 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | × | `#737373` on `#FFFFFF` | 40px (large) | 4.74:1 | 3.00:1 | ✅ | ask, recover, step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
-| 12 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 20 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 1 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 2 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 3 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
@@ -115,42 +115,41 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Let's look at one together 💡 | `#262626` on `#FFFFFF` | 20px bold (large) | 15.13:1 | 3.00:1 | ✅ | recover, step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
 | No worries — follow the steps, then give it another go. | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
 | Your problem: | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
-| 32 × 32 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | recover |
+| 23 × 30 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | recover |
 | · here's one just like it | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
 | WHOLE | `#FFFFFF` on `#00786F` | 12px bold | 5.36:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
 | 95 stays WHOLE — it's the whole team, we never split it apar | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | recover |
 | Show next step ▸ | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4, step-5, step-6, step-7 |
 | I've got it | `#4B54DD` on `#FFFFFF` | 16px | 5.81:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4, step-5, step-6, step-7 |
-| 22 × 24 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-2 |
+| 12 × 24 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-2 |
 | 2 | `#BB4D00` on `#FEF9C3` | 18px bold | 4.68:1 | 4.50:1 | ✅ | step-2, step-3 |
 | 8 | `#737373` on `#FFFFFF` | 30px bold (large) | 4.74:1 | 3.00:1 | ✅ | step-2, step-3 |
 | 5 | `#3D43BE` on `#F1F1FD` | 30px bold (large) | 6.82:1 | 3.00:1 | ✅ | step-2, step-3 |
 | 5 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
 | Ones pass: spotlight the 5. Start small: 5 × 5 = 25 — write  | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-2 |
 | ◂ Back | `#4B54DD` on `#FFFFFF` | 16px | 5.81:1 | 4.50:1 | ✅ | step-2, step-3, step-4, step-5, step-6, step-7, step-8 |
-| 32 × 20 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-3 |
+| 30 × 23 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-3, step-8 |
 | 4 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-3, step-4, step-5, step-6, step-7, step-8 |
 | 7 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-3, step-4, step-5, step-6, step-7, step-8 |
 | Keep going: 9 × 5 = 45, plus the 2 waiting on top = 47. Row  | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-3 |
-| 20 × 20 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-4 |
+| 30 × 33 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-4 |
 | 8 | `#3D43BE` on `#F1F1FD` | 30px bold (large) | 6.82:1 | 3.00:1 | ✅ | step-4, step-5, step-6 |
 | 5 | `#737373` on `#FFFFFF` | 30px bold (large) | 4.74:1 | 3.00:1 | ✅ | step-4, step-5, step-6 |
 | 0 | `#BB4D00` on `#F1F1FD` | 30px bold (large) | 4.48:1 | 3.00:1 | ✅ | step-4, step-5, step-6, step-7, step-8 |
 | WRITE IT! | `#BB4D00` on `#FFFFFF` | 12px bold | 5.03:1 | 4.50:1 | ✅ | step-4 |
 | Tens pass: spotlight the 8. It's not really 8 — it's 80! So  | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-4 |
-| 30 × 31 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-5 |
+| 40 × 21 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-5 |
 | 4 | `#BB4D00` on `#FEF9C3` | 18px bold | 4.68:1 | 4.50:1 | ✅ | step-5, step-6 |
 | 0 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-5, step-6, step-7, step-8 |
 | Same move as before: 5 × 8 = 40 — write the 0 next to the ze | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-5 |
-| 33 × 23 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-6 |
+| 20 × 14 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-6 |
 | 6 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-6, step-7, step-8 |
 | Keep going: 9 × 8 = 72, plus the 4 on top = 76. Row 2 is 760 | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-6 |
-| 13 × 23 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-7 |
+| 20 × 30 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-7 |
 | 1 | `#BB4D00` on `#FEF9C3` | 14px bold | 4.68:1 | 4.50:1 | ✅ | step-7, step-8 |
 | 8 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-7, step-8 |
 | Both passes done! Now add the rows, one column at a time fro | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-7 |
-| 43 × 20 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-8 |
-| So 95 × 85 = 8075! Your turn: 43 × 20 works exactly the same | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-8 |
+| So 95 × 85 = 8075! Your turn: 30 × 23 works exactly the same | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-8 |
 | Now try yours again | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | step-8 |
 
 ### Interactive elements — every state
@@ -183,8 +182,8 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
 | Your pet wants a snack! Solve it to fill the bowl. | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | ask |
-| 37 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 19 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 66 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 25 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 1 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 2 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 3 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
@@ -205,20 +204,20 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Let's look at one together 💡 | `#262626` on `#FFFFFF` | 20px bold (large) | 15.13:1 | 3.00:1 | ✅ | recover, step-2, step-3, step-4 |
 | No worries — follow the steps, then give it another go. | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4 |
 | Your problem: | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4 |
-| 28 + 27 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | recover |
+| 46 + 49 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | recover |
 | · here's one just like it | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4 |
 | Stack them so the ones line up under the ones. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | recover |
 | Show next step ▸ | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | recover, step-2, step-3 |
 | I've got it | `#4B54DD` on `#FFFFFF` | 16px | 5.81:1 | 4.50:1 | ✅ | recover, step-2, step-3 |
-| 35 + 50 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-2 |
+| 59 + 21 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-2 |
 | 1 | `#BB4D00` on `#FFFFFF` | 18px bold | 5.03:1 | 4.50:1 | ✅ | step-2, step-3, step-4 |
 | 5 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-2, step-3, step-4 |
 | Add the ones: 8 + 7 = 15. That's more than 9 — write 5 and c | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-2 |
 | ◂ Back | `#4B54DD` on `#FFFFFF` | 16px | 5.81:1 | 4.50:1 | ✅ | step-2, step-3, step-4 |
-| 65 + 31 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-3 |
+| 48 + 19 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-3 |
 | 1 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-3, step-4 |
 | Add the tens: 5 + 5 + 1 = 11. Write 11. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-3 |
-| 38 + 14 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-4 |
+| 47 + 19 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-4 |
 | Put it together: 115. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-4 |
 | Now try yours again | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | step-4 |
 
@@ -229,30 +228,30 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
 | Your pet wants a snack! Solve it to fill the bowl. | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | ask |
-| 64 | `#262626` on `#FFFFFF` | 40px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 33 | `#262626` on `#FFFFFF` | 40px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | ÷ | `#737373` on `#FFFFFF` | 32px (large) | 4.74:1 | 3.00:1 | ✅ | ask |
-| 8 | `#262626` on `#FFFFFF` | 40px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 4 | `#262626` on `#FFFFFF` | 40px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | EACH SHARE | `#4B54DD` on `#FFFFFF` | 12px bold | 5.81:1 | 4.50:1 | ✅ | ask |
 | LEFT OVER | `#737373` on `#FFFFFF` | 12px bold | 4.74:1 | 4.50:1 | ✅ | ask |
 | 1 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 2 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 3 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 4 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 5 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 6 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 7 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 8 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 9 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 0 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | Tap each share first — then the leftover. | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | ask |
 | Show me how 🔎 | `#4B54DD` on `#FFFFFF` | 14px | 5.81:1 | 4.50:1 | ✅ | ask |
 | SNACK TIME | `#00786F` on `#F3FBFA` ᵖ | 12px bold | 5.10:1 | 4.50:1 | ✅ | ask |
 | Let's share the candy 🍬 | `#262626` on `#FFFFFF` | 20px bold (large) | 15.13:1 | 3.00:1 | ✅ | walkthrough |
-| 64 | `#C6005C` on `#FAFAFA` | 40px bold (large) | 5.65:1 | 3.00:1 | ✅ | walkthrough |
+| 11 | `#C6005C` on `#FAFAFA` | 40px bold (large) | 5.65:1 | 3.00:1 | ✅ | walkthrough |
 | DIVIDEND | `#C6005C` on `#FDF2F8` | 12px bold | 5.40:1 | 4.50:1 | ✅ | walkthrough |
-| You have 64 candies to share. | `#262626` on `#FAFAFA` | 16px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
-| 8 | `#00786F` on `#F0FDFA` | 22px bold (large) | 5.14:1 | 3.00:1 | ✅ | walkthrough |
+| You have 11 candies to share. | `#262626` on `#FAFAFA` | 16px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
+| 9 | `#00786F` on `#F0FDFA` | 24px bold (large) | 5.14:1 | 3.00:1 | ✅ | walkthrough |
 | DIVISOR | `#00786F` on `#F0FDFA` | 12px bold | 5.14:1 | 4.50:1 | ✅ | walkthrough |
-| You share them with 8 friends. | `#262626` on `#FAFAFA` | 16px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
+| You share them with 9 friends. | `#262626` on `#FAFAFA` | 16px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
 | QUOTIENT | `#BB4D00` on `#FEF9C2` | 12px bold | 4.68:1 | 4.50:1 | ✅ | walkthrough |
 | How many does each friend get? | `#262626` on `#FAFAFA` | 16px | 14.49:1 | 4.50:1 | ✅ | walkthrough |
 | Let's discover it! ▸ | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | walkthrough |
@@ -277,7 +276,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | 0 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 15.13:1 | ✅ 6.49:1 · 90% of edge | ask |
 | check | ⚪ disabled 2.37:1 — exempt (WCAG 1.4.3) | | | | | ask |
 | Show me how 🔎 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 7.65:1 · 96% of edge | ask |
-| Let's discover it! ▸ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.99:1 · 57% of edge | walkthrough |
+| Let's discover it! ▸ | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.18:1 · 55% of edge | walkthrough |
 
 ## Lucky station
 
@@ -286,17 +285,17 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
 | Solve it to open your welcome gift! | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | ask |
-| 15 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 3 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover, step-4 |
+| 13 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 4 | `#262626` on `#FFFFFF` | 48px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
 | 1 | `#262626` on `#F1F1FD` | 30px bold (large) | 13.50:1 | 3.00:1 | ✅ | ask, recover, step-2, step-3, step-4 |
-| 2 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, step-3, step-4 |
-| 4 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 5 | `#262626` on `#F1F1FD` | 30px bold (large) | 13.50:1 | 3.00:1 | ✅ | ask, recover, step-2 |
-| 6 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, step-3 |
+| 2 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, step-3 |
+| 3 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 5 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, recover |
+| 6 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask, step-3, step-4 |
 | 7 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 8 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
+| 8 | `#262626` on `#F1F1FD` | 30px bold (large) | 13.50:1 | 3.00:1 | ✅ | ask, step-2 |
 | 9 | `#262626` on `#FFFFFF` | 24px bold (large) | 15.13:1 | 3.00:1 | ✅ | ask |
-| 0 | `#262626` on `#F1F1FD` | 30px bold (large) | 13.50:1 | 3.00:1 | ✅ | ask, step-2 |
+| 0 | `#262626` on `#F1F1FD` | 30px bold (large) | 13.50:1 | 3.00:1 | ✅ | ask, recover, step-2 |
 | Check | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | ask |
 | Type your answer, then tap Check | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | ask |
 | LUCKY STATION | `#973C00` on `#FFFAF2` ᵖ | 12px bold | 6.82:1 | 4.50:1 | ✅ | ask, correct, recover, step-2, step-3, step-4 |
@@ -309,20 +308,21 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Let's look at one together 💡 | `#262626` on `#FFFFFF` | 20px bold (large) | 15.13:1 | 3.00:1 | ✅ | recover, step-2, step-3, step-4 |
 | No worries — follow the steps, then give it another go. | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4 |
 | Your problem: | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4 |
-| 15 + 3 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | recover, step-2 |
+| 10 + 8 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | recover |
 | · here's one just like it | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | recover, step-2, step-3, step-4 |
 | Stack them so the ones line up under the ones. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | recover |
 | Show next step ▸ | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | recover, step-2, step-3 |
 | I've got it | `#4B54DD` on `#FFFFFF` | 16px | 5.81:1 | 4.50:1 | ✅ | recover, step-2, step-3 |
-| 5 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-2, step-4 |
-| Add the ones: 0 + 5 = 5. Write 5. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-2 |
+| 11 + 6 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-2 |
+| 8 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-2, step-3 |
+| Add the ones: 0 + 8 = 8. Write 8. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-2 |
 | ◂ Back | `#4B54DD` on `#FFFFFF` | 16px | 5.81:1 | 4.50:1 | ✅ | step-2, step-3, step-4 |
-| 10 + 5 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-3 |
+| 14 + 2 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-3 |
 | 1 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-3, step-4 |
-| 8 | `#4B54DD` on `#FFFFFF` | 30px bold (large) | 5.81:1 | 3.00:1 | ✅ | step-3 |
 | Add the tens: 1 + 0 = 1. Write 1. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-3 |
-| 14 + 2 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-4 |
-| Put it together: 15. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-4 |
+| 13 + 4 | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | step-4 |
+| 7 | `#4B54DD` on `#F1F1FD` | 30px bold (large) | 5.18:1 | 3.00:1 | ✅ | step-4 |
+| Put it together: 17. | `#262626` on `#F1F1FD` | 16px | 13.50:1 | 4.50:1 | ✅ | step-4 |
 | Now try yours again | `#FFFFFF` on `#6169E0` | 16px | 4.55:1 | 4.50:1 | ✅ | step-4 |
 
 ### Interactive elements — every state
