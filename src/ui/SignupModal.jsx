@@ -29,8 +29,13 @@
  * Iris 700 shadow, Datum changelog · Luxi Math · Button). Input = Datum's interactive
  * border trio (rest neutral-500 · hover 600 · focus iris-600). Hover/press/focus live in
  * index.css `.luxiSu-*` (an inline style beats :hover). role="dialog" + aria-modal.
+ *
+ * S6 governance (2026-10-22): the card + toast edge 1.5px → --border-stroke-1_6, both shadows
+ * named (--luxi-shadow-form-modal · -signup-toast, same values), emoji sizes on Datum --text-*,
+ * motion on the house ease-out: scrim 200 · card + error note + toast 300 (the toast was 400).
  */
 import { useState, useEffect, useRef } from 'react'
+import { POP_IN } from './mathkit'
 
 const FACE = 'var(--luxi-color-component-button3d-primary-background)', // Luxi 3D button face (white 4.56:1)
   SHADOW = 'var(--luxi-color-component-button3d-primary-shadow)'
@@ -79,17 +84,17 @@ const S = {
     background: 'var(--luxi-color-component-form-modal-scrim)',
     backdropFilter: 'blur(6px)',
     WebkitBackdropFilter: 'blur(6px)',
-    animation: 'scrimIn .25s ease-out both',
+    animation: 'scrimIn 200ms var(--ease-out) both',
   },
   card: {
     position: 'relative',
     width: '100%',
     background: 'var(--color-background-base)',
-    border: '1.5px solid var(--luxi-color-component-form-modal-border)',
+    border: 'var(--border-stroke-1_6) solid var(--luxi-color-component-form-modal-border)',
     borderRadius: 24,
-    boxShadow: '0 24px 60px rgba(50,38,80,.32), 0 4px 16px rgba(50,38,80,.14)',
+    boxShadow: 'var(--luxi-shadow-form-modal)',
     overflow: 'hidden',
-    animation: 'popIn .28s ease-out both',
+    animation: POP_IN,
   },
   header: {
     display: 'flex',
@@ -113,7 +118,7 @@ const S = {
     borderRadius: '50%',
     cursor: 'pointer',
     color: 'var(--color-icon-secondary)', // ✕ on lilac-100 (Snack Time close precedent)
-    fontSize: 16,
+    fontSize: 'var(--text-base)',
     lineHeight: 1,
   },
   title: { ...TYPE.xl, fontWeight: W.bold, color: 'var(--color-text-primary)', textWrap: 'pretty' }, // 20/700 (was 22/800)
@@ -244,7 +249,7 @@ export default function SignupModal({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 32,
+                fontSize: 'var(--text-32)',
                 animation: 'floaty 4s ease-in-out infinite',
               }}
             >
@@ -281,7 +286,7 @@ export default function SignupModal({
       <div role="dialog" aria-modal="true" aria-labelledby="luxiSu-title" style={{ position: 'relative', width: 'min(400px, calc(100vw - 32px))', flexShrink: 0 }}>
         <div style={S.card}>
           <div style={S.header}>
-            <span aria-hidden="true" style={{ fontSize: 18, lineHeight: 1 }}>💎</span>
+            <span aria-hidden="true" style={{ fontSize: 'var(--text-lg)', lineHeight: 1 }}>💎</span>
             <span style={S.headerLabel}>Save progress</span>
             <div style={{ flex: 1 }} />
             <button aria-label="Close" onClick={dismiss} className="luxiSu-close" style={S.closeBtn}>
@@ -307,7 +312,7 @@ export default function SignupModal({
                     border: '1px solid var(--color-status-warning-border)',
                     borderRadius: 12,
                     padding: '12px 16px',
-                    animation: 'suFadeSlide .3s ease-out both',
+                    animation: 'suFadeSlide 300ms var(--ease-out) both',
                   }}
                 >
                   <span aria-hidden="true" style={{ ...TYPE.sm }}>⚠️</span>
@@ -385,7 +390,7 @@ export default function SignupModal({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 32,
+                  fontSize: 'var(--text-32)',
                   animation: 'floaty 4s ease-in-out infinite',
                 }}
               >
@@ -465,11 +470,11 @@ export function SavedToast({ onDone, duration = 3200 }) {
           alignItems: 'center',
           gap: 12,
           background: 'var(--color-background-base)',
-          border: '1.5px solid var(--luxi-color-component-signup-toast-border)',
+          border: 'var(--border-stroke-1_6) solid var(--luxi-color-component-signup-toast-border)',
           borderRadius: 16,
-          boxShadow: '0 16px 40px rgba(50,38,80,.24)',
+          boxShadow: 'var(--luxi-shadow-signup-toast)',
           padding: '12px 20px 12px 16px',
-          animation: 'suToastIn .4s ease-out both',
+          animation: 'suToastIn 300ms var(--ease-out) both',
         }}
       >
         <span
@@ -482,7 +487,7 @@ export function SavedToast({ onDone, duration = 3200 }) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: 16,
+            fontSize: 'var(--text-base)',
             color: 'var(--color-status-success-text)', // green-800 (was green-600 #00A63E on green-100)
             fontWeight: W.bold,
             flexShrink: 0,

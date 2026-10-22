@@ -22,6 +22,12 @@
  *
  * Governance (Amy 2026-08-30): 4px grid — sheet radius 20, rows 44–48, toggle 48×28
  * (knob 24), gaps 4/8/12/16, padding 16/20/24. Colours are Oscar's comp values.
+ *
+ * S6 governance (2026-10-22): rows 6/10 → 8/12 (44 / 48 tall), Sign out sides 10 → 12, the
+ * account cards' 1.5px edge → --border-stroke-1_6, the 11px section eyebrow → 12 (--text-xs),
+ * the 18px chevron + upload icons → 20 (the row-icon size), sizes on Datum --text-*, motion on
+ * the house ease-out (sheet 300 · toggle 200 · colour 150). Row + icon-tile radius 10 = a
+ * Datum radius-ladder step, kept.
  */
 import { useRef, useState } from 'react'
 import { GemIcon } from './hudkit.jsx'
@@ -81,14 +87,14 @@ function MessageBubble() {
 }
 function ChevronR() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--luxi-color-component-settings-account-chevron)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--luxi-color-component-settings-account-chevron)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M9 6l6 6-6 6" />
     </svg>
   )
 }
 function UploadIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" {...strokeBase} aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" {...strokeBase} aria-hidden="true">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <path d="M17 8l-5-5-5 5" />
       <path d="M12 3v12" />
@@ -100,7 +106,7 @@ const scrimStyle = {
   position: 'fixed',
   inset: 0,
   background: 'var(--luxi-color-component-settings-scrim)',
-  animation: 'scrimIn .2s ease-out both',
+  animation: 'scrimIn 200ms var(--ease-out) both',
   zIndex: 55,
 }
 const closeBtn = {
@@ -111,10 +117,10 @@ const closeBtn = {
   background: 'var(--luxi-color-component-modal-close-background-default)',
   cursor: 'pointer',
   color: META,
-  fontSize: 16,
+  fontSize: 'var(--text-base)',
 }
 const sectionLabel = {
-  fontSize: 11,
+  fontSize: 'var(--text-xs)',
   fontWeight: 500,
   letterSpacing: '.08em',
   color: TEXT2, // secondary text (Amy 2026-10-05)
@@ -145,12 +151,12 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
             border: '1px solid ' + BORDER,
             boxShadow: 'var(--luxi-shadow-settings-sheet)',
             overflow: 'hidden',
-            animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both',
+            animation: 'suSheetIn 300ms var(--ease-out) both',
           }}
         >
           <div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 12px' }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: TEXT }}>Settings</span>
+                <span style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: TEXT }}>Settings</span>
                 <button aria-label="Close" onClick={close} style={closeBtn}>
                   ✕
                 </button>
@@ -170,7 +176,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                       alignItems: 'center',
                       gap: 12,
                       background: 'var(--luxi-color-component-settings-account-card-background)',
-                      border: '1.5px solid var(--luxi-color-component-settings-account-card-border)',
+                      border: 'var(--border-stroke-1_6) solid var(--luxi-color-component-settings-account-card-border)',
                       borderRadius: 12,
                       padding: '12px 16px',
                       cursor: 'pointer',
@@ -181,57 +187,58 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                       <GemIcon size={20} />
                     </span>
                     <span style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ display: 'block', fontSize: 16, fontWeight: 500, color: TEXT }}>Save your progress</span>
-                      <span style={{ display: 'block', fontSize: 14, fontWeight: 400, color: TEXT2 }}>Sign up or sign in</span>
+                      <span style={{ display: 'block', fontSize: 'var(--text-base)', fontWeight: 500, color: TEXT }}>Save your progress</span>
+                      <span style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 400, color: TEXT2 }}>Sign up or sign in</span>
                     </span>
                     <ChevronR />
                   </button>
                 ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--luxi-color-component-settings-account-card-background)', border: '1.5px solid var(--luxi-color-component-settings-account-card-border)', borderRadius: 12, padding: '12px 16px' }}>
-                    <span style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: AVATAR_BG, display: 'flex', alignItems: 'center', justifyContent: 'center', color: ON_BRAND, fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'var(--luxi-color-component-settings-account-card-background)', border: 'var(--border-stroke-1_6) solid var(--luxi-color-component-settings-account-card-border)', borderRadius: 12, padding: '12px 16px' }}>
+                    <span style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', background: AVATAR_BG, display: 'flex', alignItems: 'center', justifyContent: 'center', color: ON_BRAND, fontWeight: 700, fontSize: 'var(--text-base)', flexShrink: 0 }}>
                       {avatar ? <img src={avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} /> : auth.initial || '★'}
                     </span>
                     <span style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ display: 'block', fontSize: 16, fontWeight: 500, color: TEXT }}>Signed in</span>
-                      <span style={{ display: 'block', fontSize: 14, fontWeight: 400, color: TEXT2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{auth.email || ''}</span>
+                      <span style={{ display: 'block', fontSize: 'var(--text-base)', fontWeight: 500, color: TEXT }}>Signed in</span>
+                      <span style={{ display: 'block', fontSize: 'var(--text-sm)', fontWeight: 400, color: TEXT2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{auth.email || ''}</span>
                     </span>
                     {/* Datum Button ghost · md (colours + press live in index.css .luxiSet-ghost) */}
-                    <button onClick={() => onSignOut?.()} className="luxiSet-ghost" style={{ height: 32, padding: '0 10px', border: 'none', borderRadius: 4, fontWeight: 500, fontSize: 14, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    <button onClick={() => onSignOut?.()} className="luxiSet-ghost" style={{ height: 32, padding: '0 12px', border: 'none', borderRadius: 4, fontWeight: 500, fontSize: 'var(--text-sm)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
                       Sign out
                     </button>
                   </div>
                 )}
               </div>
 
-              <div style={{ height: 1, background: DIVIDER, margin: '0 16px' }} />
+              <div style={{ borderTop: '1px solid ' + DIVIDER, margin: '0 16px' }} />
 
               {/* PREFERENCES */}
               <div style={{ padding: '12px 16px 4px' }}>
                 <div style={sectionLabel}>Preferences</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 8px', borderRadius: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 8, borderRadius: 10 }}>
                   <span style={rowIcon}>
                     <Speaker />
                   </span>
-                  <span style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>Sound</span>
+                  <span style={{ flex: 1, fontSize: 'var(--text-base)', fontWeight: 500, color: TEXT }}>Sound</span>
                   <button
                     role="switch"
                     aria-checked={sound}
                     aria-label="Sound"
                     onClick={() => onToggleSound?.(!sound)}
-                    style={{ width: 48, height: 28, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', padding: 0, transition: 'background .18s', background: sound ? 'var(--luxi-color-component-settings-toggle-background-on)' : CONTROL }}
+                    style={{ width: 48, height: 28, borderRadius: 999, border: 'none', cursor: 'pointer', position: 'relative', padding: 0, transition: 'background 200ms var(--ease-out)', background: sound ? 'var(--luxi-color-component-settings-toggle-background-on)' : CONTROL }}
                   >
                     {/* OFF = unchecked, not disabled, so it holds 3:1 (WCAG 1.4.11) — Amy 2026-10-05,
                         option A: solid neutral-500 track (4.74 vs the sheet), white knob on it (4.74). */}
-                    <span style={{ position: 'absolute', top: 2, left: 2, width: 24, height: 24, borderRadius: '50%', background: 'var(--luxi-color-component-settings-toggle-thumb)', boxShadow: 'var(--luxi-shadow-settings-toggle-thumb)', transition: 'transform .18s', transform: 'translateX(' + (sound ? '20px' : '0px') + ')' }} />
+                    {/* top/left 2 = the knob's inset in the 28px track (24 + 2 + 2) — the 2px exception */}
+                    <span style={{ position: 'absolute', top: 2, left: 2, width: 24, height: 24, borderRadius: '50%', background: 'var(--luxi-color-component-settings-toggle-thumb)', boxShadow: 'var(--luxi-shadow-settings-toggle-thumb)', transition: 'transform 200ms var(--ease-out)', transform: 'translateX(' + (sound ? '20px' : '0px') + ')' }} />
                   </button>
                 </div>
                 {/* Music picker (2026-10-04): Island = the default, Soft Focus = the
                     calmer Luxi song. A two-option segmented control — one tap, no submenu. */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '6px 8px', borderRadius: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 8, borderRadius: 10 }}>
                   <span style={rowIcon}>
                     <MusicNote />
                   </span>
-                  <span id="music-label" style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>Music</span>
+                  <span id="music-label" style={{ flex: 1, fontSize: 'var(--text-base)', fontWeight: 500, color: TEXT }}>Music</span>
                   <div role="radiogroup" aria-labelledby="music-label" style={{ display: 'flex', gap: 4, padding: 4, borderRadius: 999, background: 'var(--luxi-color-component-settings-music-track-background)' }}>
                     {MUSIC_TRACKS.map((t) => {
                       const on = music === t.id
@@ -241,7 +248,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                           role="radio"
                           aria-checked={on}
                           onClick={() => onChooseMusic?.(t.id)}
-                          style={{ height: 28, padding: '0 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 500, transition: 'background .18s, color .18s', background: on ? 'var(--luxi-color-component-settings-music-option-background-selected)' : 'transparent', color: on ? ON_BRAND : 'var(--luxi-color-component-settings-music-option-text)' }}
+                          style={{ height: 28, padding: '0 12px', borderRadius: 999, border: 'none', cursor: 'pointer', fontSize: 'var(--text-sm)', fontWeight: 500, transition: 'background 150ms var(--ease-out), color 150ms var(--ease-out)', background: on ? 'var(--luxi-color-component-settings-music-option-background-selected)' : 'transparent', color: on ? ON_BRAND : 'var(--luxi-color-component-settings-music-option-text)' }}
                         >
                           {t.label}
                         </button>
@@ -251,7 +258,7 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                 </div>
               </div>
 
-              <div style={{ height: 1, background: DIVIDER, margin: '8px 16px 0' }} />
+              <div style={{ borderTop: '1px solid ' + DIVIDER, margin: '8px 16px 0' }} />
 
               {/* HELP — Send Feedback went LIVE 2026-09-19 (Oscar's Feedback Flow
                   lifted; the row returns exactly where the SOON row once sat).
@@ -260,12 +267,12 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                 <div style={sectionLabel}>Help</div>
                 <button
                   onClick={() => onOpenHowTo?.()}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', border: 'none', padding: '10px 8px', borderRadius: 10, cursor: 'pointer', textAlign: 'left' }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', border: 'none', padding: '12px 8px', borderRadius: 10, cursor: 'pointer', textAlign: 'left' }}
                 >
                   <span style={rowIcon}>
                     <HelpCircle />
                   </span>
-                  <span style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>How to Play</span>
+                  <span style={{ flex: 1, fontSize: 'var(--text-base)', fontWeight: 500, color: TEXT }}>How to Play</span>
                   <ChevronR />
                 </button>
                 <button
@@ -273,12 +280,12 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
                     close()
                     onOpenFeedback?.()
                   }}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', border: 'none', padding: '10px 8px', borderRadius: 10, cursor: 'pointer', textAlign: 'left' }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, background: 'transparent', border: 'none', padding: '12px 8px', borderRadius: 10, cursor: 'pointer', textAlign: 'left' }}
                 >
                   <span style={rowIcon}>
                     <MessageBubble />
                   </span>
-                  <span style={{ flex: 1, fontSize: 16, fontWeight: 500, color: TEXT }}>Send Feedback</span>
+                  <span style={{ flex: 1, fontSize: 'var(--text-base)', fontWeight: 500, color: TEXT }}>Send Feedback</span>
                   <ChevronR />
                 </button>
               </div>
@@ -286,10 +293,10 @@ export function SettingsSheet({ auth = {}, avatar = null, sound = true, onToggle
               <div style={{ padding: '12px 20px 16px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid ' + DIVIDER }}>
                 {/* Datum Button link — it opens another page (Datum: navigation = link). Its 4px
                     padding is why the footer's left pad is 16: the text still lines up at 20. */}
-                <a href={privacyHref} target="_blank" rel="noopener noreferrer" className="luxiSet-link" style={{ fontSize: 14, fontWeight: 500, padding: '0 4px', borderRadius: 4 }}>
+                <a href={privacyHref} target="_blank" rel="noopener noreferrer" className="luxiSet-link" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, padding: '0 4px', borderRadius: 4 }}>
                   Privacy Policy
                 </a>
-                <span style={{ fontSize: 14, fontWeight: 500, color: META, whiteSpace: 'nowrap' }}>Luxi Math</span>
+                <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: META, whiteSpace: 'nowrap' }}>Luxi Math</span>
               </div>
             </div>
         </div>
@@ -345,10 +352,10 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
           contrast audit shouldn't measure it. */}
       <input ref={fileRef} type="file" accept="image/*" onChange={onFile} style={{ display: 'none' }} aria-hidden="true" tabIndex={-1} />
       {/* On Datum 2026-10-05 (Amy): a real dialog (house focus ring), colours by Datum name, type on the roles —
-          title 16/700 · button 16/500 · link 14/500 · caption 14 supporting. Was: caption #9a92ac 12px (2.9:1),
-          Remove photo #8A7FB8 13px (3.6:1). Audit: a11y/profile-popover.audit.mjs. */}
+          title 16/700 · button 16/500 · link 14/500 · caption 14 supporting. Was: caption a light lilac grey 12px (2.9:1),
+          Remove photo a mid lilac 13px (3.6:1). Audit: a11y/profile-popover.audit.mjs. */}
       <div role="dialog" aria-label="Profile" style={{ position: 'fixed', top: 72, right: 60, width: 288, maxWidth: 'calc(100vw - 32px)', zIndex: 56, fontFamily: "'Inter', system-ui, sans-serif" }}>
-        <div style={{ background: 'var(--color-background-base)', borderRadius: 20, border: '1px solid ' + BORDER, boxShadow: 'var(--luxi-shadow-profile-popover)', overflow: 'hidden', animation: 'suSheetIn .28s cubic-bezier(.2,.9,.3,1.1) both' }}>
+        <div style={{ background: 'var(--color-background-base)', borderRadius: 20, border: '1px solid ' + BORDER, boxShadow: 'var(--luxi-shadow-profile-popover)', overflow: 'hidden', animation: 'suSheetIn 300ms var(--ease-out) both' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 12px' }}>
             <span style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-weight-bold)', color: 'var(--color-text-primary)' }}>Profile</span>
             <button aria-label="Close" onClick={close} style={closeBtn}>
@@ -356,11 +363,11 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
             </button>
           </div>
           <div style={{ padding: '0 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-            <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'var(--luxi-color-component-profile-avatar-background)', boxShadow: '0 0 0 3px var(--color-background-base), 0 0 0 5px var(--luxi-color-component-profile-avatar-ring)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 44, overflow: 'hidden' }}>
+            <div style={{ width: 96, height: 96, borderRadius: '50%', background: 'var(--luxi-color-component-profile-avatar-background)', boxShadow: 'var(--luxi-shadow-profile-avatar-ring)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-5xl)', lineHeight: 1, overflow: 'hidden' }}>
               {avatar ? (
                 <img src={avatar} alt="Your avatar" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
               ) : auth.signedIn ? (
-                <span style={{ width: '100%', height: '100%', background: AVATAR_BG, display: 'flex', alignItems: 'center', justifyContent: 'center', color: ON_BRAND, fontWeight: 'var(--font-weight-bold)', fontSize: 38 }}>
+                <span style={{ width: '100%', height: '100%', background: AVATAR_BG, display: 'flex', alignItems: 'center', justifyContent: 'center', color: ON_BRAND, fontWeight: 'var(--font-weight-bold)', fontSize: 'var(--text-40)' }}>
                   {auth.initial || '★'}
                 </span>
               ) : (
@@ -383,7 +390,7 @@ export function ProfilePopover({ auth = {}, avatar = null, onUploadAvatar, onRem
             {avatar && !busy && (
               <button
                 onClick={() => onRemoveAvatar?.()}
-                className="luxiSet-link" // Datum Button link, 14/500 (was #8A7FB8 13/700, 3.6:1)
+                className="luxiSet-link" // Datum Button link, 14/500 (was a mid lilac 13/700, 3.6:1)
                 style={{ border: 'none', background: 'transparent', fontFamily: 'inherit', fontWeight: 'var(--font-weight-medium)', fontSize: 'var(--text-sm)', cursor: 'pointer', padding: '4px 8px', borderRadius: 4, marginTop: -8 }}
               >
                 Remove photo

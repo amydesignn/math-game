@@ -4,11 +4,11 @@ import { SHOP, SHOP_CATEGORIES, SIZES, SPARKLE, COMPANIONS, GEAR, HEROES, PLAYER
 
 // display fill for each sparkle swatch (metallics + rainbow read as gradients)
 const SWATCH_BG = {
-  pink: '#FB64B6',
-  blue: '#51A2FF',
-  gold: 'linear-gradient(135deg,#FFD230,#E17100)',
-  silver: 'linear-gradient(135deg,#F8FAFC,#90A1B9)',
-  rainbow: 'linear-gradient(135deg,#FF6467,#FFB900,#00C950,#51A2FF,#C27AFF)',
+  pink: 'var(--luxi-color-component-shop-swatch-pink)',
+  blue: 'var(--luxi-color-component-shop-swatch-blue)',
+  gold: 'linear-gradient(135deg,var(--luxi-color-component-shop-swatch-gold-start),var(--luxi-color-component-shop-swatch-gold-end))',
+  silver: 'linear-gradient(135deg,var(--luxi-color-component-shop-swatch-silver-start),var(--luxi-color-component-shop-swatch-silver-end))',
+  rainbow: 'linear-gradient(135deg,var(--luxi-color-component-shop-swatch-rainbow-1),var(--luxi-color-component-shop-swatch-rainbow-2),var(--luxi-color-component-shop-swatch-rainbow-3),var(--luxi-color-component-shop-swatch-rainbow-4),var(--luxi-color-component-shop-swatch-rainbow-5))',
 }
 
 /*
@@ -18,6 +18,10 @@ const SWATCH_BG = {
  * Flow: tap a tile → it selects and shows a Buy button → buying closes the
  * shop and hands the item to App, which enters placement mode. "Your things"
  * lists bought-but-unplaced items (e.g. a cancelled placement) to place later.
+ *
+ * S6 governance (2026-10-22): sheet radius 22 → 24, gutters 18/14 → 16, tile gap 10 → 8,
+ * shelf gaps 6/10 → 8, size buttons 9/6 → 8 and radius 14 → 12, swatch 34 → 32, type on Datum
+ * --text-* (19 → 20 · 15 → 16), weights 800/600 → 700/500, swatch colours named in the S6 :root.
  */
 export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], gear = {}, ownedGear = [], character, ownedHeroes = [], onBuyHero, onChooseHero, onBuy, onBuySparkle, onBuyPet, onChoosePet, onBuyGear, onWearGear, onPlaceOwned, onClose }) {
   const [selected, setSelected] = useState(null) // "pack:asset" of the selected tile
@@ -37,7 +41,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
     bottom: 0,
     maxHeight: '72%',
     background: 'var(--color-background-base)',
-    borderRadius: '22px 22px 0 0',
+    borderRadius: '24px 24px 0 0',
     boxShadow: 'var(--luxi-shadow-shop-sheet)',
     display: 'flex',
     flexDirection: 'column',
@@ -51,15 +55,15 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
 
       <div style={sheet} role="dialog" aria-modal="true" aria-label="Gem Shop" onPointerDown={(e) => e.stopPropagation()}>
         {/* header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 18px 10px' }}>
-          <div style={{ fontWeight: 800, fontSize: 19, color: 'var(--color-text-primary)' }}>Gem Shop 🛍️</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 16px 8px' }}>
+          <div style={{ fontWeight: 700, fontSize: 'var(--text-xl)', color: 'var(--color-text-primary)' }}>Gem Shop 🛍️</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--color-text-primary)' }}>💎 {gems}</div>
+            <div style={{ fontWeight: 700, fontSize: 'var(--text-base)', color: 'var(--color-text-primary)' }}>💎 {gems}</div>
             <button aria-label="Close shop" onClick={onClose} style={btnStyle({ w: 36, bg: 'var(--color-background-brand-subtle)', color: 'var(--color-icon-secondary)' })}>✕</button>
           </div>
         </div>
 
-        <div style={{ overflowY: 'auto', padding: '0 14px 14px' }}>
+        <div style={{ overflowY: 'auto', padding: '0 16px 16px' }}>
           {/* your things — bought, waiting to be placed */}
           {owned.length > 0 && (
             <>
@@ -69,10 +73,10 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   const item = SHOP.find((s) => s.asset === o.asset && s.pack === o.pack)
                   return (
                     <button key={o.id} onClick={() => onPlaceOwned(o)} style={tile(true)}>
-                      <span style={{ fontSize: 30 }}>{item?.emoji ?? '📦'}</span>
+                      <span style={{ fontSize: 'var(--text-3xl)' }}>{item?.emoji ?? '📦'}</span>
                       <span style={tileName(true)}>
                         {item?.name ?? o.asset}
-                        {o.size > 1 && <span style={{ color: 'var(--color-text-brand)', fontWeight: 800 }}> ×{o.size}</span>}
+                        {o.size > 1 && <span style={{ color: 'var(--color-text-brand)', fontWeight: 700 }}> ×{o.size}</span>}
                       </span>
                       <span style={{ ...tilePrice, color: 'var(--luxi-color-component-shop-tile-action-text)' }}>place ✥</span>
                     </button>
@@ -86,7 +90,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
               unlocks with gems ONCE (tap → Unlock pill, the same two-tap buy as
               every shelf) and she plays as them right away. */}
           <SectionLabel>🦸 Heroes</SectionLabel>
-          <div role="group" aria-label="Heroes" style={{ ...grid, marginBottom: 6 }}>
+          <div role="group" aria-label="Heroes" style={{ ...grid, marginBottom: 8 }}>
             {HEROES.map((h) => {
               const isHers = h.price === 0 || ownedHeroes.includes(h.id)
               const isOn = character === h.id
@@ -139,7 +143,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
           {character === PLAYER && [['hat', '🧙 Hats', 'No hat'], ['staff', '🪄 Staffs', 'No staff']].map(([slot, label, bare]) => (
             <div key={slot}>
               <SectionLabel>{label}</SectionLabel>
-              <div style={{ ...grid, marginBottom: 6 }}>
+              <div style={{ ...grid, marginBottom: 8 }}>
                 {GEAR.filter((g) => g.slot === slot).map((g) => {
                   const isHers = g.price === 0 || ownedGear.includes(g.id)
                   const isOn = gear[slot] === g.id
@@ -189,7 +193,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   aria-pressed={gear[slot] === null}
                   style={{ ...tile(true), ...selRing(gear[slot] === null) }}
                 >
-                  <span style={{ fontSize: 30, lineHeight: '48px' }}>🚫</span>
+                  <span style={{ fontSize: 'var(--text-3xl)', lineHeight: 1, height: 48, display: 'flex', alignItems: 'center' }}>🚫</span>
                   <span style={tileName(true)}>{bare}</span>
                   <span style={{ ...tilePrice, color: gear[slot] === null ? 'var(--color-text-brand)' : 'var(--luxi-color-component-shop-tile-action-text)' }}>
                     {gear[slot] === null ? 'Wearing 💜' : 'Take off'}
@@ -201,7 +205,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
 
           {/* Companions — buy one and it follows her right away; switch any time */}
           <SectionLabel>💜 Companions</SectionLabel>
-          <div style={{ ...grid, marginBottom: 6 }}>
+          <div style={{ ...grid, marginBottom: 8 }}>
             {COMPANIONS.map((c) => {
               const isHers = ownedPets.includes(c.id)
               const isActive = pet === c.id
@@ -251,11 +255,11 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
           {/* Magic — the sparkle consumable (15-min trail on her character) */}
           <SectionLabel>✨ Magic — a sparkle trail for 15 min</SectionLabel>
           {activeSparkle && (
-            <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-brand)', margin: '0 4px 8px' }}>
+            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--color-text-brand)', margin: '0 4px 8px' }}>
               {SPARKLE.colors[activeSparkle.colorId]?.label} sparkle is on ✨ — buy again to refresh it
             </div>
           )}
-          <div style={{ ...grid, marginBottom: 6 }}>
+          <div style={{ ...grid, marginBottom: 8 }}>
             {SPARKLE.order.map((id) => {
               const c = SPARKLE.colors[id]
               const affordable = gems >= c.price
@@ -271,7 +275,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   aria-label={isSel ? `Buy ${c.label} sparkle for ${c.price} gems` : undefined}
                   style={{ ...tile(affordable), ...selRing(isSel) }}
                 >
-                  <span style={{ width: 34, height: 34, borderRadius: '50%', background: SWATCH_BG[id],
+                  <span style={{ width: 32, height: 32, borderRadius: '50%', background: SWATCH_BG[id],
                     boxShadow: 'var(--luxi-shadow-shop-swatch)',
                     filter: affordable ? 'none' : 'grayscale(0.7)', opacity: affordable ? 1 : 0.5 }} />
                   <span style={tileName(affordable)}>{c.label}</span>
@@ -300,11 +304,11 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                   key={s.size}
                   onClick={() => { setSize(s.size); setSelected(null) }}
                   style={{
-                    flex: 1, padding: '9px 6px', borderRadius: 14, cursor: 'pointer', fontFamily: 'inherit',
+                    flex: 1, padding: 8, borderRadius: 12, cursor: 'pointer', fontFamily: 'inherit',
                     border: `2px solid ${on ? 'var(--luxi-color-component-shop-size-button-background-selected)' : 'var(--luxi-color-component-shop-size-button-background)'}`,
                     background: on ? 'var(--luxi-color-component-shop-size-button-background-selected)' : 'var(--luxi-color-component-shop-size-button-background)',
                     color: on ? 'var(--color-text-on-brand)' : 'var(--luxi-color-component-shop-size-button-text)',
-                    fontWeight: on ? 800 : 600, fontSize: 14,
+                    fontWeight: on ? 700 : 500, fontSize: 'var(--text-sm)',
                   }}
                 >
                   {s.label}
@@ -313,7 +317,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
             })}
           </div>
           {size > 1 && (
-            <div style={{ fontSize: 14, fontWeight: 400, color: 'var(--color-text-secondary)', margin: '0 4px 10px' }}>
+            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 400, color: 'var(--color-text-secondary)', margin: '0 4px 8px' }}>
               {size}× bigger — so everything costs {size}× more ✨
             </div>
           )}
@@ -342,7 +346,7 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
                         aria-label={isSel ? `Buy ${item.name}${size > 1 ? ` ×${size}` : ''} for ${cost} gems` : undefined}
                         style={{ ...tile(affordable), ...selRing(isSel) }}
                       >
-                        <span style={{ fontSize: 30, filter: affordable ? 'none' : 'grayscale(1)', opacity: affordable ? 1 : 0.5 }}>{item.emoji}</span>
+                        <span style={{ fontSize: 'var(--text-3xl)', filter: affordable ? 'none' : 'grayscale(1)', opacity: affordable ? 1 : 0.5 }}>{item.emoji}</span>
                         <span style={tileName(affordable)}>{item.name}</span>
                         {isSel ? (
                           <span
@@ -369,13 +373,13 @@ export default function Shop({ gems, owned, activeSparkle, pet, ownedPets = [], 
 
 function SectionLabel({ children }) {
   // the 12 caps eyebrow — was Lilac 900 at .75 (Lilac is decoration only) → Datum text-brand
-  return <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--color-text-brand)', margin: '8px 4px 8px' }}>{children}</div>
+  return <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--color-text-brand)', margin: '8px 4px 8px' }}>{children}</div>
 }
 
 const grid = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(104px, 1fr))',
-  gap: 10,
+  gap: 8,
 }
 
 const tile = (enabled) => ({
@@ -383,7 +387,7 @@ const tile = (enabled) => ({
   flexDirection: 'column',
   alignItems: 'center',
   gap: 4,
-  padding: '12px 6px 10px',
+  padding: '12px 8px 8px',
   background: enabled ? 'var(--luxi-color-component-shop-tile-background)' : 'var(--color-background-subtle)',
   border: `2px solid ${enabled ? 'var(--luxi-color-component-shop-tile-border)' : 'var(--color-border-default)'}`,
   borderRadius: 16,
@@ -404,10 +408,10 @@ const byKeyboard = (e) => e.detail === 0
 // outline stays free for the 1px Iris 700 focus ring (a selected tile used to hide it).
 const selRing = (on) => (on ? { borderColor: 'var(--luxi-color-component-shop-tile-border-selected)', boxShadow: 'inset 0 0 0 1px var(--luxi-color-component-shop-tile-border-selected)' } : null)
 // The Buy/Unlock pill — 8px sides so "Unlock 💎50" fits a 3-up tile on a 375 phone
-const buyPill = { background: 'var(--luxi-color-component-shop-buy-pill-background)', color: 'var(--luxi-color-component-shop-buy-pill-text)', borderRadius: 999, padding: '4px 8px', fontWeight: 800, whiteSpace: 'nowrap' }
+const buyPill = { background: 'var(--luxi-color-component-shop-buy-pill-background)', color: 'var(--luxi-color-component-shop-buy-pill-text)', borderRadius: 999, padding: '4px 8px', fontWeight: 700, whiteSpace: 'nowrap' }
 
-const tileName = (enabled) => ({ fontSize: 14, fontWeight: 500, color: enabled ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' })
-const tilePrice = { fontSize: 14, fontWeight: 700 }
+const tileName = (enabled) => ({ fontSize: 'var(--text-sm)', fontWeight: 500, color: enabled ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' })
+const tilePrice = { fontSize: 'var(--text-sm)', fontWeight: 700 }
 
 function btnStyle({ w, bg, color }) {
   return {
@@ -417,7 +421,7 @@ function btnStyle({ w, bg, color }) {
     border: 'none',
     background: bg,
     color,
-    fontSize: 15,
+    fontSize: 'var(--text-base)',
     fontWeight: 700,
     cursor: 'pointer',
   }

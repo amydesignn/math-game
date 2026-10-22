@@ -28,6 +28,11 @@
  */
 import { useRef, useState } from 'react'
 
+// S6 governance (2026-10-22): card edge 1.5px → --border-stroke-1_6, shadows named (S6 :root,
+// same values), emoji sizes on Datum --text-*, the divider a 1px stroke, motion on the house
+// ease-out: scrim 200 · card fbPopIn .34s spring → 300 · thank-you gem
+// 500 → 300 (its overshoot lives in fbPop's stops) · star hover 200, no spring.
+
 // Datum tokens by name (Amy's map: Iris = text + anything WCAG; Lilac = supporting detail)
 const IRIS = 'var(--luxi-color-component-button3d-primary-background)', // Luxi 3D button face (was iris-600 — the one primary off the Iris 500 spec; aligned 2026-10-05, Amy)
   IRISD = 'var(--luxi-color-component-button3d-primary-shadow)'
@@ -38,7 +43,7 @@ const EMPTY = 'var(--color-border-interactive-default)' // neutral-500, 4.74:1 �
 // rating CONTROL, not decoration (Amy, 2026-10-04, option B: no brown yellow).
 // Star 5 moved Lilac → Iris so a 5-star rating never matches the empty star.
 const STARCOLORS = [1, 2, 3, 4, 5].map((n) => 'var(--luxi-color-component-feedback-star-' + n + ')') // 3.8 · 3.6 · 3.2 · 5.0 · 4.6
-const STARGLOW = STARCOLORS.map((c) => 'color-mix(in srgb, ' + c + ' 40%, transparent)')
+const STARGLOW = [1, 2, 3, 4, 5].map((n) => 'var(--luxi-shadow-feedback-star-' + n + ')') // each star's own colour @ 40% (S6: named)
 // caption per rating — playful, kid-voiced. index 0 = no rating yet. (Oscar, verbatim)
 const CAPTIONS = ['Tap the stars!', "Aw — we'll do better 🙏", 'Noted, thank you', "Glad you're here 🙂", 'Yay, thank you! 🎉', 'You love it?! 💜']
 
@@ -123,15 +128,15 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
       onPointerDown={(e) => e.stopPropagation()}
       style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, fontFamily: "'Inter', system-ui, sans-serif" }}
     >
-      <div onClick={close} style={{ position: 'absolute', inset: 0, background: 'var(--luxi-color-component-form-modal-scrim)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', animation: 'scrimIn .25s ease-out both' }} />
+      <div onClick={close} style={{ position: 'absolute', inset: 0, background: 'var(--luxi-color-component-form-modal-scrim)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)', animation: 'scrimIn 200ms var(--ease-out) both' }} />
 
-      <div role="dialog" aria-modal="true" aria-labelledby="luxiFb-title" style={{ position: 'relative', width: 'min(400px, calc(100vw - 32px))', maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto', background: 'var(--color-background-base)', border: '1.5px solid var(--luxi-color-component-form-modal-border)', borderRadius: 24, boxShadow: '0 24px 60px rgba(50,38,80,.32), 0 4px 16px rgba(50,38,80,.14)', animation: 'fbPopIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
+      <div role="dialog" aria-modal="true" aria-labelledby="luxiFb-title" style={{ position: 'relative', width: 'min(400px, calc(100vw - 32px))', maxHeight: 'calc(100dvh - 32px)', overflowY: 'auto', background: 'var(--color-background-base)', border: 'var(--border-stroke-1_6) solid var(--luxi-color-component-form-modal-border)', borderRadius: 24, boxShadow: 'var(--luxi-shadow-form-modal)', animation: 'fbPopIn 300ms var(--ease-out) both' }}>
         {/* header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '16px 24px', background: 'linear-gradient(180deg, var(--luxi-color-component-form-modal-header-background-start), var(--color-background-base))', borderBottom: '1px solid var(--luxi-color-component-modal-header-border)' }}>
-          <span style={{ fontSize: 18, lineHeight: 1 }}>💬</span>
+          <span style={{ fontSize: 'var(--text-lg)', lineHeight: 1 }}>💬</span>
           <span id="luxiFb-title" style={{ ...TYPE.xs, fontWeight: W.bold, letterSpacing: 'var(--tracking-widest)', textTransform: 'uppercase', color: 'var(--color-text-brand)' }}>Feedback</span>
           <div style={{ flex: 1 }} />
-          <button aria-label="Close" onClick={close} className="luxiFb-close" style={{ border: 'none', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', color: 'var(--color-icon-tertiary)', fontSize: 16, lineHeight: 1 }}>
+          <button aria-label="Close" onClick={close} className="luxiFb-close" style={{ border: 'none', width: 40, height: 40, borderRadius: '50%', cursor: 'pointer', color: 'var(--color-icon-tertiary)', fontSize: 'var(--text-base)', lineHeight: 1 }}>
             ✕
           </button>
         </div>
@@ -141,7 +146,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
           <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center', textAlign: 'center' }}>
               <div style={{ ...heading, textWrap: 'pretty' }}>How many stars for Luxi?</div>
-              <div style={{ display: 'flex', gap: 4, marginTop: 2 }}>
+              <div style={{ display: 'flex', gap: 4, marginTop: 4 }}>
                 {[1, 2, 3, 4, 5].map((n) => {
                   const on = n <= shown
                   return (
@@ -153,9 +158,9 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
                       onMouseEnter={() => setHover(n)}
                       onMouseLeave={() => setHover(0)}
                       className="luxiFb-star"
-                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 4, display: 'flex', transform: on ? 'scale(1.1)' : 'scale(1)', transition: 'transform .18s cubic-bezier(.2,.9,.3,1.7)' }}
+                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: 4, display: 'flex', transform: on ? 'scale(1.1)' : 'scale(1)', transition: 'transform 200ms var(--ease-out)' }}
                     >
-                      <span style={{ display: 'flex', color: on ? STARCOLORS[n - 1] : EMPTY, filter: on ? 'drop-shadow(0 3px 6px ' + STARGLOW[n - 1] + ')' : 'none' }}>
+                      <span style={{ display: 'flex', color: on ? STARCOLORS[n - 1] : EMPTY, filter: on ? STARGLOW[n - 1] : 'none' }}>
                         <Star hollow={!on} />
                       </span>
                     </button>
@@ -165,7 +170,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
               <div style={{ ...TYPE.base, fontWeight: W.medium, color: shown > 0 ? 'var(--color-text-brand)' : 'var(--luxi-color-component-feedback-caption-text-empty)', minHeight: 20, whiteSpace: 'nowrap' }}>{CAPTIONS[shown] || CAPTIONS[0]}</div>
             </div>
 
-            <div style={{ height: 1, background: 'var(--luxi-color-component-feedback-divider)' }} />
+            <div style={{ borderTop: '1px solid var(--luxi-color-component-feedback-divider)' }} />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={fieldLabel}>
@@ -212,7 +217,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
         {/* ── THANK YOU ── */}
         {phase === 'thanks' && (
           <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center' }}>
-            <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(160deg, var(--luxi-color-component-feedback-thanks-badge-background-start), var(--luxi-color-component-feedback-thanks-badge-background-end))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 36, animation: 'fbPop .5s cubic-bezier(.2,.9,.3,1.3) both' }}>💎</div>
+            <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(160deg, var(--luxi-color-component-feedback-thanks-badge-background-start), var(--luxi-color-component-feedback-thanks-badge-background-end))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-4xl)', lineHeight: 1, animation: 'fbPop 300ms var(--ease-out) both' }}>💎</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={heading}>Thanks for the idea!</div>
               <div style={{ ...TYPE.base, fontWeight: W.normal, color: 'var(--color-text-secondary)', textWrap: 'pretty' }}>Your feedback goes straight to the team building Luxi. Keep exploring! ✨</div>
@@ -226,7 +231,7 @@ export function FeedbackModal({ onSubmit, onLostSubmit, onClose }) {
         {/* ── GENTLE FAILURE — never blocks play, never loses text ── */}
         {phase === 'fail' && (
           <div style={{ padding: '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, textAlign: 'center' }}>
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--luxi-color-component-feedback-error-badge-background)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30 }}>🌙</div>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--luxi-color-component-feedback-error-badge-background)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 'var(--text-3xl)', lineHeight: 1 }}>🌙</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <div style={heading}>We'll try again in a bit</div>
               <div style={{ ...TYPE.base, fontWeight: W.normal, color: 'var(--color-text-secondary)', textWrap: 'pretty' }}>Couldn't send just now — your idea is safe and nothing's lost. You can keep playing.</div>

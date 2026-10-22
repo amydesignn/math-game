@@ -832,7 +832,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 @keyframes lvlPopIn { 0% { transform: scale(.82) translateY(16px); opacity: 0; } 60% { transform: scale(1.03) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 /* Phase 5-B — the progress popup: a calmer rise than popIn (a record book is
    opened, not sprung), and the climb ladder's rungs landing in sequence. */
-@keyframes sheetIn { 0% { transform: scale(.9) translateY(14px); opacity: 0; } 60% { transform: scale(1.01) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes sheetIn { 0% { transform: scale(.9) translateY(16px); opacity: 0; } 60% { transform: scale(1.01) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 @keyframes rungPop { 0% { transform: scale(.5); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
 /* S4: Oscar's confetti fall with his ease-in GRAVITY sampled into the stops (ease-in is removed from
    Datum, so the curve lives here and the timing is linear — the dvConfetti method). Start -10 → -8px;
@@ -887,16 +887,66 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 @keyframes dvDigitPop { 0% { transform: scale(.55); opacity: 0; } 60% { transform: scale(1.16); } 100% { transform: scale(1); opacity: 1; } }
 @keyframes dvShakeCell { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
 
+/* ---- luxi govern S6 2026-10-22: screens (ProgressPopup · Settings · Shop · SignupModal · FeedbackModal · HeroStage) ----
+   Its own :root block (S7 runs in parallel on the globals). Values unchanged — raw literals at the
+   use sites, now named. Two exceptions, both on a ladder: the profile avatar ring 3/5 → 4/6px spread
+   (a 2px ring on a 4px gap), and the type step --text-4xl copied verbatim from Datum. */
+:root {
+  --text-4xl: 2.25rem;  --text-4xl--line-height: 1.25; /* 36px — Datum text-4xl, verbatim (the feedback thank-you gem) */
+  /* ProgressPopup — the record book */
+  --luxi-color-component-progress-header-background-start: #E9E2FA; /* off-ramp lilac, between brand-lilac-100 and -200 */
+  --luxi-color-component-progress-header-background-end: #F8F5FE; /* off-ramp lilac, ≈ brand-lilac-50 */
+  --luxi-color-component-progress-header-border: #E7DEF4; /* off-ramp lilac — decoration */
+  --luxi-color-component-progress-climb-border: #EDEAF3; /* off-ramp lilac grey — decoration */
+  --luxi-color-component-progress-ladder-track: #E7E1F1; /* off-ramp lilac grey — the climb's empty track */
+  --luxi-color-component-progress-node-upcoming-background: #EFEDF2; /* off-ramp grey — a level not yet reached (inactive, 1.4.3 exempt) */
+  --luxi-color-component-progress-node-upcoming-text: #A79FB4; /* off-ramp grey — kept light ON PURPOSE (Amy: meaning beats ratio) */
+  --luxi-color-component-progress-stage-dot-1: #C6B4F0; /* brand-lilac-300 — Warm-up pips (decoration) */
+  --luxi-color-component-progress-stage-dot-2: #B29BEA; /* brand-lilac-400 — Challenge */
+  --luxi-color-component-progress-stage-dot-3: #8570D2; /* brand-lilac-600 — Expert */
+  --luxi-color-component-progress-confetti-lilac: #C6B4F0; /* off-ramp pastels — the header's still confetti, decoration */
+  --luxi-color-component-progress-confetti-blush: #F5B8D0;
+  --luxi-color-component-progress-confetti-butter: #FBCE7E;
+  --luxi-color-component-progress-confetti-mint: #9FE0D2;
+  --luxi-color-component-progress-confetti-sky: #A9C5F5;
+  --luxi-shadow-progress-level-badge: 0 10px 22px rgba(97,105,224,.42), inset 0 -4px 0 rgba(0,0,0,.10); /* brand-iris-500 @ 42% + black @ 10% lip — the level medallion */
+  --luxi-shadow-progress-node-current: 0 6px 14px rgba(97,105,224,.46); /* iris-500 @ 46% — the level she's on */
+  --luxi-shadow-progress-node-reached: 0 3px 9px rgba(97,105,224,.30); /* iris-500 @ 30% — levels behind her */
+  /* Profile popover */
+  --luxi-shadow-profile-avatar-ring: 0 0 0 4px var(--color-background-base), 0 0 0 6px var(--luxi-color-component-profile-avatar-ring); /* white gap + brand-lilac-200 ring (3/5 → 4/6) — decoration */
+  /* Gem Shop — the sparkle swatches (decoration, no text on them) */
+  --luxi-color-component-shop-swatch-pink: #FB64B6; /* pink-400 */
+  --luxi-color-component-shop-swatch-blue: #51A2FF; /* blue-400 */
+  --luxi-color-component-shop-swatch-gold-start: #FFD230; /* amber-300 */
+  --luxi-color-component-shop-swatch-gold-end: #E17100; /* amber-600 */
+  --luxi-color-component-shop-swatch-silver-start: #F8FAFC; /* slate-50 */
+  --luxi-color-component-shop-swatch-silver-end: #90A1B9; /* slate-400 */
+  --luxi-color-component-shop-swatch-rainbow-1: #FF6467; /* red-400 */
+  --luxi-color-component-shop-swatch-rainbow-2: #FFB900; /* amber-400 */
+  --luxi-color-component-shop-swatch-rainbow-3: #00C950; /* green-500 */
+  --luxi-color-component-shop-swatch-rainbow-4: #51A2FF; /* blue-400 */
+  --luxi-color-component-shop-swatch-rainbow-5: #C27AFF; /* purple-400 */
+  /* SignupModal + FeedbackModal — the form modals */
+  --luxi-shadow-form-modal: 0 24px 60px rgba(50,38,80,.32), 0 4px 16px rgba(50,38,80,.14); /* off-ramp ink #322650 @ 32% / 14% — sign-up + feedback cards */
+  --luxi-shadow-signup-toast: 0 16px 40px rgba(50,38,80,.24); /* ink @ 24% — "You're all set" */
+  /* the rating stars' glow — each star's own colour @ 40% */
+  --luxi-shadow-feedback-star-1: drop-shadow(0 3px 6px color-mix(in srgb, var(--luxi-color-component-feedback-star-1) 40%, transparent));
+  --luxi-shadow-feedback-star-2: drop-shadow(0 3px 6px color-mix(in srgb, var(--luxi-color-component-feedback-star-2) 40%, transparent));
+  --luxi-shadow-feedback-star-3: drop-shadow(0 3px 6px color-mix(in srgb, var(--luxi-color-component-feedback-star-3) 40%, transparent));
+  --luxi-shadow-feedback-star-4: drop-shadow(0 3px 6px color-mix(in srgb, var(--luxi-color-component-feedback-star-4) 40%, transparent));
+  --luxi-shadow-feedback-star-5: drop-shadow(0 3px 6px color-mix(in srgb, var(--luxi-color-component-feedback-star-5) 40%, transparent));
+}
+
 /* Save-Your-Progress signup modal + Settings gear (Oscar's lift, 2026-08-30).
  * Namespaced `su*` so they can't retune the shared popIn/scrimIn/floaty curves
  * (the lesson from the division dv* set). scrimIn/floaty/popIn are reused as-is. */
 @keyframes suSpin { to { transform: rotate(360deg); } }
-@keyframes suFadeSlide { 0% { opacity: 0; transform: translateY(-6px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes suFadeSlide { 0% { opacity: 0; transform: translateY(-8px); } 100% { opacity: 1; transform: translateY(0); } }
 /* vertical + scale only — horizontal centering is the wrapper's translateX(-50%),
  * so keeping it out of here avoids a double-translate that shoves the toast left. */
 @keyframes suToastIn { 0% { opacity: 0; transform: translateY(12px) scale(.94); } 60% { transform: translateY(-2px) scale(1.02); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes suSheetIn { 0% { transform: scale(.94) translateY(-10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
-@keyframes suSheetInUp { 0% { transform: scale(.94) translateY(10px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes suSheetIn { 0% { transform: scale(.94) translateY(-8px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes suSheetInUp { 0% { transform: scale(.94) translateY(8px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 
 /* ── Luxi Land footer (Door) — lifted 1:1 from Oscar's "Luxi Footer.dc.html" (2026-09-19) ──
  * Hover states live HERE, not inline, because an inline style overrides a CSS
@@ -1135,13 +1185,13 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    (same 4px press as .luxiOb-cta); Oscar's comp had 3px/1px pre-snap. */
 @keyframes fbPopIn { 0% { transform: scale(.94) translateY(16px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 @keyframes fbPop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
-.luxiFb-close { background: var(--luxi-color-component-modal-close-background-default); transition: background .15s; }
+.luxiFb-close { background: var(--luxi-color-component-modal-close-background-default); transition: background 150ms var(--ease-out); }
 .luxiFb-close:hover { background: var(--luxi-color-component-modal-close-background-hover); }
 .luxiFb-star:hover { transform: scale(1.22) rotate(-6deg) !important; } /* !important: the on/off scale is inline */
-.luxiFb-ta { border: 1.5px solid var(--color-border-interactive-default); outline: none; transition: border-color .15s; }
+.luxiFb-ta { border: var(--border-stroke-1_6) solid var(--color-border-interactive-default); outline: none; transition: border-color 150ms var(--ease-out); }
 .luxiFb-ta:hover { border-color: var(--color-border-interactive-hover); }
-.luxiFb-ta:focus { border-color: var(--color-border-interactive-focus); outline: var(--border-stroke-2) solid var(--color-border-interactive-focus); outline-offset: calc(-1 * var(--border-stroke-2)); } /* after :hover so focus wins. Field focus = a 2px Iris 600 stroke (--border-stroke-2, Amy 2026-10-17), drawn as an inset outline over the 1.5px border so nothing shifts. The colour swap alone (neutral-500 → iris-600) is 1.23:1, too faint to be a focus indicator. */
-.luxiFb-press { transition: transform .07s, box-shadow .07s, background .15s; }
+.luxiFb-ta:focus { border-color: var(--color-border-interactive-focus); outline: var(--border-stroke-2) solid var(--color-border-interactive-focus); outline-offset: calc(-1 * var(--border-stroke-2)); } /* after :hover so focus wins. Field focus = a 2px Iris 600 stroke (--border-stroke-2, Amy 2026-10-17), drawn as an inset outline over the 1.6px border so nothing shifts. The colour swap alone (neutral-500 → iris-600) is 1.23:1, too faint to be a focus indicator. */
+.luxiFb-press { transition: transform 100ms var(--ease-out), box-shadow 100ms var(--ease-out), background 150ms var(--ease-out); }
 .luxiFb-press:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--luxi-color-component-button3d-primary-shadow) !important; } /* !important: base shadow is inline */
 
 /* ── Save Your Progress (SignupModal.jsx) → Datum, 2026-10-05 ──
@@ -1149,39 +1199,39 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    :hover. Primary = the Luxi 3D button (4px press, shadow to 0). Input = Datum's
    interactive border trio (neutral-500 rest 4.74:1 · 600 hover · iris-600 focus).
    Not now = quiet secondary text (Feedback's "Not now"); links = Datum link tokens. */
-.luxiSu-close { background: var(--luxi-color-component-modal-close-background-default); transition: background .15s; }
+.luxiSu-close { background: var(--luxi-color-component-modal-close-background-default); transition: background 150ms var(--ease-out); }
 .luxiSu-close:hover { background: var(--luxi-color-component-modal-close-background-hover); }
-.luxiSu-primary { transition: transform .07s, box-shadow .07s, filter .15s; }
+.luxiSu-primary { transition: transform 100ms var(--ease-out), box-shadow 100ms var(--ease-out), filter 150ms var(--ease-out); }
 .luxiSu-primary:hover:not(:disabled):not([aria-busy]) { filter: brightness(1.04); }
 .luxiSu-primary:active:not(:disabled):not([aria-busy]) { transform: translateY(4px); box-shadow: 0 0 0 var(--luxi-color-component-button3d-primary-shadow) !important; } /* !important: base shadow is inline */
-.luxiSu-input { border: 1.5px solid var(--color-border-interactive-default); background: var(--color-background-interactive-default); outline: none; transition: border-color .15s; }
+.luxiSu-input { border: var(--border-stroke-1_6) solid var(--color-border-interactive-default); background: var(--color-background-interactive-default); outline: none; transition: border-color 150ms var(--ease-out); }
 .luxiSu-input:hover { border-color: var(--color-border-interactive-hover); }
 .luxiSu-input:focus { border-color: var(--color-border-interactive-focus); outline: var(--border-stroke-2) solid var(--color-border-interactive-focus); outline-offset: calc(-1 * var(--border-stroke-2)); } /* after :hover so focus wins. Same field-focus rule as .luxiFb-ta: a 2px Iris 600 stroke (--border-stroke-2, Amy 2026-10-17), replacing the old 1px Iris 700 ring. */
 .luxiSu-input::placeholder { color: var(--color-text-placeholder); }
 .luxiSu-input:disabled { background: var(--color-background-interactive-disabled); }
-.luxiSu-notnow { transition: background .15s, color .15s; }
+.luxiSu-notnow { transition: background 150ms var(--ease-out), color 150ms var(--ease-out); }
 .luxiSu-notnow:hover { background: var(--luxi-color-component-signup-not-now-background-hover); color: var(--color-text-primary); }
-.luxiSu-link { color: var(--luxi-color-component-signup-link-text-default); text-decoration: underline; text-underline-offset: 4px; border-radius: 4px; transition: color .15s, background-color .15s; }
+.luxiSu-link { color: var(--luxi-color-component-signup-link-text-default); text-decoration: underline; text-underline-offset: 4px; border-radius: 4px; transition: color 150ms var(--ease-out), background-color 150ms var(--ease-out); }
 .luxiSu-link:hover:not(:disabled) { color: var(--luxi-color-component-signup-link-text-hover); background: var(--luxi-color-component-signup-link-background-hover); }
 .luxiSu-link:active:not(:disabled) { color: var(--luxi-color-component-signup-link-text-pressed); background: var(--luxi-color-component-signup-link-background-pressed); }
 .luxiSu-link:focus-visible { outline: 1px solid var(--luxi-color-component-signup-link-focus-ring); outline-offset: 2px; }
 .luxiSu-link:disabled { color: var(--color-text-secondary); text-decoration: none; } /* the countdown ("Resend in 30s") is information the parent reads, so it stays legible (7.81:1) rather than disabled grey (2.6:1, exempt but reads as a fail) */
-.luxiFb-notnow { transition: background .15s; }
+.luxiFb-notnow { transition: background 150ms var(--ease-out); }
 .luxiFb-notnow:hover { background: var(--luxi-color-component-feedback-not-now-background-hover); }
 
 /* Settings sheet buttons = Datum Button variants (button.tsx), values by token name.
    ghost (Sign out): Iris 600 text · hover Lilac 100 · pressed Iris 200 + Iris 800 text · press scale .97.
    link (Privacy Policy): underlined Iris 600 · hover Iris 700 on Lilac 100 · pressed Iris 800 on Lilac 200 ·
    colour only, never scales (text under the finger shouldn't shrink). Hover/press in CSS — inline beats :hover. */
-.luxiSet-ghost { background: transparent; color: var(--luxi-color-component-settings-sign-out-text-default); transition: scale .1s cubic-bezier(.23,1,.32,1), color .15s, background-color .15s; }
+.luxiSet-ghost { background: transparent; color: var(--luxi-color-component-settings-sign-out-text-default); transition: scale 100ms var(--ease-out), color 150ms var(--ease-out), background-color 150ms var(--ease-out); }
 .luxiSet-ghost:hover { background: var(--luxi-color-component-settings-sign-out-background-hover); }
 .luxiSet-ghost:active { background: var(--luxi-color-component-settings-sign-out-background-pressed); color: var(--luxi-color-component-settings-sign-out-text-pressed); scale: .97; }
-.luxiSet-link { color: var(--luxi-color-component-settings-link-text-default); text-decoration: underline; text-underline-offset: 4px; transition: color .15s, background-color .15s; }
+.luxiSet-link { color: var(--luxi-color-component-settings-link-text-default); text-decoration: underline; text-underline-offset: 4px; transition: color 150ms var(--ease-out), background-color 150ms var(--ease-out); }
 .luxiSet-link:hover { color: var(--luxi-color-component-settings-link-text-hover); background: var(--luxi-color-component-settings-link-background-hover); }
 .luxiSet-link:active { color: var(--luxi-color-component-settings-link-text-pressed); background: var(--luxi-color-component-settings-link-background-pressed); }
 .luxiSet-link:focus-visible { outline: 1px solid var(--luxi-color-component-settings-link-focus-ring); outline-offset: 2px; }
 /* Profile popover photo button = Datum Button secondary (component tokens copied below in :root) */
-.luxiPf-secondary { background: var(--luxi-color-component-profile-upload-button-background-default); color: var(--luxi-color-component-profile-upload-button-text); transition: scale .1s cubic-bezier(.23,1,.32,1), background-color .15s; }
+.luxiPf-secondary { background: var(--luxi-color-component-profile-upload-button-background-default); color: var(--luxi-color-component-profile-upload-button-text); transition: scale 100ms var(--ease-out), background-color 150ms var(--ease-out); }
 .luxiPf-secondary:hover:not(:disabled) { background: var(--luxi-color-component-profile-upload-button-background-hover); }
 .luxiPf-secondary:active:not(:disabled) { background: var(--luxi-color-component-profile-upload-button-background-pressed); scale: .97; }
 .luxiPf-secondary:focus-visible { outline: 1px solid var(--luxi-color-component-profile-upload-button-focus-ring); outline-offset: 2px; }

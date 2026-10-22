@@ -67,7 +67,8 @@ export default function HeroStage() {
       onCreated={({ camera }) => camera.lookAt(0.05, 0.68, 0)}
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
     >
-      {/* the world's exact lighting rig, so the hero matches in-game */}
+      {/* the world's exact lighting rig, so the hero matches in-game. These are 3D scene
+          colours — parked out of the governance pass with src/world/* (Amy 2026-10-21). */}
       <hemisphereLight args={['#fff6e8', '#b9b0d6', 1.0]} />
       <directionalLight position={[4, 8, 6]} intensity={1.1} />
       <Suspense fallback={null}>
