@@ -4,7 +4,7 @@
  * LOOK: Oscar's two comps (~/Downloads/handoff — onboarding/, lifted 2026-09-19):
  * "Luxi Onboarding.dc.html" (modal frame) + "Onboarding Card.dc.html" (card).
  * Header, ✕, number badge, dots, ghost Back, the Iris CTA and the gem stage are
- * his; the CTA wears Brand Iris 500 #6169E0 (his #7C6CE8 failed AA with white,
+ * his; the CTA wears Brand Iris 500 (button3d-primary — his violet failed AA with white,
  * Amy 2026-10-04). Golden-4px values kept (2026-09-19 pass).
  *
  * REBUILT 2026-10-18 (Trail crew onboarding job — docs/onboarding/proposal.md,
@@ -59,8 +59,9 @@ import { onboardingPages } from '../onboardingCopy'
  *  never animationend (it stalls in hidden panes). Keep the two in sync. */
 export const OB_EXIT_MS = 200
 
-const TITLE = { fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }
-const BODY = { margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.55, textWrap: 'pretty' }
+// S5 (2026-10-22): type on Datum --text-*; twinkle fills → --luxi-color-component-onboarding-twinkle-* (same values)
+const TITLE = { fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }
+const BODY = { margin: '8px 0 0', fontSize: 'var(--text-base)', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.55, textWrap: 'pretty' }
 
 const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
@@ -105,9 +106,9 @@ export function useDialogFocus(ref, onEscape) {
 
 // Three twinkles around the gem: gem cyan + the card's lilac star (% of the stage).
 const TWINKLES = [
-  { l: '30%', t: '24%', s: 20, d: 0, c: '#22D3EE' },
-  { l: '68%', t: '18%', s: 16, d: 0.6, c: '#8570D2' },
-  { l: '66%', t: '62%', s: 16, d: 1.2, c: '#22D3EE' },
+  { l: '30%', t: '24%', s: 20, d: 0, c: 'var(--luxi-color-component-onboarding-twinkle-gem)' },
+  { l: '68%', t: '18%', s: 16, d: 0.6, c: 'var(--luxi-color-component-onboarding-twinkle-star)' },
+  { l: '66%', t: '62%', s: 16, d: 1.2, c: 'var(--luxi-color-component-onboarding-twinkle-gem)' },
 ]
 
 function GemStage({ active, prev }) {
@@ -121,7 +122,7 @@ function GemStage({ active, prev }) {
       </div>
       {TWINKLES.map((k, i) => (
         <svg key={i} className="luxiOb-twinkle" width={k.s} height={k.s} viewBox="0 0 24 24" style={{ position: 'absolute', left: k.l, top: k.t, animationDelay: `${0.45 + k.d}s` }}>
-          <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" fill={k.c} />
+          <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" style={{ fill: k.c }} />
         </svg>
       ))}
     </div>
@@ -247,7 +248,7 @@ export function OnboardingCard({ entry = 'first', onClose }) {
         <span id={titleId} style={TITLE}>
           {page.kind === 'about' ? page.title : 'How to Play'}
         </span>
-        <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>
+        <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 'var(--text-base)', lineHeight: 1 }}>
           ✕
         </button>
       </div>
@@ -299,7 +300,7 @@ export function OnboardingCard({ entry = 'first', onClose }) {
           <button className="luxiOb-cta" onClick={next}>Next</button>
         ) : (
           <button className="luxiOb-cta" onClick={onClose}>
-            Let&#8217;s play <span aria-hidden="true" style={{ lineHeight: 0, transform: 'translateY(1px)' }}>&#8594;</span>
+            Let’s play <span aria-hidden="true" style={{ lineHeight: 0, transform: 'translateY(1px)' }}>→</span>
           </button>
         )}
       </div>

@@ -56,18 +56,20 @@ const COPY = {
   trick: { title: 'Trick! …just kidding.', body: 'Luxi Math would never. Here are some gems to spend on your world.' },
 }
 
-// Choreography (ms from the pick). The burst owns 0 → ~1100; the chip's gems
+// Choreography (ms from the pick). The burst owns 0 → ~1000; the chip's gems
 // start dropping as the big ones leave, one every CHIP_STAGGER; each "lands" at
-// 55% of its 520ms drop — that's when the count ticks.
+// 55% of its 500ms drop — that's when the count ticks. (S5: the drop 520 → 500ms
+// on Datum's ladder, so the land moved 290 → 275.)
 const BURST_MS = 1700
 const CHIP_START = 950
 const CHIP_STAGGER = 200
 const chipDelay = (i) => CHIP_START + i * CHIP_STAGGER
-const GEM_LAND = (i) => chipDelay(i) + 290
+const GEM_LAND = (i) => chipDelay(i) + 275
 
 // Sparkles flung out from the burst (36, 14–31px) — fixed (not random per render), spread
 // round the full circle by the golden angle so they never clump.
-const SPARK_COLORS = ['#22D3EE', '#FBBF24', '#8570D2', '#F97316', '#FFFFFF']
+// gem cyan · gold · lilac star · orange · white → --luxi-color-component-promo-spark-* (same values, S5)
+const SPARK_COLORS = ['gem', 'gold', 'star', 'orange', 'white'].map((k) => `var(--luxi-color-component-promo-spark-${k})`)
 const SPARKS = Array.from({ length: 36 }, (_, i) => {
   const a = i * 2.39996 // golden angle, radians
   const r = 140 + ((i * 53) % 150) // 140–290px out
@@ -88,7 +90,7 @@ function TreatBurst({ gems }) {
             <GemIcon size={k.size + 6} />
           ) : (
             <svg width={k.size} height={k.size} viewBox="0 0 24 24">
-              <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" fill={k.color} />
+              <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" style={{ fill: k.color }} />
             </svg>
           )}
         </span>
@@ -166,12 +168,12 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
         aria-labelledby="promo-title"
         className="luxiOb-card"
         onClick={(e) => e.stopPropagation()}
-        style={{ fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", width: '100%', maxWidth: 440, background: 'var(--color-background-base)', borderRadius: 24, overflow: 'hidden', boxShadow: '0 24px 60px rgba(74,54,110,.22), inset 0 0 0 1px rgba(255,255,255,.6)' }}
+        style={{ fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif", width: '100%', maxWidth: 440, background: 'var(--color-background-base)', borderRadius: 24, overflow: 'hidden', boxShadow: 'var(--luxi-shadow-door-modal-card)' }}
       >
         {/* Header — same chrome as Onboarding: title + ✕ on the right */}
         <div style={{ padding: '16px 16px 16px 24px', background: 'linear-gradient(180deg,var(--luxi-color-component-modal-header-background-start),var(--luxi-color-component-modal-header-background-end))', borderBottom: '1px solid var(--luxi-color-component-modal-header-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <span style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>Happy Halloween</span>
-          <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 16, lineHeight: 1 }}>✕</button>
+          <span style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>Happy Halloween</span>
+          <button className="luxiOb-close" aria-label="Close" onClick={onClose} style={{ fontSize: 'var(--text-base)', lineHeight: 1 }}>✕</button>
         </div>
 
         {/* The clip — 16:9 stage, same box as Onboarding's step media */}
@@ -207,8 +209,8 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
 
         {/* Copy — swaps from the question to the reveal */}
         <div style={{ padding: '24px 24px 8px' }} aria-live="polite">
-          <div id="promo-title" style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>{copy.title}</div>
-          <p style={{ margin: '8px 0 0', fontSize: 16, fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.55, textWrap: 'pretty' }}>{copy.body}</p>
+          <div id="promo-title" style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-text-primary)', letterSpacing: '-.01em' }}>{copy.title}</div>
+          <p style={{ margin: '8px 0 0', fontSize: 'var(--text-base)', fontWeight: 400, color: 'var(--color-text-secondary)', lineHeight: 1.55, textWrap: 'pretty' }}>{copy.body}</p>
           {pick && (
             // The chip the burst lands in: one gem per gem earned drops in,
             // tumbles and settles (staggered) with a twinkle; the number ticks
@@ -219,12 +221,12 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
                   <span key={i} className="luxiPromo-gem" style={{ animationDelay: `${chipDelay(i)}ms` }}>
                     <GemIcon size={32} />
                     <svg className="luxiPromo-spark" width="16" height="16" viewBox="0 0 24 24" style={{ animationDelay: `${GEM_LAND(i)}ms` }}>
-                      <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" fill="#22D3EE" />
+                      <path d="M12 1.5c.6 5.4 3.6 9.6 10.5 10.5-6.9.9-9.9 5.1-10.5 10.5C11.4 17.1 8.4 12.9 1.5 12 8.4 11.1 11.4 6.9 12 1.5Z" style={{ fill: 'var(--luxi-color-component-promo-spark-gem)' }} />
                     </svg>
                   </span>
                 ))}
               </span>
-              <span aria-hidden="true" style={{ fontSize: 20, fontWeight: 700, color: 'var(--color-text-primary)', fontVariantNumeric: 'tabular-nums' }}>
+              <span aria-hidden="true" style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-text-primary)', fontVariantNumeric: 'tabular-nums' }}>
                 <span key={counted} className={counted ? 'luxiPromo-tick' : undefined} style={{ display: 'inline-block' }}>+{counted}</span> gems
               </span>
               <span className="sr-only">You got {promo.gems} gems</span>
@@ -245,7 +247,7 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
             </>
           ) : (
             <button className="luxiOb-cta" style={{ padding: '12px 24px' }} onClick={onClose} autoFocus>
-              Let&#8217;s play <span style={{ lineHeight: 0, transform: 'translateY(1px)' }}>&#8594;</span>
+              Let’s play <span style={{ lineHeight: 0, transform: 'translateY(1px)' }}>→</span>
             </button>
           )}
         </div>
@@ -255,9 +257,10 @@ export default function PromoPopup({ promo = PROMO, onClose }) {
   )
 }
 
+// paths are drawing; the stroke is the named 1.6px, non-scaling via .luxiPromo-soundIcon path (was 2 viewBox units at 20/24 = 1.67px)
 function SoundIcon({ on }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg className="luxiPromo-soundIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ strokeWidth: 'var(--border-stroke-1_6)' }}>
       <path d="M11 5 6 9H3v6h3l5 4V5Z" fill="currentColor" />
       {on ? (
         <>

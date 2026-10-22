@@ -2,7 +2,7 @@
   "component": "PromoPopup",
   "file": "src/ui/PromoPopup.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-21T03:01:06.097Z",
+  "ranAt": "2026-10-22T05:08:22.452Z",
   "variants": [
     "Reduced motion (poster + controls)",
     "Motion on (sound button)"
@@ -1165,9 +1165,9 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 3.23,
+      "ratio": 3.26,
       "min": 3,
-      "coverage": 0.85
+      "coverage": 0.82
     },
     {
       "variant": "Motion on (sound button)",
@@ -1539,7 +1539,7 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 3.21,
+      "ratio": 3.22,
       "min": 3,
       "coverage": 0.59
     },
@@ -1939,7 +1939,7 @@
       "kind": "focus-indicator",
       "status": "pass",
       "criterion": "1.4.11",
-      "ratio": 6.67,
+      "ratio": 5.77,
       "min": 3,
       "coverage": 1
     },
