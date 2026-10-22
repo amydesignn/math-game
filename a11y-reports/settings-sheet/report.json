@@ -2,7 +2,7 @@
   "component": "SettingsSheet",
   "file": "src/ui/Settings.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-22T12:52:10.676Z",
+  "ranAt": "2026-10-22T15:47:01.605Z",
   "variants": [
     "Guest · sound on",
     "Guest · sound off",

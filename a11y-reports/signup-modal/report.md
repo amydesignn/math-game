@@ -1,6 +1,6 @@
 # Contrast audit — SignupModal
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/SignupModal.jsx` · **Run:** 2026-10-22 12:55 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/SignupModal.jsx` · **Run:** 2026-10-22 15:50 UTC  
 **Variants:** Form, Sending, Error, Check your inbox, Guest popup, Saved toast · **Phases:** empty → filled → sending → error → check → guest → toast
 
 > **168 unique checks · 158 pass · 0 fail · 4 exempt (disabled) · 0 need review**
@@ -101,7 +101,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | We sent a link to parent@example.com. Open it to save this g | `#262626` on `#FFFFFF` | 16px | 15.13:1 | 4.50:1 | ✅ | check |
 | parent@example.com | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | check |
 | Didn’t get the email? | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | check |
-| SAVE PROGRESS | `#3D43BE` on `#FAF7FF` ᵖ | 12px bold | 7.22:1 | 4.50:1 | ✅ | check |
+| SAVE PROGRESS | `#3D43BE` on `#F9F7FF` ᵖ | 12px bold | 7.20:1 | 4.50:1 | ✅ | check |
 
 ### Interactive elements — every state
 
