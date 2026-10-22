@@ -1,6 +1,6 @@
 # Contrast audit — ProfilePopover
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-21 17:34 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-22 12:52 UTC  
 **Variants:** Guest · no photo, Signed in · initial, With photo · **Phases:** open
 
 > **49 unique checks · 46 pass · 0 fail · 0 exempt (disabled) · 0 need review**
@@ -42,7 +42,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Profile | `#262626` on `#FFFFFF` | 16px bold | 15.13:1 | 4.50:1 | ✅ | open |
 | Upload a photo | `#333A98` on `#EDE7FC` | 16px | 7.92:1 | 4.50:1 | ✅ | open |
 | Your photo stays on this device. Account settings live in th | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | open |
-| I | `#FFFFFF` on `#6856B5` ᵖ | 38px bold (large) | 5.85:1 | 3.00:1 | ✅ | open |
+| I | `#FFFFFF` on `#6856B5` ᵖ | 40px bold (large) | 5.85:1 | 3.00:1 | ✅ | open |
 
 ### Interactive elements — every state
 

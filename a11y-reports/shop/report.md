@@ -1,6 +1,6 @@
 # Contrast audit — Shop
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Shop.jsx` · **Run:** 2026-10-21 02:06 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Shop.jsx` · **Run:** 2026-10-22 12:54 UTC  
 **Variants:** 4 gems · your things · sparkle on, 0 gems (nothing affordable) · **Phases:** default → selected → magic-selected → big
 
 > **490 unique checks · 462 pass · 0 fail · 26 exempt (disabled) · 0 need review**
@@ -22,7 +22,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
-| Gem Shop 🛍️ | `#262626` on `#FFFFFF` | 19px bold (large) | 15.13:1 | 3.00:1 | ✅ | default, selected, magic-selected, big |
+| Gem Shop 🛍️ | `#262626` on `#FFFFFF` | 20px bold (large) | 15.13:1 | 3.00:1 | ✅ | default, selected, magic-selected, big |
 | 💎 4 | `#262626` on `#F6F4FD` | 14px bold | 13.89:1 | 4.50:1 | ✅ | default, selected, magic-selected, big |
 | YOUR THINGS — TAP TO PLACE | `#3D43BE` on `#FFFFFF` | 12px bold | 7.65:1 | 4.50:1 | ✅ | default, selected, magic-selected, big |
 | Tree | `#262626` on `#F6F4FD` | 14px | 13.89:1 | 4.50:1 | ✅ | default, selected, magic-selected, big |
@@ -112,14 +112,14 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Gardener, locked, 50 gems | ⚪ disabled 12.04:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
 | Cat 💎 0 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
 | Sproutling 💎 50 | ⚪ disabled 17.62:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
-| Pink 💎 2 · 15m | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected |
+| Pink 💎 2 · 15m | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 92% of edge | default, selected |
 | Blue 💎 2 · 15m | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 92% of edge | default, selected, magic-selected |
 | Gold 💎 3 · 15m | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
-| Silver 💎 3 · 15m | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
-| Rainbow 💎 4 · 15m | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
-| Normal | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 7.65:1 · 98% of edge | default, selected, magic-selected |
-| Big ×2 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.65:1 · 98% of edge | default, selected, magic-selected |
-| Huge ×3 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.65:1 · 98% of edge | default, selected, magic-selected |
+| Silver 💎 3 · 15m | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 92% of edge | default, selected, magic-selected |
+| Rainbow 💎 4 · 15m | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 92% of edge | default, selected, magic-selected |
+| Normal | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 5.81:1 | ✅ 7.65:1 · 97% of edge | default, selected, magic-selected |
+| Big ×2 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.65:1 · 97% of edge | default, selected, magic-selected |
+| Huge ×3 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.92:1 | ✅ 7.65:1 · 97% of edge | default, selected, magic-selected |
 | 🌳 Tree 💎 3 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, magic-selected |
 | 🌲 Tall tree 💎 4 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
 | 🌿 Plant 💎 2 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
@@ -130,10 +130,10 @@ None — every check passes WCAG 2.2 AA. 🎉
 | ⛺ Tent 💎 5 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
 | 🌉 Bridge 💎 6 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
 | 🎯 Target 💎 3 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
-| 🍎 Fruit stand 💎 4 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 94% of edge | default, selected, magic-selected |
+| 🍎 Fruit stand 💎 4 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
 | 🥐 Bakery stand 💎 4 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
 | 🛒 Cart 💎 3 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 94% of edge | default, selected, magic-selected |
-| 🍦 Ice-cream freezer 💎 4 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 94% of edge | default, selected, magic-selected |
+| 🍦 Ice-cream freezer 💎 4 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
 | 🕹️ Arcade machine 💎 6 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
 | 🧸 Claw machine 💎 6 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
 | 🎮 Pinball 💎 5 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
@@ -151,11 +151,11 @@ None — every check passes WCAG 2.2 AA. 🎉
 | 💰 Treasure chest 💎 5 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
 | ⛩️ Dungeon gate 💎 5 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
 | 🏛️ Column 💎 3 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 94% of edge | default, selected, magic-selected |
-| 🗿 Stone stairs 💎 3 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 94% of edge | default, selected, magic-selected |
-| 🎌 Banner 💎 2 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 94% of edge | default, selected, magic-selected |
+| 🗿 Stone stairs 💎 3 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
+| 🎌 Banner 💎 2 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
 | 🛡️ Shield 💎 2 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
-| 🛢️ Barrel 💎 2 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 94% of edge | default, selected, magic-selected |
-| 🧱 Stone wall 💎 2 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 94% of edge | default, selected, magic-selected |
+| 🛢️ Barrel 💎 2 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
+| 🧱 Stone wall 💎 2 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 13.89:1 | ✅ 7.65:1 · 93% of edge | default, selected, magic-selected |
 | 🗿 Tower block 💎 8 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
 | 🏰 Castle gate 💎 6 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
 | 🌁 Stone bridge 💎 6 | ⚪ disabled 20.12:1 — exempt (WCAG 1.4.3) | | | | | default, selected, magic-selected |
@@ -170,7 +170,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 
 | Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
 |---|---|---|---|---|---|---|
-| Gem Shop 🛍️ | `#262626` on `#FFFFFF` | 19px bold (large) | 15.13:1 | 3.00:1 | ✅ | default |
+| Gem Shop 🛍️ | `#262626` on `#FFFFFF` | 20px bold (large) | 15.13:1 | 3.00:1 | ✅ | default |
 | 💎 0 | `#262626` on `#F6F4FD` | 14px bold | 13.89:1 | 4.50:1 | ✅ | default |
 | 🦸 HEROES | `#3D43BE` on `#FFFFFF` | 12px bold | 7.65:1 | 4.50:1 | ✅ | default |
 | Sunny | `#262626` on `#F6F4FD` | 14px | 13.89:1 | 4.50:1 | ✅ | default |

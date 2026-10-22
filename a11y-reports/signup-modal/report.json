@@ -2,7 +2,7 @@
   "component": "SignupModal",
   "file": "src/ui/SignupModal.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-17T18:46:17.855Z",
+  "ranAt": "2026-10-22T12:55:39.916Z",
   "variants": [
     "Form",
     "Sending",
@@ -2285,12 +2285,12 @@
       "label": "SAVE PROGRESS",
       "target": "span:nth-child(2)",
       "fg": "#3D43BE",
-      "bg": "#F9F7FF",
+      "bg": "#FAF7FF",
       "bgRange": [
-        "#F9F7FF",
+        "#FAF7FF",
         "#FCFAFF"
       ],
-      "ratio": 7.2,
+      "ratio": 7.22,
       "min": 4.5,
       "large": false,
       "px": 12,
