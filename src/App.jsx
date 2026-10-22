@@ -1143,7 +1143,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
           the word, the clearest "leave" affordance for a child. The speaker
           lives here (was in the right stat row) — utility, out of the stats
           zone; it folds into a single gear menu here in a later pass (Amy). */}
-      <div className="hud-left" style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', left: 16, display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'flex-start' }}>
+      <div className="hud-left" style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', left: 16, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'flex-start' }}>
         {!placing && !shopOpen && selectedId == null && !meadow && !math && !station && (
           <ExitButton onTap={goToDoor} />
         )}
@@ -1171,7 +1171,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
             aria-label="Open Settings"
             onPointerDown={(e) => e.stopPropagation()}
             onClick={() => setSettingsOpen(true)}
-            style={{ flex: 'none', width: 44, height: 44, borderRadius: '50%', border: 'none', background: '#fff', boxShadow: '0 4px 14px rgba(43,32,90,0.16)', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            style={{ flex: 'none', width: 44, height: 44, borderRadius: '50%', border: 'none', background: 'var(--color-background-base)', boxShadow: 'var(--luxi-shadow-hud-chip)', fontSize: 'var(--text-xl)', lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             ⚙️
           </button>
@@ -1427,16 +1427,16 @@ function ExitButton({ onTap }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: 6,
+        gap: 8,
         height: 44,
         padding: '0 16px 0 12px',
         borderRadius: 999,
         border: 'none',
-        background: '#ffffff',
-        boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
+        background: 'var(--color-background-base)',
+        boxShadow: 'var(--luxi-shadow-hud-chip)',
         color: 'var(--luxi-color-component-exit-pill-text)',
-        fontWeight: 800,
-        fontSize: 15,
+        fontWeight: 700,
+        fontSize: 'var(--text-base)',
         cursor: 'pointer',
       }}
     >
@@ -1456,13 +1456,13 @@ function RoundHudButton({ aria, emoji, onTap, hintKey }) {
       onPointerDown={(e) => e.stopPropagation()}
       onClick={onTap}
       style={{
-        width: 50,
-        height: 50,
+        width: 48,
+        height: 48,
         borderRadius: 999,
         border: 'none',
-        background: '#ffffff',
-        boxShadow: '0 4px 14px rgba(43,32,90,0.18)',
-        fontSize: 23,
+        background: 'var(--color-background-base)',
+        boxShadow: 'var(--luxi-shadow-hud-round-button)',
+        fontSize: 'var(--text-2xl)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
@@ -1485,13 +1485,13 @@ function HomeButton({ onTap }) {
         position: 'absolute',
         bottom: 'max(20px, env(safe-area-inset-bottom))',
         right: 16,
-        width: 54,
-        height: 54,
+        width: 52,
+        height: 52,
         borderRadius: 999,
         border: 'none',
-        background: '#ffffff',
-        boxShadow: '0 4px 14px rgba(43,32,90,0.2)',
-        fontSize: 24,
+        background: 'var(--color-background-base)',
+        boxShadow: 'var(--luxi-shadow-hud-home-button)',
+        fontSize: 'var(--text-2xl)',
         cursor: 'pointer',
       }}
     >
@@ -1518,15 +1518,15 @@ function MapLabel({ name }) {
     >
       <span
         style={{
-          padding: '4px 12px',
-          background: 'rgba(255,255,255,0.94)',
+          padding: '4px 8px', // S4: 12.5 → 14px type; side padding 12 → 8 keeps "Forest Clearing" off the screen edge
+          background: 'var(--luxi-color-component-map-label-background)',
           color: 'var(--luxi-color-component-map-label-text)',
           borderRadius: 999,
           fontWeight: 700,
-          fontSize: 12.5,
+          fontSize: 'var(--text-sm)',
           letterSpacing: 0.1,
           whiteSpace: 'nowrap',
-          boxShadow: '0 4px 14px rgba(43,32,90,0.16)',
+          boxShadow: 'var(--luxi-shadow-hud-chip)',
         }}
       >
         {name}
@@ -1546,11 +1546,11 @@ function EmoteBar({ onEmote }) {
         left: '50%',
         transform: 'translateX(-50%)',
         display: 'flex',
-        gap: 10,
-        background: '#ffffff',
+        gap: 8,
+        background: 'var(--color-background-base)',
         borderRadius: 999,
         padding: 8,
-        boxShadow: '0 4px 14px rgba(43,32,90,0.2)',
+        boxShadow: 'var(--luxi-shadow-hud-emote-bar)',
       }}
     >
       {EMOTES.map((e) => (
@@ -1559,12 +1559,12 @@ function EmoteBar({ onEmote }) {
           aria-label={e.kind}
           onClick={() => onEmote(e)}
           style={{
-            width: 46,
-            height: 46,
+            width: 48,
+            height: 48,
             borderRadius: 999,
             border: 'none',
             background: 'var(--color-background-brand-subtle)',
-            fontSize: 22,
+            fontSize: 'var(--text-2xl)',
             cursor: 'pointer',
           }}
         >
@@ -1583,12 +1583,13 @@ function MapToast({ name }) {
         top: 'max(72px, calc(env(safe-area-inset-top) + 56px))',
         left: '50%',
         transform: 'translateX(-50%)',
-        padding: '10px 20px',
-        background: 'rgba(43,32,90,0.82)',
-        color: '#fff',
+        padding: '8px 20px',
+        background: 'var(--luxi-color-component-hud-toast-background)',
+        color: 'var(--color-text-inverse)',
         borderRadius: 999,
         fontWeight: 700,
-        fontSize: 16,
+        fontSize: 'var(--text-base)',
+        lineHeight: 'var(--text-base--line-height)',
         letterSpacing: 0.2,
         pointerEvents: 'none',
       }}
@@ -1648,8 +1649,8 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
       }}
     >
       {/* the hint: Luxi's own action-bar-hint tokens on the type ladder (was 13.5px on raw rgba(43,32,90,.82) — Amy, 2026-10-20) */}
-      <div style={{ padding: '6px 14px', background: 'var(--luxi-color-component-action-bar-hint-background)', color: 'var(--luxi-color-component-action-bar-hint-text)', borderRadius: 999, fontWeight: 600, fontSize: 14 }}>{hint}</div>
-      <div style={{ display: 'flex', gap: 10, background: 'var(--color-background-base)', borderRadius: 999, padding: 8, boxShadow: 'var(--luxi-shadow-action-bar)' }}>
+      <div style={{ padding: '8px 16px', background: 'var(--luxi-color-component-action-bar-hint-background)', color: 'var(--luxi-color-component-action-bar-hint-text)', borderRadius: 999, fontWeight: 500, fontSize: 'var(--text-sm)' }}>{hint}</div>
+      <div style={{ display: 'flex', gap: 8, background: 'var(--color-background-base)', borderRadius: 999, padding: 8, boxShadow: 'var(--luxi-shadow-action-bar)' }}>
         {buttons.map((b) => (
           <button
             key={b.aria}
@@ -1657,15 +1658,15 @@ function ActionBar({ hint, buttons, hintKey = 'action-bar' }) {
             onClick={b.onTap}
             disabled={b.disabled}
             style={{
-              minWidth: 46,
-              height: 46,
+              minWidth: 48,
+              height: 48,
               padding: '0 16px',
               borderRadius: 999,
               border: 'none',
               // disabled (Water she can't afford yet) = Datum's disabled tokens, not a faded CTA (Amy, 2026-10-20)
               background: b.disabled ? 'var(--color-background-interactive-disabled)' : b.primary ? 'var(--luxi-color-component-action-bar-button-primary-background)' : 'var(--luxi-color-component-action-bar-button-secondary-background)',
               color: b.disabled ? 'var(--color-text-disabled)' : b.primary ? 'var(--luxi-color-component-action-bar-button-primary-text)' : 'var(--luxi-color-component-action-bar-button-secondary-text)',
-              fontSize: 16,
+              fontSize: 'var(--text-base)',
               fontWeight: 700,
               cursor: b.disabled ? 'default' : 'pointer',
             }}
@@ -1687,12 +1688,13 @@ function NoteToast({ text }) {
         top: 'max(120px, calc(env(safe-area-inset-top) + 104px))',
         left: '50%',
         transform: 'translateX(-50%)',
-        padding: '10px 20px',
-        background: 'rgba(43,32,90,0.88)',
-        color: '#fff',
+        padding: '8px 20px',
+        background: 'var(--luxi-color-component-note-toast-background)',
+        color: 'var(--color-text-inverse)',
         borderRadius: 999,
         fontWeight: 700,
-        fontSize: 15,
+        fontSize: 'var(--text-base)',
+        lineHeight: 'var(--text-base--line-height)',
         pointerEvents: 'none',
         whiteSpace: 'nowrap',
       }}
@@ -1711,12 +1713,13 @@ function MoveHint() {
         bottom: 'max(28px, env(safe-area-inset-bottom))',
         left: '50%',
         transform: 'translateX(-50%)',
-        padding: '10px 18px',
-        background: 'rgba(43,32,90,0.82)',
-        color: '#fff',
+        padding: '8px 20px',
+        background: 'var(--luxi-color-component-hud-toast-background)',
+        color: 'var(--color-text-inverse)',
         borderRadius: 999,
-        fontWeight: 600,
-        fontSize: 15,
+        fontWeight: 500,
+        fontSize: 'var(--text-base)',
+        lineHeight: 'var(--text-base--line-height)',
         letterSpacing: 0.2,
         pointerEvents: 'none',
       }}

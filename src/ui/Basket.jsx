@@ -33,7 +33,7 @@ export function BasketButton({ total, onTap, className = '', buttonRef, open = f
         border: 'none',
         background: 'var(--color-background-base)',
         boxShadow: 'var(--luxi-shadow-basket-button)',
-        fontSize: 24,
+        fontSize: 'var(--text-2xl)',
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
@@ -57,9 +57,9 @@ export function BasketButton({ total, onTap, className = '', buttonRef, open = f
             color: 'var(--luxi-color-component-basket-count-text)',
             fontSize: 'var(--luxi-component-basket-count-font-size)', // Luxi-own token, not Datum's Badge (Amy, 2026-10-20)
             fontWeight: 'var(--luxi-component-basket-count-font-weight)',
-            lineHeight: '24px',
+            lineHeight: 2, // 12px × 2 = the 24px chip
             boxSizing: 'border-box',
-            animation: 'gempop 0.45s ease-out',
+            animation: 'gempop 300ms var(--ease-out)', // S4: .45s → 300
           }}
         >
           {total}
@@ -113,13 +113,13 @@ export function BasketCard({ total, basket, onClose }) {
       >
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* the house 12 caps eyebrow (= the Gem Shop's SectionLabel) */}
-          <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--color-text-brand)' }}>Your basket</span>
+          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', color: 'var(--color-text-brand)' }}>Your basket</span>
           <button
             ref={closeRef}
             aria-label="Close your basket"
             onClick={onClose}
             // the ✕ is a WCAG glyph → neutral icon token, not Lilac (decoration only) — same as the Gem Shop's close
-            style={{ width: 40, height: 40, borderRadius: 999, border: 'none', background: 'var(--color-background-brand-subtle)', color: 'var(--color-icon-secondary)', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}
+            style={{ width: 40, height: 40, borderRadius: 999, border: 'none', background: 'var(--color-background-brand-subtle)', color: 'var(--color-icon-secondary)', fontSize: 'var(--text-base)', fontWeight: 500, cursor: 'pointer' }} /* = ModalClose 16/500 */
           >
             ✕
           </button>
@@ -127,8 +127,8 @@ export function BasketCard({ total, basket, onClose }) {
 
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, marginTop: 4 }}>
           {/* one generic unit, no label (spec: the basket IS the currency icon — "5 🧺") */}
-          <span style={{ fontSize: 40, fontWeight: 800, lineHeight: 1, color: 'var(--color-text-brand)' }}>{total}</span>
-          <span style={{ fontSize: 28, lineHeight: 1 }} aria-hidden>🧺</span>
+          <span style={{ fontSize: 'var(--text-40)', fontWeight: 700, lineHeight: 1, color: 'var(--color-text-brand)' }}>{total}</span>
+          <span style={{ fontSize: 'var(--text-32)', lineHeight: 1 }} aria-hidden>🧺</span>
         </div>
 
         {rows.length > 0 ? (
@@ -136,16 +136,16 @@ export function BasketCard({ total, basket, onClose }) {
             {rows.map(([id, n]) => {
               const k = kindOf(id)
               return (
-                <li key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 16, color: 'var(--color-text-primary)' }}>
-                  <span style={{ fontSize: 20 }} aria-hidden>{k.emoji}</span>
-                  <span style={{ flex: 1, fontWeight: 600 }}>{k.name}</span>
-                  <span style={{ fontWeight: 800, color: 'var(--color-text-brand)' }}>× {n}</span>
+                <li key={id} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 'var(--text-base)', color: 'var(--color-text-primary)' }}>
+                  <span style={{ fontSize: 'var(--text-xl)' }} aria-hidden>{k.emoji}</span>
+                  <span style={{ flex: 1, fontWeight: 500 }}>{k.name}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--color-text-brand)' }}>× {n}</span>
                 </li>
               )
             })}
           </ul>
         ) : (
-          <p style={{ margin: '12px 0 0', fontSize: 14, lineHeight: 1.45, color: 'var(--color-text-secondary)' }}>
+          <p style={{ margin: '12px 0 0', fontSize: 'var(--text-sm)', lineHeight: 'var(--text-sm--line-height)', color: 'var(--color-text-secondary)' }}>
             Empty for now. Grow flowers in Sunny Town and pick them to fill it 🌱
           </p>
         )}

@@ -25,17 +25,18 @@ import { levelState, fmtPoints, SIGNATURES } from '../levels'
    (App passes hudGemRef as gemRef), so a solved problem's gems land right on it. */
 
 const barStyles = {
-  pill: { position: 'relative', display: 'flex', alignItems: 'center', gap: 10, background: T.surface, borderRadius: 999, padding: '0 16px', height: 44, boxShadow: '0 4px 14px rgba(43,32,90,0.16)', userSelect: 'none' },
-  div: { width: 1, height: 20, background: '#ECE7F5', flex: 'none' }, // hair rule between points and the gem wallet
-  gem: { display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 800, fontSize: 14, color: '#0E7490', flex: 'none' }, // teal = the gem wallet
-  label: { display: 'flex', alignItems: 'baseline', gap: 4, fontWeight: 800, fontSize: 15, color: T.textPrimary, whiteSpace: 'nowrap' },
+  // S4 (10-22): gap 10 → 8 · every type step on --text-* · weights 800 → 700 · shadows/colours by name
+  pill: { position: 'relative', display: 'flex', alignItems: 'center', gap: 8, background: T.surface, borderRadius: 999, padding: '0 16px', height: 44, boxShadow: 'var(--luxi-shadow-hud-chip)', userSelect: 'none' },
+  div: { width: 0, height: 20, borderLeft: '1px solid var(--luxi-color-component-level-pill-divider)', flex: 'none' }, // hair rule between points and the gem wallet (a 1px stroke)
+  gem: { display: 'inline-flex', alignItems: 'center', gap: 4, fontWeight: 700, fontSize: 'var(--text-sm)', color: 'var(--luxi-color-component-level-pill-gem-text)', flex: 'none' }, // teal = the gem wallet
+  label: { display: 'flex', alignItems: 'baseline', gap: 4, fontWeight: 700, fontSize: 'var(--text-base)', color: T.textPrimary, whiteSpace: 'nowrap' },
   lvlWrap: { position: 'relative', display: 'inline-block', overflow: 'hidden', height: 20, minWidth: '2ch', textAlign: 'center' },
   track: { position: 'relative', width: 72, height: 12, borderRadius: 999, background: LVL.soft, overflow: 'hidden', flex: 'none' }, // 96→72: shortened to make room for the top-right gear (Amy 2026-08-30)
-  fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: LVL.grad, transition: 'width .45s cubic-bezier(.22,1.2,.36,1)' },
-  shine: { position: 'absolute', top: 0, bottom: 0, width: '34%', background: 'linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.75) 50%,rgba(255,255,255,0) 100%)', animation: 'shineSweep .7s ease-out 1' },
-  pts: { fontWeight: 700, fontSize: 14, color: LVL.deep, whiteSpace: 'nowrap', minWidth: 26, textAlign: 'right' },
-  floater: { position: 'absolute', top: -6, right: 10, fontWeight: 800, fontSize: 13, color: LVL.ink, animation: 'floatUp .9s ease-out forwards', pointerEvents: 'none' },
-  star: { position: 'absolute', left: '50%', top: '50%', fontSize: 13, animation: 'barStar .8s ease-out forwards', pointerEvents: 'none' },
+  fill: { position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 999, background: LVL.grad, transition: 'width 500ms var(--ease-out)' },
+  shine: { position: 'absolute', top: 0, bottom: 0, width: '34%', background: 'linear-gradient(90deg,transparent 0%,var(--luxi-color-component-level-fill-shine) 50%,transparent 100%)', animation: 'shineSweep 500ms var(--ease-out) 1' },
+  pts: { fontWeight: 700, fontSize: 'var(--text-sm)', color: LVL.deep, whiteSpace: 'nowrap', minWidth: 24, textAlign: 'right' },
+  floater: { position: 'absolute', top: -8, right: 12, fontWeight: 700, fontSize: 'var(--text-sm)', color: LVL.ink, animation: 'floatUp 800ms var(--ease-out) forwards', pointerEvents: 'none' },
+  star: { position: 'absolute', left: '50%', top: '50%', fontSize: 'var(--text-sm)', animation: 'barStar 800ms var(--ease-out) forwards', pointerEvents: 'none' },
 }
 
 /**
@@ -123,9 +124,9 @@ export default function LevelBar({ points, gems, gemRef, onLevelUp, onOpen }) {
         // No icon by design (Amy) — it's words plus press feedback, discovered
         // by tapping. The press state is therefore the ONLY affordance; keep it.
         transform: pressed ? 'translateY(1px) scale(.99)' : 'none',
-        boxShadow: pressed ? '0 1px 5px rgba(43,32,90,0.2)' : barStyles.pill.boxShadow,
-        transition: 'transform .09s ease, box-shadow .09s ease',
-        animation: phase !== 'idle' ? 'surgeGlow 1.3s ease-out 1' : 'none' }}
+        boxShadow: pressed ? 'var(--luxi-shadow-hud-chip-pressed)' : barStyles.pill.boxShadow,
+        transition: 'transform 100ms var(--ease-out), box-shadow 100ms var(--ease-out)',
+        animation: phase !== 'idle' ? 'surgeGlow 1000ms var(--ease-out) 1' : 'none' }}
       aria-label={`Level ${st.level}, ${st.into} of ${st.need} points${onOpen ? '. Tap to see your progress.' : ''}`}
     >
       <span style={barStyles.label}>
@@ -133,8 +134,8 @@ export default function LevelBar({ points, gems, gemRef, onLevelUp, onOpen }) {
         <span style={barStyles.lvlWrap}>
           {rolling ? (
             <span key="roll" style={{ position: 'relative', display: 'block' }}>
-              <span style={{ display: 'block', animation: 'rollOut .32s ease-in forwards' }}>{rolling.from}</span>
-              <span style={{ position: 'absolute', left: 0, top: 0, right: 0, animation: 'rollIn .32s .22s ease-out both' }}>{rolling.to}</span>
+              <span style={{ display: 'block', animation: 'rollOut 300ms var(--ease-out) forwards' }}>{rolling.from}</span>
+              <span style={{ position: 'absolute', left: 0, top: 0, right: 0, animation: 'rollIn 300ms 200ms var(--ease-out) both' }}>{rolling.to}</span>
             </span>
           ) : (
             <span style={{ display: 'block' }}>{st.level}</span>
@@ -145,7 +146,7 @@ export default function LevelBar({ points, gems, gemRef, onLevelUp, onOpen }) {
         <span style={{ ...barStyles.fill, width: pct + '%', animation: near ? 'nearShimmer 1.6s ease-in-out infinite' : 'none' }} />
         {shine > 0 && <span key={shine} style={barStyles.shine} />}
       </span>
-      <span className="lvlbar-pts" key={points} style={{ ...barStyles.pts, animation: 'tickPop .4s ease-out 1' }}>{fmtPoints(points)}</span>
+      <span className="lvlbar-pts" key={points} style={{ ...barStyles.pts, animation: 'tickPop 300ms var(--ease-out) 1' }}>{fmtPoints(points)}</span>
       {gems != null && (
         <>
           <span className="lvlbar-div" style={barStyles.div} />
@@ -163,30 +164,33 @@ export default function LevelBar({ points, gems, gemRef, onLevelUp, onOpen }) {
 /* Pure applause — the bar already told the story. One joyful exit, no ✕. */
 
 const popStyles = {
-  scrim: { position: 'fixed', inset: 0, background: 'rgba(38,30,60,.45)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'scrimIn .25s ease-out', zIndex: 60 },
-  card: { position: 'relative', width: 'min(400px, calc(100vw - 48px))', background: T.surface, borderRadius: T.radius, padding: '34px 28px 24px', textAlign: 'center', boxShadow: '0 24px 70px rgba(38,20,80,.35)', animation: 'lvlPopIn .45s cubic-bezier(.22,1.3,.36,1) both', overflow: 'hidden' },
-  kicker: { fontSize: 13, fontWeight: 800, letterSpacing: '.14em', color: LVL.ink, textTransform: 'uppercase' },
-  badgeWrap: { position: 'relative', width: 112, height: 112, margin: '18px auto 14px' },
-  halo: { position: 'absolute', inset: -10, borderRadius: '50%', border: '3px solid ' + LVL.main, opacity: 0.4, animation: 'haloPulse 1.4s ease-out .3s 2' },
+  // S4 (10-22): the card's overshoot lives in lvlPopIn's stops, so the curve is the house ease-out
+  scrim: { position: 'fixed', inset: 0, background: 'var(--luxi-color-component-level-popup-scrim)', backdropFilter: 'blur(3px)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'scrimIn 200ms var(--ease-out)', zIndex: 60 },
+  card: { position: 'relative', width: 'min(400px, calc(100vw - 48px))', background: T.surface, borderRadius: T.radius, padding: '32px 28px 24px', textAlign: 'center', boxShadow: 'var(--luxi-shadow-level-popup)', animation: 'lvlPopIn 500ms var(--ease-out) both', overflow: 'hidden' },
+  kicker: { fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.14em', color: LVL.ink, textTransform: 'uppercase' }, // the house 12 caps eyebrow
+  badgeWrap: { position: 'relative', width: 112, height: 112, margin: '16px auto 16px' },
+  halo: { position: 'absolute', inset: -8, borderRadius: '50%', border: 'var(--border-stroke-2) solid ' + LVL.main, opacity: 0.4, animation: 'haloPulse 1000ms var(--ease-out) 300ms 2' },
   // the inset lip softened with the palette (was -5px/.14 under the saturated
   // violet — too heavy a shadow for a pastel badge, it read as a dark rim)
-  badge: { position: 'absolute', inset: 0, borderRadius: '50%', background: LVL.grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 10px 26px rgba(${LVL.glow},.42), inset 0 -4px 0 rgba(0,0,0,.10)`, animation: 'badgeBounce .55s cubic-bezier(.22,1.4,.36,1) .1s both' },
+  badge: { position: 'absolute', inset: 0, borderRadius: '50%', background: LVL.grad, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--luxi-shadow-level-badge)', animation: 'badgeBounce 500ms var(--ease-out) 100ms both' }, // overshoot in badgeBounce's stops
   // numeral = LVL.onFill (white on Iris 500) — see the note in mathkit.
   // The drop shadow goes with it: it existed to lift white off the saturated
   // violet, and under a deep numeral it just muddies the pastel.
-  badgeNum: { position: 'relative', overflow: 'hidden', height: 56, width: '100%', textAlign: 'center', color: LVL.onFill, fontWeight: 800, fontSize: 46, lineHeight: '56px' },
-  msg: { fontSize: 19, lineHeight: 1.45, fontWeight: 700, color: T.textPrimary, textWrap: 'pretty', padding: '0 6px' },
+  badgeNum: { position: 'relative', overflow: 'hidden', height: 60, width: '100%', textAlign: 'center', color: LVL.onFill, fontWeight: 700, fontSize: 'var(--text-5xl)', lineHeight: 'var(--text-5xl--line-height)' }, // 48 × 1.25 = the 60px window the numeral rolls through
+  msg: { fontSize: 'var(--text-xl)', lineHeight: 'var(--text-xl--line-height)', fontWeight: 700, color: T.textPrimary, textWrap: 'pretty', padding: '0 8px' },
   // The signature (Amy's ask): right-aligned like a signed note, because that
   // is the visual grammar for "a person wrote this to you" — which is the
   // entire job of this line. Conditional: no `from`, no signature, so a public
   // build with unsigned copy needs no change here.
-  sign: { marginTop: 12, paddingRight: 6, textAlign: 'right', fontSize: 15, fontWeight: 700, color: LVL.ink },
-  btn: { marginTop: 18, width: '100%', height: 54, border: 'none', borderRadius: 16, background: T.irisFace, color: '#fff', fontSize: 18, fontWeight: 800, cursor: 'pointer', boxShadow: '0 5px 0 ' + T.irisDeep, transition: 'transform .08s ease, box-shadow .08s ease' },
-  piece: { position: 'absolute', top: -8, width: 9, height: 14, borderRadius: 3, animation: 'confettiFall var(--dur) ease-in var(--delay) forwards', pointerEvents: 'none' },
+  sign: { marginTop: 12, paddingRight: 8, textAlign: 'right', fontSize: 'var(--text-base)', fontWeight: 700, color: LVL.ink },
+  // the house 3D press (mathkit BigButton): a 4px edge, pressed 4px down onto it
+  btn: { marginTop: 20, width: '100%', height: 56, border: 'none', borderRadius: 16, background: T.irisFace, color: 'var(--color-text-on-brand)', fontSize: 'var(--text-lg)', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 0 ' + T.irisDeep, transition: 'transform 100ms var(--ease-out), box-shadow 100ms var(--ease-out)' },
+  // Oscar's ease-in gravity is baked into confettiFall's stops (ease-in is removed from Datum), so the timing is linear
+  piece: { position: 'absolute', top: -8, width: 8, height: 12, borderRadius: 4, animation: 'confettiFall var(--dur) var(--delay) linear forwards', pointerEvents: 'none' },
 }
 // pastel confetti to match the softened level identity (was T.violet/#9810FA —
 // the two saturated purples popped out of the card once it went pastel)
-const CONFETTI = [LVL.main, '#C6B4F0', '#9FE0D2', '#FBCE7E', '#A9C5F5', '#F5B8D0']
+const CONFETTI = [LVL.main, ...['lilac', 'mint', 'butter', 'sky', 'blush'].map((c) => `var(--luxi-color-component-level-confetti-${c})`)]
 
 export function LevelUpPopup({ level, message, from, onClose }) {
   const [pieces] = useState(() =>
@@ -195,7 +199,7 @@ export function LevelUpPopup({ level, message, from, onClose }) {
       dx: Math.random() * 60 - 30 + 'px',
       dy: 140 + Math.random() * 160 + 'px',
       rot: Math.random() * 520 - 260 + 'deg',
-      dur: 1.1 + Math.random() * 0.9 + 's',
+      dur: `var(--duration-${i % 2 ? 2800 : 1800})`, // Datum's celebration tier (was a random 1.1–2.0s)
       delay: Math.random() * 0.45 + 's',
       color: CONFETTI[i % CONFETTI.length],
       round: Math.random() > 0.6,
@@ -215,7 +219,7 @@ export function LevelUpPopup({ level, message, from, onClose }) {
         {pieces.map((p, i) => (
           <span
             key={i}
-            style={{ ...popStyles.piece, left: p.left + '%', background: p.color, borderRadius: p.round ? '50%' : 3, width: p.round ? 8 : 9, height: p.round ? 8 : 14, '--dx': p.dx, '--dy': p.dy, '--rot': p.rot, '--dur': p.dur, '--delay': p.delay }}
+            style={{ ...popStyles.piece, left: p.left + '%', background: p.color, borderRadius: p.round ? '50%' : 4, width: 8, height: p.round ? 8 : 12, '--dx': p.dx, '--dy': p.dy, '--rot': p.rot, '--dur': p.dur, '--delay': p.delay }}
           />
         ))}
         <div style={popStyles.kicker}>Level up!</div>
@@ -223,8 +227,8 @@ export function LevelUpPopup({ level, message, from, onClose }) {
           <span style={popStyles.halo} />
           <div style={popStyles.badge}>
             <span style={popStyles.badgeNum}>
-              <span style={{ display: 'block', animation: 'rollOut .34s .5s ease-in forwards' }}>{level - 1}</span>
-              <span style={{ position: 'absolute', left: 0, top: 0, right: 0, animation: 'rollIn .34s .76s ease-out both' }}>{level}</span>
+              <span style={{ display: 'block', animation: 'rollOut 300ms 500ms var(--ease-out) forwards' }}>{level - 1}</span>
+              <span style={{ position: 'absolute', left: 0, top: 0, right: 0, animation: 'rollIn 300ms 800ms var(--ease-out) both' }}>{level}</span>
             </span>
           </div>
         </div>
@@ -233,9 +237,9 @@ export function LevelUpPopup({ level, message, from, onClose }) {
         <button
           style={popStyles.btn}
           onClick={onClose}
-          onPointerDown={(e) => { e.stopPropagation(); e.currentTarget.style.transform = 'translateY(3px)'; e.currentTarget.style.boxShadow = '0 2px 0 ' + T.irisDeep }}
-          onPointerUp={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 5px 0 ' + T.irisDeep }}
-          onPointerLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 5px 0 ' + T.irisDeep }}
+          onPointerDown={(e) => { e.stopPropagation(); e.currentTarget.style.transform = 'translateY(4px)'; e.currentTarget.style.boxShadow = '0 0 0 ' + T.irisDeep }}
+          onPointerUp={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 0 ' + T.irisDeep }}
+          onPointerLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 4px 0 ' + T.irisDeep }}
         >
           Keep going! ✨
         </button>

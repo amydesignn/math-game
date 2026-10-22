@@ -382,6 +382,43 @@
   --duration-1800: 1800ms; /* Datum, verbatim (styling-v0.36 celebration tier) — confetti, quick */
   --duration-2800: 2800ms; /* Datum, verbatim — confetti, slow */
 
+  /* ---- luxi govern S4 2026-10-22: HUD (LevelBar · hudkit · Minimap · Basket · BasketFlight · App.jsx HUD) ----
+     Values unchanged — raw literals at the use sites, now named. Two exceptions, both on a ladder:
+     the surge ring's spread 7 → 8px, the profile ring 1.5 → 1.6px (--border-stroke-1_6). */
+  --luxi-shadow-hud-chip: 0 4px 14px rgba(43,32,90,0.16); /* off-ramp ink #2B205A @ 16% — level pill, ⚙️ gear, ‹ Exit, minimap, map name */
+  --luxi-shadow-hud-chip-pressed: 0 1px 5px rgba(43,32,90,0.2); /* ink @ 20% — the level pill while pressed */
+  --luxi-shadow-hud-round-button: 0 4px 14px rgba(43,32,90,0.18); /* ink @ 18% — 🛍️ on the left rail */
+  --luxi-shadow-hud-home-button: 0 4px 14px rgba(43,32,90,0.2); /* ink @ 20% — 🏡 leave the meadow */
+  --luxi-shadow-hud-emote-bar: 0 4px 14px rgba(43,32,90,0.2); /* ink @ 20% — the meadow's emote pill */
+  --luxi-shadow-level-surge-rest: 0 0 0 0 rgba(97,105,224,0); /* brand-iris-500 @ 0% — surgeGlow ends */
+  --luxi-shadow-level-surge-peak: 0 0 0 8px rgba(97,105,224,.30); /* iris-500 @ 30% — surgeGlow peak (spread 7 → 8) */
+  --luxi-shadow-level-popup: 0 24px 70px rgba(38,20,80,.35); /* off-ramp ink #261450 @ 35% — the congratulations card */
+  --luxi-shadow-level-badge: 0 10px 26px rgba(97,105,224,.42), inset 0 -4px 0 rgba(0,0,0,.10); /* iris-500 @ 42% + black @ 10% lip — the level medallion */
+  --luxi-shadow-profile-chip: 0 0 0 2px #FFFFFF, 0 0 0 3.6px #DDD1F7; /* white gap + brand-lilac-200 ring (1.5 → 1.6 stroke) — decoration */
+  --luxi-shadow-fly-flower: drop-shadow(0 4px 8px rgba(43,32,90,0.28)); /* ink @ 28% — the picked flower's flight */
+  --luxi-color-component-level-pill-divider: #ECE7F5; /* off-ramp lilac grey — the hairline before the gem wallet (decoration) */
+  --luxi-color-component-level-pill-gem-text: #0E7490; /* cyan-700 — the gem count, 5.36:1 on white */
+  --luxi-color-component-level-fill-shine: rgba(255,255,255,.75); /* white @ 75% — the sheen across the fill */
+  --luxi-color-component-level-popup-scrim: rgba(38,30,60,.45); /* off-ramp ink #261E3C @ 45% */
+  --luxi-color-component-level-confetti-lilac: #C6B4F0; /* off-ramp pastels — decoration, no text */
+  --luxi-color-component-level-confetti-mint: #9FE0D2;
+  --luxi-color-component-level-confetti-butter: #FBCE7E;
+  --luxi-color-component-level-confetti-sky: #A9C5F5;
+  --luxi-color-component-level-confetti-blush: #F5B8D0;
+  --luxi-color-component-profile-chip-fill-start: #EDE7FC; /* brand-lilac-100 — the avatar's radial fill */
+  --luxi-color-component-profile-chip-fill-end: #B29BEA; /* off-ramp lilac */
+  --luxi-color-component-map-label-background: rgba(255,255,255,0.94); /* white @ 94% — the map name chip; iris-900 text on it = 11.22:1 */
+  --luxi-color-component-hud-toast-background: rgba(43,32,90,0.82); /* ink @ 82% — the arrival toast + "Tap anywhere" hint (white text) */
+  --luxi-color-component-note-toast-background: rgba(43,32,90,0.88); /* ink @ 88% — the note toast */
+  /* the minimap is a canvas: Minimap.jsx reads these by name (getComputedStyle) */
+  --luxi-color-component-minimap-player: #4B54DD; /* brand-iris-600 — her dot */
+  --luxi-color-component-minimap-pet: var(--star-gold); /* the companion */
+  --luxi-color-component-minimap-sparkle: var(--gem-cyan); /* gems to find */
+  --luxi-color-component-minimap-scenery: rgba(74,61,122,0.35); /* off-ramp lilac-900 @ 35% */
+  --luxi-color-component-minimap-placed: #9B84E0; /* off-ramp lilac — her placed things */
+  --luxi-color-component-minimap-buddy: #EF7FB5; /* off-ramp pink — a buddy in the meadow */
+  --luxi-color-component-minimap-ring: #FFFFFF; /* white — dot rings + the frame */
+
   /* ---- luxi skins 10-21: the six station skins + the lucky skin (skins.js) ----
      accent = slots, rings, tints, the 3D ring/orb (fails AA on white — never text)
      glow   = the 3D orb's face
@@ -674,7 +711,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    phones. Below 600px the stat group owns the top row from the left edge to
    the minimap, and the pill fills it so the level and gem digits have room.
    The left rail (Exit as a 48px door+arrow icon, then 🛍️) drops below it. */
-.hud-exit-wide { display: inline-flex; align-items: center; gap: 6px; }
+.hud-exit-wide { display: inline-flex; align-items: center; gap: 8px; } /* S4: 6 → 8 */
 .hud-exit-icon { display: none; }
 @media (max-width: 600px) {
   /* both rail buttons 48px (Amy: a bigger target for kids; Datum has no
@@ -724,20 +761,33 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
 @keyframes nearShimmer { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.28); } }
 /* level identity = Iris 500 (97,105,224 = LVL.glow, 2026-10-06; was pastel Lilac).
    Kept soft at .30 — a full-strength ring read as a hard flash on the bar */
-@keyframes surgeGlow { 0% { box-shadow: 0 0 0 0 rgba(97,105,224,0); } 45% { box-shadow: 0 0 0 7px rgba(97,105,224,.30); } 100% { box-shadow: 0 0 0 0 rgba(97,105,224,0); } }
+@keyframes surgeGlow { 0% { box-shadow: var(--luxi-shadow-level-surge-rest); } 45% { box-shadow: var(--luxi-shadow-level-surge-peak); } 100% { box-shadow: var(--luxi-shadow-level-surge-rest); } } /* S4: named, spread 7 → 8 */
 @keyframes rollOut { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-115%); opacity: 0; } }
 @keyframes rollIn { 0% { transform: translateY(115%); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 @keyframes tickPop { 0% { transform: scale(1); } 40% { transform: scale(1.28); } 100% { transform: scale(1); } }
-@keyframes floatUp { 0% { transform: translateY(4px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-26px); opacity: 0; } }
+@keyframes floatUp { 0% { transform: translateY(4px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(-24px); opacity: 0; } } /* S4: rise 26 → 24 */
 @keyframes barStar { 0% { transform: translate(0,0) scale(.4) rotate(0deg); opacity: 0; } 25% { opacity: 1; } 100% { transform: translate(var(--dx),var(--dy)) scale(1) rotate(var(--rot)); opacity: 0; } }
 /* the popup — its own popIn (the overshoot is Oscar's); `popIn` above belongs
    to the math card and is deliberately gentler, so they don't share a name */
-@keyframes lvlPopIn { 0% { transform: scale(.82) translateY(18px); opacity: 0; } 60% { transform: scale(1.03) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+@keyframes lvlPopIn { 0% { transform: scale(.82) translateY(16px); opacity: 0; } 60% { transform: scale(1.03) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 /* Phase 5-B — the progress popup: a calmer rise than popIn (a record book is
    opened, not sprung), and the climb ladder's rungs landing in sequence. */
 @keyframes sheetIn { 0% { transform: scale(.9) translateY(14px); opacity: 0; } 60% { transform: scale(1.01) translateY(-2px); opacity: 1; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 @keyframes rungPop { 0% { transform: scale(.5); opacity: 0; } 60% { transform: scale(1.12); } 100% { transform: scale(1); opacity: 1; } }
-@keyframes confettiFall { 0% { transform: translate(0,-10px) rotate(0deg); opacity: 0; } 12% { opacity: 1; } 100% { transform: translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity: 0; } }
+/* S4: Oscar's confetti fall with his ease-in GRAVITY sampled into the stops (ease-in is removed from
+   Datum, so the curve lives here and the timing is linear — the dvConfetti method). Start -10 → -8px;
+   opacity rounded to the ladder. p = ease-in progress at each stop. */
+@keyframes confettiFall {
+  0% { transform: translate(0,-8px) rotate(0deg); opacity: 0; }
+  12% { transform: translate(calc(var(--dx) * .024), calc(-8px + (var(--dy) + 8px) * .024)) rotate(calc(var(--rot) * .024)); opacity: 1; }
+  25% { transform: translate(calc(var(--dx) * .093), calc(-8px + (var(--dy) + 8px) * .093)) rotate(calc(var(--rot) * .093)); opacity: 1; }
+  37.5% { transform: translate(calc(var(--dx) * .192), calc(-8px + (var(--dy) + 8px) * .192)) rotate(calc(var(--rot) * .192)); opacity: 0.9; }
+  50% { transform: translate(calc(var(--dx) * .315), calc(-8px + (var(--dy) + 8px) * .315)) rotate(calc(var(--rot) * .315)); opacity: 0.8; }
+  62.5% { transform: translate(calc(var(--dx) * .459), calc(-8px + (var(--dy) + 8px) * .459)) rotate(calc(var(--rot) * .459)); opacity: 0.6; }
+  75% { transform: translate(calc(var(--dx) * .622), calc(-8px + (var(--dy) + 8px) * .622)) rotate(calc(var(--rot) * .622)); opacity: 0.4; }
+  87.5% { transform: translate(calc(var(--dx) * .801), calc(-8px + (var(--dy) + 8px) * .801)) rotate(calc(var(--rot) * .801)); opacity: 0.2; }
+  100% { transform: translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity: 0; }
+}
 @keyframes badgeBounce { 0% { transform: scale(.3) rotate(-10deg); opacity: 0; } 55% { transform: scale(1.12) rotate(3deg); opacity: 1; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
 @keyframes haloPulse { 0% { transform: scale(.8); opacity: .5; } 100% { transform: scale(1.55); opacity: 0; } }
 
@@ -1087,7 +1137,7 @@ a.doorApp:focus-visible { outline: 1px solid var(--luxi-color-focus-ring); outli
    The card grows up out of the bottom-left button. On phones the garden bar
    (bottom-centre) is wide enough to reach the button, so while it's open the
    basket steps aside below 600px; iPad keeps both. */
-.basket-card { animation: basketIn 0.22s cubic-bezier(.2,.9,.3,1.2); }
+.basket-card { animation: basketIn 200ms var(--ease-out); } /* S4: was .22s on a raw overshoot curve */
 @keyframes basketIn { 0% { transform: scale(.9) translateY(8px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .basket-card, .hud-basket span { animation: none !important; } }
 @media (max-width: 600px) { .hud-basket--bar { display: none !important; } }
