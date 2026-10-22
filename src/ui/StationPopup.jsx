@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { solve } from '../math'
 import { SKINS, skinTint } from './skins'
-import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk } from './mathkit'
+import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk, POP_IN } from './mathkit'
 import DivisionWalkthrough from './DivisionWalkthrough'
 
 /*
@@ -34,14 +34,14 @@ function QuestSlots({ skin, total, done }) {
       {[...Array(total)].map((_, i) => {
         const filled = i < done, active = i === done
         return (
-          <div key={i} style={{ width: 46, height: 46, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 24, lineHeight: 1,
+          <div key={i} style={{ width: 48, height: 48, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', /* was 46 · 14 */
+            fontSize: 'var(--text-2xl)', lineHeight: 1,
             background: filled ? skinTint(skin.accent, '1e') : 'var(--color-background-subtle)',
             border: filled ? `2px solid ${skin.accent}` : active ? `2px solid ${skin.accent}` : `2px dashed var(--luxi-color-component-station-slot-border)`,
-            boxShadow: active ? `0 0 0 5px ${skinTint(skin.accent, '22')}` : 'none',
-            transition: 'all .25s' }}>
-            {filled ? <span style={{ animation: 'slotFill .45s ease-out both' }}>{skin.marker}</span>
-              : <span style={{ opacity: active ? 0.45 : 0.2 }}>{skin.marker}</span>}
+            boxShadow: active ? `0 0 0 4px ${skinTint(skin.accent, '22')}` : 'none',
+            transition: 'background 200ms var(--ease-out), border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out)' }}>
+            {filled ? <span style={{ animation: 'slotFill 300ms var(--ease-out) both' }}>{skin.marker}</span>
+              : <span style={{ opacity: active ? 0.4 : 0.2 }}>{skin.marker}</span>}
           </div>
         )
       })}
@@ -111,7 +111,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
   }
   const fail = () => {
     setShake(true)
-    setTimeout(() => setShake(false), 420)
+    setTimeout(() => setShake(false), 300)
     setTimeout(() => setPhase('recover'), 260)
   }
   // single-answer check (× / + / −). Division routes through <DivisionAsk> instead
@@ -141,40 +141,40 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
       onScrim={dismissable ? () => close(false) : undefined}
       cardRef={cardRef}
       cardClass={shake ? 'shakeit' : ''}
-      cardStyle={{ padding: '0 0 26px' }}
+      cardStyle={{ padding: '0 0 24px' }}
       overlay={flyGems.map((g) => <FlyGem key={g.id} {...g} />)}
       label={skin.tag}>
 
         {/* quest banner — skin banner + a QUEST badge so it reads as the bigger encounter */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 24px',
           background: `linear-gradient(180deg in srgb,${skinTint(skin.accent, '14')},var(--color-background-base))`, borderBottom: `1px solid ${T.line}` }}>
-          <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
+          <span style={{ fontSize: 'var(--text-2xl)', lineHeight: 1 }}>{skin.paw}</span>
           <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
           <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--color-text-inverse)',
-            background: skin.accentInk, borderRadius: 9, padding: '4px 9px' }}>Quest</span>
+            background: skin.accentInk, borderRadius: 8, padding: '4px 8px' }}>Quest</span>
           <div style={{ flex: 1 }} />
           {dismissable && <ModalClose onClick={() => close(false)} />}
         </div>
 
-        <div style={{ padding: '20px 26px 4px' }}>
+        <div style={{ padding: '20px 24px 4px' }}>
           {phase === 'intro' && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '6px 0 4px' }}>
-              <div style={{ fontSize: 44, lineHeight: 1, animation: 'floaty 3s ease-in-out infinite' }}>{skin.marker}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, padding: '8px 0 4px' }}>
+              <div style={{ fontSize: 'var(--text-5xl)', lineHeight: 1, animation: 'floaty 3s ease-in-out infinite' }}>{skin.marker}</div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: T.textPrimary }}>{skin.questAsk}</div>
                 <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4 }}>{total} {skin.stepPlural} to go — finish them all for a bonus gem!</div>
               </div>
               <QuestSlots skin={skin} total={total} done={0} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 'var(--text-sm)', fontWeight: 500, color: T.textSecondary,
-                background: 'var(--color-background-subtle)', border: `1px solid ${T.line}`, borderRadius: 12, padding: '8px 14px' }}>
-                Finish-the-quest bonus: +{quest.bonus} <Gem size={15} />
+                background: 'var(--color-background-subtle)', border: `1px solid ${T.line}`, borderRadius: 12, padding: '8px 16px' }}>
+                Finish-the-quest bonus: +{quest.bonus} <Gem size={16} />
               </div>
               <BigButton tone="primary" onClick={() => setPhase('ask')} style={{ minWidth: 200 }}>Let's go ✨</BigButton>
             </div>
           )}
 
           {phase === 'ask' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <QuestSlots skin={skin} total={total} done={step} />
               {problem.op === '÷' ? (
                 /* division = the shared two-field ask; a correct answer advances the
@@ -191,21 +191,21 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                   </div>
                   <EquationRow a={problem.a} op={problem.op} b={problem.b} entry={entry} />
                   <Keypad onKey={onKey} />
-                  <div style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 400, marginTop: 10 }}>Type your answer, then tap Check</div>
+                  <div style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: T.textSecondary, fontWeight: 400, marginTop: 8 }}>Type your answer, then tap Check</div>
                 </>
               )}
             </div>
           )}
 
           {phase === 'stepdone' && (
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
-              padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+              padding: '8px 0 0', animation: POP_IN }}>
               <Sparkles colors={['var(--luxi-color-component-reward-sparkle-1)', skin.accent, T.irisSoft, T.tealLt]} n={14} />
               <QuestSlots skin={skin} total={total} done={step + 1} />
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>{skin.stepWin(step + 1, total)}</div>
-                <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
-                  +{gift?.step === step ? gift.gems : problem.gems || 1} <Gem size={17} />{gift?.step === step && ' +1 🌱'} · {total - (step + 1)} {total - (step + 1) > 1 ? skin.stepPlural : skin.stepNoun} to go
+                <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center' }}>
+                  +{gift?.step === step ? gift.gems : problem.gems || 1} <Gem size={16} />{gift?.step === step && ' +1 🌱'} · {total - (step + 1)} {total - (step + 1) > 1 ? skin.stepPlural : skin.stepNoun} to go
                 </div>
               </div>
               <BigButton tone="primary" onClick={nextProblem} style={{ marginTop: 4, minWidth: 200 }}>Next {skin.stepNoun} ▸</BigButton>
@@ -213,7 +213,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           )}
 
           {phase === 'recover' && (
-            <div style={{ paddingBottom: 6 }}>
+            <div style={{ paddingBottom: 8 }}>
               <QuestSlots skin={skin} total={total} done={step} />
               {problem.op === '÷' ? (
                 /* division recovers into Oscar's candy walkthrough (its own header +
@@ -221,7 +221,7 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
                 <DivisionWalkthrough problem={problem.similar || problem} onDone={backToAsk} />
               ) : (
                 <>
-                  <div style={{ textAlign: 'center', margin: '14px 0' }}>
+                  <div style={{ textAlign: 'center', margin: '16px 0' }}>
                     <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
                     {/* reassurance = supporting line, 14 secondary (Amy 2026-10-05) */}
                     <div style={{ fontSize: 'var(--text-sm)', color: T.textSecondary, marginTop: 4 }}>No worries — the quest waits. Follow the steps, then try again.</div>
@@ -233,27 +233,27 @@ export default function StationPopup({ quest, onAward, onBonusAward, onPetReact,
           )}
 
           {phase === 'complete' && (
-            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
-              padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
+            <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+              padding: '8px 0 0', animation: POP_IN }}>
               <Sparkles colors={['var(--luxi-color-component-reward-sparkle-1)', skin.accent, T.amber, T.tealLt]} n={20} />
               <QuestSlots skin={skin} total={total} done={total} />
               {/* the bonus moment — amber, ringed, visibly NOT the ordinary gem beat */}
               <div style={{ position: 'relative', width: 104, height: 104, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `3px solid ${T.amber}`, animation: 'bonusRing 1.1s ease-out .9s infinite' }} />
+                <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `var(--border-stroke-2) solid ${T.amber}`, animation: 'bonusRing 1.1s ease-out .9s infinite' }} />
                 <div style={{ position: 'absolute', inset: 8, borderRadius: '50%', background: 'var(--luxi-color-component-station-bonus-halo)' }} />
-                <Gem size={76} style={{ animation: 'gemSpin .5s ease-out both', filter: `drop-shadow(0 0 14px ${T.amber}) drop-shadow(0 6px 14px rgba(217,119,6,.45))` }} />
+                <Gem size={76} style={{ animation: 'gemSpin 500ms var(--ease-out) both', filter: 'var(--luxi-shadow-bonus-gem)' }} />
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>Quest complete! 🎉</div>
                 <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4 }}>{skin.questWin}</div>
-                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10 }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', fontWeight: 500, color: T.textPrimary,
-                    background: 'var(--color-background-subtle)', border: `1px solid ${T.line}`, borderRadius: 12, padding: '7px 13px' }}>+{earned} <Gem size={16} /> earned</span>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--luxi-color-component-station-bonus-chip-text)' /* amber-700 · AA on the cream chip */,
-                    background: 'var(--luxi-color-component-station-bonus-chip-background)', border: '1px solid var(--luxi-color-component-station-bonus-chip-border)', borderRadius: 12, padding: '7px 13px' }}>+{quest.bonus} <Gem size={16} /> bonus!</span>
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 12 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 'var(--text-sm)', fontWeight: 500, color: T.textPrimary,
+                    background: 'var(--color-background-subtle)', border: `1px solid ${T.line}`, borderRadius: 12, padding: '8px 12px' }}>+{earned} <Gem size={16} /> earned</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--luxi-color-component-station-bonus-chip-text)' /* amber-700 · AA on the cream chip */,
+                    background: 'var(--luxi-color-component-station-bonus-chip-background)', border: '1px solid var(--luxi-color-component-station-bonus-chip-border)', borderRadius: 12, padding: '8px 12px' }}>+{quest.bonus} <Gem size={16} /> bonus!</span>
                 </div>
               </div>
-              <BigButton tone="primary" onClick={() => close(true)} style={{ marginTop: 6, minWidth: 200 }}>Back to your world ✨</BigButton>
+              <BigButton tone="primary" onClick={() => close(true)} style={{ marginTop: 8, minWidth: 200 }}>Back to your world ✨</BigButton>
             </div>
           )}
         </div>

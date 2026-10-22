@@ -2,7 +2,7 @@
   "component": "LevelBar + LevelUpPopup",
   "file": "src/ui/LevelBar.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-21T22:56:20.216Z",
+  "ranAt": "2026-10-22T01:40:25.180Z",
   "variants": [
     "HUD pill · Level 2",
     "Congratulations card"

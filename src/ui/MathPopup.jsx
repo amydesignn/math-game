@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { solve } from '../math'
 import { SKINS, skinTint } from './skins'
-import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk, GiftWin } from './mathkit'
+import { T, Gem, Sparkles, BigButton, EquationRow, Keypad, WorkedExample, FlyGem, useKeyInput, Modal, ModalClose, DivisionAsk, GiftWin, POP_IN } from './mathkit'
 import { HINT_COPY } from '../gameHintsCopy'
 import DivisionWalkthrough from './DivisionWalkthrough'
 
@@ -93,9 +93,9 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
       onScrim={phase === 'ask' ? () => onClose(false) : undefined}
       cardRef={cardRef}
       cardClass={shake ? 'shakeit' : ''}
-      cardStyle={{ padding: '0 0 26px' }}
+      cardStyle={{ padding: '0 0 24px' }}
       overlay={flyGems.map((g) => <FlyGem key={g.id} {...g} />)}
-      animation={phase === 'correct' ? '' : 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both'}
+      animation={phase === 'correct' ? '' : undefined /* the shell's POP_IN */}
       label={skin.tag}>
 
         {divRecover ? (
@@ -103,14 +103,14 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
              skin banner is HIDDEN on the lesson (Amy: the banner belongs on the
              calculation screen, not the instruction) — just a floating ✕ so she
              can always leave (the walkthrough's own buttons only retry/step). */
-          <div style={{ position: 'absolute', top: 14, right: 14, zIndex: 3 }}>
+          <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 3 }}>
             <ModalClose onClick={() => onClose(false)} />
           </div>
         ) : (
           /* skin banner — the family header: scenario tint → white + a 1px divider */
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '16px 22px',
-            background: `linear-gradient(180deg in srgb,${skinTint(skin.accent, '14')},#fff)`, borderBottom: `1px solid ${T.line}` }}>
-            <span style={{ fontSize: 22, lineHeight: 1 }}>{skin.paw}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 24px',
+            background: `linear-gradient(180deg in srgb,${skinTint(skin.accent, '14')},var(--color-background-base))`, borderBottom: `1px solid ${T.line}` }}>
+            <span style={{ fontSize: 'var(--text-2xl)', lineHeight: 1 }}>{skin.paw}</span>
             <span style={{ fontWeight: 700, fontSize: 'var(--text-xs)', letterSpacing: '.06em', textTransform: 'uppercase', color: skin.accentInk }}>{skin.tag}</span>
             <div style={{ flex: 1 }} />
             {phase === 'ask' && <ModalClose onClick={() => onClose(false)} />}
@@ -126,7 +126,7 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
              2's generator will supply one) then she retries hers via onDone. */
           <DivisionWalkthrough problem={problem.similar || problem} onDone={backToAsk} closeGutter />
         ) : (
-          <div style={{ padding: '22px 26px 4px' }}>
+          <div style={{ padding: '24px 24px 4px' }}>
             {phase === 'ask' && (problem.op === '÷'
               ? <DivisionAsk problem={problem} skin={skin} onSolved={win} onResult={onResult} onWalkthrough={() => setPhase('recover')} />
               : <AskState skin={skin} problem={problem} entry={entry} onKey={onKey} />)}
@@ -134,8 +134,8 @@ export default function MathPopup({ problem, skin, onAward, onPetReact, onClose,
               ? <GiftWin copy={HINT_COPY.lucky} gems={pay} onNext={() => onClose(true)} />
               : <CorrectState skin={skin} pay={pay} onNext={() => onClose(true)} />)}
             {phase === 'recover' && (
-              <div style={{ paddingBottom: 6 }}>
-                <div style={{ textAlign: 'center', marginBottom: 14 }}>
+              <div style={{ paddingBottom: 8 }}>
+                <div style={{ textAlign: 'center', marginBottom: 16 }}>
                   <div style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: T.textPrimary }}>Let's look at one together 💡</div>
                   {/* reassurance = supporting line, 14 secondary (Amy 2026-10-05) */}
                   <div style={{ fontSize: 'var(--text-sm)', color: T.textSecondary, marginTop: 4 }}>No worries — follow the steps, then give it another go.</div>
@@ -166,21 +166,21 @@ function AskState({ skin, problem, entry, onKey }) {
 
 function CorrectState({ skin, pay, onNext }) {
   return (
-    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14,
-      padding: '8px 0 2px', animation: 'popIn .34s cubic-bezier(.2,.9,.3,1.2) both' }}>
-      <Sparkles colors={['#fff', skin.accent, T.irisSoft, T.tealLt]} n={16} />
+    <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+      padding: '8px 0 0', animation: POP_IN }}>
+      <Sparkles colors={['var(--luxi-color-component-reward-sparkle-1)', skin.accent, T.irisSoft, T.tealLt]} n={16} />
       <div style={{ position: 'relative', width: 96, height: 96, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: skinTint(skin.accent, '22'),
           animation: 'ringpulse 1.4s ease-out infinite' }} />
-        <Gem size={72} style={{ animation: 'gemSpin .5s ease-out both', filter: 'drop-shadow(0 6px 14px rgba(46,197,197,.4))' }} />
+        <Gem size={72} style={{ animation: 'gemSpin 500ms var(--ease-out) both', filter: 'var(--luxi-shadow-reward-gem)' }} />
       </div>
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color: T.textPrimary }}>Nice work!</div>
-        <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
-          {skin.win} <span>+{pay}</span> <Gem size={18} />
+        <div style={{ fontSize: 'var(--text-base)', color: T.textPrimary, marginTop: 4, display: 'flex', alignItems: 'center', gap: 4, justifyContent: 'center' }}>
+          {skin.win} <span>+{pay}</span> <Gem size={16} />
         </div>
       </div>
-      <BigButton tone="primary" onClick={onNext} style={{ marginTop: 6, minWidth: 180 }}>Keep going ✨</BigButton>
+      <BigButton tone="primary" onClick={onNext} style={{ marginTop: 8, minWidth: 180 }}>Keep going ✨</BigButton>
     </div>
   )
 }
