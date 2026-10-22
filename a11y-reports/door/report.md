@@ -1,6 +1,6 @@
 # Contrast audit — Door
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-21 17:34 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-22 05:07 UTC  
 **Variants:** Returning player · **Phases:** idle
 
 > **30 unique checks · 30 pass · 0 fail · 0 exempt (disabled) · 0 need review**
@@ -31,15 +31,15 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Spooky Arcade for Halloween | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
 | Today’s Quest | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
 | · Refreshes in 1h | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
-| Visit Sunny Town to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
+| Visit Merry Market to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
 | +1 | `#8A5300` on `#FFEFCF` | 14px bold | 5.57:1 | 4.50:1 | ✅ | idle |
 | Forest Clearing | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Where every journey begins | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
-| Play | `#FFFFFF` on `#6169E0` | 15px bold | 4.55:1 | 4.50:1 | ✅ | idle |
+| Play | `#FFFFFF` on `#6169E0` | 16px bold | 4.55:1 | 4.50:1 | ✅ | idle |
 | Last played | `#404040` on `#FFFFFF` | 12px | 10.36:1 | 4.50:1 | ✅ | idle |
 | Sunny Town | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Warm streets, friendly faces | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
-| Resume | `#FFFFFF` on `#6169E0` | 15px bold | 4.55:1 | 4.50:1 | ✅ | idle |
+| Resume | `#FFFFFF` on `#6169E0` | 16px bold | 4.55:1 | 4.50:1 | ✅ | idle |
 | Rosy Garden | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Petal paths and quiet corners | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
 | Merry Market | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
@@ -51,7 +51,7 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Welcome, player! | `#262626` on `#F5F1FC` ᵖ | 24px (large) | 13.60:1 | 3.00:1 | ✅ | idle |
 | Choose your world | `#262626` on `#F5F1FC` ᵖ | 24px (large) | 13.60:1 | 3.00:1 | ✅ | idle |
 | 5 worlds | `#525252` on `#F5F1FC` ᵖ | 14px | 7.02:1 | 4.50:1 | ✅ | idle |
-| Coming soon | `#3D43BE` on `#E4DBF8` ᵖ | 13px bold | 5.75:1 | 4.50:1 | ✅ | idle |
+| Coming soon | `#3D43BE` on `#E3DCF7` ᵖ | 14px bold | 5.77:1 | 4.50:1 | ✅ | idle |
 
 ---
 
