@@ -2,7 +2,7 @@
   "component": "Heroes picker (Gem Shop)",
   "file": "src/ui/Shop.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-22T15:49:51.937Z",
+  "ranAt": "2026-10-22T19:01:57.715Z",
   "variants": [
     "60 gems · playing Sunny · Champ unlocked",
     "4 gems · playing the Sorcerer (every locked hero unaffordable)"

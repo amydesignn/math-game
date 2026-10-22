@@ -1,6 +1,6 @@
 # Contrast audit — Heroes picker (Gem Shop)
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Shop.jsx` · **Run:** 2026-10-22 15:49 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Shop.jsx` · **Run:** 2026-10-22 19:01 UTC  
 **Variants:** 60 gems · playing Sunny · Champ unlocked, 4 gems · playing the Sorcerer (every locked hero unaffordable) · **Phases:** default → unlock-asked
 
 > **165 unique checks · 153 pass · 0 fail · 12 exempt (disabled) · 0 need review**

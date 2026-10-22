@@ -1,6 +1,6 @@
 # Contrast audit — PromoPopup
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/PromoPopup.jsx` · **Run:** 2026-10-22 13:06 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/PromoPopup.jsx` · **Run:** 2026-10-22 19:06 UTC  
 **Variants:** Reduced motion (poster + controls), Motion on (sound button) · **Phases:** pick → trick → treat → sound-off → sound-on → after-pick
 
 > **68 unique checks · 64 pass · 0 fail · 0 exempt (disabled) · 0 need review**
@@ -66,10 +66,10 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
 | Close | ✅ 6.49:1 | ✅ 5.41:1 | ✅ 5.41:1 | ✅ 6.49:1 | ✅ 3.72:1 · 70% of edge | sound-off, sound-on, after-pick |
-| Turn sound on | — | — | — | — | ✅ 3.25:1 · 72% of edge | sound-off, after-pick |
+| Turn sound on | — | — | — | — | ✅ 3.22:1 · 84% of edge | sound-off, after-pick |
 | Trick | ✅ 12.56:1 | ✅ 10.47:1 | ✅ 10.47:1 | ✅ 12.56:1 | ✅ 6.49:1 · 92% of edge | sound-off, sound-on |
 | Treat | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 6.49:1 · 55% of edge | sound-off, sound-on |
-| Turn sound off | — | — | — | — | ✅ 3.24:1 · 63% of edge | sound-on |
+| Turn sound off | — | — | — | — | ✅ 3.21:1 · 63% of edge | sound-on |
 | Let’s play → | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.73:1 · 57% of edge | after-pick |
 
 ---

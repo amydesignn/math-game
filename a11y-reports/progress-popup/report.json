@@ -2,7 +2,7 @@
   "component": "ProgressPopup",
   "file": "src/ui/ProgressPopup.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-22T15:46:33.890Z",
+  "ranAt": "2026-10-22T19:05:51.129Z",
   "variants": [
     "Record (Level 2, three subjects)",
     "Empty (new player)"

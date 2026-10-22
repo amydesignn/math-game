@@ -1,6 +1,6 @@
 # Contrast audit — FeedbackModal
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/FeedbackModal.jsx` · **Run:** 2026-10-22 15:52 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/FeedbackModal.jsx` · **Run:** 2026-10-22 19:00 UTC  
 **Variants:** Feedback · **Phases:** default → rated-1 → rated-5 → text-entered → near-limit → thanks → fail
 
 > **86 unique checks · 84 pass · 0 fail · 1 exempt (disabled) · 0 need review**
