@@ -1,6 +1,6 @@
 # Contrast audit — Garden overlays (Basket + GardenBar)
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Basket.jsx · src/App.jsx (GardenBar/ActionBar)` · **Run:** 2026-10-22 05:06 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Basket.jsx · src/App.jsx (GardenBar/ActionBar)` · **Run:** 2026-10-22 13:01 UTC  
 **Variants:** A seed to plant · basket empty, Growing, can water (12 💎) · basket full, Growing, can’t afford water (2 💎) · basket full, Bloomed · basket full, No seeds yet · basket empty · **Phases:** closed → basket-open
 
 > **98 unique checks · 92 pass · 0 fail · 1 exempt (disabled) · 0 need review**

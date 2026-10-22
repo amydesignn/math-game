@@ -1,6 +1,6 @@
 # Contrast audit — ProfilePopover
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-21 17:34 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-22 13:05 UTC  
 **Variants:** Guest · no photo, Signed in · initial, With photo · **Phases:** open
 
 > **49 unique checks · 46 pass · 0 fail · 0 exempt (disabled) · 0 need review**

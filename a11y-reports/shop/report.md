@@ -1,6 +1,6 @@
 # Contrast audit — Shop
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Shop.jsx` · **Run:** 2026-10-21 02:06 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Shop.jsx` · **Run:** 2026-10-22 13:09 UTC  
 **Variants:** 4 gems · your things · sparkle on, 0 gems (nothing affordable) · **Phases:** default → selected → magic-selected → big
 
 > **490 unique checks · 462 pass · 0 fail · 26 exempt (disabled) · 0 need review**

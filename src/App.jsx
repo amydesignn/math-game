@@ -34,7 +34,7 @@ import { sessionCache, signOut, sendMagicLink } from './auth'
 import { WORLD, REFRESH, GARDEN, SEED_KINDS, HINTS_ON, HINT_ARROW_OVERRIDE, WELCOME } from './config'
 import { MAPS, arrivalPoint, resumePoint, preloadMap } from './maps'
 
-const FADE_MS = 380 // gate-travel fade half-duration (out, swap, in)
+const FADE_MS = 300 // gate-travel fade half-duration (out, swap, in) — S7: 380 → 300, Datum's UI ceiling
 
 export default function App({ cloud = false, justSignedIn = false }) {
   const [state] = useState(getState)
@@ -393,7 +393,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
       return
     }
     const emoji = (SEED_KINDS[kind] || { emoji: '🌼' }).emoji
-    // the basket must be visible to catch it — below 600px it steps aside for the garden bar
+    // the basket must be visible to catch it — below md (768) it steps aside for the garden bar
     clearTimeout(catchTimer.current)
     setCatching(true)
     // the button may be display:none right now (phone + bar), so aim at where it sits
@@ -1160,7 +1160,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
           the minimap (Amy 2026-08-30: gear moved here from the left rail; the level
           bar shortened a touch to make room). Profile stays off the world (lives on
           the Door). On phones the pill compacts to "Level · 💎". The minimap keeps
-          its corner and the map name stands right below it. On phones (≤600px)
+          its corner and the map name stands right below it. On phones (≤767px, below md)
           this group owns the top row, left edge to minimap, and the pill fills
           it — pill · gear; Exit + 🛍️ drop below (Amy 2026-10-05, see index.css). */}
       <div className="hud-stats" style={{ position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 16 + 104 + 12, display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -1301,7 +1301,7 @@ export default function App({ cloud = false, justSignedIn = false }) {
 
       {/* ── the welcome gift's card, when it landed inside a quest ── */}
       {giftCard && (
-        <Modal label={HINT_COPY.lucky.title} cardStyle={{ padding: '24px 26px 26px' }}>
+        <Modal label={HINT_COPY.lucky.title} cardStyle={{ padding: 24 }}>
           <GiftWin copy={HINT_COPY.lucky} gems={WELCOME.gems} onNext={() => setGiftCard(false)} />
         </Modal>
       )}
@@ -1366,9 +1366,9 @@ export default function App({ cloud = false, justSignedIn = false }) {
         style={{
           position: 'absolute',
           inset: 0,
-          background: '#ffffff',
+          background: 'var(--luxi-color-component-gate-fade-background)',
           opacity: fading ? 1 : 0,
-          transition: `opacity ${FADE_MS}ms ease`,
+          transition: `opacity ${FADE_MS}ms var(--ease-out)`,
           pointerEvents: fading ? 'auto' : 'none',
         }}
       />
