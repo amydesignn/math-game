@@ -1,6 +1,6 @@
 # Contrast audit — Door
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-21 22:52 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Door.jsx` · **Run:** 2026-10-22 05:06 UTC  
 **Variants:** Returning player · **Phases:** idle
 
 > **101 unique checks · 89 pass · 0 fail · 0 exempt (disabled) · 12 need review**
@@ -32,16 +32,16 @@ None — every check passes WCAG 2.2 AA. 🎉
 | What’s new | `#262626` on `#FFFFFF` | 14px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Spooky Arcade for Halloween | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
 | Today’s Quest | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
-| · Refreshes in 2h | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
-| Visit Rosy Garden to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
+| · Refreshes in 1h | `#8A5300` on `#FFF7EA` | 12px | 5.95:1 | 4.50:1 | ✅ | idle |
+| Visit Star Arcade to earn gems | `#6E4E15` on `#FFF7EA` | 14px | 7.14:1 | 4.50:1 | ✅ | idle |
 | +1 | `#8A5300` on `#FFEFCF` | 14px bold | 5.57:1 | 4.50:1 | ✅ | idle |
 | Forest Clearing | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Where every journey begins | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
-| Play | `#FFFFFF` on `#6169E0` | 15px bold | 4.55:1 | 4.50:1 | ✅ | idle |
+| Play | `#FFFFFF` on `#6169E0` | 16px bold | 4.55:1 | 4.50:1 | ✅ | idle |
 | Last played | `#404040` on `#FFFFFF` | 12px | 10.36:1 | 4.50:1 | ✅ | idle |
 | Sunny Town | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Warm streets, friendly faces | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
-| Resume | `#FFFFFF` on `#6169E0` | 15px bold | 4.55:1 | 4.50:1 | ✅ | idle |
+| Resume | `#FFFFFF` on `#6169E0` | 16px bold | 4.55:1 | 4.50:1 | ✅ | idle |
 | Rosy Garden | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
 | Petal paths and quiet corners | `#525252` on `#FFFFFF` | 14px | 7.81:1 | 4.50:1 | ✅ | idle |
 | Merry Market | `#262626` on `#FFFFFF` | 18px | 15.13:1 | 4.50:1 | ✅ | idle |
@@ -53,20 +53,20 @@ None — every check passes WCAG 2.2 AA. 🎉
 | Welcome, player! | `#262626` on `#F5F1FC` ᵖ | 24px (large) | 13.60:1 | 3.00:1 | ✅ | idle |
 | Choose your world | `#262626` on `#F5F1FC` ᵖ | 24px (large) | 13.60:1 | 3.00:1 | ✅ | idle |
 | 5 worlds | `#525252` on `#F5F1FC` ᵖ | 14px | 7.02:1 | 4.50:1 | ✅ | idle |
-| Coming soon | `#3D43BE` on `#E4DBF8` ᵖ | 13px bold | 5.75:1 | 4.50:1 | ✅ | idle |
+| Coming soon | `#3D43BE` on `#E3DCF7` ᵖ | 14px bold | 5.77:1 | 4.50:1 | ✅ | idle |
 
 ### Interactive elements — every state
 
 | Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
 |---|---|---|---|---|---|---|
 | Luxi Cozy Closet | ✅ 3.36:1 | ✅ 5.81:1 | ✅ 7.65:1 | ✅ 5.81:1 | ✅ 7.65:1 · 95% of edge | idle |
-| Settings | — | — | — | — | ✅ 5.29:1 · 100% of edge | idle |
-| Profile | — | — | — | — | ✅ 4.61:1 · 100% of edge | idle |
+| Settings | — | — | — | — | ✅ 3.88:1 · 70% of edge | idle |
+| Profile | — | — | — | — | ✅ 3.12:1 · 52% of edge | idle |
 | What's new, 1 of 4: Spooky Arcade for Ha | ✅ 7.81:1 | ✅ 7.81:1 | ✅ 7.81:1 | ✅ 7.81:1 | ✅ 3.59:1 · 94% of edge | idle |
 | Previous | — | — | — | — | ✅ 7.35:1 · 100% of edge | idle |
 | Next | — | — | — | — | ✅ 7.35:1 · 100% of edge | idle |
-| Play | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.98:1 · 95% of edge | idle |
-| Resume | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 5.98:1 · 95% of edge | idle |
+| Play | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 6.49:1 · 55% of edge | idle |
+| Resume | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 4.55:1 | ✅ 6.49:1 · 55% of edge | idle |
 | hello@luxi.land | — | — | — | ✅ 17.24:1 | 🟡 review none visible | idle |
 | Luxi Land on Instagram | — | — | — | — | 🟡 review none visible | idle |
 | Luxi Land on LinkedIn | — | — | — | — | 🟡 review none visible | idle |
