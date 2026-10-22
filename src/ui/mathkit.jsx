@@ -39,10 +39,13 @@ export { Gem }
  */
 export const MODAL = {
   gutter: 20,
-  radius: 28, // 4px base unit (Amy) — was 26 before the sync
-  scrim: 'rgba(56,42,82,.44)', scrimBlur: 'blur(6px)',
-  border: '1.5px solid rgba(74,54,110,.10)',
-  shadow: '0 24px 60px rgba(50,38,80,.30), 0 4px 16px rgba(50,38,80,.13)',
+  // 24 = the top of Datum's radius ladder (0·4·6·8·10·12·16·20·24). Was 28 (26 before the
+  // 4px sync) — 28 is on the grid but not a ladder step; S1 2026-10-21. Same as the onboarding card.
+  radius: 24,
+  scrim: 'var(--luxi-color-component-popup-scrim)', scrimBlur: 'blur(6px)',
+  // 1.6 = --border-stroke-1_6, the lighter stroke on Datum's ladder (was 1.5px — a 2× screen draws both as 1.5)
+  border: 'var(--border-stroke-1_6) solid var(--luxi-color-component-popup-border)',
+  shadow: 'var(--luxi-shadow-popup)',
   width: 'min(520px, calc(100vw - 40px))',
   // 40, not Oscar's token 36: Amy's call — a friendlier tap target on Ivy's iPad
   // (his comp rendered 40 while MODAL said 36; 40 is what the screenshots show).

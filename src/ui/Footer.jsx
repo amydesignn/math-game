@@ -26,30 +26,36 @@
  * in the stylesheet; inline keeps just the static geometry.
  *
  * Renders INSIDE Door.jsx only, so it never appears in-world.
+ *
+ * GOVERNED 2026-10-21 (S1): colours → --luxi-color-component-footer-* (values
+ * unchanged), type → Datum --text-*, spacing on the 4px grid (brand gap 9→8,
+ * email 10→12 to match the tagline's 12), keyboard focus ring added (index.css).
+ * The logo + social icon SVGs are artwork: their path numbers and fills are
+ * drawing coordinates, not layout, and stay as drawn.
  */
 
 const F = {
-  root: { fontFamily: "'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif", background: '#1D1730', color: '#C9C2E0' },
+  root: { fontFamily: "'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif", background: 'var(--luxi-color-component-footer-background)', color: 'var(--luxi-color-component-footer-text)' },
   wrap: { maxWidth: 1160, margin: '0 auto', padding: 'clamp(48px,7vw,72px) clamp(20px,5vw,40px)' },
   top: { display: 'flex', flexWrap: 'wrap', gap: 'clamp(32px,5vw,64px)', justifyContent: 'space-between' },
   brandCol: { flex: '1 1 260px', maxWidth: 340 },
-  brandRow: { display: 'flex', alignItems: 'center', gap: 9 },
-  brandName: { fontSize: 18, fontWeight: 700, color: '#fff', letterSpacing: '-.02em', whiteSpace: 'nowrap' },
-  tagline: { margin: '12px 0 0', fontSize: 14, fontWeight: 400, lineHeight: 1.5, color: '#ADA4CB', maxWidth: '32ch' },
-  email: { display: 'inline-block', margin: '10px 0 0', fontWeight: 500 },
+  brandRow: { display: 'flex', alignItems: 'center', gap: 8 },
+  brandName: { fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--luxi-color-component-footer-brand-text)', letterSpacing: '-.02em', whiteSpace: 'nowrap' },
+  tagline: { margin: '12px 0 0', fontSize: 'var(--text-sm)', fontWeight: 400, lineHeight: 1.5, color: 'var(--luxi-color-component-footer-tagline-text)', maxWidth: '32ch' },
+  email: { display: 'inline-block', margin: '12px 0 0', fontWeight: 500 },
   social: { marginTop: 20, display: 'flex', gap: 12 },
   socialLink: { width: 32, height: 32, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center' },
   cols: { flex: '2 1 460px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 'clamp(24px,4vw,40px)' },
   nav: { display: 'flex', flexDirection: 'column', gap: 12 },
-  colHead: { fontSize: 12, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: '#A79DC4' },
-  link: { fontSize: 14, fontWeight: 400, lineHeight: 1.5 },
-  bottom: { borderTop: '1px solid rgba(255,255,255,.08)' },
+  colHead: { fontSize: 'var(--text-xs)', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--luxi-color-component-footer-heading-text)' },
+  link: { fontSize: 'var(--text-sm)', fontWeight: 400, lineHeight: 1.5 },
+  bottom: { borderTop: '1px solid var(--luxi-color-component-footer-divider)' },
   bottomWrap: {
     maxWidth: 1160, margin: '0 auto',
     // Oscar's 20px, plus the iOS home-indicator inset so the last line clears it.
     padding: '20px clamp(20px,5vw,40px) calc(20px + env(safe-area-inset-bottom))',
     display: 'flex', flexWrap: 'wrap', gap: '8px 24px', alignItems: 'center',
-    justifyContent: 'space-between', fontSize: 12, fontWeight: 400, lineHeight: 1.5, color: '#9990B3',
+    justifyContent: 'space-between', fontSize: 'var(--text-xs)', fontWeight: 400, lineHeight: 1.5, color: 'var(--luxi-color-component-footer-legal-text)',
   },
 }
 

@@ -1,6 +1,6 @@
 # Contrast audit — LevelBar + LevelUpPopup
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/LevelBar.jsx` · **Run:** 2026-10-06 22:00 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/LevelBar.jsx` · **Run:** 2026-10-21 22:56 UTC  
 **Variants:** HUD pill · Level 2, Congratulations card · **Phases:** default
 
 > **30 unique checks · 30 pass · 0 fail · 0 exempt (disabled) · 0 need review**
