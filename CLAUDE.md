@@ -18,7 +18,13 @@ outside land renders muted so "the end of the map" is visible in-world), plus
 site + `.github/workflows/deploy.yml` were deleted outright once Amy confirmed the
 link was never shared externally (no dead-bookmark risk). Vercel owns production;
 there is no GitHub Pages deploy anymore (the old URL 404s). Vercel
-Web Analytics is now fully on (package + dashboard toggle, 2026-08-01). Original
+Web Analytics is now fully on (package + dashboard toggle, 2026-08-01).
+**Social attribution paths (2026-10-02):** `vercel.json` rewrites `/ig` `/yt` `/x`
+`/li` `/fb` `/flyer` (QR codes) to `index.html`, so each platform's link opens the game normally but
+lands as its own row in Analytics → Pages. This is the Hobby-plan workaround: UTM
+dimensions + custom events are paid, and IG's in-app browser strips the referrer.
+The app never reads the pathname, so these paths are pure labels — keep it that
+way (don't `replaceState` them away; that's the data). Original
 Pages launch was 2026-07-16; that history follows. **Public brand = "Luxi Math"**
 (family-agreed 2026-08-01 as "Lumio Math", then **RENAMED to "Luxi Math" the same
 day** — Amy + Finn found "Lumio" is trademarked, caught before the IG push. The
