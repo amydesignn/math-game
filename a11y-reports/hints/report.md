@@ -1,0 +1,115 @@
+# Contrast audit — In-game hints (HintLayer)
+
+**Standard:** WCAG 2.2 AA · **Source:** `src/hints/HintLayer.jsx · hints.css · motion.css` · **Run:** 2026-10-23 05:38 UTC  
+**Variants:** Docked pill (no target), Green arrow + paired pill, Pink arrow + paired pill, Iris arrow + paired pill, Edge arrow (target off-screen), Lucky (gold) pill, Pill without ✕ · **Phases:** rest → focus-dismiss
+
+> **43 unique checks · 37 pass · 0 fail · 0 exempt (disabled) · 0 need review**
+
+**Rules applied**
+
+- **1.4.3 Text contrast:** 4.5:1 for body text · 3:1 for large text (≥ 24px, or ≥ 18.66px bold).
+- **1.4.11 Non-text contrast / 2.4.7 Focus visible:** a focus indicator must be visible, and its strongest ring covering half the control’s perimeter must reach 3:1 against the colours it replaces (AA asks for a visible 3:1 change; an unbroken ring is AAA 2.4.13). Coverage = share of the edge at ≥ 3:1. Icon-only glyphs (✕, ⌫) are graphics: 3:1.
+- **Disabled is exempt:** WCAG 1.4.3 exempts text in inactive UI components. Disabled controls are measured and listed for transparency, never counted as failures.
+- Every interactive element is checked in **default · hover · pressed · focus**, driven with real mouse/keyboard input. Gradients and images are scored pixel by pixel (worst 5% of the background wins).
+
+## Failures to fix (0)
+
+None — every check passes WCAG 2.2 AA. 🎉
+
+## Docked pill (no target)
+
+### Text
+
+| Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
+|---|---|---|---|---|---|---|
+| Plant your seed in the garden 🌱 | `#FFFFFF` on `#3E3160` ᵖ | 16px bold | 11.58:1 | 4.50:1 | ✅ | rest, focus-dismiss |
+
+### Interactive elements — every state
+
+| Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
+|---|---|---|---|---|---|---|
+| Not now | ✅ 7.12:1 | ✅ 5.63:1 | ✅ 4.44:1 | ✅ 7.12:1 | ✅ 6.98:1 · 100% of edge | rest, focus-dismiss |
+
+## Green arrow + paired pill
+
+### Text
+
+| Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
+|---|---|---|---|---|---|---|
+| Plant your seed in the garden 🌱 | `#FFFFFF` on `#3E3160` ᵖ | 16px bold | 11.58:1 | 4.50:1 | ✅ | rest, focus-dismiss |
+
+### Interactive elements — every state
+
+| Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
+|---|---|---|---|---|---|---|
+| Not now | ✅ 7.12:1 | ✅ 5.63:1 | ✅ 4.44:1 | ✅ 7.12:1 | ✅ 6.98:1 · 100% of edge | rest, focus-dismiss |
+
+## Pink arrow + paired pill
+
+### Text
+
+| Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
+|---|---|---|---|---|---|---|
+| Plant your seed in the garden 🌱 | `#FFFFFF` on `#3E3160` ᵖ | 16px bold | 11.58:1 | 4.50:1 | ✅ | rest, focus-dismiss |
+
+### Interactive elements — every state
+
+| Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
+|---|---|---|---|---|---|---|
+| Not now | ✅ 7.12:1 | ✅ 5.63:1 | ✅ 4.44:1 | ✅ 7.12:1 | ✅ 6.98:1 · 100% of edge | rest, focus-dismiss |
+
+## Iris arrow + paired pill
+
+### Text
+
+| Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
+|---|---|---|---|---|---|---|
+| Plant your seed in the garden 🌱 | `#FFFFFF` on `#3E3160` ᵖ | 16px bold | 11.58:1 | 4.50:1 | ✅ | rest, focus-dismiss |
+
+### Interactive elements — every state
+
+| Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
+|---|---|---|---|---|---|---|
+| Not now | ✅ 7.12:1 | ✅ 5.63:1 | ✅ 4.44:1 | ✅ 7.12:1 | ✅ 6.98:1 · 100% of edge | rest, focus-dismiss |
+
+## Edge arrow (target off-screen)
+
+### Text
+
+| Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
+|---|---|---|---|---|---|---|
+| Plant your seed in the garden 🌱 | `#FFFFFF` on `#3E3160` ᵖ | 16px bold | 11.58:1 | 4.50:1 | ✅ | rest, focus-dismiss |
+
+### Interactive elements — every state
+
+| Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
+|---|---|---|---|---|---|---|
+| Not now | ✅ 7.12:1 | ✅ 5.63:1 | ✅ 4.44:1 | ✅ 7.12:1 | ✅ 6.98:1 · 100% of edge | rest, focus-dismiss |
+
+## Lucky (gold) pill
+
+### Text
+
+| Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
+|---|---|---|---|---|---|---|
+| Welcome gift! Answer one to open it 🎁 | `#FFFFFF` on `#8E3900` ᵖ | 16px bold | 7.68:1 | 4.50:1 | ✅ | rest, focus-dismiss |
+
+### Interactive elements — every state
+
+| Element | Default | Hover | Pressed | Focus (text) | Focus indicator | Seen in |
+|---|---|---|---|---|---|---|
+| Not now | ✅ 5.31:1 | ✅ 4.44:1 | ✅ 3.65:1 | ✅ 5.31:1 | ✅ 5.14:1 · 93% of edge | rest, focus-dismiss |
+
+## Pill without ✕
+
+### Text
+
+| Text | Colour on surface | Size | Ratio | Needs | Result | Seen in |
+|---|---|---|---|---|---|---|
+| Plant your seed in the garden 🌱 | `#FFFFFF` on `#3E3160` ᵖ | 16px bold | 11.58:1 | 4.50:1 | ✅ | rest, focus-dismiss |
+
+---
+
+ᵖ = measured by pixel sampling (gradient or image behind the text). Screenshots of every phase sit next to this report.
+
+_Generated by Datum `tooling/contrast-audit` — axe-core engine + real-input state driving + pixel fallback._
