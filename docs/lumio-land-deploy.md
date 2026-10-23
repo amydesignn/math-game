@@ -1,5 +1,11 @@
 # Publishing to lumio.land — status & handoff
 
+> **🪦 RETIRED 2026-10-15.** `lumio.land` is no longer used: removed from
+> Vercel, its Cloudflare DNS + redirect rule deleted, auto-renew off (it lapses
+> ~2027-07). Old `lumio.land` links no longer resolve. The canonical home is
+> **https://math.luxi.land**. Kept below as history (and as the domain-setup
+> recipe, which still applies to luxi.land).
+
 _Last updated: 2026-07-29, evening (Amy + Nathan) — apex redirect live, auth
 working on the new domain, favicon shipped._
 

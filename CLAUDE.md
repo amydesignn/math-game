@@ -11,8 +11,8 @@ outside land renders muted so "the end of the map" is visible in-world), plus
 **pinch-to-zoom** (iPad) / wheel (desktop). Zero console errors; `npm run build`
 + `oxlint` both clean.
 
-**🌍 LIVE at https://math.lumio.land** (Vercel, auto-deployed from `main` — see
-`docs/lumio-land-deploy.md`). The old GitHub Pages URL
+**🌍 LIVE at https://math.luxi.land** (Vercel, auto-deployed from `main` — see
+`docs/lumio-land-deploy.md` for the domain recipe; `lumio.land` RETIRED 2026-10-15). The old GitHub Pages URL
 `amydesignn.github.io/math-game/` was a second live copy; **fully removed
 2026-08-02** — first retired to a redirect (2026-08-01, `d76bdbd`), then the Pages
 site + `.github/workflows/deploy.yml` were deleted outright once Amy confirmed the
@@ -28,11 +28,12 @@ World" stays retired.** ✅ **The DOMAIN migrated too, 2026-08-02: `math.luxi.la
 is now the canonical home** (Vercel — added the subdomain, Cloudflare CNAME `math` →
 `92baac53b29db479.vercel-dns-017.com` grey-cloud/DNS-only, cert issued; merged
 `59ae137` so OG/canonical/sitemap/robots + the Pages-redirect target all point to
-luxi — verified live). **`math.lumio.land` is KEPT as a 301/308 redirect to
-`math.luxi.land`** (not dropped — old bookmarks/shares still resolve). The
-remembered-device key was renamed `'lumio.account'` → `'luxi.account'`; `main.jsx`
-reads BOTH transitionally so no signed-in device dropped during cutover (safe to
-delete the lumio fallback in a later cleanup). ⚠️ **Everyone re-signs-in ONCE on the
+luxi — verified live). **`lumio.land` was RETIRED 2026-10-15** (Amy's call): the
+`math.lumio.land` 308 redirect, its Vercel domain, Cloudflare DNS + apex rule and
+Supabase allowlist entry are gone, auto-renew is off (lapses ~2027-07), so old
+lumio links no longer resolve. The remembered-device key is `'luxi.account'` only
+(the transitional `'lumio.account'` fallback was removed in the same cleanup; it
+only ever existed on the dead lumio origin). ⚠️ **Everyone re-signs-in ONCE on the
 new origin** (localStorage is per-origin; cloud saves are account-keyed → safe,
 nothing lost). **Supabase redirect allowlist must include `https://math.luxi.land/**`**
 or magic-link sign-in on the new origin breaks (same family as `3cce96f`).) SEO/social basics shipped for the IG push:
