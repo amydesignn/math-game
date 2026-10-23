@@ -174,7 +174,7 @@ export default function LuckyStation({ x, z, farewell = false, onTap }) {
       {/* the 🎁 marker (pointer-transparent so the hitbox wins) */}
       {!farewell && (
         <Html center position={[0, 1.85, 0]} style={{ pointerEvents: 'none', userSelect: 'none' }} zIndexRange={[0, 0]}>
-          <div style={{ fontSize: 40, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(40,30,70,.4))', animation: still ? 'none' : 'markerOrbit 2.6s ease-in-out infinite' }}>🎁</div>
+          <div style={{ fontSize: 40, lineHeight: 1, filter: 'drop-shadow(var(--luxi-shadow-station-marker))', animation: still ? 'none' : 'markerOrbit 2.6s ease-in-out infinite' }}>🎁</div>
         </Html>
       )}
     </group>

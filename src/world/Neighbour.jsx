@@ -205,13 +205,13 @@ export default function Neighbour({ character, pet, home: homeProp, lines, strol
             {/* No distanceFactor (the Station nameplate rule): one legible size at every zoom.
                 Under the HUD (zIndex 0). 4px grid: pad 8/16, radius 16, tail 8. */}
             <div className="nbBubble" style={{
-              position: 'relative', background: '#fff', color: '#2a2140',
+              position: 'relative', background: 'var(--luxi-color-component-neighbour-bubble-background)', color: 'var(--luxi-color-component-neighbour-bubble-text)',
               fontWeight: 700, fontSize: 'var(--text-base, 16px)', lineHeight: 1.25,
               padding: '8px 16px', borderRadius: 16, whiteSpace: 'nowrap',
-              boxShadow: '0 4px 12px rgba(40,30,70,.22)', animation: 'nbPop .28s cubic-bezier(.2,1.4,.4,1) both',
+              boxShadow: 'var(--luxi-shadow-neighbour-bubble)', animation: 'nbPop 300ms var(--ease-out) both', /* was .28s overshoot (S8: motion ladder) */
             }}>
               {say}
-              <span style={{ position: 'absolute', left: '50%', bottom: -8, transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid #fff' }} />
+              <span style={{ position: 'absolute', left: '50%', bottom: -8, transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '8px solid transparent', borderRight: '8px solid transparent', borderTop: '8px solid var(--luxi-color-component-neighbour-bubble-background)' }} />
             </div>
           </Html>
         )}

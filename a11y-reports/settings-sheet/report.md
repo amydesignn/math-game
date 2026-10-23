@@ -1,6 +1,6 @@
 # Contrast audit — SettingsSheet
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-22 15:47 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/ui/Settings.jsx` · **Run:** 2026-10-22 19:06 UTC  
 **Variants:** Guest · sound on, Guest · sound off, Signed in · **Phases:** open
 
 > **160 unique checks · 157 pass · 0 fail · 0 exempt (disabled) · 0 need review**

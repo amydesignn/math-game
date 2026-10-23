@@ -1,6 +1,6 @@
 # Contrast audit — SignIn
 
-**Standard:** WCAG 2.2 AA · **Source:** `src/main.jsx` · **Run:** 2026-10-22 13:09 UTC  
+**Standard:** WCAG 2.2 AA · **Source:** `src/main.jsx` · **Run:** 2026-10-22 19:09 UTC  
 **Variants:** Enter your email, That didn't send, Check your inbox · **Phases:** default
 
 > **37 unique checks · 37 pass · 0 fail · 0 exempt (disabled) · 0 need review**

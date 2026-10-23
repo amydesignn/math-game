@@ -2,7 +2,7 @@
   "component": "ProfilePopover",
   "file": "src/ui/Settings.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-22T15:47:13.041Z",
+  "ranAt": "2026-10-22T19:05:42.051Z",
   "variants": [
     "Guest · no photo",
     "Signed in · initial",

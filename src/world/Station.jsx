@@ -119,16 +119,16 @@ export default function Station({ x, z, skin, resume = 0, farewell = false, onTa
           {/* A nameplate: NO distanceFactor, so marker + label keep one size on screen at
               every zoom — the label is a true 16px (Amy 2026-10-05: world scaling shrank it
               to ~6–9px zoomed out). zIndex 0 keeps it UNDER the HUD (Level pill, minimap). */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, whiteSpace: 'nowrap' }}>
-            <div style={{ fontSize: 40, lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(40,30,70,.4))', animation: 'markerOrbit 2.6s ease-in-out infinite' }}>{skin.marker}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, whiteSpace: 'nowrap' }}> {/* S8: gap 6 → 8 (4px grid) */}
+            <div style={{ fontSize: 40, lineHeight: 1, filter: 'drop-shadow(var(--luxi-shadow-station-marker))', animation: 'markerOrbit 2.6s ease-in-out infinite' }}>{skin.marker}</div>
             <div style={{
               /* WCAG AA (Amy 2026-10-05): white text sat on the light glow→accent gradient
                  (1.7–3.7:1). Now the popup QUEST badge's ink (skin.accentInk, a Luxi token
                  by name) fading only DARKER, so every point of the pill passes: 4.94–7.88:1.
                  The accent glow stays in the shadow. Type + padding on Datum's scale / 4px. */
-              background: `linear-gradient(180deg,${skin.accentInk},color-mix(in srgb, ${skin.accentInk} 85%, #000))`,
-              color: '#fff', fontWeight: 700, fontSize: 'var(--text-base)',
-              padding: '8px 16px', borderRadius: 20, boxShadow: `0 6px 16px ${skinTint(skin.accent, '72')}`, textShadow: '0 1px 3px rgba(0,0,0,.25)',
+              background: `linear-gradient(180deg,${skin.accentInk},color-mix(in srgb, ${skin.accentInk} 85%, var(--luxi-color-component-station-label-shade)))`,
+              color: 'var(--luxi-color-component-station-label-text)', fontWeight: 700, fontSize: 'var(--text-base)',
+              padding: '8px 16px', borderRadius: 20, boxShadow: `0 6px 16px ${skinTint(skin.accent, '72')}`, textShadow: 'var(--luxi-shadow-station-label-text)',
               fontFamily: 'Inter, system-ui, sans-serif',
             }}>
               {resume > 0 ? `${skin.questLabel} · ${resume} done ✨` : `${skin.questLabel}! ✨`}

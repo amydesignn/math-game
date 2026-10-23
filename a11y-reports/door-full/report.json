@@ -2,7 +2,7 @@
   "component": "Door",
   "file": "src/ui/Door.jsx",
   "standard": "WCAG 2.2 AA",
-  "ranAt": "2026-10-22T12:59:20.373Z",
+  "ranAt": "2026-10-22T18:59:05.213Z",
   "variants": [
     "Returning player"
   ],
@@ -201,7 +201,7 @@
       "variant": "Returning player",
       "phase": "idle",
       "state": "default",
-      "label": "Visit Rosy Garden to earn gems",
+      "label": "Visit Sunny Town to earn gems",
       "target": ".doorLeftBody > div:nth-child(3) > div > div:nth-child(2)",
       "fg": "#6E4E15",
       "bg": "#FFF7EA",
