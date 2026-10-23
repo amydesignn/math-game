@@ -4,11 +4,11 @@
  * (HINT_MOTION), so change both together.
  *
  * Every motion has a purpose, and anything without one was cut:
- *   arrival  = "look here"     arrow drops in 280 ms, the dock pill rises +120 ms later
- *   bob      = "still here"    6 px toward the target, 1.6 s, x3, then it RESTS
+ *   arrival  = "look here"     arrow drops in 300 ms, the dock pill rises +100 ms later
+ *   bob      = "still here"    6 px toward the target, 1.8 s, x3, then it RESTS
  *   edge     = "over there"    the same bob; Linden's rotate aims it at the bed
  *   retire   = "ok, gone"      200 ms, faster than the arrival
- *   done     = "you did it"    a small hop, peak 270 ms (Wren's hintDone note 4), sinks in, gone 600 ms
+ *   done     = "you did it"    a small hop, peak 270 ms (Wren's hintDone note 4), sinks in, gone 500 ms
  *
  * Hooks (Linden's HintLayer):
  *   .luxiHint-arrow         Linden: translate + rotate, written per frame. NOT animated here.
@@ -23,11 +23,21 @@
  * restarting. Only the bob and the one-shot done swell are keyframes.
  *
  * transform + opacity only. Keyframes are luxiHint-prefixed (dv / su / fb history).
+ *
+ * Governance (S9, 2026-10-23): every duration sits on Datum's motion-v2 ladder
+ * (UI 100·150·200·300 · 500 · expressive 800 · the finite-loop 1800/2800 tier the
+ * Door's bob uses), and every curve is Datum's by name. The two raw curves this
+ * file used WERE Datum's ease-out and ease-in-out, so the rename changes nothing.
+ * Where a duration moved, keyframe stops were rescaled so the beats Wren's sounds
+ * land on keep their absolute time (the done peak stays at 270 ms; a tap's press
+ * keeps its ~290 ms).
  */
 
-.luxiHint-arrowMotion,
-.luxiHint-toast {
-  --luxiHint-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)); /* Datum's ease-out */
+/* The two curves, named once for the whole layer (inherited by every hook below,
+   ::before/::after included). Fallbacks keep the layer working off-Luxi. */
+.luxiHint-layer {
+  --luxiHint-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));     /* Datum ease-out: enter / exit */
+  --luxiHint-press: var(--ease-in-out, cubic-bezier(0.77, 0, 0.175, 1)); /* Datum ease-in-out: on-screen movement */
 }
 
 /* ── Arrow: arrival + retire (transitions) ─────────────────────────────── */
@@ -42,7 +52,7 @@
 .luxiHint-arrowMotion[data-state='shown'] {
   opacity: 1;
   transform: none;
-  transition: opacity 280ms var(--luxiHint-ease), transform 280ms var(--luxiHint-ease);
+  transition: opacity 300ms var(--luxiHint-ease), transform 300ms var(--luxiHint-ease);
 }
 .luxiHint-arrowMotion[data-state='out'] {
   opacity: 0;
@@ -54,25 +64,26 @@
 
 /* ── Arrow: done = one swell from the tip, then gone ────────────────────── */
 .luxiHint-arrowMotion[data-state='done'] {
-  animation: luxiHintPointerDone 600ms var(--luxiHint-ease) both;
+  animation: luxiHintPointerDone 500ms var(--luxiHint-ease) both;
 }
 @keyframes luxiHintPointerDone {
   /* a small hop that PEAKS on hintDone's top note (270 ms; E6 since Amy's cut 04), holds a beat while it
      rings, then sinks into the bed and fades ("planted"). Segment 1 is
      ease-in-out so the top lands AT 270 ms, not at 90 ms (the frames showed a
      plain ease-out plateaus early and the peak doesn't read as a moment). */
-  0%   { opacity: 1; transform: translateY(0) scale(1); animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1); }
-  45%  { opacity: 1; transform: translateY(-4px) scale(1.15); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
-  60%  { opacity: 1; transform: translateY(-3px) scale(1.12); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  /* S9: 600 → 500 ms; stops 45/60 → 54/72 so the peak still lands at 270 ms and the hold at 360 ms. */
+  0%   { opacity: 1; transform: translateY(0) scale(1); animation-timing-function: var(--luxiHint-press); }
+  54%  { opacity: 1; transform: translateY(-4px) scale(1.15); animation-timing-function: var(--luxiHint-ease); }
+  72%  { opacity: 1; transform: translateY(-3px) scale(1.12); animation-timing-function: var(--luxiHint-ease); }
   100% { opacity: 0; transform: translateY(4px) scale(0.9); }
 }
 
 /* ── Arrow: bob, on target and at the edge ──────────────────────────────── */
 /* Toward the target along the arrow's own axis (+Y, inside Linden's rotate),
-   then back. It waits for hintShow's tail (700 ms), runs 3 slow cycles, then
+   then back. It waits for hintShow's tail (~700 ms → 800), runs 3 slow cycles, then
    rests. A still arrow still points, and an endless pulse tires the eye. */
 .luxiHint-arrowBob {
-  animation: luxiHintBob 1600ms cubic-bezier(0.77, 0, 0.175, 1) 700ms 3 both;
+  animation: luxiHintBob 1800ms var(--luxiHint-press) 800ms 3 both; /* S9: 1600 at 700 → 1800 at 800 */
 }
 .luxiHint-arrowMotion[data-soft] .luxiHint-arrowBob { animation-iteration-count: 1; }
 .luxiHint-arrowMotion[data-state='out'] .luxiHint-arrowBob,
@@ -86,8 +97,8 @@
 /* Job 2 (Amy: one consistent position): the pill lives in the BOTTOM DOCK at
    every size, so it rises 16 px from the dock and sinks back into it. That's the
    panel contract from proposal-panel.md, proven here on the pill first, so the
-   card inherits it unchanged. It follows the arrow by 120 ms ("look here", then
-   read). Toast-only hints get the same 120 ms, imperceptible after the engine's
+   card inherits it unchanged. It follows the arrow by 100 ms ("look here", then
+   read). Toast-only hints get the same 100 ms, imperceptible after the engine's
    3 s calm wait. Calm, never springy: it is text being read. */
 .luxiHint-toast {
   will-change: transform, opacity;
@@ -99,7 +110,7 @@
 .luxiHint-toast[data-state='shown'] {
   opacity: 1;
   transform: none;
-  transition: opacity 280ms var(--luxiHint-ease) 120ms, transform 280ms var(--luxiHint-ease) 120ms;
+  transition: opacity 300ms var(--luxiHint-ease) 100ms, transform 300ms var(--luxiHint-ease) 100ms;
 }
 .luxiHint-toast[data-state='out'],
 .luxiHint-toast[data-state='done'] {
@@ -109,7 +120,7 @@
 }
 .luxiHint-toast[data-soft][data-state='in'] { transform: none; }
 /* swap (job 3: paired ↔ dock): the same fade-through as the pill, in place */
-.luxiHint-toast[data-state='swap'] { opacity: 0; transform: none; transition: opacity 120ms var(--luxiHint-ease); }
+.luxiHint-toast[data-state='swap'] { opacity: 0; transform: none; transition: opacity 100ms var(--luxiHint-ease); }
 .luxiHint-toast[data-swap][data-state='in'] { transform: none; }
 .luxiHint-toast[data-swap][data-state='shown'] { transition: opacity 200ms var(--luxiHint-ease); }
 
@@ -119,16 +130,15 @@
    element, only .luxiHint-pillMotion inside it. Text never rotates and never
    bobs: only the glyph taps.
      arrival   the arrow lands (~120 ms), then the pill UNFOLDS from the arrow-facing
-               edge at +120 ms: fade + scale .96 → 1, 280 ms ("look here", then read)
+               edge at +100 ms: fade + scale .96 → 1, 300 ms ("look here", then read)
      leave     with the arrow, 200 ms, folding back toward it
      done      shrinks toward the arrow + fades, 200 ms (normally hidden by the GardenBar)
-     swap      side switch / re-anchor / paired↔dock: 120 ms fade out, the host moves
+     swap      side switch / re-anchor / paired↔dock: 100 ms fade out, the host moves
                it, then a 200 ms fade in, in place with no scale. A crossfade, never a slide.
    Hooks: data-state in|shown|out|done|swap · data-side top|bottom|left|right
    (the pill's side relative to the arrow) · [data-swap] on the fade-in after a
    swap · [data-soft]. Timers: HINT_MOTION.swapOutMs / swapInMs. */
 .luxiHint-pillMotion {
-  --luxiHint-ease: var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
   transform-origin: 50% 100%; /* default: pill above a down arrow */
   will-change: transform, opacity;
 }
@@ -143,7 +153,7 @@
 .luxiHint-pillMotion[data-state='shown'] {
   opacity: 1;
   transform: none;
-  transition: opacity 280ms var(--luxiHint-ease) 120ms, transform 280ms var(--luxiHint-ease) 120ms;
+  transition: opacity 300ms var(--luxiHint-ease) 100ms, transform 300ms var(--luxiHint-ease) 100ms;
 }
 .luxiHint-pillMotion[data-state='out'],
 .luxiHint-pillMotion[data-state='done'] {
@@ -155,12 +165,14 @@
 .luxiHint-pillMotion[data-state='swap'] {
   opacity: 0;
   transform: none;
-  transition: opacity 120ms var(--luxiHint-ease);
+  transition: opacity 100ms var(--luxiHint-ease);
 }
 /* blocked swap (Clover, job 3 QA): if the held spot turns blocked mid-swap, Linden
-   adds data-snap and it's gone in 60 ms instead of riding into the blocked spot. */
+   adds data-snap and it's gone AT ONCE instead of riding into the blocked spot.
+   S9: was a 60 ms fade, under Datum's shortest step (100, which is the plain swap,
+   so the snap would mean nothing) → a cut. */
 .luxiHint-pillMotion[data-snap][data-state='swap'],
-.luxiHint-toast[data-snap][data-state='swap'] { transition: opacity 60ms var(--luxiHint-ease); }
+.luxiHint-toast[data-snap][data-state='swap'] { transition: none; }
 .luxiHint-pillMotion[data-swap][data-state='in'],
 .luxiHint-pillMotion[data-soft][data-state='in'] { transform: none; }
 .luxiHint-pillMotion[data-swap][data-state='shown'] {
@@ -172,14 +184,14 @@
    ripples spreading across the soil from the tip. The ripples are ellipses
    because the bed is seen from above at an angle. They sit on .luxiHint-arrow
    (not the fading motion layer) so they outlive the swell, and both finish
-   by 600 ms. */
+   by 500 ms. */
 .luxiHint-arrow[data-motion='bold'][data-state='done'] .luxiHint-arrowMotion {
   animation-name: luxiHintPointerDoneBold;
 }
 @keyframes luxiHintPointerDoneBold {
-  0%   { opacity: 1; transform: translateY(0) scale(1); animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1); }
-  45%  { opacity: 1; transform: translateY(-8px) scale(1.25); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
-  60%  { opacity: 1; transform: translateY(-6px) scale(1.2); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+  0%   { opacity: 1; transform: translateY(0) scale(1); animation-timing-function: var(--luxiHint-press); }
+  54%  { opacity: 1; transform: translateY(-8px) scale(1.25); animation-timing-function: var(--luxiHint-ease); }
+  72%  { opacity: 1; transform: translateY(-6px) scale(1.2); animation-timing-function: var(--luxiHint-ease); }
   100% { opacity: 0; transform: translateY(4px) scale(0.9); }
 }
 .luxiHint-arrow[data-motion='bold'][data-state='done']::before,
@@ -189,18 +201,18 @@
   left: 50%;
   top: 100%;
   width: 56px;
-  height: 20px;
-  margin: -10px 0 0 -28px;
+  height: 24px; /* S9: 56 × 20 → 56 × 24 (4px grid) */
+  margin: -12px 0 0 -28px;
   border-radius: 50%;
-  border: 3px solid rgba(245, 182, 35, 0.85); /* --star-gold, the house reward accent */
+  border: var(--border-stroke-2, 2px) solid var(--luxiHint-ripple-gold); /* --star-gold, the house reward accent. S9: 3px → stroke-2 */
   opacity: 0;
   pointer-events: none;
-  animation: luxiHintRipple 400ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) 200ms forwards; /* forwards, not both: nothing shows during the delay */
+  animation: luxiHintRipple 300ms var(--luxiHint-ease) 150ms forwards; /* forwards, not both: nothing shows during the delay. S9: 400 at 200 → 300 at 150 */
 }
 .luxiHint-arrow[data-motion='bold'][data-state='done']::after {
-  border-color: rgba(46, 197, 197, 0.7); /* --gem-cyan */
-  animation-delay: 260ms;
-  animation-duration: 340ms;
+  border-color: var(--luxiHint-ripple-cyan); /* --gem-cyan */
+  animation-delay: 200ms; /* S9: 340 at 260 → 300 at 200: still trails the gold, done by 500 */
+  animation-duration: 300ms;
 }
 @keyframes luxiHintRipple {
   0%   { opacity: 0.9; transform: scale(0.4); }
@@ -219,10 +231,6 @@
      .luxiHint-arrow[data-arrow=green]
        > .luxiHint-arrowShadow[data-state]   ground ellipse at the tip, stays put
        > .luxiHint-arrowMotion > .luxiHint-arrowBob > glyph */
-.luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) {
-  --luxiHint-press: cubic-bezier(0.77, 0, 0.175, 1); /* strong ease-in-out: on-screen movement */
-}
-
 /* Arrival: drops from 28 px (vs 12), lands at ~120 ms (hintShow note 2). */
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-state='in'] {
   transform: translateY(-28px) scale(0.9);
@@ -231,14 +239,14 @@
 
 /* Landing squash + the tap rhythm both ride the bob layer as ONE animation
    list, so the in→shown flip never restarts them. The squash peaks as the drop
-   lands (~140 ms) and is settled by 360 ms. The tap starts after the sound tail (700 ms). */
+   lands (~135 ms) and is settled by 300 ms. The tap starts after the sound tail (800 ms). */
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowBob {
   animation:
-    luxiHintGreenLand 360ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1)) 0ms 1 none,
-    luxiHintGreenTap 1600ms linear 700ms 4 none;
+    luxiHintGreenLand 300ms var(--luxiHint-ease) 0ms 1 none,
+    luxiHintGreenTap 1800ms linear 800ms 4 none; /* S9: land 360 → 300; tap 1600 at 700 → 1800 at 800 */
 }
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-soft] .luxiHint-arrowBob {
-  animation: luxiHintGreenTap 1600ms linear 400ms 1 none;
+  animation: luxiHintGreenTap 1800ms linear 300ms 1 none; /* S9: 1600 at 400 → 1800 at 300 */
 }
 @keyframes luxiHintGreenLand {
   0%, 30% { transform: none; }
@@ -247,37 +255,39 @@
 }
 /* On target, "here, HERE": a press toward the bed with a small squash, a
    spring back, then a rest. 4 taps, then still (Clover: a still arrow keeps
-   reading). Per-segment curves are set in the keyframes. */
+   reading). Per-segment curves are set in the keyframes. S9: stops 18/40 → 16/36
+   of the longer cycle, so the press (~290 ms) and spring (~350 ms) are unchanged;
+   only the rest between taps grows by 200 ms. */
 @keyframes luxiHintGreenTap {
   0%   { transform: none; animation-timing-function: var(--luxiHint-press); }
-  18%  { transform: translateY(10px) scale(1.04, 0.94); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
-  40%  { transform: none; }
+  16%  { transform: translateY(10px) scale(1.04, 0.94); animation-timing-function: var(--luxiHint-ease); }
+  36%  { transform: none; }
   100% { transform: none; }
 }
 
 /* Edge (the arrow kids miss most): a stronger tap toward the off-screen bed,
-   one every 2.4 s, 5 taps (~12 s) then rest (Amy, review 1). The host re-arms it
+   one every 2.8 s (S9: was 2.4), 5 taps (~14 s) then rest (Amy, review 1). The host re-arms it
    when the camera moves. data-mode flips also restart it. */
 /* Re-arm = Linden flips data-arm 1↔2 (only after a full run has rested AND the
    camera moved ≥24 px / ≥10°). A changed animation-name restarts the run cleanly
    with no remount, so A and B are identical. Timing is exported as
    HINT_MOTION.edgeTap* in motion.js; keep both in step. */
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-mode='edge'] .luxiHint-arrowBob {
-  animation: luxiHintGreenEdgeA 2400ms linear 300ms 5 none;
+  animation: luxiHintGreenEdgeA 2800ms linear 300ms 5 none;
 }
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-mode='edge'][data-arm='2'] .luxiHint-arrowBob {
   animation-name: luxiHintGreenEdgeB;
 }
 @keyframes luxiHintGreenEdgeB {
   0%   { transform: none; animation-timing-function: var(--luxiHint-press); }
-  12%  { transform: translateY(12px) scale(1.04, 0.94); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
-  30%  { transform: none; }
+  10%  { transform: translateY(12px) scale(1.04, 0.94); animation-timing-function: var(--luxiHint-ease); } /* S9: 12/30 → 10/26: same ~290 ms press in the 2.8 s cycle */
+  26%  { transform: none; }
   100% { transform: none; }
 }
 @keyframes luxiHintGreenEdgeA {
   0%   { transform: none; animation-timing-function: var(--luxiHint-press); }
-  12%  { transform: translateY(12px) scale(1.04, 0.94); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
-  30%  { transform: none; }
+  10%  { transform: translateY(12px) scale(1.04, 0.94); animation-timing-function: var(--luxiHint-ease); } /* S9: 12/30 → 10/26: same ~290 ms press in the 2.8 s cycle */
+  26%  { transform: none; }
   100% { transform: none; }
 }
 
@@ -286,16 +296,17 @@
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-state='done'] .luxiHint-arrowBob { animation: none; }
 
 /* Done: an anticipation squash, a bigger hop that peaks at 270 ms (hintDone top note,
-   E6 since cut 04), then it dives into the bed: "planted". Gone by 600 ms. */
+   E6 since cut 04), then it dives into the bed: "planted". Gone by 500 ms (S9: was
+   600; stops 12/45/60 → 14/54/72 keep the squash at 70 ms and the peak at 270 ms). */
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowMotion[data-state='done'],
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink'])[data-motion='bold'][data-state='done'] .luxiHint-arrowMotion {
-  animation: luxiHintGreenDone 600ms linear both;
+  animation: luxiHintGreenDone 500ms linear both;
 }
 @keyframes luxiHintGreenDone {
-  0%   { opacity: 1; transform: none; animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
-  12%  { opacity: 1; transform: scale(1.05, 0.9); animation-timing-function: var(--luxiHint-press); }
-  45%  { opacity: 1; transform: translateY(-10px) scale(1.25); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
-  60%  { opacity: 1; transform: translateY(-9px) scale(1.22); animation-timing-function: cubic-bezier(0.77, 0, 0.175, 1); }
+  0%   { opacity: 1; transform: none; animation-timing-function: var(--luxiHint-ease); }
+  14%  { opacity: 1; transform: scale(1.05, 0.9); animation-timing-function: var(--luxiHint-press); }
+  54%  { opacity: 1; transform: translateY(-10px) scale(1.25); animation-timing-function: var(--luxiHint-ease); }
+  72%  { opacity: 1; transform: translateY(-9px) scale(1.22); animation-timing-function: var(--luxiHint-press); }
   100% { opacity: 0; transform: translateY(12px) scale(0.7); }
 }
 
@@ -308,26 +319,26 @@
 }
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowShadow[data-state='shown'] {
   opacity: 1; transform: none;
-  transition: opacity 280ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1)), transform 280ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
-  animation: luxiHintShadowTap 1600ms linear 700ms 4 none;
+  transition: opacity 300ms var(--luxiHint-ease), transform 300ms var(--luxiHint-ease);
+  animation: luxiHintShadowTap 1800ms linear 800ms 4 none; /* in step with luxiHintGreenTap */
 }
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowShadow[data-state='out'] {
   opacity: 0; transform: scale(0.8);
-  transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1)), transform 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
+  transition: opacity 200ms var(--luxiHint-ease), transform 200ms var(--luxiHint-ease);
 }
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink']) .luxiHint-arrowShadow[data-state='done'] {
-  animation: luxiHintShadowDone 600ms linear both;
+  animation: luxiHintShadowDone 500ms linear both;
 }
 .luxiHint-arrow:is([data-candy], [data-arrow='green'], [data-arrow='pink'])[data-mode='edge'] .luxiHint-arrowShadow { opacity: 0; transition: none; animation: none; }
 @keyframes luxiHintShadowTap {
   0%   { transform: none; animation-timing-function: var(--luxiHint-press); }
-  18%  { transform: scale(1.2); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
-  40%, 100% { transform: none; }
+  16%  { transform: scale(1.2); animation-timing-function: var(--luxiHint-ease); }
+  36%, 100% { transform: none; }
 }
 @keyframes luxiHintShadowDone {
   0%   { opacity: 1; transform: none; animation-timing-function: var(--luxiHint-press); }
-  45%  { opacity: 0.6; transform: scale(0.75); animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); } /* arrow at its highest */
-  80%  { opacity: 0.8; transform: scale(1.1); }
+  54%  { opacity: 0.6; transform: scale(0.75); animation-timing-function: var(--luxiHint-ease); } /* arrow at its highest (270 ms) */
+  84%  { opacity: 0.8; transform: scale(1.1); }
   100% { opacity: 0; transform: scale(1.1); }
 }
 
@@ -344,22 +355,22 @@
   .luxiHint-pillMotion[data-state='shown'],
   .luxiHint-pillMotion[data-state='out'],
   .luxiHint-pillMotion[data-state='done'] {
-    transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
+    transition: opacity 200ms var(--luxiHint-ease);
   }
   .luxiHint-arrowMotion[data-state='shown'],
   .luxiHint-arrowMotion[data-state='out'],
   .luxiHint-toast[data-state='shown'],
   .luxiHint-toast[data-state='out'],
   .luxiHint-toast[data-state='done'] {
-    transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
+    transition: opacity 200ms var(--luxiHint-ease);
   }
   .luxiHint-arrowMotion[data-state='done'] {
     animation: none !important;
     opacity: 0;
-    transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1));
+    transition: opacity 200ms var(--luxiHint-ease);
   }
   .luxiHint-arrowBob { animation: none !important; }
-  .luxiHint-arrowShadow { transform: none !important; animation: none !important; transition: opacity 200ms var(--luxiHint-ease, cubic-bezier(0.23, 1, 0.32, 1)) !important; }
+  .luxiHint-arrowShadow { transform: none !important; animation: none !important; transition: opacity 200ms var(--luxiHint-ease) !important; }
   .luxiHint-arrowShadow[data-state='done'] { opacity: 0; }
   .luxiHint-arrow::before,
   .luxiHint-arrow::after { animation: none !important; content: none !important; }

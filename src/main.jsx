@@ -21,6 +21,7 @@ import PromoPopup from './ui/PromoPopup.jsx'
 import { SKINS, LUCKY_SKIN } from './ui/skins.js'
 import { TOPICS, solve, luckyProblem } from './math.js'
 import { WELCOME } from './config.js'
+import HintLayer from './hints/HintLayer.jsx'
 import './index.css'
 
 /*
@@ -637,6 +638,42 @@ function PromoAudit() {
     </div>
   )
 }
+/*
+ * `/?a11y=hints&mode=dock|pair|edge[&arrow=green|pink|iris][&tone=lucky][&nodismiss][&play]` — the
+ * in-game hint layer (src/hints) over Sunny Town's capture: the docked pill, an arrow with
+ * its paired pill on a fixed world point, or an edge arrow (target off-screen). (a11y/hints.audit.mjs, S9)
+ */
+function HintsAudit() {
+  const mode = AUDIT_Q.get('mode') || 'dock'
+  const pt = mode === 'edge' ? { x: -400, y: 360 } : { x: 520, y: 470 }
+  const hint = {
+    id: 'audit', tone: AUDIT_Q.get('tone') || undefined,
+    text: AUDIT_Q.get('tone') === 'lucky' ? 'Welcome gift! Answer one to open it 🎁' : 'Plant your seed in the garden 🌱',
+    target: mode === 'dock' ? undefined : { world: 'audit' },
+  }
+  // `&play` = the eye sheet's motion loop: on for 7 s, then "done" (the planted hop), again every 9 s
+  const [on, setOn] = React.useState(true)
+  React.useEffect(() => {
+    if (!AUDIT_Q.has('play')) return
+    let t
+    const cycle = (v) => { setOn(v); t = setTimeout(() => cycle(!v), v ? 7000 : 2000) }
+    t = setTimeout(() => cycle(false), 7000)
+    return () => clearTimeout(t)
+  }, [])
+  return (
+    <div data-audit-root style={{ position: 'fixed', inset: 0, background: 'url(/a11y-reports/garden/world-backdrop.png) center / cover' }}>
+      <HintLayer
+        hint={on ? hint : null}
+        exitReason={on ? null : 'done'}
+        arrowStyle={AUDIT_Q.get('arrow') || 'green'}
+        getTargetPos={() => pt}
+        dismissLabel="Not now"
+        onDismiss={AUDIT_Q.has('nodismiss') ? undefined : () => {}}
+      />
+    </div>
+  )
+}
+const HINTS_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'hints'
 const ONBOARDING_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'onboarding'
 const PROMO_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'promo'
 const MATH_AUDIT =
@@ -653,7 +690,7 @@ const SIGNIN_AUDIT = import.meta.env.DEV && AUDIT_Q.get('a11y') === 'signin'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Oops>
-      {SIGNIN_AUDIT ? <SignIn initial={AUDIT_Q.get('state') || 'idle'} /> : ONBOARDING_AUDIT ? <OnboardingAudit /> : PROMO_AUDIT ? <PromoAudit /> : GARDEN_AUDIT ? <GardenAudit /> : LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
+      {SIGNIN_AUDIT ? <SignIn initial={AUDIT_Q.get('state') || 'idle'} /> : HINTS_AUDIT ? <HintsAudit /> : ONBOARDING_AUDIT ? <OnboardingAudit /> : PROMO_AUDIT ? <PromoAudit /> : GARDEN_AUDIT ? <GardenAudit /> : LEVEL_AUDIT ? <LevelAudit /> : PROGRESS_AUDIT ? <ProgressAudit /> : SHOP_AUDIT ? <ShopAudit /> : STATION_AUDIT ? <StationAudit /> : MATH_AUDIT ? <MathAudit /> : DEV_DEMO ? <DivDemo /> : SIGNUP_DEMO ? <SignupDemo /> : SETTINGS_DEMO ? <SettingsDemo /> : <Boot />}
     </Oops>
     {/* Cookieless, privacy-friendly traffic counting (no personal data, no
       * consent banner needed) — the whole point of moving to a real domain. */}

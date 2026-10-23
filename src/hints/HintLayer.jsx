@@ -35,14 +35,15 @@ import './motion.css'
 
 const IN_MS = 16 // "in" → "shown" on the next tick, so the arrival transition runs
 const OUT_MS = HINT_MOTION?.outMs ?? 200
-const DONE_ARROW_MS = HINT_MOTION?.doneArrowMs ?? 700
-const EDGE_REST_MS = (HINT_MOTION?.edgeTapDelayMs ?? 300) + (HINT_MOTION?.edgeTaps ?? 5) * (HINT_MOTION?.edgeTapMs ?? 2400) // a tap run, then rest
-const SWAP_OUT_MS = HINT_MOTION?.swapOutMs ?? 120 // side switch / re-anchor: fade out in place…
-const SWAP_SNAP_MS = HINT_MOTION?.swapSnapMs ?? 60 // …or 60 ms when the held spot is already blocked
-const SWAP_IN_MS = HINT_MOTION?.swapInMs ?? 200 //  …move, fade in on the new side (≈320 ms, never a slide)
+const DONE_ARROW_MS = HINT_MOTION?.doneArrowMs ?? 500
+const EDGE_REST_MS = (HINT_MOTION?.edgeTapDelayMs ?? 300) + (HINT_MOTION?.edgeTaps ?? 5) * (HINT_MOTION?.edgeTapMs ?? 2800) // a tap run, then rest
+const SWAP_OUT_MS = HINT_MOTION?.swapOutMs ?? 100 // side switch / re-anchor: fade out in place…
+const SWAP_SNAP_MS = HINT_MOTION?.swapSnapMs ?? 0 // …or at once when the held spot is already blocked
+const SWAP_IN_MS = HINT_MOTION?.swapInMs ?? 200 //  …move, fade in on the new side (≈300 ms, never a slide)
 const SWAP_HOLD_MS = 600 // a pill that just moved stays put this long
 const PILL_MAX_H = 72 // 2 lines of 24 + 12 padding top and bottom
-const PILL_PHONE_MAX = 256 // ≤600px wide: the paired pill wraps (2 lines allowed) so it fits beside an edge arrow
+const PILL_PHONE_MAX = 256 // below Datum md (768px): the paired pill wraps (2 lines allowed) so it fits beside an edge arrow
+const BP_MD = 768 // Datum --breakpoint-md (S9: was a JS 600, the old phone cut; S7 moved every CSS 600 to < 768)
 const POLL_MS = 250 // fallback beside rAF: the arrow never freezes in a throttled pane
 
 /** Screen gutter only: the HUD itself is avoided rect by rect (hudRects). */
@@ -228,7 +229,7 @@ export default function HintLayer({
       const el = measureRef.current
       const layer = layerRef.current
       if (!el || !layer) return { w: 0, h: 0 }
-      const cap = layer.clientWidth <= 600 ? PILL_PHONE_MAX : Infinity
+      const cap = layer.clientWidth < BP_MD ? PILL_PHONE_MAX : Infinity
       const mw = Math.floor(Math.min(maxW, cap))
       const pr = pairRef.current
       const key = mw + '|' + el.textContent
@@ -516,10 +517,14 @@ function CandyArrowGlyph() {
       {/* face + white rim */}
       <path d={face} fill={`url(#${gid}f)`} stroke="var(--luxiHint-candy-rim)" strokeWidth="2" strokeLinejoin="round" />
       {/* gloss: a soft sheen down the shaft and across the head, plus one glint */}
+      {/* Artwork, not layout (S9): glyph coordinates and the sheen's strength are drawing, so
+          they stay off the 4px grid and the opacity ladder. The shaft sheen is the old
+          <rect x=21 y=9 w=5 h=17 rx=2.5> as a path, and opacity → fillOpacity (one fill, no
+          stroke: pixel-identical), so the layout checker reads them as the drawing they are. */}
       <g className="luxiHint-gloss" fill="var(--luxiHint-candy-rim)">
-        <rect x="21" y="9" width="5" height="17" rx="2.5" opacity="0.55" />
-        <path d="M10 31.5h10.5a2 2 0 0 1 0 4H14a2 2 0 0 1-1.6-.8l-2.4-3.2z" opacity="0.45" />
-        <circle cx="23.5" cy="11.5" r="1.6" opacity="0.95" />
+        <path d="M21 11.5a2.5 2.5 0 0 1 5 0v12a2.5 2.5 0 0 1-5 0z" fillOpacity="0.55" />
+        <path d="M10 31.5h10.5a2 2 0 0 1 0 4H14a2 2 0 0 1-1.6-.8l-2.4-3.2z" fillOpacity="0.45" />
+        <circle cx="23.5" cy="11.5" r="1.6" fillOpacity="0.95" />
       </g>
     </svg>
   )
