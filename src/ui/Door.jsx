@@ -228,7 +228,7 @@ function QuestCard({ quest }) {
    Status indicator = a live state about HER ("Last played", 10.37:1, top-left):
    a green dot that breathes (motion-pulse). Colours = Luxi's own door-badge / door-status
    tokens (same values as Datum's, 10-21: no Datum component tokens on Luxi elements). ── */
-const pill = { display: 'inline-flex', alignItems: 'center', gap: 'var(--space-1, 4px)', height: 20, padding: '0 var(--space-2, 8px)', borderRadius: 9999, borderWidth: 1, borderStyle: 'solid', fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' }
+const pill = { display: 'inline-flex', alignItems: 'center', gap: 4, height: 20, padding: '0 8px', borderRadius: 9999, borderWidth: 1, borderStyle: 'solid', fontSize: 'var(--text-xs)', lineHeight: 'var(--text-xs--line-height)', fontWeight: 'var(--font-weight-medium)', whiteSpace: 'nowrap' }
 const badgeS = {
   new: { background: 'var(--luxi-color-component-door-badge-new-background)', borderColor: 'var(--luxi-color-component-door-badge-new-border)', color: 'var(--luxi-color-component-door-badge-new-text)' },
 }
@@ -248,7 +248,7 @@ function StatusIndicator({ children, style }) {
     </span>
   )
 }
-const corner = { position: 'absolute', top: 'var(--space-3, 12px)', zIndex: 2 }
+const corner = { position: 'absolute', top: 12, zIndex: 2 }
 
 /* ── what's new — a full-bleed manual carousel (Amy 2026-10-06): the image fills
    the card, "What's new" + the tag ride on it as pills, one arrow each side, no
@@ -296,7 +296,7 @@ function WhatsNew({ map, onPlay, onResume }) {
             <button key={k} className="doorNew-slide" style={newS.slide} onClick={open} aria-roledescription="slide" aria-label={`What's new, ${k + 1} of ${n}: ${isFresh(u) ? 'New, ' : ''}${u.title}`} tabIndex={k === i ? 0 : -1} inert={k !== i} aria-hidden={k !== i || undefined}>
               <span style={{ ...newS.media, ...(w ? worldThumb(w.tint) : null), position: 'relative' }}>
                 {w?.art && <img src={w.art} alt="" style={newS.img} loading="lazy" />}
-                {isFresh(u) && <Badge variant="new" style={{ ...corner, right: 'var(--space-3, 12px)' }}>New</Badge>}
+                {isFresh(u) && <Badge variant="new" style={{ ...corner, right: 12 }}>New</Badge>}
               </span>
               <span style={newS.text}>
                 <span style={newS.sTitle}>What’s new</span>
@@ -335,8 +335,8 @@ function WorldCard({ world, current, locked, together, onPlay, onResume }) {
   return (
     <div style={cardS.card}>
       <div style={cardS.thumb}>
-        {WORLD_NEW[world.id] && !locked && <Badge variant="new" style={{ ...corner, right: 'var(--space-3, 12px)' }}>New</Badge>}
-        {current && !locked && <StatusIndicator style={{ ...corner, left: 'var(--space-3, 12px)' }}>Last played</StatusIndicator>}
+        {WORLD_NEW[world.id] && !locked && <Badge variant="new" style={{ ...corner, right: 12 }}>New</Badge>}
+        {current && !locked && <StatusIndicator style={{ ...corner, left: 12 }}>Last played</StatusIndicator>}
         <div style={worldThumb(world.tint)}>
           {world.art && <img src={world.art} alt="" style={cardS.thumbImg} loading="lazy" />}
         </div>
